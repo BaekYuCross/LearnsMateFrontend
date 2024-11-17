@@ -190,6 +190,7 @@
   
   <style scoped>
   .filter-card {
+    margin-top: 50px;
     margin-bottom: 1rem;
     background-color: white;
     border-radius: 0.5rem;

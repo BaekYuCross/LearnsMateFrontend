@@ -35,17 +35,17 @@
 
     const menus = ref([
         {
-        name: '강사',
+        name: '학생',
         submenus: [
-            { name: '강사 조회', path: '/member' },
-            { name: '강사 블랙리스트', path: '/tutor-blacklist' },
+            { name: '학생 조회', path: '/member' },
+            { name: '학생 블랙리스트', path: '/student-blacklist' },
         ],
         },
         {
-        name: '학생',
+        name: '강사',
         submenus: [
-            { name: '학생 조회', path: '/student' },
-            { name: '학생 블랙리스트', path: '/student-blacklist' },
+            { name: '강사 조회', path: '/tutor' },
+            { name: '강사 블랙리스트', path: '/tutor-blacklist' },
         ],
         },
     ]);
