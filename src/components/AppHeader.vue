@@ -55,7 +55,7 @@
   <style scoped>
   .header-container {
     width: 100%;
-    height: 66px;
+    height: 50px;
     background-color: #ffffff;
     border-bottom: 3px solid #005950;
   }
@@ -99,8 +99,8 @@
     white-space: nowrap;
     padding-left: 40px;
     padding-right: 40px;
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 25px;
+    padding-bottom: 25px;
     position: relative;
     width: 52px;
     height: 44.6px;
@@ -113,7 +113,6 @@
     color: #FFFFFF;
     background-color: #005950;
     margin-bottom: -3px;
-    border-bottom: 3px solid #005950;
   }
   
   .icon-section {

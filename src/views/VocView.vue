@@ -1,10 +1,12 @@
 <template>
     <div class="voc-container">
-      <h1>VOC 페이지</h1>
+      <VOCSideMenu/>
     </div>
   </template>
   
   <script setup>
+import VOCSideMenu from '@/components/sideMenu/VOCSideMenu.vue';
+
   </script>
   
   <style scoped>

@@ -1,10 +1,11 @@
 <template>
     <div class="lecture-container">
-      <h1>강의 페이지</h1>
+      <LectureSideMenu/>
     </div>
   </template>
   
   <script setup>
+    import LectureSideMenu from '@/components/sideMenu/LectureSideMenu.vue';
   </script>
   
   <style scoped>
