@@ -1,10 +1,11 @@
 <template>
     <div class="marketing-container">
-      <h1>마케팅 페이지</h1>
+      <MarketingSideMenu/>
     </div>
   </template>
   
   <script setup>
+  import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   </script>
   
   <style scoped>

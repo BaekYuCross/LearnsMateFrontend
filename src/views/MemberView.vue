@@ -1,10 +1,11 @@
 <template>
     <div class="member-container">
-      <h1>고객 페이지</h1>
+      <MemberSideMenu/>
     </div>
   </template>
   
   <script setup>
+    import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
   </script>
   
   <style scoped>
