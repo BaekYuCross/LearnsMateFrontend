@@ -70,6 +70,7 @@
         display: flex;
         flex-direction: column;
         padding-top: 20px;
+        z-index: 100;
     }
 
 
