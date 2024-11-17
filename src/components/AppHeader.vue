@@ -58,6 +58,7 @@
     height: 50px;
     background-color: #ffffff;
     border-bottom: 3px solid #005950;
+    position: fixed;
   }
   
   .nav-container {
