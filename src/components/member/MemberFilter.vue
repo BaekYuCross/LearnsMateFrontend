@@ -15,17 +15,41 @@
   
       <div class="filter-container">
         <!-- 첫째 줄 - 회색 배경 -->
+         
         <div class="filter-row gray">
-          <div class="filter-item">
-            <span class="filter-label">이름</span>
+        <div class="filter-item">
+            <span class="filter-label">학생 코드</span>
             <input 
-              v-model="filters.name"
-              type="text" 
-              placeholder="이름을 입력하세요"
+                v-model="filters.code"
+                type="text" 
+                placeholder="학생 코드를 입력하세요"
+                class="filter-input"
+            />
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">학생 이름</span>
+            <input 
+                v-model="filters.name"
+                type="text" 
+                placeholder="학생 이름을 입력하세요"
+                class="filter-input"
+            />
+        </div>
+        <div class="filter-item">
+            <span class="filter-label">이메일</span>
+            <input 
+              v-model="filters.email"
+              type="email" 
+              placeholder="이메일을 입력하세요"
               class="filter-input"
             />
           </div>
-          <div class="filter-item">
+        </div>
+  
+        <!-- 둘째 줄 - 흰색 배경 -->
+        <div class="filter-row white">
+            
+          <div class="filter-item"> <!-- 1번 -->
             <span class="filter-label">연락처</span>
             <input 
               v-model="filters.phone"
@@ -34,20 +58,36 @@
               class="filter-input"
             />
           </div>
-          <div class="filter-item">
-            <span class="filter-label">수준</span>
+          <div class="filter-item"> <!-- 2번 -->
+            <span class="filter-label">주소</span>
             <input 
-              v-model="filters.level"
-              type="text"
-              placeholder="수준을 입력하세요"
+              v-model="filters.address"
+              type="text" 
+              placeholder="주소를 입력하세요"
               class="filter-input"
             />
           </div>
+
+          <div class="filter-item"> <!-- 3번 -->
+            <span class="filter-label">나이</span>
+            <input 
+              v-model="filters.startAge"
+              type="text"
+              placeholder="시작 나이를 입력해주세요"
+              class="filter-input"
+            />
+            <span class="date-separator">~</span>
+            <input 
+                v-model="filters.endAge"
+                type="text" 
+                placeholder="끝 나이를 입력해주세요"
+                class="filter-input"
+            />
+          </div>
         </div>
-  
-        <!-- 둘째 줄 - 흰색 배경 -->
-        <div class="filter-row white">
-          <div class="filter-item">
+        <!-- 셋째 줄 - 회색 배경 -->
+        <div class="filter-row gray">
+            <div class="filter-item"> <!-- 1번 -->
             <span class="filter-label">생년월일</span>
             <div class="date-range-container">
               <input 
@@ -63,29 +103,20 @@
               />
             </div>
           </div>
-          <div class="filter-item">
-            <span class="filter-label">이메일</span>
-            <input 
-              v-model="filters.email"
-              type="email"
-              placeholder="이메일을 입력하세요"
-              class="filter-input"
-            />
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">상태</span>
-            <input 
-              v-model="filters.status"
-              type="text"
-              placeholder="상태를 입력하세요"
-              class="filter-input"
-            />
-          </div>
-        </div>
-  
-        <!-- 셋째 줄 - 회색 배경 -->
-        <div class="filter-row gray">
-          <div class="filter-item">
+
+          <div class="filter-item"> <!-- 2번 -->
+                <span class="filter-label">계정상태</span> 
+                <select 
+                v-model="filters.memberFlag"
+                class="filter-input"
+                >
+                <option value="">전체</option>
+                <option value="Y">활성</option>
+                <option value="N">비활성</option>
+                </select>
+            </div>
+          
+          <div class="filter-item"> <!-- 3번 -->
             <span class="filter-label">생성일</span>
             <div class="date-range-container">
               <input 
@@ -101,46 +132,46 @@
               />
             </div>
           </div>
-          <div class="filter-item">
-            <span class="filter-label">나이</span>
-            <input 
-              v-model="filters.age"
-              type="text"
-              placeholder="나이를 입력하세요"
-              class="filter-input"
-            />
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">계정상태</span>
-            <select 
-              v-model="filters.memberFlag"
-              class="filter-input"
-            >
-              <option value="">전체</option>
-              <option value="Y">활성</option>
-              <option value="N">비활성</option>
-            </select>
-          </div>
+
+        </div>
+        
+        <!-- 넷째 줄 - 흰색 배경 -->
+        <div class="filter-row white">
+            <div class="filter-item partial-width"> <!-- 2번 -->
+                <span class="filter-label">휴면 상태</span> 
+                <select 
+                v-model="filters.dromantFlag"
+                class="filter-input"
+                >
+                <option value="">전체</option>
+                <option value="Y">휴면</option>
+                <option value="N">비휴면</option>
+                </select>
+            </div>
+        </div>
+
+
         </div>
       </div>
-    </div>
   </template>
   
   <script setup>
   import { ref } from 'vue'
   
   const filters = ref({
+    code: '',
     name: '',
-    phone: '',
-    level: '',
     email: '',
-    status: '',
-    age: '',
+    phone: '',
+    address: '',
+    startAge: '',
+    endAge: '',
     startBirDate: '',
     endBirDate: '',
+    memberFlag: '',
     startCreateDate: '',
     endCreateDate: '',
-    memberFlag: ''
+    dromantFlag: ''
   })
   
   const emit = defineEmits(['search', 'reset'])
@@ -204,7 +235,12 @@
     display: flex;
     align-items: center;
   }
-  
+
+  .partial-width {
+    width: 33.33%;
+    flex: 0 0 33.33%;
+  }
+
   .filter-label {
     width: 5rem;
     font-size: 0.875rem;
