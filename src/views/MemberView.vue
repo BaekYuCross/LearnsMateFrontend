@@ -1,10 +1,13 @@
 <template>
     <div class="member-container">
-      <h1>고객 페이지</h1>
+      <MemberFilter/>
     </div>
   </template>
   
   <script setup>
+
+import MemberFilter from '@/components/member/MemberFilter.vue';
+
   </script>
   
   <style scoped>
