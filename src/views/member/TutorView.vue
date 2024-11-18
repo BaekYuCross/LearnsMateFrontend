@@ -89,12 +89,6 @@
               </button>
             </div>
           </div>
-  
-          <Transition 
-            name="tutor-slide-fade"
-            @before-enter="loadTutorDetail"
-            @enter="onEnter"
-          >
           <div v-if="selectedTutor" class="tutor-detail-container">
             <div class="tutor-detail-content">
               <h3>상세 정보</h3>
@@ -149,7 +143,6 @@
               </div>
             </div>
           </div>
-      </Transition>
     </div>
   </div>
   </div>
@@ -276,24 +269,66 @@ isLoading.value = false;
   // }
 }
 
-  const onEnter = (el, done) => {
-    // transition 완료 후 호출될 콜백
-    done()
-  }
-
-
   const showDetail = (tutor) => {
     if (selectedTutor.value?.code === tutor.code) {
       selectedTutor.value = null;
       tutorDetail.value = null;
     } else {
       selectedTutor.value = tutor
+
+    // loadTutorDetail 로직 통합
+    isLoading.value = true;
+    tutorDetail.value = null;
+    
+    tutorDetail.value = {
+      memberDTO: {
+        name: "김용승",
+        email: "dhkdkd12@gmail.com",
+        phone: "010-9090-2020",
+        birthDate: "2002-02-06",
+        address: "서울특별시 강남구 선릉로 627"
+      },
+      tutorLectureDetailList: [
+        {
+          lectureCode: "LEC001",
+          lectureTitle: "백엔드 고수가 되기싶은자, 나에게로 - 42강",
+          videoCount: 42,
+          totalStudents: 328
+        },
+        {
+          lectureCode: "LEC002",
+          lectureTitle: "자바(JAVA)를 잡아보자 - 40강",
+          videoCount: 40,
+          totalStudents: 256
+        },
+        {
+          lectureCode: "LEC003",
+          lectureTitle: "자바를 기초부터! JAVA BASIC - 22강",
+          videoCount: 22,
+          totalStudents: 415
+        },
+        {
+          lectureCode: "LEC004",
+          lectureTitle: "스프링부트 마스터 클래스 - 35강",
+          videoCount: 35,
+          totalStudents: 281
+        }
+      ]
+    };
+    
+    isLoading.value = false;
+    
+    // API 연동 시에는 아래 코드 사용
+    // try {
+    //   const response = await axios.get(`/tutor/${selectedTutor.value.code}`)
+    //   tutorDetail.value = response.data
+    // } catch (error) {
+    //   console.error('Failed to load tutor detail:', error)
+    // } finally {
+    //   isLoading.value = false
+    // }
     }
   }
-
-
-
-
 
   </script>
   <style scoped>
@@ -324,9 +359,8 @@ isLoading.value = false;
   align-items: center;
   padding: 10px 10px 10px 20px;
   width: 100%;
-  transition: all 0.4s ease-in-out;
   white-space: nowrap; /* 줄바꿈 방지 */
-  background-color: #f0ecec;
+  background-color: #f8f9fa;
 }
 
   
@@ -334,7 +368,6 @@ isLoading.value = false;
     display: flex;
     gap: 20px;
     margin-top: 20px;
-    transition: all 0.3s ease;
   }
   
   .tutor-table-container {
@@ -344,28 +377,12 @@ isLoading.value = false;
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.4s ease-in-out;
   overflow-x: auto;
   }
   
   .tutor-table-container.shrink {
     flex: 0 0 50%;
   }
-
-  .tutor-slide-fade-enter-active {
-   transition: all 0.3s ease-out;
-  }
-
-  .tutor-slide-fade-leave-active {
-   transition: all 0.3s ease-in;
-  }
-
-  .tutor-slide-fade-enter-from,
-  .tutor-slide-fade-leave-to {
-   transform: translateX(20px);
-   opacity: 0;
-  }
-  
 
   .tutor-detail-container {
   flex: 0 0 40%; /* 50%에서 40%로 변경 */
