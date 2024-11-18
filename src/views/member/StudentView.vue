@@ -258,7 +258,7 @@ table {
 
 th, td {
   padding: 12px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #e2e8f0;
   white-space: nowrap; /* 각 셀의 텍스트도 줄바꿈 방지 */
 }
