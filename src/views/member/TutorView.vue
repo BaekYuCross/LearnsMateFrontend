@@ -12,9 +12,12 @@
         />
   
         <!-- 전체 강사 수 표시 -->
-        <div class="tutor-count">
-          전체 강사 수 <span class="tutor-count-number">{{ tutors.length }}</span>명
+        <div class="header-container">
+        <div class="tutor-count">전체 강사 수 <span class="count-number">{{ tutors.length }}</span>명</div>
+        <div class="tutor-button-group">
+          <button class="tutor-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
         </div>
+      </div>
         
         <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
           <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
@@ -179,7 +182,6 @@
     }
   }
   </script>
-  
   <style scoped>
   .tutor-layout-container {
     display: flex;
@@ -200,6 +202,14 @@
     padding: 20px;
     background-color: #f8f9fa;
     min-height: 100vh;
+  }
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -15px;
+    margin-top: 20px;
   }
   
   .tutor-content-section {
@@ -255,6 +265,11 @@
     text-align: center;
     border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
+    font-size: 11px;
+  }
+  
+  th {
+    font-size: 13px;
   }
   
   .tutor-selected {
@@ -323,15 +338,33 @@
   }
   
   .tutor-count {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: bold;
-    margin-left: 10px;
-    margin-bottom: -15px;
     color: #333;
   }
   
-  .tutor-count-number {
+  .count-number {
     color: #006D5C;
     font-weight: bold;
+  }
+  
+  .tutor-button-group {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .tutor-excel-button {
+    background: #005950;
+    padding: 2px 5px;
+    margin-bottom: 3px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .tutor-excel-button img {
+    width: 16px;
+    height: 16px;
   }
   </style>
