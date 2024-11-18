@@ -1,8 +1,15 @@
 <template>
   <div class="marketing-container">
     <MarketingSideMenu />
+    <CampaignFilter/>
     <div class="content-container">
+      <div class="campaign-actions">
       <div class="campaign-count">등록된 캠페인 <span class="campaign-length">{{ campaigns.length }}</span>개</div>
+      <div class="campaign-button-group">
+        <button class="campaign-register-button">캠페인 등록</button>
+        <button class="campaign-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+    </div>
+    </div>
       <div class="board-container">
         <div class="board-header">
           <div class="board-header-number">캠페인 번호</div>
@@ -56,6 +63,7 @@
   <script setup>
   import { ref, computed } from 'vue';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
+  import CampaignFilter from '@/components/member/CampaignFilter.vue';
 
   const campaigns = [
     {
@@ -293,25 +301,26 @@
 
 ];
 
-const currentPage = ref(1);
-const pageSize = 15;
+  const currentPage = ref(1);
+  const pageSize = 15;
 
-const totalPages = computed(() => Math.ceil(campaigns.length / pageSize));
+  const totalPages = computed(() => Math.ceil(campaigns.length / pageSize));
 
-const paginatedCampaigns = computed(() =>
-  campaigns.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-);
+  const paginatedCampaigns = computed(() =>
+    campaigns.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+  );
 
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
+  const changePage = (page) => {
+    if (page > 0 && page <= totalPages.value) {
+      currentPage.value = page;
+    }
 };
   </script>
   
   <style scoped>
     .marketing-container {
       display: flex;
+      flex-direction: column;
       padding: 20px;
     }
     
@@ -321,13 +330,32 @@ const changePage = (page) => {
       margin-left: 160px;
       margin-top: 50px;
     }
+
+    .campaign-actions {
+      display: flex;
+    }
     
     .campaign-count {
+      flex: 1;
       font-size: 17px;
       font-weight: bold;
-      margin-top: 20px;
       margin-bottom: 5px;
       color: #333;
+    }
+    
+    .campaign-button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .campaign-register-button, .campaign-excel-button {
+      background: #005950;
+      padding: 2px 5px;
+      margin-bottom: 3px;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 13px;
     }
 
     .campaign-length {
