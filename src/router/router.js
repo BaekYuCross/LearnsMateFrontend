@@ -19,7 +19,12 @@ const routes = [
   {
     path: '/marketing',
     name: 'Marketing',
-    component: () => import('../views/MarketingView.vue')
+    component: () => import('../views/marketing/MarketingView.vue'),
+  },
+  {
+    path: '/marketing/register-campaign',
+    name: 'Register-campaign',
+    component: () => import('../views/marketing/CampaignRegisterPage.vue'),
   },
   {
     path: '/voc',
