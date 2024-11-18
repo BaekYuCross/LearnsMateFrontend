@@ -40,7 +40,7 @@
   const menus = ref([
     { name: '메인', path: '/main' },
     { name: '강의', path: '/lecture' },
-    { name: '고객', path: '/member' },
+    { name: '고객', path: '/student' },
     { name: '마케팅', path: '/marketing' },
     { name: 'VOC', path: '/voc' }
   ]);
