@@ -1,6 +1,9 @@
 <template>
     <div class="marketing-container">
+        <div class="filter-container">
     <MarketingSideMenu/>
+    <CouponFilter @search="applyFilters"/>
+</div>
     <div class="content-container">
       <div class="coupon-count">등록된 쿠폰 <span class="coupon-length">{{ coupons.length }}</span>개</div>
       <div class="board-container">
@@ -61,7 +64,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
+import CouponFilter from '@/components/marketing/CouponFilter.vue';
 
 const coupons = [
     {
@@ -72,10 +77,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -87,10 +92,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -102,10 +107,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -117,10 +122,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -132,10 +137,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -147,10 +152,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -162,10 +167,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -177,10 +182,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -192,10 +197,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -207,10 +212,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -222,10 +227,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -237,10 +242,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -252,10 +257,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -267,10 +272,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -282,10 +287,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -297,10 +302,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -312,10 +317,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -327,10 +332,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -342,10 +347,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -357,10 +362,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -372,40 +377,10 @@ const coupons = [
       discountRate: "10",
       type: "일반",
       status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
-      admin: "이서현",
-      tutor: ""
-    },
-    {
-      id: 1,
-      code: "C001-20241118eidj23isjle",
-      name: "10% 일반 할인",
-      contents: "일반 할인쿠폰입니다.",
-      discountRate: "10",
-      type: "일반",
-      status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
-      admin: "이서현",
-      tutor: ""
-    },
-    {
-      id: 1,
-      code: "C001-20241118eidj23isjle",
-      name: "10% 일반 할인",
-      contents: "일반 할인쿠폰입니다.",
-      discountRate: "10",
-      type: "일반",
-      status: "O",
-      startDate: "2024-11-01T00:00:00",
-      expireDate: "2024-11-30T00:00:00",
-      createdAt: "2024-10-031T00:00:00",
-      updatedAt: "2024-10-031T00:00:00",
+      startDate: "2024-11-01",
+      expireDate: "2024-11-30",
+      createdAt: "2024-10-031",
+      updatedAt: "2024-10-031",
       admin: "이서현",
       tutor: ""
     },
@@ -426,26 +401,42 @@ const changePage = (page) => {
   }
 };
 
+const applyFilters = async (filters) => {
+  try {
+    const response = await axios.post('/api/coupons/filter', filters);
+    coupons.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
+    currentPage.value = 1; // 필터링 후 첫 페이지로 이동
+  } catch (error) {
+    console.error('Error fetching filtered coupons:', error);
+  }
+};
+
 </script>
 
 <style>
     .marketing-container {
       display: flex;
       padding: 20px;
+      flex-direction: column;
     }
+
+    .filter-container {
+      display: block;
+      margin-bottom:5px;
+      position: relative;
+}
     
     .content-container {
       display: block;
       flex-grow: 1;
       margin-left: 160px;
-      margin-top: 50px;
     }
     
     .coupon-count {
       font-size: 17px;
       font-weight: bold;
-      margin-top: 20px;
-      margin-bottom: 5px;
+      margin-top: 10px;
+      margin-bottom: 10px;
       color: #333;
     }
 
@@ -467,6 +458,12 @@ const changePage = (page) => {
       color: #595656;
       text-align: center;
     }
+
+    .board-header > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
     
     .board-body {
       display: flex;
@@ -483,6 +480,12 @@ const changePage = (page) => {
       text-align: center;
     }
     
+    .board-row > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
     .board-row:hover {
       background-color: #f4f4f4;
     }
