@@ -130,15 +130,29 @@ const changePage = (page) => {
 }
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString)
+  if (!dateString) {
+    return '-';
+  }
+
+  const isoDateString = dateString.replace(' ', 'T');
+
+  const date = new Date(isoDateString);
+  if (isNaN(date.getTime())) {
+    console.error('유효하지 않은 날짜 포맷:', dateString);
+    return '-';
+  }
+
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
-}
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date);
+};
+
+
 
 const getStatusClass = (status) => {
   return {
