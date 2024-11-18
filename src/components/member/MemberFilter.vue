@@ -21,8 +21,8 @@
             <input v-model="filters.code" type="text" placeholder="학생 코드를 입력하세요" class="filter-input"/>
           </div>
           <div class="filter-item">
-            <span class="filter-label">학생 이름</span>
-            <input v-model="filters.name" type="text" placeholder="학생 이름을 입력하세요" class="filter-input"/>
+            <span class="filter-label">학생명</span>
+            <input v-model="filters.name" type="text" placeholder="학생명을 입력하세요" class="filter-input"/>
           </div>
           <div class="filter-item">
             <span class="filter-label">이메일</span>
