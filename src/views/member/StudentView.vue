@@ -6,7 +6,11 @@
     </div>
     <div class="main-content">
       <!-- 필터 -->
-      <MemberFilter/>
+      <MemberFilter 
+        type="student" 
+        @search="handleSearch" 
+        @reset="handleReset"
+      />
 
       <!-- 전체 학생 수 표시 -->
       <div class="student-count">

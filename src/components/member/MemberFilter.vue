@@ -1,7 +1,7 @@
 <template>
     <div class="filter-card">
       <div class="section-header">
-        <h2 class="section-title">학생</h2>
+        <h2 class="section-title">{{ title }}</h2>
         <div class="button-group">
           <button @click="search" class="search-button">
             <i class="fas fa-search"></i>
@@ -17,12 +17,12 @@
         <!-- 첫째 줄 - 회색 배경 -->
         <div class="filter-row gray">
           <div class="filter-item">
-            <span class="filter-label">학생 코드</span>
-            <input v-model="filters.code" type="text" placeholder="학생 코드를 입력하세요" class="filter-input"/>
+            <span class="filter-label">{{ memberType }} 코드</span>
+            <input v-model="filters.code" type="text" placeholder="코드를 입력하세요" class="filter-input"/>
           </div>
           <div class="filter-item">
-            <span class="filter-label">학생명</span>
-            <input v-model="filters.name" type="text" placeholder="학생명을 입력하세요" class="filter-input"/>
+            <span class="filter-label">{{ memberType }}명</span>
+            <input v-model="filters.name" type="text" placeholder="이름을 입력하세요" class="filter-input"/>
           </div>
           <div class="filter-item">
             <span class="filter-label">이메일</span>
@@ -92,7 +92,20 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
+
+  // props 정의
+  const props = defineProps({
+    type: {
+      type: String,
+      required: true,
+      validator: (value) => ['student', 'tutor'].includes(value)
+    }
+  });
+  // 타입에 따른 표시 텍스트 계산
+  const title = computed(() => props.type === 'student' ? '학생' : '강사')
+  const memberType = computed(() => props.type === 'student' ? '학생' : '강사')
+
   
   const filters = ref({
     code: '',
