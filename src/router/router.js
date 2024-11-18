@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import MemberRouter from './member'
 
 const routes = [
   {
@@ -11,15 +12,19 @@ const routes = [
     name: 'Lecture',
     component: () => import('../views/LectureView.vue')
   },
-  {
-    path: '/member',
-    name: 'Member',
-    component: () => import('../views/MemberView.vue')
-  },
+
+  ...MemberRouter,
+
   {
     path: '/marketing',
     name: 'Marketing',
     component: () => import('../views/MarketingView.vue')
+  },
+  {
+    path: '/coupons',
+    name: 'Coupons',
+    component: () => import('../views/CouponView.vue')
+
   },
   {
     path: '/voc',
