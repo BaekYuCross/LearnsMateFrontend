@@ -6,11 +6,18 @@
     </div>
     <div class="main-content">
       <!-- 필터 -->
-      <MemberFilter/>
+      <MemberFilter 
+        type="student" 
+        @search="handleSearch" 
+        @reset="handleReset"
+      />
 
       <!-- 전체 학생 수 표시 -->
-      <div class="student-count">
-        전체 학생 수 <span class="count-number">{{ students.length }}</span>명
+      <div class="header-container">
+        <div class="student-count">전체 학생 수 <span class="count-number">{{ students.length }}</span>명</div>
+        <div class="student-button-group">
+          <button class="student-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+        </div>
       </div>
       
       <div class="content-section" :class="{ 'with-detail': selectedStudent }">
@@ -205,6 +212,14 @@ const showDetail = (student) => {
   min-height: 100vh;
 }
 
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: -15px;
+  margin-top: 20px;
+}
+
 .content-section {
   display: flex;
   gap: 20px;
@@ -261,6 +276,10 @@ th, td {
   text-align: center;
   border-bottom: 1px solid #e2e8f0;
   white-space: nowrap; /* 각 셀의 텍스트도 줄바꿈 방지 */
+  font-size: 11px;
+}
+th {
+  font-size: 13px;
 }
 
 .selected {
@@ -328,11 +347,10 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   color: #ccc;
   cursor: not-allowed;
 }
+
 .student-count {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: bold;
-  margin-left: 10px;
-  margin-bottom: -15px;
   color: #333;
 }
 
@@ -341,6 +359,25 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   font-weight: bold;
 }
 
+.student-button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.student-excel-button {
+  background: #005950;
+  padding: 2px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.student-excel-button img {
+  width: 16px;
+  height: 16px;
+}
 
 
 </style>
