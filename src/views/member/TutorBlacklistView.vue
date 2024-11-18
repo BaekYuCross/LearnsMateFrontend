@@ -11,9 +11,12 @@
         <BlacklistFilter type="tutor" @search="handleSearch" @reset="handleReset" />
   
         <!-- 전체 강사 블랙리스트 표시 -->
-        <div class="tutor-blacklist-count">
-          전체 강사 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명
+        <div class="header-container">
+        <div class="tutor-blacklist-count">전체 강사 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명</div>
+        <div class="tutor-blacklist-button-group">
+          <button class="tutor-blacklist-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
         </div>
+      </div>
   
         <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
           <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
@@ -160,9 +163,7 @@
     }
   };
   </script>
-  
   <style scoped>
-  
   .layout-container {
     display: flex;
     min-height: 100vh;
@@ -184,6 +185,14 @@
     min-height: 100vh;
   }
   
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: -15px;
+    margin-top: 20px;
+  }
+  
   .content-section {
     display: flex;
     gap: 20px;
@@ -197,15 +206,14 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     transition: all 0.4s ease-in-out;
-    overflow-x: auto; /* 수평 스크롤 추가 */
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    overflow-x: auto;
+    white-space: nowrap;
   }
   
   .table-container.shrink {
     flex: 0 0 50%;
   }
   
-  /* slide-fade -> Transition(애니메이션) 해놓은거 */
   .slide-fade-enter-from {
     transform: translateX(20px);
     opacity: 0;
@@ -216,12 +224,10 @@
     opacity: 0;
   }
   
-  /* 상세 정보 slide-fade transition 효과 */
   .slide-fade-enter-active,
   .slide-fade-leave-active {
     transition: all ease-in-out;
   }
-  /* 여기까지 */
   
   .detail-container {
     flex: 0 0 50%;
@@ -231,7 +237,7 @@
   
   table {
     width: 100%;
-    min-width: 1200px; /* 테이블 최소 너비 설정 */
+    min-width: 1200px;
     border-collapse: collapse;
   }
   
@@ -239,7 +245,12 @@
     padding: 12px;
     text-align: center;
     border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap; /* 각 셀의 텍스트도 줄바꿈 방지 */
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  
+  th {
+    font-size: 13px;
   }
   
   .selected {
@@ -264,18 +275,15 @@
   }
   
   /* 각 열의 너비 지정 */
-  th:nth-child(1), td:nth-child(1) { width: 100px; } /* 학생 코드 */
-  th:nth-child(2), td:nth-child(2) { width: 100px; } /* 이름 */
-  th:nth-child(3), td:nth-child(3) { width: 150px; } /* 이메일 */
-  th:nth-child(4), td:nth-child(4) { width: 120px; } /* 연락처 */
-  th:nth-child(5), td:nth-child(5) { width: 200px; } /* 주소 */
-  th:nth-child(6), td:nth-child(6) { width: 80px; } /* 나이 */
-  th:nth-child(7), td:nth-child(7) { width: 100px; } /* 생년월일 */
-  th:nth-child(8), td:nth-child(8) { width: 100px; } /* 계정상태 */
-  th:nth-child(9), td:nth-child(9) { width: 100px; } /* 생성일 */
-  th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
+  th:nth-child(1), td:nth-child(1) { width: 100px; }
+  th:nth-child(2), td:nth-child(2) { width: 100px; }
+  th:nth-child(3), td:nth-child(3) { width: 150px; }
+  th:nth-child(4), td:nth-child(4) { width: 120px; }
+  th:nth-child(5), td:nth-child(5) { width: 200px; }
+  th:nth-child(6), td:nth-child(6) { width: 80px; }
+  th:nth-child(7), td:nth-child(7) { width: 100px; }
+  th:nth-child(8), td:nth-child(8) { width: 100px; }
   
-  /* 페이지네이션 */
   .pagination {
     position: sticky;
     left: 0;
@@ -307,18 +315,35 @@
     color: #ccc;
     cursor: not-allowed;
   }
+  
   .tutor-blacklist-count {
-  font-size: 20px;
-  font-weight: bold;
-  margin-left: 10px;
-  margin-bottom: -15px;
-  color: #333;
-}
+    font-size: 17px;
+    font-weight: bold;
+    color: #333;
+  }
+  
   .count-number {
     color: #006D5C;
     font-weight: bold;
   }
   
+  .tutor-blacklist-button-group {
+    display: flex;
+    gap: 10px;
+  }
   
+  .tutor-blacklist-excel-button {
+    background: #005950;
+    padding: 2px 5px;
+    margin-bottom: 3px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+  }
   
+  .tutor-blacklist-excel-button img {
+    width: 16px;
+    height: 16px;
+  }
   </style>
