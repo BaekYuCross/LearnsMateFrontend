@@ -8,7 +8,7 @@
     <!-- 메인 컨텐츠-->
     <div class="main-content">
       <!--블랙리스트 필터-->
-      <BlacklistFilter/>
+      <BlacklistFilter type="student" @search="handleSearch" @reset="handleReset" />
 
       <!-- 전체 학생 블랙리스트 표시 -->
       <div class="student-blacklist-count">

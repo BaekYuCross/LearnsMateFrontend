@@ -1,68 +1,97 @@
 <template>
-    <div class="filter-card">
-      <div class="section-header">
-        <h2 class="section-title">블랙리스트</h2>
-        <div class="button-group">
-          <button @click="search" class="search-button">
-            <i class="fas fa-search"></i>
-            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-          </button>
-          <button @click="reset" class="reset-button">
-            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
-          </button>
+  <div class="filter-card">
+    <div class="section-header">
+      <h2 class="section-title">블랙리스트</h2>
+      <div class="button-group">
+        <button @click="search" class="search-button">
+          <i class="fas fa-search"></i>
+          <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+        </button>
+        <button @click="reset" class="reset-button">
+          <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-container">
+      <!-- 첫째 줄 - 회색 배경 -->
+      <div class="filter-row gray">
+        <div class="filter-item">
+          <span class="filter-label">블랙 코드</span>
+          <input 
+            v-model="filters.blackCode" 
+            type="text" 
+            placeholder="블랙리스트 코드를 입력하세요" 
+            class="filter-input"
+          />
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">{{ memberType }} 코드</span>
+          <input 
+            v-model="filters.memberCode" 
+            type="text" 
+            :placeholder="`${memberType} 코드를 입력하세요`" 
+            class="filter-input"
+          />
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">{{ memberType }}명</span>
+          <input 
+            v-model="filters.memberName" 
+            type="text" 
+            :placeholder="`${memberType}명을 입력하세요`" 
+            class="filter-input"
+          />
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">이메일</span>
+          <input 
+            v-model="filters.memberEmail" 
+            type="email" 
+            placeholder="이메일을 입력하세요" 
+            class="filter-input"
+          />
         </div>
       </div>
-  
-      <div class="filter-container">
-        <!-- 첫째 줄 - 회색 배경 -->
-        <div class="filter-row gray">
-          <div class="filter-item">
-            <span class="filter-label">블랙 코드</span>
-            <input v-model="filters.blackCode" type="text" placeholder="블랙리스트 코드를 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">학생 코드</span>
-            <input v-model="filters.memberCode" type="text" placeholder="학생 코드를 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">학생명</span>
-            <input v-model="filters.memberName" type="text" placeholder="학생명을 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">이메일</span>
-            <input v-model="filters.memberEmail" type="email" placeholder="이메일을 입력하세요" class="filter-input"/>
-          </div>
-        </div>
+    </div>
+  </div>
+</template>
 
+<script setup>
+import { ref, computed } from 'vue'
 
+// type prop 정의
+const props = defineProps({
+  type: {
+    type: String,
+    required: true,
+    validator: (value) => ['student', 'tutor'].includes(value)
+  }
+})
 
-        </div>
-      </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  
-  const filters = ref({
-    blackCode: '',
-    memberCode: '',
-    memberName: '',
-    memberEmail: '',
+// 멤버 타입 계산
+const memberType = computed(() => props.type === 'student' ? '학생' : '강사')
+
+const filters = ref({
+  blackCode: '',
+  memberCode: '',
+  memberName: '',
+  memberEmail: '',
+})
+
+const emit = defineEmits(['search', 'reset'])
+
+const search = () => {
+  emit('search', filters.value)
+}
+
+const reset = () => {
+  Object.keys(filters.value).forEach(key => {
+    filters.value[key] = ''
   })
-  
-  const emit = defineEmits(['search', 'reset'])
-  
-  const search = () => {
-    emit('search', filters.value)
-  }
-  
-  const reset = () => {
-    Object.keys(filters.value).forEach(key => {
-      filters.value[key] = ''
-    })
-    emit('reset')
-  }
-  </script>
+  emit('reset')
+}
+</script>
   
   <style scoped>
 .filter-card {
