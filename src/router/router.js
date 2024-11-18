@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/member',
     name: 'Member',
-    component: () => import('../views/MemberView.vue')
+    component: () => import('../views/member/MemberView.vue')
   },
   {
     path: '/marketing',
