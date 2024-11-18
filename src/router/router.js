@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import MemberRouter from './member'
+import MarketingRouter from './marketing'
 
 const routes = [
   {
@@ -11,25 +13,25 @@ const routes = [
     name: 'Lecture',
     component: () => import('../views/LectureView.vue')
   },
-  {
-    path: '/member',
-    name: 'Member',
-    component: () => import('../views/member/MemberView.vue')
-  },
-  {
-    path: '/marketing',
-    name: 'Marketing',
-    component: () => import('../views/marketing/MarketingView.vue'),
-  },
-  {
-    path: '/marketing/register-campaign',
-    name: 'Register-campaign',
-    component: () => import('../views/marketing/CampaignRegisterPage.vue'),
-  },
+
+  ...MemberRouter,
+  ...MarketingRouter,
+
+  // {
+  //   path: '/marketing',
+  //   name: 'Marketing',
+  //   component: () => import('../views/MarketingView.vue')
+  // },
+  // {
+  //   path: '/coupons',
+  //   name: 'Coupons',
+  //   component: () => import('../views/CouponView.vue')
+
+  // },
   {
     path: '/voc',
     name: 'VOC',
-    component: () => import('../views/VocView.vue')
+    component: () => import('../views/voc/VocView.vue')
   },
   {
     path: '/',
