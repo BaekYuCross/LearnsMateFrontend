@@ -4,19 +4,17 @@
     <div class="main-content">
       <BlacklistFilter type="student" @search="handleSearch" @reset="handleReset" />
 
-      
-      
       <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
         <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
           <!-- 전체 학생 블랙리스트 표시 -->
-            <div class="header-container">
-              <div class="student-blacklist-count">전체 학생 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명</div>
-              <div class="student-blacklist-button-group">
-                <button class="student-blacklist-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
-              </div>
+          <div class="header-container">
+            <div class="student-blacklist-count">전체 학생 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명</div>
+            <div class="student-blacklist-button-group">
+              <button class="student-blacklist-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
             </div>
-          <table>
+          </div>
 
+          <table>
             <thead>
               <tr>
                 <th>No</th>
