@@ -306,7 +306,7 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   color: #ccc;
   cursor: not-allowed;
 }
-.student-count {
+.student-blacklist-count {
   font-size: 20px;
   font-weight: bold;
   margin-left: 10px;
