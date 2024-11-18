@@ -11,16 +11,18 @@
             @reset="handleReset"
         />
   
-        <!-- 전체 강사 수 표시 -->
-        <div class="header-container">
-        <div class="tutor-count">전체 강사 수 <span class="count-number">{{ tutors.length }}</span>명</div>
-        <div class="tutor-button-group">
-          <button class="tutor-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
-        </div>
-      </div>
+        
         
         <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
           <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
+            <!-- 전체 강사 수 표시 -->
+            <div class="header-container">
+            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ tutors.length }}</span>명</div>
+            <div class="tutor-button-group">
+              <button class="tutor-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+            </div>
+            </div>
+            
             <table>
               <thead>
                 <tr>
@@ -88,38 +90,83 @@
             </div>
           </div>
   
-          <Transition name="tutor-slide-fade">
-            <div v-if="selectedTutor" class="tutor-detail-container">
-              <div class="tutor-detail-content">
-                <h3>상세 정보</h3>
-                <div class="tutor-info-grid">
+          <Transition 
+            name="tutor-slide-fade"
+            @before-enter="loadTutorDetail"
+            @enter="onEnter"
+          >
+          <div v-if="selectedTutor" class="tutor-detail-container">
+            <div class="tutor-detail-content">
+              <h3>상세 정보</h3>
+              <div class="tutor-info-grid">
+                <div class="tutor-info-item">
+                  <span class="tutor-label">강사 코드</span>
+                  <span>{{ selectedTutor.code }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">이름</span>
+                  <span>{{ selectedTutor.name }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">이메일</span>
+                  <span>{{ selectedTutor.email }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">연락처</span>
+                  <span>{{ selectedTutor.phone }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">생년월일</span>
+                  <span>{{ selectedTutor.birthDate }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">주소</span>
+                  <span>{{ selectedTutor.address }}</span>
+                </div>
+                <div class="tutor-info-item">
+                  <span class="tutor-label">총 수강생 수</span>
+                  <span>{{ tutorDetail?.tutorLectureDetailList?.reduce((sum, lecture) => sum + lecture.totalStudents, 0).toLocaleString() }}명</span>
+                </div>
+
+                <!-- 강의 목록 -->
+                <div v-if="tutorDetail?.tutorLectureDetailList?.length">
                   <div class="tutor-info-item">
-                    <span class="tutor-label">강사 코드:</span>
-                    <span>{{ selectedTutor.code }}</span>
+                    <span class="tutor-label">강의 목록</span>
                   </div>
-                  <div class="tutor-info-item">
-                    <span class="tutor-label">이름:</span>
-                    <span>{{ selectedTutor.name }}</span>
-                  </div>
-                  <!-- 다른 상세 정보들 추가 -->
+                  <ul class="lecture-list">
+                    <li v-for="lecture in tutorDetail.tutorLectureDetailList" 
+                        :key="lecture.lectureCode" 
+                        class="lecture-item">
+                      {{ lecture.lectureTitle }}, {{ lecture.videoCount }}강
+                    </li>
+                  </ul>
                 </div>
               </div>
+
+              <!-- 로딩 상태 표시 -->
+              <div v-if="isLoading" class="loading-spinner">
+                데이터를 불러오는 중...
+              </div>
             </div>
-          </Transition>
-        </div>
-      </div>
+          </div>
+      </Transition>
     </div>
-  </template>
-  
+  </div>
+  </div>
+</template>
+
   <script setup>
   import { ref, computed } from 'vue'
+  import axios from 'axios';
   import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
   import MemberFilter from '@/components/member/MemberFilter.vue';
   
   const selectedTutor = ref(null);
   const currentPage = ref(1);
   const pageSize = 15; // 한 페이지당 보여줄 항목 수
-  
+  const tutorDetail = ref(null);
+  const isLoading = ref(false);
+
   const tutors = ref([
     // 더미 데이터 예시
     {
@@ -173,14 +220,81 @@
       selectedTutor.value = null;
     }
   };
+
   
+  const loadTutorDetail = async () => {
+  if (!selectedTutor.value) return;
+  
+  isLoading.value = true;
+  tutorDetail.value = null;
+  
+  tutorDetail.value = {
+  memberDTO: {
+    name: "김용승",
+    email: "dhkdkd12@gmail.com",
+    phone: "010-9090-2020",
+    birthDate: "2002-02-06",
+    address: "서울특별시 강남구 선릉로 627"
+  },
+  tutorLectureDetailList: [
+    {
+      lectureCode: "LEC001",
+      lectureTitle: "백엔드 고수가 되기싶은자, 나에게로 - 42강",
+      videoCount: 42,
+      totalStudents: 328
+    },
+    {
+      lectureCode: "LEC002",
+      lectureTitle: "자바(JAVA)를 잡아보자 - 40강",
+      videoCount: 40,
+      totalStudents: 256
+    },
+    {
+      lectureCode: "LEC003",
+      lectureTitle: "자바를 기초부터! JAVA BASIC - 22강",
+      videoCount: 22,
+      totalStudents: 415
+    },
+    {
+      lectureCode: "LEC004",
+      lectureTitle: "스프링부트 마스터 클래스 - 35강",
+      videoCount: 35,
+      totalStudents: 281
+    }
+  ]
+};
+
+isLoading.value = false;
+
+  // try {
+  //   const response = await axios.get(`/tutor/${selectedTutor.value.code}`)
+  //   tutorDetail.value = response.data
+  // } catch (error) {
+  //   console.error('Failed to load tutor detail:', error)
+  // } finally {
+  //   isLoading.value = false
+  // }
+}
+
+  const onEnter = (el, done) => {
+    // transition 완료 후 호출될 콜백
+    done()
+  }
+
+
   const showDetail = (tutor) => {
     if (selectedTutor.value?.code === tutor.code) {
-      selectedTutor.value = null
+      selectedTutor.value = null;
+      tutorDetail.value = null;
     } else {
       selectedTutor.value = tutor
     }
   }
+
+
+
+
+
   </script>
   <style scoped>
   .tutor-layout-container {
@@ -205,12 +319,16 @@
   }
   
   .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: -15px;
-    margin-top: 20px;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 10px 10px 20px;
+  width: 100%;
+  transition: all 0.4s ease-in-out;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  background-color: #f0ecec;
+}
+
   
   .tutor-content-section {
     display: flex;
@@ -220,39 +338,44 @@
   }
   
   .tutor-table-container {
-    flex: 1;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    transition: all 0.4s ease-in-out;
-    overflow-x: auto;
-    white-space: nowrap;
+  display: flex;
+  flex-direction: column; /* 수직 방향으로 배치 */
+  flex: 1;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: all 0.4s ease-in-out;
+  overflow-x: auto;
   }
   
   .tutor-table-container.shrink {
     flex: 0 0 50%;
   }
-  
-  .tutor-slide-fade-enter-from {
-    transform: translateX(20px);
-    opacity: 0;
+
+  .tutor-slide-fade-enter-active {
+   transition: all 0.3s ease-out;
   }
-  
-  .tutor-slide-fade-leave-to {
-    transform: translateX(20px);
-    opacity: 0;
-  }
-  
-  .tutor-slide-fade-enter-active,
+
   .tutor-slide-fade-leave-active {
-    transition: all ease-in-out;
+   transition: all 0.3s ease-in;
+  }
+
+  .tutor-slide-fade-enter-from,
+  .tutor-slide-fade-leave-to {
+   transform: translateX(20px);
+   opacity: 0;
   }
   
+
   .tutor-detail-container {
-    flex: 0 0 50%;
-    opacity: 1;
-    transform: translateX(0);
-  }
+  flex: 0 0 40%; /* 50%에서 40%로 변경 */
+  opacity: 1;
+  transform: translateX(0);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
   
   table {
     width: 100%;
@@ -277,21 +400,22 @@
   }
   
   .tutor-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-top: 16px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
   
-  .tutor-info-item {
-    display: flex;
-    gap: 8px;
-  }
+.tutor-info-item {
+  display: flex;
+  gap: 20px;
+}
   
-  .tutor-label {
-    color: #64748b;
-    min-width: 80px;
-  }
+.tutor-label {
+  color: #64748b;
+  min-width: 100px; /* 레이블 너비 통일 */
+  text-align: left;
+}
   
   /* 각 열의 너비 지정 */
   th:nth-child(1), td:nth-child(1) { width: 100px; }
@@ -349,11 +473,14 @@
   }
   
   .tutor-button-group {
-    display: flex;
-    gap: 10px;
-  }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
   
   .tutor-excel-button {
+    display: flex;
+    align-items: center;
     background: #005950;
     padding: 2px 5px;
     margin-bottom: 3px;
@@ -367,4 +494,44 @@
     width: 16px;
     height: 16px;
   }
+
+
+
+  .tutor-lectures {
+  margin-top: 20px;
+}
+
+.lecture-item {
+  padding: 8px 8px 8px 100px; /* 왼쪽 패딩을 레이블과 맞춤 */
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.lecture-item {
+  padding: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.tutor-detail-content h4 {
+  margin: 20px 0 10px 0;
+  color: #64748b;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #666;
+}
+
+/* shrink 클래스가 적용될 때 헤더도 함께 줄어들도록 수정 */
+.tutor-table-container.shrink .header-container {
+  width: 100%;
+}
+
+.tutor-table-container.shrink {
+  flex: 0 0 50%;
+}
   </style>
