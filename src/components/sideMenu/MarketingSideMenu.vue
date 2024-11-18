@@ -44,7 +44,7 @@
         {
         name: '쿠폰',
         submenus: [
-            { name: '쿠폰', path: '/coupons' },
+            { name: '쿠폰', path: '/marketing/coupons' },
             { name: '발급 쿠폰', path: '/issued-coupons' },
             { name: '쿠폰 분석', path: '/coupon-analysis' },
         ],
