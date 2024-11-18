@@ -190,6 +190,7 @@
   
   <style scoped>
   .filter-card {
+    margin-top: 50px;
     margin-bottom: 1rem;
     background-color: white;
     border-radius: 0.5rem;
@@ -201,12 +202,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 5px;
     border-bottom: 1px solid #e9ecef;
   }
   
   .section-title {
-    font-size: 1.25rem;
+    font-size: 20px;
     font-weight: 500;
     margin: 0;
   }
@@ -218,7 +219,7 @@
   
   .filter-row {
     display: flex;
-    padding: 1rem;
+    padding: 5px;
     gap: 1rem;
   }
   
@@ -243,7 +244,7 @@
 
   .filter-label {
     width: 5rem;
-    font-size: 0.875rem;
+    font-size: 15px;
     font-weight: 500;
   }
   
