@@ -10,9 +10,7 @@
             @search="handleSearch" 
             @reset="handleReset"
         />
-  
-        
-        
+
         <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
           <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
             <!-- 전체 강사 수 표시 -->
