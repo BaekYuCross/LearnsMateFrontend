@@ -31,7 +31,7 @@ const routes = [
   {
     path: '/voc',
     name: 'VOC',
-    component: () => import('../views/VocView.vue')
+    component: () => import('../views/voc/VocView.vue')
   },
   {
     path: '/',

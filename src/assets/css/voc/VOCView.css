@@ -1,171 +1,186 @@
 .voc-container {
-    display: flex;
-    min-height: 100vh;
-  }
-  
-  .voc-content {
-    flex: 1;
-    padding: 1.5rem;
-    background-color: #f1f5f9;
-  }
-  
-  .voc-table-container {
-    margin: 0 0 1rem calc(160px);
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .voc-table-header {
-    padding: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .voc-table-header h2 {
-    font-size: 1.25rem;
-    font-weight: 500;
-    margin: 0;
-  }
-  
-  .voc-button-group {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .voc-excel-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background-color: #16a34a;
-    color: white;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-  }
-  
-  .voc-excel-btn:hover {
-    background-color: #15803d;
-  }
-  
-  .voc-table-wrapper {
-    overflow-x: auto;
-  }
-  
-  .voc-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .voc-table th,
-  .voc-table td {
-    padding: 0.75rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap;
-  }
-  
-  .voc-content-cell {
-    max-width: 300px;
-  }
-  
-  .voc-content-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    white-space: normal;
-  }
-  
-  .voc-analysis-cell {
-    max-width: 200px;
-  }
-  
-  .voc-analysis-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    white-space: normal;
-  }
-  
-  .voc-table th {
-    background-color: #f8f9fa;
-    font-weight: 500;
-    font-size: 0.875rem;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-  
-  .voc-status {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-  }
-  
-  .voc-status-completed {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  
-  .voc-status-pending {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
-  
-  .voc-satisfaction {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-  }
-  
-  .voc-satisfaction-high {
-    background-color: #dcfce7;
-    color: #166534;
-  }
-  
-  .voc-satisfaction-medium {
-    background-color: #fef9c3;
-    color: #854d0e;
-  }
-  
-  .voc-satisfaction-low {
-    background-color: #fee2e2;
-    color: #991b1b;
-  }
-  
-  .voc-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  
-  .voc-page-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.375rem;
-    background-color: white;
-  }
-  
-  .voc-page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .voc-page-btn:not(:disabled):hover {
-    background-color: #f8fafc;
-  }
-  
-  .voc-page-info {
-    font-size: 0.875rem;
-    color: #64748b;
-  }
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.voc-content-container {
+  display: block;
+  flex-grow: 1;
+  margin-left: 160px;
+  margin-top: 50px;
+}
+
+.voc-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.voc-count {
+  flex: 1;
+  font-size: 17px;
+  font-weight: bold;
+  color: #333;
+}
+
+.voc-length {
+  color: #005950;
+}
+
+.voc-button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.voc-register-button,
+.voc-excel-button,
+.voc-ai-button {
+  background: #005950;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
+}
+
+.voc-board-container {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.voc-board-header {
+  display: grid;
+  grid-template-columns: 0.8fr 2fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  font-size: 13px;
+  font-weight: bold;
+  color: #595656;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.voc-board-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.voc-board-row {
+  display: grid;
+  grid-template-columns: 0.8fr 2fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
+  padding: 10px 20px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 11px;
+  color: #333333;
+  text-align: center;
+  align-items: center;
+}
+
+.voc-board-row:hover {
+  background-color: #f4f4f4;
+}
+
+.voc-board-row-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  padding: 0 5px;
+}
+
+.voc-board-row-analysis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  padding: 0 5px;
+}
+
+.voc-status {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.voc-status-completed {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.voc-status-pending {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.voc-satisfaction {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.voc-satisfaction-high {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.voc-satisfaction-medium {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+.voc-satisfaction-low {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.voc-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.voc-page-button {
+  background: none;
+  border: none;
+  color: #333;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.voc-page-button.active {
+  font-weight: bold;
+  color: #005950;
+}
+
+.voc-page-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.voc-prev-button,
+.voc-next-button {
+  color: #005950;
+}
+
+.voc-prev-button:disabled,
+.voc-next-button:disabled {
+  color: #ccc;
+}
+
+.voc-excel-button img {
+  width: 16px;
+  height: 16px;
+}
