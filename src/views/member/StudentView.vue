@@ -1,10 +1,7 @@
 <template>
   <div class="layout-container">
-    <div class="side-menu">
-      <MemberSideMenu/>
-    </div>
+    <div class="side-menu"><MemberSideMenu/></div>
     <div class="main-content">
-      <!-- 필터 -->
       <MemberFilter 
         type="student" 
         @search="handleSearch" 

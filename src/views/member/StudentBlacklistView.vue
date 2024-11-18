@@ -1,26 +1,22 @@
 <template>
-  <!--전체 view 컨테이너-->
   <div class="layout-container">
-    <!--사이드 메뉴-->
-    <div class="side-menu">
-      <MemberSideMenu/>
-    </div>
-    <!-- 메인 컨텐츠-->
+    <div class="side-menu"><MemberSideMenu/></div>
     <div class="main-content">
-      <!--블랙리스트 필터-->
       <BlacklistFilter type="student" @search="handleSearch" @reset="handleReset" />
 
-      <!-- 전체 학생 블랙리스트 표시 -->
-      <div class="header-container">
-        <div class="student-blacklist-count">전체 학생 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명</div>
-        <div class="student-blacklist-button-group">
-          <button class="student-blacklist-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
-        </div>
-      </div>
+      
       
       <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
         <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
+          <!-- 전체 학생 블랙리스트 표시 -->
+            <div class="header-container">
+              <div class="student-blacklist-count">전체 학생 블랙리스트 수 <span class="count-number">{{ blacklists.length }}</span>명</div>
+              <div class="student-blacklist-button-group">
+                <button class="student-blacklist-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+              </div>
+            </div>
           <table>
+
             <thead>
               <tr>
                 <th>No</th>
@@ -81,24 +77,22 @@
           </div>
         </div>
 
-        <Transition name="slide-fade">
-          <div v-if="selectedBlacklist" class="detail-container">
-            <div class="detail-content">
-              <h3>상세 정보</h3>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">학생 코드:</span>
-                  <span>{{ selectedBlacklist.memberCode }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">이름:</span>
-                  <span>{{ selectedBlacklist.memberName }}</span>
-                </div>
-                <!-- 다른 상세 정보들 추가 -->
+        <div v-if="selectedBlacklist" class="detail-container">
+          <div class="detail-content">
+            <h3>상세 정보</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">학생 코드:</span>
+                <span>{{ selectedBlacklist.memberCode }}</span>
               </div>
+              <div class="info-item">
+                <span class="label">이름:</span>
+                <span>{{ selectedBlacklist.memberName }}</span>
+              </div>
+              <!-- 다른 상세 정보들 추가 -->
             </div>
           </div>
-        </Transition>
+        </div>
       </div>
     </div>
   </div>
@@ -190,15 +184,16 @@ const showDetail = (blacklist) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: -15px;
-  margin-top: 20px;
+  padding: 10px 10px 10px 20px;
+  width: 100%;
+  white-space: nowrap;
+  background-color: #f8f9fa;
 }
 
 .content-section {
   display: flex;
   gap: 20px;
   margin-top: 20px;
-  transition: all 0.3s ease;
 }
 
 .table-container {
@@ -206,7 +201,6 @@ const showDetail = (blacklist) => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.4s ease-in-out;
   overflow-x: auto; /* 수평 스크롤 추가 */
   white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
@@ -214,24 +208,6 @@ const showDetail = (blacklist) => {
 .table-container.shrink {
   flex: 0 0 50%;
 }
-
-/* slide-fade -> Transition(애니메이션) 해놓은거 */
-.slide-fade-enter-from {
-  transform: translateX(20px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateX(20px);
-  opacity: 0;
-}
-
-/* 상세 정보 slide-fade transition 효과 */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all ease-in-out;
-}
-/* 여기까지 */
 
 .detail-container {
   flex: 0 0 50%;
