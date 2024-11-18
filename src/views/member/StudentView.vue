@@ -18,6 +18,7 @@
           <table>
             <thead>
               <tr>
+                <th>No</th>
                 <th>학생 코드</th>
                 <th>이름</th>
                 <th>이메일</th>
@@ -32,12 +33,13 @@
             </thead>
             <tbody>
               <tr 
-                v-for="student in paginatedStudents" 
+                v-for="(student, index) in paginatedStudents" 
                 :key="student.code"
                 @click="showDetail(student)"
                 class="cursor-pointer hover:bg-gray-50"
                 :class="{ 'selected': selectedStudent?.code === student.code }"
               >
+                <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
                 <td>{{ student.code }}</td>
                 <td>{{ student.name }}</td>
                 <td>{{ student.email }}</td>
