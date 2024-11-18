@@ -2,7 +2,7 @@ const MarketingRouter = [
     {
         path: '/marketing',
         name: 'Marketing',
-        component: () => import('../views/MarketingView.vue')
+        component: () => import('../views/marketing/MarketingView.vue')
     },
     {
         path: '/marketing/coupons',
