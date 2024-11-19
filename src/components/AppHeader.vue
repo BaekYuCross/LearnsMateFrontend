@@ -1,61 +1,70 @@
 <template>
-    <header class="header-container">
-      <nav class="nav-container">
-        <div class="logo-section">
-          <h1>LearnsMate</h1>
-        </div>
-  
-        <div class="menu-section">
-          <ul class="menu-list">
-            <li 
-              v-for="menu in menus" 
-              :key="menu.path"
-              class="menu-item"
-              :class="{ 'active': currentGroup === menu.group }"
-              @click="navigateTo(menu.path)"
-            >
-              {{ menu.name }}
-            </li>
-          </ul>
-        </div>
-  
-        <div class="icon-section">
-          <img src="@/assets/icons/account.svg" alt="계정" class="icon">
-          <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-          <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon">
-          <img src="@/assets/icons/search.svg" alt="검색" class="icon">
-          <img src="@/assets/icons/settings.svg" alt="설정" class="icon">
-        </div>
-      </nav>
-    </header>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
-  
-  const router = useRouter();
-  const route = useRoute();
-  
-  const menus = ref([
-    { name: '메인', path: '/main', group: 'main' },
-    { name: '강의', path: '/lecture', group: 'lecture' },
-    { name: '고객', path: '/student', group: 'student' },
-    { name: '마케팅', path: '/marketing', group: 'marketing' },
-    { name: 'VOC', path: '/voc', group: 'voc' },
-  ]);
+  <header class="header-container">
+    <nav class="nav-container">
+      <div class="logo-section">
+        <h1>LearnsMate</h1>
+      </div>
 
-  const currentGroup = computed(() => {
-    const matchedMenu = menus.value.find(menu => route.path.startsWith(menu.path));
-    return matchedMenu ? matchedMenu.group : null;
+      <div class="menu-section">
+        <ul class="menu-list">
+          <li 
+            v-for="menu in menus" 
+            :key="menu.path"
+            class="menu-item"
+            :class="{ 'active': currentGroup === menu.group }"
+            @click="navigateTo(menu.path)"
+          >
+            {{ menu.name }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="icon-section">
+        <img src="@/assets/icons/account.svg" alt="계정" class="icon">
+        <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon">
+        <img src="@/assets/icons/search.svg" alt="검색" class="icon">
+        <img src="@/assets/icons/settings.svg" alt="설정" class="icon">
+      </div>
+    </nav>
+  </header>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+
+const menus = ref([
+  { name: '메인', path: '/main', group: 'main' },
+  { name: '강의', path: '/lecture', group: 'lecture' },
+  { 
+    name: '고객', 
+    path: '/student', 
+    group: 'member',
+    includePaths: ['/student', '/tutor']
+  },
+  { name: '마케팅', path: '/marketing', group: 'marketing' },
+  { name: 'VOC', path: '/voc', group: 'voc' },
+]);
+
+const currentGroup = computed(() => {
+  const currentPath = route.path;
+  const matchedMenu = menus.value.find(menu => {
+      if (menu.includePaths) {
+          return menu.includePaths.some(path => currentPath.startsWith(path));
+      }
+      return currentPath.startsWith(menu.path);
   });
+  return matchedMenu ? matchedMenu.group : null;
+});
 
-  
-  const navigateTo = (path) => {
-    router.push(path);
-  };
-
-  </script>
+const navigateTo = (path) => {
+  router.push(path);
+};
+</script>
   
   <style scoped>
   .header-container {
