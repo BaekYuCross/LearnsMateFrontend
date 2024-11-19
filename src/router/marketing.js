@@ -7,9 +7,9 @@ const MarketingRouter = [
     {
         path: '/marketing/coupons',
         name: 'Coupons',
-        component: () => import('@/views/CouponView.vue')
+        component: () => import('@/views/coupon/CouponView.vue')
     },
-      {
+    {
         path: '/marketing/register-campaign',
         name: 'Register-campaign',
         component: () => import('../views/marketing/campaign/CampaignRegisterPage.vue'),
