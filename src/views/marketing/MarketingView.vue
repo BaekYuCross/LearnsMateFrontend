@@ -6,7 +6,7 @@
       <div class="campaign-actions">
       <div class="campaign-count">등록된 캠페인 <span class="campaign-length">{{ campaigns.length }}</span>개</div>
       <div class="campaign-button-group">
-        <button class="campaign-register-button">캠페인 등록</button>
+        <button class="campaign-register-button" @click="navigateTo()">캠페인 등록</button>
         <button class="campaign-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
     </div>
     </div>
@@ -62,8 +62,11 @@
   
   <script setup>
   import { ref, computed } from 'vue';
+  import { useRouter } from 'vue-router';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-  import CampaignFilter from '@/components/member/CampaignFilter.vue';
+  import CampaignFilter from '@/components/marketing/CampaignFilter.vue';
+
+  const router = useRouter(); 
 
   const campaigns = [
     {
@@ -315,6 +318,12 @@
       currentPage.value = page;
     }
 };
+
+const navigateTo = () => {
+    router.push({ 
+        path: "/marketing/register-campaign",
+    });
+};
   </script>
   
   <style scoped>
@@ -364,6 +373,7 @@
     
     .board-container {
       background-color: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     
     .board-header {
