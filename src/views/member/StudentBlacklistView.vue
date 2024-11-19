@@ -76,51 +76,59 @@
         </div>
 
         <div v-if="selectedBlacklist" class="detail-container">
-  <div class="detail-content">
-    <h3>블랙리스트 상세 정보</h3>
-    <div class="info-grid">
-      <div class="info-item">
-        <span class="label">학생 코드:</span>
-        <span>{{ selectedBlacklist.memberCode }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">이름:</span>
-        <span>{{ selectedBlacklist.memberName }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">이메일:</span>
-        <span>{{ selectedBlacklist.memberEmail }}</span>
-      </div>
-      <div class="info-item">
-        <span class="label">정지일:</span>
-        <span>{{ selectedBlacklist.createDate }}</span>
-      </div>
-    </div>
+          <div class="detail-content">
+            <h3>블랙리스트 상세 정보</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">학생 코드:</span>
+                <span>{{ selectedBlacklist.memberCode }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">이름:</span>
+                <span>{{ selectedBlacklist.memberName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">이메일:</span>
+                <span>{{ selectedBlacklist.memberEmail }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">정지일:</span>
+                <span>{{ selectedBlacklist.createDate }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">블랙리스트 사유:</span>
+                <span>{{ selectedBlacklist.blackReason }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">담당자:</span>
+                <span>{{ selectedBlacklist.adminName }}</span>
+              </div>
+            </div>
 
-    <h4 class="report-title">신고 내역</h4>
-    <div class="report-list">
-      <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
-        <div class="report-header">
-          <span class="report-number">신고 #{{ index + 1 }}</span>
-          <span class="report-date">{{ formatDate(report.reportDTO.reportDate) }}</span>
-        </div>
-        
-        <div class="report-content">
-          <div class="report-info">
-            <p><strong>신고 사유:</strong> {{ report.reportDTO.reportReason }}</p>
-            <p><strong>신고자:</strong> {{ report.reportDTO.reportMemberCode }}</p>
+            <h4 class="report-title">신고 내역</h4>
+            <div class="report-list">
+              <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
+                <div class="report-header">
+                  <span class="report-number">신고 #{{ index + 1 }}</span>
+                  <span class="report-date">{{ formatDate(report.reportDTO.reportDate) }}</span>
+                </div>
+                
+                <div class="report-content">
+                  <div class="report-info">
+                    <p><strong>신고 사유:</strong> {{ report.reportDTO.reportReason }}</p>
+                    <p><strong>신고자:</strong> {{ report.reportDTO.reportMemberCode }}</p>
+                  </div>
+                  
+                  <div class="comment-info">
+                    <p><strong>댓글 내용:</strong> {{ report.commentDTO.commentContent }}</p>
+                    <p><strong>작성일:</strong> {{ formatDate(report.commentDTO.createdAt) }}</p>
+                    <p><strong>강의:</strong> {{ report.commentDTO.lectureCode }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <div class="comment-info">
-            <p><strong>댓글 내용:</strong> {{ report.commentDTO.commentContent }}</p>
-            <p><strong>작성일:</strong> {{ formatDate(report.commentDTO.createdAt) }}</p>
-            <p><strong>강의:</strong> {{ report.commentDTO.lectureCode }}</p>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
       </div>
     </div>
   </div>
@@ -495,6 +503,9 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   display: flex;
   flex-direction: column;
   gap: 15px;
+  max-height: 580px;  /* 원하는 높이로 조절 가능 */
+  overflow-y: auto;   /* 세로 스크롤 추가 */
+  padding-right: 10px; /* 스크롤바 공간 확보 */
 }
 
 .report-item {

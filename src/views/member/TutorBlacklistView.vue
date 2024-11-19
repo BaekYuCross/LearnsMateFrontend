@@ -95,6 +95,14 @@
                   <span class="label">정지일:</span>
                   <span>{{ selectedBlacklist.createDate }}</span>
                 </div>
+                <div class="info-item">
+                  <span class="label">블랙리스트 사유:</span>
+                  <span>{{ selectedBlacklist.blackReason }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">담당자:</span>
+                  <span>{{ selectedBlacklist.adminName }}</span>
+                </div>
               </div>
 
               <h4 class="report-title">신고 내역</h4>
@@ -436,6 +444,9 @@ const reportDetails = ref([
   display: flex;
   flex-direction: column;
   gap: 15px;
+  max-height: 500px;  /* 원하는 높이로 조절 가능 */
+  overflow-y: auto;   /* 세로 스크롤 추가 */
+  padding-right: 10px; /* 스크롤바 공간 확보 */
 }
 
 .report-item {
