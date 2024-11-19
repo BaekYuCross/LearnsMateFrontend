@@ -347,7 +347,6 @@ isLoading.value = false;
     flex: 1;
     margin-left: 160px;
     padding: 20px;
-    background-color: #f8f9fa;
     min-height: 100vh;
   }
   

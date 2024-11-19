@@ -77,7 +77,7 @@
   
           <div v-if="selectedBlacklist" class="detail-container">
             <div class="detail-content">
-              <h3>상세 정보</h3>
+              <h3>블랙리스트 상세 정보</h3>
               <div class="info-grid">
                 <div class="info-item">
                   <span class="label">강사 코드:</span>
@@ -87,7 +87,49 @@
                   <span class="label">이름:</span>
                   <span>{{ selectedBlacklist.memberName }}</span>
                 </div>
-                <!-- 다른 상세 정보들 추가 -->
+                <div class="info-item">
+                  <span class="label">이메일:</span>
+                  <span>{{ selectedBlacklist.memberEmail }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">정지일:</span>
+                  <span>{{ selectedBlacklist.createDate }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">블랙리스트 사유:</span>
+                  <span>{{ selectedBlacklist.blackReason }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">담당자:</span>
+                  <span>{{ selectedBlacklist.adminName }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">신고 당한 횟수:</span>
+                  <span>{{ reportDetails.length }}회</span>
+                </div>
+              </div>
+
+              <h4 class="report-title">신고 내역</h4>
+              <div class="report-list">
+                <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
+                  <div class="report-header">
+                    <span class="report-number">신고 #{{ index + 1 }}</span>
+                    <span class="report-date">{{ formatDate(report.reportDTO.reportDate) }}</span>
+                  </div>
+                  
+                  <div class="report-content">
+                    <div class="report-info">
+                      <p><strong>신고 사유:</strong> {{ report.reportDTO.reportReason }}</p>
+                      <p><strong>신고자:</strong> {{ report.reportDTO.reportMemberCode }}</p>
+                    </div>
+                    
+                    <div class="comment-info">
+                      <p><strong>댓글 내용:</strong> {{ report.commentDTO.commentContent }}</p>
+                      <p><strong>작성일:</strong> {{ formatDate(report.commentDTO.createdAt) }}</p>
+                      <p><strong>강의:</strong> {{ report.commentDTO.lectureCode }}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -154,6 +196,70 @@
       selectedBlacklist.value = blacklist
     }
   };
+
+// formatDate 함수 추가
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleString();
+};
+
+// 임시 신고 상세 데이터 추가
+const reportDetails = ref([
+  {
+    reportDTO: {
+      reportCode: 1001,
+      reportReason: "강의 품질 불량",
+      reportDate: "2024-03-19T10:30:00",
+      commentCode: 5001,
+      reportMemberCode: 3001,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5001,
+      commentContent: "강의 내용이 교재와 전혀 다름",
+      createdAt: "2024-03-19T10:15:00",
+      updatedAt: "2024-03-19T10:15:00",
+      memberCode: 2001,
+      lectureCode: "LEC001"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "불친절한 응대",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "수강생 질문에 불성실한 답변",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1003,
+      reportReason: "강의 품질 저하",
+      reportDate: "2024-03-20T09:15:00",
+      commentCode: 5003,
+      reportMemberCode: 3003,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5003,
+      commentContent: "최근 강의 퀄리티가 너무 떨어짐",
+      createdAt: "2024-03-20T09:00:00",
+      updatedAt: "2024-03-20T09:00:00",
+      memberCode: 2001,
+      lectureCode: "LEC003"
+    }
+  }
+]);
+
   </script>
   <style scoped>
   .layout-container {
@@ -173,7 +279,6 @@
     flex: 1;
     margin-left: 160px;
     padding: 20px;
-    background-color: #f8f9fa;
     min-height: 100vh;
   }
   
@@ -323,4 +428,68 @@
     width: 16px;
     height: 16px;
   }
+
+  .detail-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.report-title {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 500px;  /* 원하는 높이로 조절 가능 */
+  overflow-y: auto;   /* 세로 스크롤 추가 */
+  padding-right: 10px; /* 스크롤바 공간 확보 */
+}
+
+.report-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.report-number {
+  font-weight: bold;
+  color: #006D5C;
+}
+
+.report-date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-info, .comment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.report-info p, .comment-info p {
+  margin: 0;
+  font-size: 0.9em;
+}
   </style>

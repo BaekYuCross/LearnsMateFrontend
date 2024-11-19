@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppHeader/>
+    <AppHeader v-if="!isLoginPage" />  
   </div>
   <main>
     <RouterView />
@@ -10,7 +10,11 @@
 <script setup>
 
 import AppHeader from './components/AppHeader.vue';
-import { RouterView } from 'vue-router';
+import { RouterView , useRoute} from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const isLoginPage = computed(() => route.path === '/login');
 
 </script>
 

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MemberRouter from './member'
+import LoginRouter from './login'
 import MarketingRouter from './marketing'
 
 const routes = [
@@ -15,6 +16,7 @@ const routes = [
   },
 
   ...MemberRouter,
+  ...LoginRouter,
   ...MarketingRouter,
 
   {
