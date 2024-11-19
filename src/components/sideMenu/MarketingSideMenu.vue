@@ -15,7 +15,7 @@
                 v-for="submenu in menu.submenus"
                 :key="submenu.path"
                 class="submenu-item"
-                :class="{ active: currentGroup === submenu.group }"
+                :class="{ active: currentRoute === submenu.path }"
                 @click="navigateTo(submenu.path)"
                 >
                 {{ submenu.name }}
@@ -37,8 +37,8 @@
         {
         name: '캠페인',
         submenus: [
-            { name: '캠페인', path: '/marketing', group: 'marketing' },
-            { name: '캠페인 템플릿', path: '/campaign-template', group: 'campaign-template' },
+            { name: '캠페인', path: '/marketing'},
+            { name: '캠페인 템플릿', path: '/marketing/campaign-template' },
         ],
         },
         {
@@ -51,12 +51,14 @@
         },
     ]);
 
-    const currentGroup = computed(() => {
-        const matchedSubmenu = menus.value
-            .flatMap(menu => menu.submenus) 
-            .find(submenu => route.path.startsWith(submenu.path)); 
-        return matchedSubmenu ? matchedSubmenu.group : null; 
-    });
+    // const currentGroup = computed(() => {
+    //     const matchedSubmenu = menus.value
+    //         .flatMap(menu => menu.submenus) 
+    //         .find(submenu => route.path.startsWith(submenu.path)); 
+    //     return matchedSubmenu ? matchedSubmenu.group : null; 
+    // });
+
+    const currentRoute = computed(() => route.path);
 
 
     const navigateTo = (path) => {
