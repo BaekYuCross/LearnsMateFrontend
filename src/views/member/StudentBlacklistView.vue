@@ -77,7 +77,7 @@
 
         <div v-if="selectedBlacklist" class="detail-container">
           <div class="detail-content">
-            <h3>상세 정보</h3>
+            <h3>블랙리스트 상세 정보</h3>
             <div class="info-grid">
               <div class="info-item">
                 <span class="label">학생 코드:</span>
@@ -87,11 +87,55 @@
                 <span class="label">이름:</span>
                 <span>{{ selectedBlacklist.memberName }}</span>
               </div>
-              <!-- 다른 상세 정보들 추가 -->
+              <div class="info-item">
+                <span class="label">이메일:</span>
+                <span>{{ selectedBlacklist.memberEmail }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">정지일:</span>
+                <span>{{ selectedBlacklist.createDate }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">블랙리스트 사유:</span>
+                <span>{{ selectedBlacklist.blackReason }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">담당자:</span>
+                <span>{{ selectedBlacklist.adminName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">신고 당한 횟수:</span>
+                <span>{{ reportDetails.length }}회</span>
+              </div>
+            </div>
+
+            <h4 class="report-title">신고 내역</h4>
+            <div class="report-list">
+              <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
+                <div class="report-header">
+                  <span class="report-number">신고 #{{ index + 1 }}</span>
+                  <span class="report-date">{{ formatDate(report.reportDTO.reportDate) }}</span>
+                </div>
+                
+                <div class="report-content">
+                  <div class="report-info">
+                    <p><strong>신고 사유:</strong> {{ report.reportDTO.reportReason }}</p>
+                    <p><strong>신고자:</strong> {{ report.reportDTO.reportMemberCode }}</p>
+                  </div>
+                  
+                  <div class="comment-info">
+                    <p><strong>댓글 내용:</strong> {{ report.commentDTO.commentContent }}</p>
+                    <p><strong>작성일:</strong> {{ formatDate(report.commentDTO.createdAt) }}</p>
+                    <p><strong>강의:</strong> {{ report.commentDTO.lectureCode }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    <ReservedBlacklist :type="'student'" class="reserved-section" />
+
     </div>
   </div>
 </template>
@@ -100,6 +144,7 @@
 import { ref, computed } from 'vue'
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import ReservedBlacklist from '@/components/member/ReservedBlacklist.vue'
 
 const selectedBlacklist = ref(null);
 const currentPage = ref(1);
@@ -153,6 +198,125 @@ const showDetail = (blacklist) => {
     selectedBlacklist.value = blacklist
   }
 };
+
+// formatDate 함수 추가
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleString();
+};
+
+// 임시 신고 상세 데이터
+const reportDetails = ref([
+  {
+    reportDTO: {
+      reportCode: 1001,
+      reportReason: "부적절한 언어 사용",
+      reportDate: "2024-03-19T10:30:00",
+      commentCode: 5001,
+      reportMemberCode: 3001,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5001,
+      commentContent: "이 강의 완전 시간낭비임 ㅡㅡ",
+      createdAt: "2024-03-19T10:15:00",
+      updatedAt: "2024-03-19T10:15:00",
+      memberCode: 2001,
+      lectureCode: "LEC001"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },
+  {
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  }
+]);
+
+
 </script>
 
 <style scoped>
@@ -174,8 +338,9 @@ const showDetail = (blacklist) => {
   flex: 1;
   margin-left: 160px;
   padding: 20px;
-  background-color: #f8f9fa;
   min-height: 100vh;
+  max-width: calc(1920px - 160px - 40px);  /* 전체 - 사이드메뉴 - 패딩 */
+  overflow-x: hidden;
 }
 
 .header-container {
@@ -192,6 +357,11 @@ const showDetail = (blacklist) => {
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  height: 600px; /* 최소 높이 설정 */
+}
+
+.reserved-section {
+  margin-top: 20px;  /* 블랙리스트와 예비 블랙리스트 사이 간격 */
 }
 
 .table-container {
@@ -199,8 +369,8 @@ const showDetail = (blacklist) => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow-x: auto; /* 수평 스크롤 추가 */
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .table-container.shrink {
@@ -209,8 +379,8 @@ const showDetail = (blacklist) => {
 
 .detail-container {
   flex: 0 0 50%;
-  opacity: 1;
-  transform: translateX(0);
+  height: 100%; /* content-section의 높이를 상속 */
+  overflow: hidden; /* 내부 스크롤을 위한 설정 */
 }
 
 table {
@@ -328,5 +498,68 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   height: 16px;
 }
 
+.detail-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  height: 100%;
+  overflow-y: auto; /* 여기에 스크롤 추가 */
+}
 
+.report-title {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* report-list의 max-height 제거 (이미 detail-container에서 스크롤 처리) */
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-right: 10px;
+}
+
+.report-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.report-number {
+  font-weight: bold;
+  color: #006D5C;
+}
+
+.report-date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-info, .comment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.report-info p, .comment-info p {
+  margin: 0;
+  font-size: 0.9em;
+}
 </style>
