@@ -1,20 +1,25 @@
 <template>
   <div class="layout-container">
-    <div class="side-menu">
-      <!--사이드 메뉴-->
-      <MemberSideMenu/>
-    </div>
+    <div class="side-menu"><MemberSideMenu/></div>
     <div class="main-content">
-      <!-- 필터 -->
-      <MemberFilter/>
+      <MemberFilter 
+        type="student" 
+        @search="handleSearch" 
+        @reset="handleReset"
+      />
 
-      <!-- 전체 학생 수 표시 -->
-      <div class="student-count">
-        전체 학생 수 <span class="count-number">{{ students.length }}</span>명
-      </div>
-      
       <div class="content-section" :class="{ 'with-detail': selectedStudent }">
         <div class="table-container" :class="{ 'shrink': selectedStudent }">
+          <!-- 전체 학생 수 표시 -->
+          <div class="header-container">
+            <div class="count">전체 학생 수 <span class="count-number">{{ students.length }}</span>명</div>
+            <div class="button-group">
+              <button class="excel-button">
+                <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
+              </button>
+            </div>
+          </div>
+            
           <table>
             <thead>
               <tr>
@@ -82,24 +87,37 @@
           </div>
         </div>
 
-        <Transition name="slide-fade">
-          <div v-if="selectedStudent" class="detail-container">
-            <div class="detail-content">
-              <h3>상세 정보</h3>
-              <div class="info-grid">
-                <div class="info-item">
-                  <span class="label">학생 코드:</span>
-                  <span>{{ selectedStudent.code }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="label">이름:</span>
-                  <span>{{ selectedStudent.name }}</span>
-                </div>
-                <!-- 다른 상세 정보들 추가 -->
+        <div v-if="selectedStudent" class="detail-container">
+          <div class="detail-content">
+            <h3>상세 정보</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">학생 코드</span>
+                <span>{{ selectedStudent.code }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">이름</span>
+                <span>{{ selectedStudent.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">이메일</span>
+                <span>{{ selectedStudent.email }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">연락처</span>
+                <span>{{ selectedStudent.phone }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">생년월일</span>
+                <span>{{ selectedStudent.birthDate }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">주소</span>
+                <span>{{ selectedStudent.address }}</span>
               </div>
             </div>
           </div>
-        </Transition>
+        </div>
       </div>
     </div>
   </div>
@@ -107,6 +125,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import axios from 'axios';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 
@@ -138,9 +157,9 @@ const students = ref([
   },
 ])
 
-// 더미 데이터 20개로 확장 -> 나중에 삭제해야함.
+// 더미 데이터 20개로 확장
 const expandData = () => {
-  const baseData = students.value.slice(0, 2); // 기본 2개 데이터
+  const baseData = students.value.slice(0, 2);
   for (let i = 3; i <= 20; i++) {
     students.value.push({
       ...baseData[i % 2],
@@ -149,7 +168,6 @@ const expandData = () => {
   }
 };
 expandData();
-
 
 // 페이지네이션 관련 computed 속성들
 const totalPages = computed(() => Math.ceil(students.value.length / pageSize));
@@ -165,22 +183,17 @@ const paginatedStudents = computed(() =>
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
-
-    // 페이지 변경 시 상세 정보창 닫기 -> 2페이지로 가면 상세정보창 자동으로 닫힘.
     selectedStudent.value = null;
   }
 };
 
-
 const showDetail = (student) => {
-  // 현재 선택된 학생을 다시 클릭하면 선택 해제
   if (selectedStudent.value?.code === student.code) {
-    selectedStudent.value = null
+    selectedStudent.value = null;
   } else {
-    // 다른 학생을 클릭하면 해당 학생 선택
-    selectedStudent.value = student
+    selectedStudent.value = student;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -205,54 +218,49 @@ const showDetail = (student) => {
   min-height: 100vh;
 }
 
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 10px 10px 20px;
+  width: 100%;
+  white-space: nowrap;
+  background-color: #f8f9fa;
+}
+
 .content-section {
   display: flex;
   gap: 20px;
   margin-top: 20px;
-  transition: all 0.3s ease;
 }
 
 .table-container {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.4s ease-in-out;
-  overflow-x: auto; /* 수평 스크롤 추가 */
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow-x: auto;
 }
 
 .table-container.shrink {
   flex: 0 0 50%;
 }
 
-/* slide-fade -> Transition(애니메이션) 해놓은거 */
-.slide-fade-enter-from {
-  transform: translateX(20px);
-  opacity: 0;
-}
-
-.slide-fade-leave-to {
-  transform: translateX(20px);
-  opacity: 0;
-}
-
-/* 상세 정보 slide-fade transition 효과 */
-.slide-fade-enter-active,
-.slide-fade-leave-active {
-  transition: all ease-in-out;
-}
-/* 여기까지 */
-
 .detail-container {
-  flex: 0 0 50%;
+  flex: 0 0 40%;
   opacity: 1;
   transform: translateX(0);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 table {
   width: 100%;
-  min-width: 1200px; /* 테이블 최소 너비 설정 */
+  min-width: 1200px;
   border-collapse: collapse;
 }
 
@@ -260,7 +268,12 @@ th, td {
   padding: 12px;
   text-align: center;
   border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap; /* 각 셀의 텍스트도 줄바꿈 방지 */
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+th {
+  font-size: 13px;
 }
 
 .selected {
@@ -268,35 +281,35 @@ th, td {
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin-top: 16px;
 }
 
 .info-item {
   display: flex;
-  gap: 8px;
+  gap: 20px;
 }
 
 .label {
   color: #64748b;
-  min-width: 80px;
+  min-width: 100px;
+  text-align: left;
 }
 
 /* 각 열의 너비 지정 */
-th:nth-child(1), td:nth-child(1) { width: 100px; } /* 학생 코드 */
-th:nth-child(2), td:nth-child(2) { width: 100px; } /* 이름 */
-th:nth-child(3), td:nth-child(3) { width: 150px; } /* 이메일 */
-th:nth-child(4), td:nth-child(4) { width: 120px; } /* 연락처 */
-th:nth-child(5), td:nth-child(5) { width: 200px; } /* 주소 */
-th:nth-child(6), td:nth-child(6) { width: 80px; } /* 나이 */
-th:nth-child(7), td:nth-child(7) { width: 100px; } /* 생년월일 */
-th:nth-child(8), td:nth-child(8) { width: 100px; } /* 계정상태 */
-th:nth-child(9), td:nth-child(9) { width: 100px; } /* 생성일 */
-th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
+th:nth-child(1), td:nth-child(1) { width: 100px; }
+th:nth-child(2), td:nth-child(2) { width: 100px; }
+th:nth-child(3), td:nth-child(3) { width: 150px; }
+th:nth-child(4), td:nth-child(4) { width: 120px; }
+th:nth-child(5), td:nth-child(5) { width: 200px; }
+th:nth-child(6), td:nth-child(6) { width: 80px; }
+th:nth-child(7), td:nth-child(7) { width: 100px; }
+th:nth-child(8), td:nth-child(8) { width: 100px; }
+th:nth-child(9), td:nth-child(9) { width: 100px; }
+th:nth-child(10), td:nth-child(10) { width: 100px; }
 
-/* 페이지네이션 */
 .pagination {
   position: sticky;
   left: 0;
@@ -328,11 +341,10 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   color: #ccc;
   cursor: not-allowed;
 }
-.student-count {
-  font-size: 20px;
+
+.count {
+  font-size: 17px;
   font-weight: bold;
-  margin-left: 10px;
-  margin-bottom: -15px;
   color: #333;
 }
 
@@ -341,6 +353,31 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   font-weight: bold;
 }
 
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
+.excel-button {
+  display: flex;
+  align-items: center;
+  background: #005950;
+  padding: 2px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+}
 
+.excel-button img {
+  width: 16px;
+  height: 16px;
+}
+
+.detail-content h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
 </style>

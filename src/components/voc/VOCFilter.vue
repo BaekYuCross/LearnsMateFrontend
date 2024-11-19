@@ -1,19 +1,15 @@
 <template>
   <div class="voc-filter-card">
     <div class="voc-filter-container">
-      <div class="voc-filter-row white">
-        <div class="voc-filter-item">
-          <span class="voc-filter-h2">VOC</span>
-        </div>
-        <div class="voc-filter-item">
-        </div>
+      <div class="voc-section-header">
+        <h2 class="voc-section-title">VOC</h2>
         <div class="voc-button-group">
           <button @click="search" class="voc-search-button">
-            <img src="@/assets/icons/search.svg" alt="검색" class="voc-icon">
-            조회
+            <i class="fas fa-search"></i>
+            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
           </button>
           <button @click="reset" class="voc-reset-button">
-            초기화
+            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
           </button>
         </div>
       </div>
@@ -89,26 +85,14 @@
         </div>
         <div class="voc-filter-item">
           <span class="voc-filter-label">등록일</span>
-            <div class="voc-date-range">
-              <input 
-                v-model="filters.startDate"
-                type="date" 
-                class="voc-filter-input"
-              />
+            <div class="voc-date-range-container">
+              <input v-model="filters.startCreateDate" type="date" class="voc-filter-input voc-date-input"/>
               <span class="voc-date-separator">~</span>
-              <input 
-                v-model="filters.endDate"
-                type="date" 
-                class="voc-filter-input"
-              />
+              <input v-model="filters.endCreateDate" type="date" class="voc-filter-input voc-date-input"/>
             </div>
           </div>
-        <div class="voc-filter-item">
-        </div>
+        <div class="voc-filter-item"></div>
       </div>
-        
-
-      
     </div>
   </div>
 </template>
@@ -143,11 +127,23 @@ const reset = () => {
 
 <style scoped>
 .voc-filter-card {
-  padding-top:2.5px;
+  margin-bottom: 16px;
   background-color: white;
-  border-radius: 0.5rem;
+  padding: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin: calc(30px + 1rem) 0 1rem calc(160px);
+}
+
+.voc-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 10px;
+    border-bottom: 1px solid #e9ecef;
+  }
+  
+.voc-section-title {
+  font-size: 17px;
+  font-weight: bold;
 }
 
 .voc-filter-container {
@@ -157,124 +153,7 @@ const reset = () => {
 
 .voc-filter-row {
   display: flex;
-  padding: 2.5px 5px 2.5px 10px;
-  gap: 50px;
-  align-items: flex-start;
-}
-
-.voc-filter-item {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 200px;
-}
-
-.voc-filter-h2 {
-  padding-left : 6px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #374151;
-  text-align: end;
-}
-
-.voc-filter-label {
-  min-width: 55px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #374151;
-  text-align: end;
-}
-
-.voc-filter-input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  background-color: white;
-  font-size: 12px;
-  max-width: 230px;
-}
-
-.voc-filter-input:focus {
-  outline: none;
-  border-color: #0d9488;
-  box-shadow: 0 0 0 1px #0d9488;
-}
-
-.voc-date-range {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.voc-date-range input {
-  width: calc(50% - 10px);
-}
-
-.voc-date-separator {
-  color: #64748b;
-  font-size: 0.875rem;
-}
-
-.voc-filter-row:last-child .voc-filter-item:empty {
-  min-width: 113px;
-}
-
-.voc-button-group {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  min-width: 365px;
-  justify-content: flex-end;
-  padding-top: 0;
-}
-
-.voc-search-button {
-  padding: 5px 10px;
-  background-color: #0d9488;
-  color: white;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 12px;
-  transition: background-color 0.2s;
-}
-
-.voc-reset-button {
-  padding: 5px 10px;
-  height:29.2px;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.375rem;
-  background-color: white;
-  font-size: 12px;
-  transition: background-color 0.2s;
-}
-
-.voc-search-button:hover {
-  background-color: #0f766e;
-}
-
-.voc-reset-button:hover {
-  background-color: #f8fafc;
-}
-
-.voc-search-button:focus,
-.voc-reset-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
-}
-
-.voc-filter-input[type="date"] {
-  min-width: 0;
-  flex: 1;
-}
-
-.voc-icon {
-  width: 12px;
-  height: 12px;
+  padding: 3px 10px;
 }
 
 .voc-filter-row.gray {
@@ -285,5 +164,88 @@ const reset = () => {
   
 .voc-filter-row.white {
   background-color: white;
+}
+
+.voc-filter-item {
+  width: 25%;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.voc-filter-label {
+  width: 5rem;
+  min-width: 5rem;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: end;
+  padding-right: 10px;
+}
+
+.voc-filter-input {
+  flex: 1;
+  padding: 5px 5px;
+  font-size: 11px;
+  border: 1px solid #e2e8f0;
+  min-width: 0;
+  width: 100%;
+}
+
+.voc-date-range-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.voc-date-input {
+  width: calc(50% - 8px);
+  min-width: 0;
+}
+  
+.voc-date-separator {
+    color: #64748b;
+    padding: 0 0.25rem;
+  }
+
+.voc-button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.voc-search-button {
+  padding: 2px 6px 3px 3px;        
+    background-color: #005950;
+    border: 1px solid #005950;
+    border-radius: 4px;
+    font-size: 10px;
+    color: white;
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    margin-top: 4px;
+}
+
+.voc-reset-button {
+  padding: 4px 5px 3px;   
+  border: 1px solid #A29D9D;
+  border-radius: 4px;
+  font-size: 10px;
+  background-color: white;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.voc-search-button:hover {
+  background-color: #004c42;  
+}
+
+.voc-reset-button:hover {
+  background-color: #f8fafc;
+}
+
+.voc-search-button:focus,
+.voc-reset-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
 }
 </style>

@@ -11,7 +11,7 @@
               v-for="menu in menus" 
               :key="menu.path"
               class="menu-item"
-              :class="{ 'active': currentRoute === menu.path }"
+              :class="{ 'active': currentGroup === menu.group }"
               @click="navigateTo(menu.path)"
             >
               {{ menu.name }}
@@ -38,18 +38,23 @@
   const route = useRoute();
   
   const menus = ref([
-    { name: '메인', path: '/main' },
-    { name: '강의', path: '/lecture' },
-    { name: '고객', path: '/student' },
-    { name: '마케팅', path: '/marketing' },
-    { name: 'VOC', path: '/voc' }
+    { name: '메인', path: '/main', group: 'main' },
+    { name: '강의', path: '/lecture', group: 'lecture' },
+    { name: '고객', path: '/student', group: 'student' },
+    { name: '마케팅', path: '/marketing', group: 'marketing' },
+    { name: 'VOC', path: '/voc', group: 'voc' },
   ]);
-  
-  const currentRoute = computed(() => route.path);
+
+  const currentGroup = computed(() => {
+    const matchedMenu = menus.value.find(menu => route.path.startsWith(menu.path));
+    return matchedMenu ? matchedMenu.group : null;
+  });
+
   
   const navigateTo = (path) => {
     router.push(path);
   };
+
   </script>
   
   <style scoped>

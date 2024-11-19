@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MemberRouter from './member'
+<<<<<<< HEAD
 import LoginRouter from './login'
+=======
+import MarketingRouter from './marketing'
+>>>>>>> 7362054cf0c03833e49bdc54bffecd6747657f20
 
 const routes = [
   {
@@ -15,23 +19,27 @@ const routes = [
   },
 
   ...MemberRouter,
+<<<<<<< HEAD
   ...LoginRouter,
+=======
+  ...MarketingRouter,
+>>>>>>> 7362054cf0c03833e49bdc54bffecd6747657f20
 
-  {
-    path: '/marketing',
-    name: 'Marketing',
-    component: () => import('../views/MarketingView.vue')
-  },
-  {
-    path: '/coupons',
-    name: 'Coupons',
-    component: () => import('../views/CouponView.vue')
+  // {
+  //   path: '/marketing',
+  //   name: 'Marketing',
+  //   component: () => import('../views/MarketingView.vue')
+  // },
+  // {
+  //   path: '/coupons',
+  //   name: 'Coupons',
+  //   component: () => import('../views/CouponView.vue')
 
-  },
+  // },
   {
     path: '/voc',
     name: 'VOC',
-    component: () => import('../views/VocView.vue')
+    component: () => import('../views/voc/VocView.vue')
   },
   {
     path: '/',
