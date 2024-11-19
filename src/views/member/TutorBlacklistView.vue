@@ -103,6 +103,10 @@
                   <span class="label">담당자:</span>
                   <span>{{ selectedBlacklist.adminName }}</span>
                 </div>
+                <div class="info-item">
+                  <span class="label">신고 당한 횟수:</span>
+                  <span>{{ reportDetails.length }}회</span>
+                </div>
               </div>
 
               <h4 class="report-title">신고 내역</h4>

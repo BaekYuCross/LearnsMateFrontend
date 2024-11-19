@@ -103,6 +103,10 @@
                 <span class="label">담당자:</span>
                 <span>{{ selectedBlacklist.adminName }}</span>
               </div>
+              <div class="info-item">
+                <span class="label">신고 당한 횟수:</span>
+                <span>{{ reportDetails.length }}회</span>
+              </div>
             </div>
 
             <h4 class="report-title">신고 내역</h4>
@@ -131,6 +135,7 @@
         </div>
       </div>
     </div>
+    <ReservedBlacklist/>
   </div>
 </template>
 
@@ -138,6 +143,7 @@
 import { ref, computed } from 'vue'
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import ReservedBlacklist from '@/components/member/ReservedBlacklist.vue'
 
 const selectedBlacklist = ref(null);
 const currentPage = ref(1);
