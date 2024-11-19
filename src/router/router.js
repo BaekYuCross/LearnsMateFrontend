@@ -17,17 +17,6 @@ const routes = [
   ...MemberRouter,
   ...MarketingRouter,
 
-  // {
-  //   path: '/marketing',
-  //   name: 'Marketing',
-  //   component: () => import('../views/MarketingView.vue')
-  // },
-  // {
-  //   path: '/coupons',
-  //   name: 'Coupons',
-  //   component: () => import('../views/CouponView.vue')
-
-  // },
   {
     path: '/voc',
     name: 'VOC',
