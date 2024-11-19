@@ -106,6 +106,9 @@
             </div>
           </div>
         </div>
+
+        <!-- 여기에 등록하기 버튼 -->
+        <button class="reserved-blacklist-insert">등록하기</button>
       </div>
     </div>
   </div>
@@ -221,6 +224,74 @@ const reportDetails = ref([
       memberCode: 2001,
       lectureCode: "LEC002"
     }
+  },{
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },{
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },{
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
+  },{
+    reportDTO: {
+      reportCode: 1002,
+      reportReason: "스팸/도배성 댓글",
+      reportDate: "2024-03-19T14:20:00",
+      commentCode: 5002,
+      reportMemberCode: 3002,
+      reportedMemberCode: 2001
+    },
+    commentDTO: {
+      commentCode: 5002,
+      commentContent: "같은 내용 반복 도배...",
+      createdAt: "2024-03-19T14:10:00",
+      updatedAt: "2024-03-19T14:10:00",
+      memberCode: 2001,
+      lectureCode: "LEC002"
+    }
   }
 ]);
 </script>
@@ -230,6 +301,7 @@ const reportDetails = ref([
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  height: 600px; /* 고정 높이 설정 */
 }
 
 .table-container {
@@ -237,8 +309,8 @@ const reportDetails = ref([
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow-x: auto; /* 수평 스크롤 추가 */
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .table-container.shrink {
@@ -246,9 +318,9 @@ const reportDetails = ref([
 }
 
 .detail-container {
-  flex: 0 0 50%;
-  opacity: 1;
-  transform: translateX(0);
+  flex: 0 0 50%; 
+  height: 100%;
+  overflow: hidden; 
 }
 
 .header-container {
@@ -263,7 +335,7 @@ const reportDetails = ref([
 
 table {
   width: 100%;
-  min-width: 1200px; /* 테이블 최소 너비 설정 */
+  min-width: 1200px; 
   border-collapse: collapse;
 }
 
@@ -349,7 +421,10 @@ th{
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  height: 100%;
+  overflow-y: auto; /* 세로 스크롤 추가 */
 }
+
 
 .report-title {
   margin-top: 20px;
@@ -358,32 +433,12 @@ th{
   font-weight: bold;
 }
 
+/* report-list의 max-height 제거 (이미 detail-content에서 스크롤 처리) */
 .report-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-height: 580px;  /* 원하는 높이로 조절 가능 */
-  overflow-y: auto;   /* 세로 스크롤 추가 */
-  padding-right: 10px; /* 스크롤바 공간 확보 */
-}
-
-/* 스크롤바 스타일링 */
-.report-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.report-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.report-list::-webkit-scrollbar-thumb {
-  background: #006D5C;
-  border-radius: 3px;
-}
-
-.report-list::-webkit-scrollbar-thumb:hover {
-  background: #005950;
+  padding-right: 10px;
 }
 
 .report-item {
@@ -434,4 +489,17 @@ th:nth-child(3), td:nth-child(3) { width: 120px; } /* 이름 */
 th:nth-child(4), td:nth-child(4) { width: 200px; } /* 이메일 */
 th:nth-child(5), td:nth-child(5) { width: 100px; } /* 신고 횟수 */
 th:nth-child(6), td:nth-child(6) { width: 120px; } /* 최근 신고일 */
+
+.reserved-blacklist-insert {
+  background: #005950;
+  padding: 2px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 20px;
+  float: right;  /* 오른쪽 정렬 */
+  margin-right: 10px;
+  }
 </style>

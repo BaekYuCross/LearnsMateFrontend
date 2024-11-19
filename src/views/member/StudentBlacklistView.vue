@@ -134,8 +134,9 @@
           </div>
         </div>
       </div>
+    <ReservedBlacklist :type="'student'" class="reserved-section" />
+
     </div>
-    <ReservedBlacklist/>
   </div>
 </template>
 
@@ -337,8 +338,9 @@ const reportDetails = ref([
   flex: 1;
   margin-left: 160px;
   padding: 20px;
-  background-color: #f8f9fa;
   min-height: 100vh;
+  max-width: calc(1920px - 160px - 40px);  /* 전체 - 사이드메뉴 - 패딩 */
+  overflow-x: hidden;
 }
 
 .header-container {
@@ -355,6 +357,11 @@ const reportDetails = ref([
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  height: 600px; /* 최소 높이 설정 */
+}
+
+.reserved-section {
+  margin-top: 20px;  /* 블랙리스트와 예비 블랙리스트 사이 간격 */
 }
 
 .table-container {
@@ -362,8 +369,8 @@ const reportDetails = ref([
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow-x: auto; /* 수평 스크롤 추가 */
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .table-container.shrink {
@@ -372,8 +379,8 @@ const reportDetails = ref([
 
 .detail-container {
   flex: 0 0 50%;
-  opacity: 1;
-  transform: translateX(0);
+  height: 100%; /* content-section의 높이를 상속 */
+  overflow: hidden; /* 내부 스크롤을 위한 설정 */
 }
 
 table {
@@ -496,6 +503,8 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  height: 100%;
+  overflow-y: auto; /* 여기에 스크롤 추가 */
 }
 
 .report-title {
@@ -505,13 +514,12 @@ th:nth-child(10), td:nth-child(10) { width: 100px; } /* 휴면상태 */
   font-weight: bold;
 }
 
+/* report-list의 max-height 제거 (이미 detail-container에서 스크롤 처리) */
 .report-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-height: 580px;  /* 원하는 높이로 조절 가능 */
-  overflow-y: auto;   /* 세로 스크롤 추가 */
-  padding-right: 10px; /* 스크롤바 공간 확보 */
+  padding-right: 10px;
 }
 
 .report-item {
