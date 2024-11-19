@@ -6,7 +6,7 @@
       <div class="coupon-table-container" :class="{ 'shrink': selectedCoupon }">
       <!-- 전체 쿠폰 개수 -->
       <div class="coupon-count">
-        등록된 쿠폰 <span class="coupon-length">{{ coupons.length }}</span>개
+        등록된 쿠폰 <span class="coupon-length">{{ coupon.length }}</span>개
       </div>
       <!-- 조회 데이터 테이블 -->
       <table class="coupon-table">
@@ -29,22 +29,22 @@
         <tbody>
           <tr
             class="coupon-table-row"
-            v-for="(coupons, index) in paginatedCoupons"
-            :key="coupons.id"
-            @click="selectCoupon(coupons)"
+            v-for="(coupon, index) in paginatedCoupons"
+            :key="coupon.id"
+            @click="selectCoupon(coupon)"
           >
-            <td>{{ coupons.code }}</td>
-            <td>{{ coupons.name }}</td>
-            <td>{{ coupons.contents }}</td>
-            <td>{{ coupons.discountRate }}</td>
-            <td>{{ coupons.type }}</td>
-            <td>{{ coupons.status }}</td>
-            <td>{{ coupons.startDate }}</td>
-            <td>{{ coupons.expireDate }}</td>
-            <td>{{ coupons.createdAt }}</td>
-            <td>{{ coupons.updatedAt }}</td>
-            <td>{{ coupons.admin || '-' }}</td>
-            <td>{{ coupons.tutor || '-' }}</td>
+            <td>{{ coupon.code }}</td>
+            <td>{{ coupon.name }}</td>
+            <td>{{ coupon.contents }}</td>
+            <td>{{ coupon.discountRate }}</td>
+            <td>{{ coupon.type }}</td>
+            <td>{{ coupon.status }}</td>
+            <td>{{ coupon.startDate }}</td>
+            <td>{{ coupon.expireDate }}</td>
+            <td>{{ coupon.createdAt }}</td>
+            <td>{{ coupon.updatedAt }}</td>
+            <td>{{ coupon.admin || '-' }}</td>
+            <td>{{ coupon.tutor || '-' }}</td>
           </tr>
         </tbody>
       </table>
@@ -70,20 +70,7 @@
 
       <!-- 쿠폰 단건 조회 -->
       <div class="coupon-detail-container" v-if="selectedCoupon">
-        <button class="close-button" @click="selectedCoupon = null">닫기</button>
-        <h3>선택된 쿠폰 상세 정보</h3>
-        <p><strong>쿠폰 번호:</strong> {{ selectedCoupon.code }}</p>
-        <p><strong>쿠폰 이름:</strong> {{ selectedCoupon.name }}</p>
-        <p><strong>내용:</strong> {{ selectedCoupon.contents }}</p>
-        <p><strong>할인율:</strong> {{ selectedCoupon.discountRate }}</p>
-        <p><strong>종류:</strong> {{ selectedCoupon.type }}</p>
-        <p><strong>상태:</strong> {{ selectedCoupon.status }}</p>
-        <p><strong>시작일:</strong> {{ selectedCoupon.startDate }}</p>
-        <p><strong>만료일:</strong> {{ selectedCoupon.expireDate }}</p>
-        <p><strong>생성일:</strong> {{ selectedCoupon.createdAt }}</p>
-        <p><strong>수정일:</strong> {{ selectedCoupon.updatedAt }}</p>
-        <p><strong>직원:</strong> {{ selectedCoupon.admin || '-' }}</p>
-        <p><strong>강사:</strong> {{ selectedCoupon.tutor || '-' }}</p>
+        <CouponDetail :selectedCoupon="selectedCoupon" />
       </div>
     </div>
   </div>
@@ -94,8 +81,9 @@ import { ref, computed } from 'vue';
 import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponFilter from '@/components/marketing/CouponFilter.vue';
+import CouponDetail from '@/components/marketing/CouponDetail.vue';
 
-const coupons = [
+const coupon = [
     {
       id: 1,
       code: "C001-20241118eidj23isjle",
@@ -417,10 +405,10 @@ const selectedCoupon = ref(null);
 const currentPage = ref(1);
 const pageSize = 15;
 
-const totalPages = computed(() => Math.ceil(coupons.length / pageSize));
+const totalPages = computed(() => Math.ceil(coupon.length / pageSize));
 
 const paginatedCoupons = computed(() =>
-  coupons.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+  coupon.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
 );
 
 const changePage = (page) => {
@@ -432,20 +420,21 @@ const changePage = (page) => {
 const applyFilters = async (filters) => {
   try {
     const response = await axios.post('/api/coupons/filter', filters);
-    coupons.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
+    coupon.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
     currentPage.value = 1; // 필터링 후 첫 페이지로 이동
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
   }
 };
 
-const selectCoupon = (coupons) => {
-  if (selectedCoupon.value?.code === coupons.code) {
-    selectedCoupon.value = null;
-  } else {
-    selectedCoupon.value = coupons;
-  }
-}
+const selectCoupon = (coupon) => {
+  selectedCoupon.value = selectedCoupon.value?.id === coupon.id ? null : coupon;
+};
+
+// const selectCoupon = (coupon) => {
+//   console.log('Selected Coupon:', coupon); // 선택된 쿠폰 확인
+//   selectedCoupon.value = coupon; // 선택한 쿠폰 데이터를 설정
+// };
 </script>
 
 <style>
@@ -540,11 +529,9 @@ const selectCoupon = (coupons) => {
   .coupon-detail-container {
     flex: 0.5;
     background-color: #f9f9f9;
-    padding: 20px;
     border: 1px solid #ddd;
     border-radius: 4px;
     transition: flex 0.3s ease;
-    margin-top: 42px;
     margin-left: 10px;
   }
 
