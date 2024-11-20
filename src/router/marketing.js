@@ -2,7 +2,7 @@ const MarketingRouter = [
     {
         path: '/marketing',
         name: 'Marketing',
-        component: () => import('../views/marketing/MarketingView.vue')
+        component: () => import('../views/marketing/campaign/CampaignGetPage.vue')
     },
     {
         path: '/marketing/coupons',
@@ -19,11 +19,11 @@ const MarketingRouter = [
         name: 'Campaign-template',
         component: () => import('../views/marketing/campaignTemplate/CampaignTemplateGetPage.vue'),
       },
-    {
+      {
         path: '/marketing/issued-coupons',
-        name: 'IssuedCoupons',
+        name: 'Issued-Coupons',
         component: () => import('@/views/coupon/IssuedCouponView.vue')
-    }
+      }
 ];
 
 export default MarketingRouter;
