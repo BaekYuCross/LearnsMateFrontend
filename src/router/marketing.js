@@ -14,6 +14,11 @@ const MarketingRouter = [
         name: 'Register-campaign',
         component: () => import('../views/marketing/CampaignRegisterPage.vue'),
     },
+    {
+        path: '/marketing/issued-coupons',
+        name: 'IssuedCoupons',
+        component: () => import('@/views/coupon/IssuedCouponView.vue')
+    }
 ];
 
 export default MarketingRouter;
