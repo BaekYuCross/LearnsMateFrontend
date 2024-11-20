@@ -22,7 +22,7 @@ const MarketingRouter = [
       {
         path: '/marketing/issued-coupons',
         name: 'Issued-Coupons',
-        component: () => import('@/views/coupon/IssuedCouponView.vue')
+        // component: () => import('@/views/coupon/IssuedCouponView.vue')
       }
 ];
 
