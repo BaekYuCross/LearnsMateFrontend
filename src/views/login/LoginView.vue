@@ -25,12 +25,12 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { shallowRef } from 'vue';
   import LoginLeft from '@/components/login/LoginLeft.vue';
   import LoginPwLeft from '@/components/login/LoginPwLeft.vue';
   
  // 현재 보여줄 컴포넌트를 관리하는 상태
-const currentComponent = ref(LoginLeft);
+const currentComponent = shallowRef(LoginLeft);
 
 // 컴포넌트를 전환하는 함수
 const showLoginPw = () => {

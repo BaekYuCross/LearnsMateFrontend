@@ -1,8 +1,10 @@
 <template>
     <div class="login-left">
       <h1>| 비밀번호 재설정</h1>
+      <!-- @submit.prevent로 재로딩 방지 -->
       <form class="login-form" @submit.prevent="handleSubmit">
         <input id="id" type="text" placeholder="사번 ID" class="login-input" />
+        
         <div class="input-group">
           <label for="email" class="input-label">이메일</label>
           <div class="email-wrapper">
@@ -13,6 +15,7 @@
               placeholder="E-mail 입력"
               class="login-input email-input"
             />
+            <!-- 인증 버튼 -->
             <button type="button" class="auth-button" @click="sendAuthCode">인증</button>
           </div>
         </div>
@@ -28,14 +31,16 @@
           />
         </div>
   
+        <!-- 다음 버튼 -->
         <button type="submit" class="login-button">다음</button>
+        <!-- 메시지 출력 -->
         <p v-if="message" :class="messageClass">{{ message }}</p>
+        <!-- 로그인하기 버튼 -->
         <button type="button" class="login-pw" @click="$emit('show-login')">로그인하기</button>
       </form>
     </div>
   </template>
   
-
   <script setup>
   import { ref } from 'vue';
   
