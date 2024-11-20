@@ -193,9 +193,8 @@ const fetchTutors = async () => {
 // 필터링 검색
 const handleSearch = async (filterData) => {
   try {
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor',
-      camelToSnake(filterData),
+    console.log(camelToSnake(filterData.value));
+    const response = await axios.post('http://localhost:5000/member/filter/tutor',camelToSnake(filterData),
       {
         headers: {
           Authorization: token,

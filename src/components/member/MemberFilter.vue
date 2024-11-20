@@ -52,16 +52,16 @@
           <span class="filter-label">계정상태</span>
           <select v-model="filters.memberFlag" class="filter-input">
             <option value="">전체</option>
-            <option value="Y">활성</option>
-            <option value="N">비활성</option>
+            <option value="true">활성</option>
+            <option value="false">비활성</option>
           </select>
         </div>
         <div class="filter-item">
           <span class="filter-label">휴면상태</span>
           <select v-model="filters.memberDormantFlag" class="filter-input">
             <option value="">전체</option>
-            <option value="Y">휴면</option>
-            <option value="N">비휴면</option>
+            <option value="true">휴면</option>
+            <option value="false">비휴면</option>
           </select>
         </div>
       </div>
