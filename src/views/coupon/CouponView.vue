@@ -428,7 +428,7 @@ const applyFilters = async (filters) => {
 };
 
 const selectCoupon = (coupon) => {
-  selectedCoupon.value = selectedCoupon.value?.id === coupon.id ? null : coupon;
+  selectedCoupon.value = coupon; // 클릭한 데이터를 바로 설정
 };
 
 // const selectCoupon = (coupon) => {
@@ -547,4 +547,64 @@ const selectCoupon = (coupon) => {
   .coupon-detail-container .close-button:hover {
     background-color: #cc0000;
   }
+
+  .coupon-table th:nth-child(1), /* 쿠폰 번호 */
+.coupon-table td:nth-child(1) {
+  width: 150px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(2), /* 쿠폰 이름 */
+.coupon-table td:nth-child(2) {
+  width: 150px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(3), /* 쿠폰 내용 */
+.coupon-table td:nth-child(3) {
+  width: 200px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(4), /* 쿠폰 할인율 */
+.coupon-table td:nth-child(4) {
+  width: 120px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(5), /* 쿠폰 종류 */
+.coupon-table td:nth-child(5) {
+  width: 100px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(6), /* 상태 */
+.coupon-table td:nth-child(6) {
+  width: 80px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(7), /* 시작일 */
+.coupon-table td:nth-child(7) {
+  width: 100px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(8), /* 만료일 */
+.coupon-table td:nth-child(8) {
+  width: 120px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(9), /* 생성일 */
+.coupon-table td:nth-child(9) {
+  width: 120px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(10), /* 수정일 */
+.coupon-table td:nth-child(10) {
+  width: 120px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(11), /* 직원 */
+.coupon-table td:nth-child(11) {
+  width: 100px; /* 열 너비 설정 */
+}
+
+.coupon-table th:nth-child(12), /* 강사 */
+.coupon-table td:nth-child(12) {
+  width: 100px; /* 열 너비 설정 */
+}
 </style>
