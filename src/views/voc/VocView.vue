@@ -6,10 +6,6 @@
       <div class="voc-actions">
         <div class="voc-count">등록된 VOC <span class="voc-length">{{ vocList.length }}</span>개</div>
         <div class="voc-button-group">
-          <button class="voc-register-button">
-            <img src="@/assets/icons/voc_answer_register.svg" alt="VOC 답변 등록록">
-            VOC 등록
-          </button>
           <button class="voc-excel-button">
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
@@ -44,7 +40,7 @@
             <div class="voc-board-row-name">{{ voc.member_name }}</div>
             <div class="voc-board-row-code">{{ voc.member_code }}</div>
             <div class="voc-board-row-manager">{{ voc.admin_name || '-' }}</div>
-            <div class="voc-board-row-date">{{ formatDate(voc.created_at) }}</div>
+            <div class="voc-board-row-date">{{ formatDateFromArray(voc.created_at) }}</div>
             <div class="voc-board-row-status">
               <span :class="getStatusClass(voc.voc_answer_status)">
                 {{ voc.voc_answer_status ? '답변완료' : '미답변' }}
@@ -59,29 +55,15 @@
         </div>
 
         <div class="voc-pagination">
-          <button 
-            class="voc-page-button voc-prev-button" 
-            @click="changePage(currentPage - 1)" 
-            :disabled="currentPage === 1"
-          >
-            ◀이전
-          </button>
-          <span v-for="page in totalPages" :key="page" class="page-number">
-            <button 
-              class="voc-page-button" 
-              :class="{ active: currentPage === page }" 
-              @click="changePage(page)"
-            >
-              {{ page }}
-            </button>
-          </span>
-          <button 
-            class="voc-page-button voc-next-button"
-            @click="changePage(currentPage + 1)" 
-            :disabled="currentPage === totalPages"
-          >
-            다음▶
-          </button>
+          <button class="voc-page-button voc-prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
+          <button class="voc-page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
+          <span v-if="startPage > 2">...</span>
+          <template v-for="page in displayedPages" :key="page">
+            <button v-if="page !== 1 && page !== totalPages"class="voc-page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+          </template>
+          <span v-if="endPage < totalPages - 1">...</span>
+          <button v-if="totalPages > 1"class="voc-page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
+          <button class="voc-page-button voc-next-button"@click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
         </div>
       </div>
     </div>
@@ -99,7 +81,7 @@ const vocList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const pageSize = 10
+const pageSize = 15
 
 const paginatedVOCs = computed(() => {
   const start = (currentPage.value - 1) * pageSize
@@ -109,7 +91,11 @@ const paginatedVOCs = computed(() => {
 
 const fetchVOCList = async (filters = {}) => {
   try {
-    const response = await axios.get('https://learnsmate.shop/voc/list', {
+    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbXSwiaWF0IjoxNzMyMDcyMDEyLCJleHAiOjE3NzUyNzIwMTJ9.OI2PLhgf-sf90n-r9yR_deawJ2_iPjzPP4QHb2xcOBlWuhG88-3nszwPLOct-Q22Omvu7GCYt0abH8HYhQO8aw';
+    const response = await axios.get('http://localhost:5000/voc/list', {
+      headers: {
+        Authorization: token,
+      },
       params: {
         ...filters,
         page: currentPage.value,
@@ -139,28 +125,18 @@ const changePage = (page) => {
   fetchVOCList()
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) {
-    return '-'
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+
+  const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateArray;
+
+  if (dateArray.length === 5 && hours === 0 && minutes === 0) {
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   }
 
-  const isoDateString = dateString.replace(' ', 'T')
-  const date = new Date(isoDateString)
-  
-  if (isNaN(date.getTime())) {
-    console.error('유효하지 않은 날짜 포맷:', dateString)
-    return '-'
-  }
+  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
 
-  return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(date)
-}
 
 const getStatusClass = (status) => {
   return {
@@ -181,5 +157,28 @@ const getSatisfactionClass = (satisfaction) => {
 
 onMounted(() => {
   fetchVOCList()
+})
+
+const displayedPages = computed(() => {
+  let start = Math.max(currentPage.value - 2, 2)
+  let end = Math.min(start + 2, totalPages.value - 1)
+  
+  if (end === totalPages.value - 1) {
+    start = Math.max(end - 2, 2)
+  }
+  
+  let pages = []
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+const startPage = computed(() => {
+  return displayedPages.value[0]
+})
+
+const endPage = computed(() => {
+  return displayedPages.value[displayedPages.value.length - 1]
 })
 </script>
