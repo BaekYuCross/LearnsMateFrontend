@@ -10,7 +10,6 @@
 
       <div class="content-section" :class="{ 'with-detail': selectedStudent }">
         <div class="table-container" :class="{ 'shrink': selectedStudent }">
-          <!-- 전체 학생 수 표시 -->
           <div class="header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ students.length }}</span>명</div>
             <div class="button-group">
@@ -39,27 +38,26 @@
             <tbody>
               <tr 
                 v-for="(student, index) in paginatedStudents" 
-                :key="student.code"
+                :key="student.member_code"
                 @click="showDetail(student)"
                 class="cursor-pointer hover:bg-gray-50"
-                :class="{ 'selected': selectedStudent?.code === student.code }"
+                :class="{ 'selected': selectedStudent?.member_code === student.member_code }"
               >
                 <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
-                <td>{{ student.code }}</td>
-                <td>{{ student.name }}</td>
-                <td>{{ student.email }}</td>
-                <td>{{ student.phone }}</td>
-                <td>{{ student.address }}</td>
-                <td>{{ student.age }}</td>
-                <td>{{ student.birthDate }}</td>
-                <td>{{ student.memberFlag === 'Y' ? '활성' : '비활성' }}</td>
-                <td>{{ student.createDate }}</td>
-                <td>{{ student.dormantFlag === 'Y' ? '휴면' : '활성' }}</td>
+                <td>{{ student.member_code }}</td>
+                <td>{{ student.member_name }}</td>
+                <td>{{ student.member_email }}</td>
+                <td>{{ student.member_phone }}</td>
+                <td>{{ student.member_address }}</td>
+                <td>{{ student.member_age }}</td>
+                <td>{{ student.member_birth }}</td>
+                <td>{{ student.member_flag === true ? '활성' : '비활성' }}</td>
+                <td>{{ student.created_at }}</td>
+                <td>{{ student.member_dormant_flag === true ? '휴면' : '활성' }}</td>
               </tr>
             </tbody>
           </table>
 
-          <!-- 페이지네이션 -->
           <div class="pagination">
             <button 
               class="page-button prev-button" 
@@ -91,29 +89,9 @@
           <div class="detail-content">
             <h3>상세 정보</h3>
             <div class="info-grid">
-              <div class="info-item">
-                <span class="label">학생 코드</span>
-                <span>{{ selectedStudent.code }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">이름</span>
-                <span>{{ selectedStudent.name }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">이메일</span>
-                <span>{{ selectedStudent.email }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">연락처</span>
-                <span>{{ selectedStudent.phone }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">생년월일</span>
-                <span>{{ selectedStudent.birthDate }}</span>
-              </div>
-              <div class="info-item">
-                <span class="label">주소</span>
-                <span>{{ selectedStudent.address }}</span>
+              <div class="info-item" v-for="(value, key) in selectedStudent" :key="key">
+                <span class="label">{{ key }}</span>
+                <span>{{ value }}</span>
               </div>
             </div>
           </div>
@@ -124,62 +102,90 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 
+// 날짜 변환 헬퍼 함수
+const convertToLocalDateTime = (date, isEndDate = false) => {
+  if (!date) return null;
+  
+  // 날짜 문자열에 시간 추가
+  const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
+  return `${date}${timeString}`;
+};
+
+// Snake Case 변환 헬퍼 함수
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
 const selectedStudent = ref(null);
 const currentPage = ref(1);
-const pageSize = 15; // 한 페이지당 보여줄 항목 수
+const pageSize = 15;
+const students = ref([]);
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
 
-const students = ref([
-  // 더미 데이터 예시
-  {
-    code: 1,
-    name: '김철수',
-    email: 'test@example.com',
-    phone: '010-1234-5678',
-    birthDate: '1999-01-01',
-    address: '서울시 강남구'
-  },
-  {
-    code: 'STD002',
-    name: '이영희',
-    email: 'lee@example.com',
-    phone: '010-2345-6789',
-    address: '서울시 서초구 서초동',
-    age: '23',
-    birthDate: '2001-03-15',
-    memberFlag: 'Y',
-    createDate: '2024-01-20',
-    dormantFlag: 'N'
-  },
-])
 
-// 더미 데이터 20개로 확장
-const expandData = () => {
-  const baseData = students.value.slice(0, 2);
-  for (let i = 3; i <= 20; i++) {
-    students.value.push({
-      ...baseData[i % 2],
-      code: `STD${String(i).padStart(3, '0')}`,
+// 전체 학생 목록 가져오기
+const fetchStudents = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/member/students', {
+      headers: {
+        Authorization: token,
+      },
     });
+    students.value = response.data;
+    console.log(students.value);
+  } catch (error) {
+    console.error('Failed to fetch students:', error);
   }
 };
-expandData();
 
-// 페이지네이션 관련 computed 속성들
+// 필터링 검색
+const handleSearch = async (filterData) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/member/filter/student',
+      camelToSnake(filterData), // Camel Case → Snake Case 변환
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    students.value = response.data;
+    currentPage.value = 1;
+    selectedStudent.value = null;
+  } catch (error) {
+    console.error('Failed to filter students:', error);
+  }
+};
+
+// 초기화
+const handleReset = () => {
+  fetchStudents();
+  currentPage.value = 1;
+  selectedStudent.value = null;
+};
+
+onMounted(() => {
+  fetchStudents();
+});
+
+// 페이지네이션 관련
 const totalPages = computed(() => Math.ceil(students.value.length / pageSize));
-
-const paginatedStudents = computed(() => 
-  students.value.slice(
-    (currentPage.value - 1) * pageSize,
-    currentPage.value * pageSize
-  )
+const paginatedStudents = computed(() =>
+  students.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
 );
-
-// 페이지 변경 함수
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
@@ -188,11 +194,7 @@ const changePage = (page) => {
 };
 
 const showDetail = (student) => {
-  if (selectedStudent.value?.code === student.code) {
-    selectedStudent.value = null;
-  } else {
-    selectedStudent.value = student;
-  }
+  selectedStudent.value = selectedStudent.value?.member_code === student.member_code ? null : student;
 };
 </script>
 
