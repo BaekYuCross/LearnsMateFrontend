@@ -1,18 +1,24 @@
 <template>
     <div class="login-left">
       <h1>Login</h1>
-      <form class="login-form">
+      <!-- @submit.prevent를 사용하여 재로딩 방지 -->
+      <form class="login-form" @submit.prevent="handleSubmit">
         <input type="text" placeholder="사번 ID" class="login-input" />
         <input type="password" placeholder="비밀번호" class="login-input" />
         <button type="submit" class="login-button">로그인</button>
+        <!-- 비밀번호 재설정 버튼 -->
         <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
       </form>
     </div>
   </template>
   
   <script setup>
-  // 필요한 로직이 있다면 여기에 추가
+  const handleSubmit = () => {
+    console.log('로그인 버튼 클릭됨');
+    // 로그인 로직 추가 가능 (e.g., API 호출)
+  };
   </script>
+  
   
   <style scoped>
   .login-left {
