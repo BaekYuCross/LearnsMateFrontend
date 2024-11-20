@@ -1,12 +1,19 @@
 <template>
   <MarketingSideMenu />
-  <div class="coupon-main-container">
+  <div class="coupon-main-container"
+  @click="deselectCoupon">
     <CouponFilter @search="applyFilters" />
-    <div class="coupon-content-container">
+    <div class="coupon-content-container"
+    @click.stop>
       <div class="coupon-table-container" :class="{ 'shrink': selectedCoupon }">
         <!-- 전체 쿠폰 개수 -->
-        <div class="coupon-count">
-          등록된 쿠폰 <span class="coupon-length">{{ coupon.length }}</span>개
+        <div class="coupon-table-top">
+          <div class="coupon-count">
+            등록된 쿠폰 <span class="coupon-length">{{ coupon.length }}</span>개
+          </div>
+          <div class="coupon-count-right">
+            <button class="coupon-register-button">쿠폰 등록</button>
+          </div>
         </div>
         <!-- 조회 데이터 테이블 -->
         <div class="coupon-table-wrapper">
@@ -108,7 +115,337 @@ const coupon = [
     admin: "이서현",
     tutor: "",
   },
-  // ... 나머지 데이터는 동일
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+  {
+    id: 1,
+    code: "C001-20241118eidj23isjle",
+    name: "10% 일반 할인",
+    contents: "일반 할인쿠폰입니다.",
+    discountRate: "10",
+    type: "일반",
+    status: "O",
+    startDate: "2024-11-01",
+    expireDate: "2024-11-30",
+    createdAt: "2024-10-031",
+    updatedAt: "2024-10-031",
+    admin: "이서현",
+    tutor: "",
+  },
+
 ];
 
 const selectedCoupon = ref(null);
@@ -139,6 +476,10 @@ const applyFilters = async (filters) => {
 
 const selectCoupon = (coupon) => {
   selectedCoupon.value = coupon;
+};
+
+const deselectCoupon = () => {
+  selectedCoupon.value = null;
 };
 </script>
 
@@ -256,6 +597,25 @@ const selectCoupon = (coupon) => {
 
 .coupon-detail-container .close-button:hover {
   background-color: #cc0000;
+}
+
+.coupon-register-button {
+  background-color: #005950;
+    color: #ffffff;
+    border: none;
+    border-radius: 3px;
+    margin-left: 20px;
+    padding: 10px 20px;
+}
+
+.coupon-register-button:hover {
+  cursor: pointer;
+}
+
+.coupon-table-top {
+  display: flex;
+  justify-content:space-between;
+  padding: 0px 10px;
 }
 
 .coupon-table th:nth-child(1),
