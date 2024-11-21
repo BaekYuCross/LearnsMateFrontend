@@ -19,7 +19,7 @@
         <div class="campaign-filter-item">
             <span class="campaign-filter-label">제목</span>
             <input 
-                v-model="filters.title"
+                v-model="filters.campaignTitle"
                 type="text" 
                 placeholder="캠페인 제목을 입력하세요"
                 class="campaign-filter-input"
@@ -29,13 +29,13 @@
             <span class="campaign-filter-label">게시일</span>
             <div class="campaign-date-range-container">
               <input 
-                v-model="filters.startPostDate"
+                v-model="filters.campaignStartPostDate"
                 type="date" 
                 class="campaign-filter-input date-input"
               />
               <span class="campaign-date-separator">~</span>
               <input 
-                v-model="filters.endPostDate"
+                v-model="filters.campaignEndPostDate"
                 type="date" 
                 class="campaign-filter-input date-input"
               />
@@ -44,7 +44,7 @@
         <div class="campaign-filter-item">
             <span class="campaign-filter-label">유형</span>
             <select 
-                v-model="filters.type"
+                v-model="filters.campaignType"
                 class="campaign-filter-input"
                 >
                 <option value="">전체</option>
@@ -56,7 +56,7 @@
           <div class="campaign-filter-item"> <!-- 1번 -->
             <span class="campaign-filter-label">발송 현황</span>
             <select 
-                v-model="filters.status"
+                v-model="filters.campaignStatus"
                 class="campaign-filter-input"
                 >
                 <option value="">전체</option>
@@ -73,18 +73,35 @@
   import { ref } from 'vue'
   
   const filters = ref({
-    title: '',
-    startPostDate: '',
-    endPostDate: '',
-    type: '',
-    status: '',
+    campaignTitle: '',
+    campaignStartPostDate: '',
+    campaignEndPostDate: '',
+    campaignType: '',
+    campaignStatus: '', 
   })
   
   const emit = defineEmits(['search', 'reset'])
+
+  const convertToLocalDateTime = (date, isEndDate = false) => {
+    if (!date) return null; // date가 없으면 null 반환
+    const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
+    return `${date}${timeString}`; // 'yyyy-MM-ddT00:00:00' 또는 'yyyy-MM-ddT23:59:59'
+  };
+
+  const prepareFilters = (filters) => {
+    return {
+      ...filters,
+      campaignStartPostDate: convertToLocalDateTime(filters.campaignStartPostDate), // 시작 날짜 변환
+      campaignEndPostDate: convertToLocalDateTime(filters.campaignEndPostDate, true), // 종료 날짜 변환
+    };
+  };
   
   const search = () => {
-    emit('search', filters.value)
-  }
+    const preparedFilters = prepareFilters(filters.value);
+    console.log(preparedFilters); 
+    emit('search', preparedFilters); 
+  };
+
   
   const reset = () => {
     Object.keys(filters.value).forEach(key => {
