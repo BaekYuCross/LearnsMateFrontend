@@ -208,14 +208,13 @@
     margin-bottom: 16px;
     background-color: white;
     padding: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .coupon-select-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 10px;
+    padding: 0px 10px;
     border-bottom: 1px solid #e9ecef;
   }
   
@@ -334,5 +333,9 @@
   .coupon-select-reset-button:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+  }
+
+  input:focus {
+    outline: none; 
   }
 </style>
