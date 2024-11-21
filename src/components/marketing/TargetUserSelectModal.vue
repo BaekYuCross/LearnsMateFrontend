@@ -5,13 +5,20 @@
         <h2>타겟 유저</h2>
         <button class="target-user-select-close-button" @click="closeModal">&times;</button>
       </div>
-      <TargetUserFilter @search="applyFilters" @reset="applyFilters({})" />
+      <TargetUserFilter @search="handleSearch" @reset="handleReset" />
       <div class="target-user-select-modal-content">
         <div class="target-user-content-container">
-          <div class="target-user-count">전체 학생 <span class="target-user-length">{{ users.length }}</span>명</div>
+          <div class="target-user-count">전체 학생 <span class="target-user-length">{{ totalCount }}</span>명</div>
           <div class="target-user-board-container">
             <div class="target-user-board-header">
-              <div class="target-user-board-header-select">선택</div>
+              <div class="target-user-board-header-select">
+                <input
+                  type="checkbox"
+                  :checked="isAllSelected"
+                  @change="selectAll"
+                  class="select-all-checkbox"
+                />
+              </div>
               <div class="target-user-board-header-code">학생 코드</div>
               <div class="target-user-board-header-name">이름</div>
               <div class="target-user-board-header-email">이메일</div>
@@ -24,42 +31,37 @@
               <div class="target-user-board-header-dormantflag">휴면상태</div>
             </div>
             <div class="target-user-board-body">
-              <div class="target-user-board-row" v-for="user in paginatedUsers" :key="user.user_code">
+              <div class="target-user-board-row" v-for="user in users" :key="user.member_code">
                 <div class="target-user-board-row-select">
                   <input
                     type="checkbox"
                     :value="user"
                     v-model="selectedUsers"
+                    :checked="isSelected(user)"
                   />
                 </div>
-                <!-- 쿠폰 -> 멤버로 변경하기!!!!!!! -->
                 <div class="target-user-board-row-code">{{ user.member_code }}</div>
                 <div class="target-user-board-row-name">{{ user.member_name }}</div>
                 <div class="target-user-board-row-email">{{ user.member_email }}</div>
                 <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
                 <div class="target-user-board-row-address">{{ user.member_address }}</div>
                 <div class="target-user-board-row-age">{{ user.member_age }}</div>
-                <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
-                <div class="target-user-board-row-memberflag">{{ user.member_flag }}</div>
-                <div class="target-user-board-row-createdat">{{ formatDateTimeFromArray(user.updated_at) }}</div>
-                <div class="target-user-board-row-dormantflag">{{ user.member_dormant_status }}</div>
+                <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
+                <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
+                <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
+                <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
               </div>
 
-              <div class="target-user-pagination">
-                <button 
-                    class="target-user-page-button target-user-prev-button" 
-                    @click="changePage(currentPage - 1)" 
-                    :disabled="currentPage === 1">◀이전</button>
-                <span v-for="page in totalPages" :key="page" class="page-number">
-                    <button 
-                    class="target-user-page-button" 
-                    :class="{ active: currentPage === page }" 
-                    @click="changePage(page)">{{ page }}</button>
-                </span>
-                <button 
-                    class="target-user-page-button target-user-next-button"
-                    @click="changePage(currentPage + 1)" 
-                    :disabled="currentPage === totalPages">다음▶</button>
+              <div class="pagination">
+                <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
+                <button class="page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
+                <span v-if="startPage > 2">...</span>
+                <template v-for="page in displayedPages" :key="page">
+                  <button v-if="page !== 1 && page !== totalPages" class="page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+                </template>
+                <span v-if="endPage < totalPages - 1">...</span>
+                <button v-if="totalPages > 1" class="page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
+                <button class="page-button next-button" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
               </div>
             </div>
           </div>
@@ -78,28 +80,177 @@ import axios from 'axios';
 import TargetUserFilter from './TargetUserFilter.vue';
 
 const emit = defineEmits(['submit', 'close']);
-const cancleModal = ref(false);
 
 const isOpen = ref(true);
 const users = ref([]);
 const selectedUsers = ref([]);
+const totalCount = ref(0);
+const currentPage = ref(1);
+const totalPages = ref(1);
+const pageSize = 15;
+const isFiltered = ref(false);
+const lastFilterData = ref(null);
+
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+
+// Snake Case 변환 헬퍼 함수
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
 
 const fetchUsers = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/member/students', {
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        Authorization: token,
+      }
+    });
+    users.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+  }
+};
+
+const isAllSelected = computed(() => {
+  return users.value.length > 0 && selectedUsers.value.length === users.value.length;
+});
+
+const isSelected = (user) => {
+  return selectedUsers.value.some(selected => selected.member_code === user.member_code);
+};
+
+const selectAll = async (event) => {
+  if (event.target.checked) {
     try {
-      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-      const response = await axios.get('http://localhost:5000/member/students',{
-        method: 'GET',
-        headers: {
-          Authorization: token,
+      let response;
+      if (isFiltered.value && lastFilterData.value) {
+        // 필터링된 전체 데이터 가져오기
+        response = await axios.post(
+          'http://localhost:5000/member/filter/student',
+          camelToSnake(lastFilterData.value),
+          {
+            params: {
+              page: 0,
+              size: totalCount.value // 전체 데이터를 한 번에 가져오기 위해 size를 totalCount로 설정
+            },
+            headers: {
+              Authorization: token,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } else {
+        // 필터링되지 않은 전체 데이터 가져오기
+        response = await axios.get('http://localhost:5000/member/students', {
+          params: {
+            page: 0,
+            size: totalCount.value
+          },
+          headers: {
+            Authorization: token,
           }
         });
-        users.value = response.data;
-        console.log(users.value);
-        console.log(users.value.length);
+      }
+      selectedUsers.value = response.data.content;
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error('Failed to fetch all users:', error);
     }
-  };
+  } else {
+    selectedUsers.value = [];
+  }
+};
+
+const handleSearch = async (filterData) => {
+  try {
+    isFiltered.value = true;
+    lastFilterData.value = filterData;
+    currentPage.value = 1;
+    selectedUsers.value = []; // 검색 시 선택 초기화 추가
+
+    const response = await axios.post(
+      'http://localhost:5000/member/filter/student',
+      camelToSnake(filterData),
+      {
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize
+        },
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    users.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    console.error('Failed to filter users:', error);
+  }
+};
+
+const handleReset = () => {
+  isFiltered.value = false;
+  lastFilterData.value = null;
+  currentPage.value = 1;
+  selectedUsers.value = []; // 초기화 시 선택 초기화 추가
+  fetchUsers();
+};
+
+const displayedPages = computed(() => {
+  // 앞뒤로 2페이지씩 보이도록 수정
+  let start = Math.max(currentPage.value - 2, 2);
+  let end = Math.min(start + 4, totalPages.value - 1); // 4로 변경하여 더 많은 페이지 표시
+  
+  // end가 마지막 페이지에 가까울 때 start를 조정
+  if (end === totalPages.value - 1) {
+    start = Math.max(end - 4, 2); // 마찬가지로 4로 변경
+  }
+  
+  // start가 2에 가까울 때 end를 조정
+  if (start === 2) {
+    end = Math.min(6, totalPages.value - 1); // 첫 페이지 다음부터 5개 페이지 표시
+  }
+  
+  let pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
+const startPage = computed(() => {
+  return displayedPages.value[0];
+});
+
+const endPage = computed(() => {
+  return displayedPages.value[displayedPages.value.length - 1];
+});
+
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  
+  currentPage.value = newPage;
+  selectedUsers.value = []; 
+  
+  if (isFiltered.value && lastFilterData.value) {
+    await handleSearch(lastFilterData.value);
+  } else {
+    await fetchUsers();
+  }
+};
 
 const closeModal = () => {
   isOpen.value = false;
@@ -110,60 +261,23 @@ const saveSelection = () => {
   emit('submit', selectedUsers.value);
 };
 
-const currentPage = ref(1);
-const pageSize = 15;
-
-const totalPages = computed(() => Math.ceil(users.value.length / pageSize));
-
-const paginatedUsers = computed(() =>
-  Array.isArray(users.value)
-    ? users.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-    : []
-);
-
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
-
 const formatDateTimeFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
+  if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
   const [year, month, day, hours, minutes, seconds] = dateArray;
   return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 5) return ''; // 유효하지 않은 데이터 처리
-  const [year, month, day, hours, minutes ] = dateArray;
+  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+  const [year, month, day] = dateArray;
   return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 };
 
-const applyFilters = async (filters) => {
-  try {
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/student', 
-      filters,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    );
-    users.value = response.data; 
-    currentPage.value = 1; 
-    console.log('Filtered Users:', users.value);
-  } catch (error) {
-    console.error('Error fetching filtered users:', error);
-  }
-};
-
-onMounted(async() => {
-  await fetchUsers();
+onMounted(() => {
+  fetchUsers();
 });
-
 </script>
+
   
   <style scoped>
   .target-user-modal-overlay {
@@ -254,6 +368,8 @@ onMounted(async() => {
     font-size: 11px;
     color: #333333;
     text-align: center;
+    justify-content: center;
+    align-items: center;
   }
 
   .target-user-pagination {
@@ -302,16 +418,16 @@ onMounted(async() => {
     color: white;
   }
 
+  .select-all-checkbox {
+    cursor: pointer;
+  }
 
-
-
-
-
-
-
-
-
-
+  .target-user-board-header-select,
+  .target-user-board-row-select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .target-user-count {
     font-size: 17px;
@@ -322,17 +438,6 @@ onMounted(async() => {
   .target-user-length {
     color: #005950;
   }
-
-
-
-
-
-
-
-
-
-
-
   
   .user-list {
     max-height: 300px;
@@ -385,5 +490,37 @@ onMounted(async() => {
     border-radius: 4px;
     cursor: pointer;
   }
+
+  .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.page-button {
+  background: none;
+  border: none;
+  color: #333;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 0 2px;
+}
+
+.page-button.active {
+  font-weight: bold;
+  color: #005950;
+}
+
+.page-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.prev-button,
+.next-button {
+  font-size: 12px;
+}
   </style>
   
