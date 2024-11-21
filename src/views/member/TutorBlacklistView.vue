@@ -142,6 +142,7 @@
   import { ref, computed } from 'vue'
   import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
   import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import '@/assets/css/member/StudentBlacklistView.css';
   
   const selectedBlacklist = ref(null);
   const currentPage = ref(1);

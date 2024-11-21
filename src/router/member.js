@@ -12,7 +12,7 @@ const MemberRouter = [
     {
         path: '/student/blacklist/reserved',
         name: 'StudentReservedBlacklist',
-        component: () => import('../views/member/StudentReservedBlacklistView.vue')
+        component: () => import('../views/member/ReservedBlacklistView.vue')
     },
     {
         path: '/tutor',
@@ -27,7 +27,7 @@ const MemberRouter = [
     {
         path: '/tutor/blacklist/reserved',
         name: 'TutorReservedBlacklist',
-        component: () => import('../views/member/TutorReservedBlacklistView.vue')
+        component: () => import('../views/member/ReservedBlacklistView.vue')
     },
 ];
 
