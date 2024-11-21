@@ -68,7 +68,7 @@ const loginUser = async () => {
       alert(`${decodedToken.name}님, 환영합니다.`);
 
       // 메인 페이지로 이동
-      router.push('/');
+      window.location.href = '/';
     } else {
       errorMessage.value = '인증 토큰이 없습니다. 로그인 실패';
       alert("아이디와 비밀번호를 확인해주세요.");
