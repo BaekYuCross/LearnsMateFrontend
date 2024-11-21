@@ -21,8 +21,8 @@
                 <span class="detail-title">캠페인 템플릿 선택</span>
                 <select v-model="selectedTemplateCode" @change="updateTemplate" class="template-select">
                   <option value="">직접 입력</option>
-                  <option v-for="template in templates" :key="template.campaignTemplateCode" :value="template.campaignTemplateCode">
-                    {{ template.campaignTemplateTitle }}
+                  <option v-for="template in templates" :key="template.campaign_template_code" :value="template.campaign_template_code">
+                    {{ template.campaign_template_title }}
                   </option>
                 </select>
               </div>
@@ -49,7 +49,7 @@
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">담당자</span>
-                <span class="detail-content">조제훈</span>
+                <span class="detail-content">로그인한 직원이름으로 바뀔거여요^^</span>
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">발송 유형</span>
@@ -96,20 +96,28 @@
               </div>
             </div>
             <div class="coupon-list">
-              <div v-for="coupon in attachedCoupons" :key="coupon.couponCode" class="coupon-item">
-                {{ coupon.couponName }}
+              <div v-for="coupon in attachedCoupons" :key="coupon.coupon_code" class="coupon-item">
+                {{ coupon.coupon_name }}
               </div>
             </div>
           </div>
         </div>
-        <div class="campaign-target">
-          <TargetUserFilter @applyFilter="applyTargetUserFilter" />
+        <div class="campaign-header">
+          <span class="campaign-select-span">타겟 유저</span>
+          <div class="target-buttons">
+                <button class="excel-download-btn">
+                  <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
+                  엑셀 업로드
+                </button>
+                <button class="add-target-user-btn" @click="clickTargetUserSelect">+</button>
+              </div>
         </div>
         <div class="target-user-list">
-          <div v-for="user in targetUsers" :key="user.memberCode" class="coupon-item">
-            {{ user.memberCode }}
-          </div>
+          <div v-for="user in targetUsers" :key="user.member_code" class="target-user-item">
+                {{ user.user_name }}
+              </div>
         </div>
+
         <div class="campaign-register-button-group">
           <button class="campaign-register-button" @click="registerCampaign">
             등록하기
@@ -122,28 +130,51 @@
     </div>
   </div>
   <CouponSelectModal
-  v-if="showCouponSelectModal"
-  @Close="handleModalClose"
-  @Submit="handleModalSubmit"
+    v-if="showCouponSelectModal"
+    @Close="handleCouponModalClose"
+    @Submit="handleCouponSubmit"
+  />
+  <TargetUserSelctModal
+    v-if="showTargetUserSelectModal"
+    @Close="handleTargetUserModalClose"
+    @Submit="handleTargetUserSubmit"
   />
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-import TargetUserFilter from '@/components/marketing/TargetUserFilter.vue';
-import CouponSelectModal from '@/components/couponSelectModal.vue';
+import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
+import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
 
 const showCouponSelectModal = ref(false);
+const showTargetUserSelectModal = ref(false);
 
-const clickCouponSelect = () => {
-  fetchCoupons;
+const clickCouponSelect = async() => {
   showCouponSelectModal.value = true;
-  }
+};
 
-const handleModalClose = () => {
+const handleCouponModalClose = () => {
   showCouponSelectModal.value = false;
-  };
+};
+
+const handleCouponSubmit = (coupons) => {
+  attachedCoupons.value = [...attachedCoupons.value, ...coupons]; // 선택된 쿠폰 추가
+  showCouponSelectModal.value = false; // 모달 닫기
+};
+
+const clickTargetUserSelect = async() => {
+  showTargetUserSelectModal.value = true;
+};
+const handleTargetUserModalClose = () => {
+  showTargetUserSelectModal.value = false;
+};
+
+const handleTargetUserSubmit = (users) => {
+  targetUsers.value = [...targetUsers.value, ...users]; // 선택된 유저 추가
+  showTargetUserSelectModal.value = false; // 모달 닫기
+};
 
 const templates = ref([]);
 const selectedTemplateCode = ref('');
@@ -165,34 +196,28 @@ const updateTemplate = async () => {
     campaignTitle.value = '';
     campaignContents.value = '';
   } else {
-    const template = templates.value.find((t) => t.id === selectedTemplateCode.value);
+    const template = templates.value.find((t) => t.campaign_template_code === selectedTemplateCode.value);
     if (template) {
-      campaignTitle.value = template.title;
-      campaignContents.value = template.content;
+      campaignTitle.value = template.campaign_template_title;
+      campaignContents.value = template.campaign_template_contents;
     }
   }
 };
 
 const fetchTemplates = async () => {
   try {
-    const response = await fetch('/https://learnsmate.site/campaign-template/list');
+    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+    const response = await axios.get('http://localhost:5000/campaign-template/list',{
+      method: 'GET',
+      headers: {
+        Authorization: token,
+        }
+      });
     templates.value = response.data;
+    console.log(templates.value);
   } catch (error) {
     console.error('Failed to fetch templates:', error);
   }
-};
-
-const fetchCoupons = async () => {
-  try {
-    const response = await fetch('/https://learnsmate.site/coupon/coupons');
-    attachedCoupons.value = response.data;
-  } catch (error) {
-    console.error('Failed to fetch coupons:', error);
-  }
-};
-
-const applyTargetUserFilter = (filteredUsers) => {
-  targetUsers.value = filteredUsers;
 };
 
 const selectSendType = (type) => {
@@ -412,7 +437,7 @@ fetchTemplates();
   margin-bottom: 15px;
 }
 
-.attach-buttons {
+.attach-buttons, .target-buttons {
   display: flex;
   align-items: center; 
   gap: 10px;
@@ -438,7 +463,7 @@ fetchTemplates();
   background-color: #004c42;
 }
 
-.add-coupon-btn {
+.add-coupon-btn, .add-target-user-btn {
   width: 25px;
   height: 25px;
   font-size: 15px;
@@ -480,7 +505,7 @@ fetchTemplates();
   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
     
-.coupon-item {
+.coupon-item, .target-user-item {
   padding: 10px;
   background-color: white;
   border: 1px solid #ddd;
