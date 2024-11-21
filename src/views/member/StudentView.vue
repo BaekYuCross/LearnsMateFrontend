@@ -38,22 +38,22 @@
             <tbody>
               <tr 
                 v-for="(student, index) in students" 
-                :key="student.member_code"
+                :key="student.memberCode"
                 @click="showDetail(student)"
                 class="cursor-pointer hover:bg-gray-50"
-                :class="{ 'selected': selectedStudent?.member_code === student.member_code }"
+                :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
               >
                 <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ student.member_code }}</td>
-                <td>{{ student.member_name }}</td>
-                <td>{{ student.member_email }}</td>
-                <td>{{ student.member_phone }}</td>
-                <td>{{ student.member_address }}</td>
-                <td>{{ student.member_age }}</td>
-                <td>{{ student.member_birth }}</td>
-                <td>{{ student.member_flag === true ? '활성' : '비활성' }}</td>
-                <td>{{ student.created_at }}</td>
-                <td>{{ student.member_dormant_flag === true ? '휴면' : '활성' }}</td>
+                <td>{{ student.memberCode }}</td>
+                <td>{{ student.memberName }}</td>
+                <td>{{ student.memberEmail }}</td>
+                <td>{{ student.memberPhone }}</td>
+                <td>{{ student.memberAddress }}</td>
+                <td>{{ student.memberAge }}</td>
+                <td>{{ student.memberBirth }}</td>
+                <td>{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
+                <td>{{ student.createdAt }}</td>
+                <td>{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
               </tr>
             </tbody>
           </table>
@@ -89,7 +89,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import axios from '@/plugins/axios';
+
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/StudentView.css'
@@ -103,17 +104,6 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
-
-// Snake Case 변환 헬퍼 함수
-const camelToSnake = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  return Object.keys(obj).reduce((acc, key) => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    acc[snakeKey] = camelToSnake(obj[key]);
-    return acc;
-  }, {});
-};
 
 // 전체 학생 목록 가져오기
 const fetchStudents = async () => {
@@ -131,6 +121,7 @@ const fetchStudents = async () => {
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
+    console.log(students.value);
   } catch (error) {
     console.error('Failed to fetch students:', error);
   }
@@ -236,10 +227,27 @@ const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
 
-const showDetail = (student) => {
-  selectedStudent.value = selectedStudent.value?.member_code === student.member_code ? null : student;
+const showDetail = async (student) => {
+  if (selectedStudent.value?.memberCode === student.memberCode) {
+    selectedStudent.value = null;
+    // reportDetails.value = [];
+  } else {
+    selectedStudent.value = student;
+    try {
+      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      // reportDetails.value = response.data;
+      // console.log('학생 상세 정보:', reportDetails.value);
+    } catch (error) { 
+      console.error('Failed to load student details:', error);
+      // reportDetails.value = []; 
+    }
+  }
 };
-
 onMounted(() => {
   fetchStudents();
 });

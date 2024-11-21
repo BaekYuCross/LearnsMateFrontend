@@ -39,6 +39,7 @@
         submenus: [
             { name: '학생 조회', path: '/student' },
             { name: '학생 블랙리스트', path: '/student/blacklist' },
+            { name: '학생 예비 블랙리스트', path: '/student/blacklist/reserved'}
         ],
         },
         {
@@ -46,6 +47,7 @@
         submenus: [
             { name: '강사 조회', path: '/tutor' },
             { name: '강사 블랙리스트', path: '/tutor/blacklist' },
+            { name: '강사 예비 블랙리스트', path: '/tutor/blacklist/reserved'}
         ],
         },
     ]);
