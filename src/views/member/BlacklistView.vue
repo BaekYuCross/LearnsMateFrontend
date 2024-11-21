@@ -3,7 +3,7 @@
     <div class="side-menu"><MemberSideMenu/></div>
     <div class="main-content">
       <BlacklistFilter 
-        type="student" 
+        :type="filterType"
         @search="handleSearch" 
         @reset="handleReset"
       />
@@ -11,9 +11,9 @@
       <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
         <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
           <div class="blacklist-header-container">
-            <div class="student-blacklist-count">전체 학생 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
-            <div class="student-blacklist-button-group">
-              <button class="student-blacklist-excel-button">
+            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="blacklist-button-group">
+              <button class="blacklist-excel-button">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -24,9 +24,9 @@
               <tr>
                 <th>No</th>
                 <th>블랙리스트 코드</th>
-                <th>학생 코드</th>
-                <th>학생 이름</th>
-                <th>학생 이메일</th>
+                <th>{{ memberTypeText }} 코드</th>
+                <th>{{ memberTypeText }} 이름</th>
+                <th>{{ memberTypeText }} 이메일</th>
                 <th>블랙리스트 사유</th>
                 <th>정지일</th>
                 <th>담당자</th>
@@ -46,7 +46,7 @@
                 <td>{{ blacklist.memberName }}</td>
                 <td>{{ blacklist.memberEmail }}</td>
                 <td>{{ blacklist.blackReason }}</td>
-                <td>{{ blacklist.createDate }}</td>
+                <td>{{ blacklist.createdAt }}</td>
                 <td>{{ blacklist.adminName }}</td>
               </tr>
             </tbody>
@@ -70,7 +70,7 @@
             <h3>블랙리스트 상세 정보</h3>
             <div class="info-grid">
               <div class="info-item">
-                <span class="label">학생 코드:</span>
+                <span class="label"> {{ memberTypeText }} 코드:</span>
                 <span>{{ selectedBlacklist.memberCode }}</span>
               </div>
               <div class="info-item">
@@ -83,7 +83,7 @@
               </div>
               <div class="info-item">
                 <span class="label">정지일:</span>
-                <span>{{ selectedBlacklist.createDate }}</span>
+                <span>{{ selectedBlacklist.createdAt }}</span>
               </div>
               <div class="info-item">
                 <span class="label">블랙리스트 사유:</span>
@@ -104,17 +104,17 @@
               <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
                 <div class="report-header">
                   <span class="report-number">신고 #{{ index + 1 }}</span>
-                  <span class="report-date">{{ formatDate(report.reportDTO.reportDate) }}</span>
+                  <span class="report-date">{{ report.reportDto.reportDate }}</span>
                 </div>
                 <div class="report-content">
                   <div class="report-info">
-                    <p><strong>신고 사유:</strong> {{ report.reportDTO.reportReason }}</p>
-                    <p><strong>신고자:</strong> {{ report.reportDTO.reportMemberCode }}</p>
+                    <p><strong>신고 사유:</strong> {{ report.reportDto.reportReason }}</p>
+                    <p><strong>신고자:</strong> {{ report.reportDto.reportMemberCode }}</p>
                   </div>
                   <div class="comment-info">
-                    <p><strong>댓글 내용:</strong> {{ report.commentDTO.commentContent }}</p>
-                    <p><strong>작성일:</strong> {{ formatDate(report.commentDTO.createdAt) }}</p>
-                    <p><strong>강의:</strong> {{ report.commentDTO.lectureCode }}</p>
+                    <p><strong>댓글 내용:</strong> {{ report.commentDto.commentContent }}</p>
+                    <p><strong>작성일:</strong> {{ report.commentDto.createdAt }}</p>
+                    <p><strong>강의:</strong> {{ report.commentDto.lectureCode }}</p>
                   </div>
                 </div>
               </div>
@@ -127,11 +127,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import axios from '@/plugins/axios';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
-import '@/assets/css/member/StudentBlacklistView.css';
+import '@/assets/css/member/BlacklistView.css';
 
 const selectedBlacklist = ref(null);
 const blacklists = ref([]);
@@ -142,8 +143,16 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const reportDetails = ref([]);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
+const route = useRoute();
+const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
+const memberTypeText = computed(() => ({
+  'tutor': '강사',
+  'student': '학생'
+}[memberType.value]));
+const filterType = computed(() => memberType.value);
 
+
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
 
 // Snake Case 변환 함수
 const camelToSnake = (obj) => {
@@ -156,10 +165,29 @@ const camelToSnake = (obj) => {
   }, {});
 };
 
-// 전체 블랙리스트 목록 가져오기
+watch(
+  () => route.path,
+  (newPath) => {
+    memberType.value = newPath.includes('/tutor') ? 'tutor' : 'student';
+    resetData();
+  }
+);
+
+const resetData = () => {
+  currentPage.value = 1;
+  selectedBlacklist.value = null;
+  reportDetails.value = [];
+  blacklists.value = [];
+  totalCount.value = 0;
+  totalPages.value = 1;
+  isFiltered.value = false;
+  lastFilterData.value = null;
+  fetchBlacklists();
+};
+
 const fetchBlacklists = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/blacklist/student', {
+    const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}`, {
       params: {
         page: currentPage.value - 1,
         size: pageSize
@@ -172,6 +200,7 @@ const fetchBlacklists = async () => {
     blacklists.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
+    console.log(blacklists.value);
   } catch (error) {
     console.error('Failed to fetch blacklists:', error);
   }
@@ -185,7 +214,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      'http://localhost:5000/blacklist/student/filter',
+      `http://localhost:5000/blacklist/${memberType.value}/filter`,
       camelToSnake(filterData),
       {
         params: {
@@ -275,7 +304,6 @@ const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
 
-// 상세 정보 및 신고 내역 조회
 const showDetail = async (blacklist) => {
   if (selectedBlacklist.value?.blackCode === blacklist.blackCode) {
     selectedBlacklist.value = null;
@@ -283,23 +311,18 @@ const showDetail = async (blacklist) => {
   } else {
     selectedBlacklist.value = blacklist;
     try {
-      const response = await axios.get(`http://localhost:5000/blacklist/student/${blacklist.blackCode}/reports`, {
+      const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/${blacklist.blackCode}`, {
         headers: {
           Authorization: token,
         },
       });
       reportDetails.value = response.data;
+      console.log("상세내용ㅇ,ㅡㄴ", reportDetails.value);
     } catch (error) {
       console.error('Failed to load report details:', error);
       reportDetails.value = [];
     }
   }
-};
-
-// 날짜 포맷 함수
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleString();
 };
 
 onMounted(() => {

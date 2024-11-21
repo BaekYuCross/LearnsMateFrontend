@@ -32,12 +32,12 @@
                 :key="blacklist.member_code"
                 @click="showDetail(blacklist)"
                 class="reserved-cursor-pointer hover:bg-gray-50"
-                :class="{ 'reserved-selected': selectedReserved?.member_code === blacklist.member_code }"
+                :class="{ 'reserved-selected': selectedReserved?.memberCode === blacklist.memberCode }"
               >
                 <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ blacklist.member_code }}</td>
-                <td>{{ blacklist.member_name }}</td>
-                <td>{{ blacklist.report_count }}</td>
+                <td>{{ blacklist.memberCode }}</td>
+                <td>{{ blacklist.memberName }}</td>
+                <td>{{ blacklist.reportCount }}</td>
               </tr>
             </tbody>
           </table>
@@ -83,15 +83,15 @@
             <div class="reserved-info-grid">
               <div class="reserved-info-item">
                 <span class="reserved-label">{{ memberTypeText }} 코드:</span>
-                <span>{{ selectedReserved.member_code }}</span>
+                <span>{{ selectedReserved.memberCode }}</span>
               </div>
               <div class="reserved-info-item">
                 <span class="reserved-label">이름:</span>
-                <span>{{ selectedReserved.member_name }}</span>
+                <span>{{ selectedReserved.memberName }}</span>
               </div>
               <div class="reserved-info-item">
                 <span class="reserved-label">신고 횟수:</span>
-                <span>{{ selectedReserved.report_count }}회</span>
+                <span>{{ selectedReserved.reportCount }}회</span>
               </div>
             </div>
 
@@ -128,10 +128,10 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import axios from 'axios';
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
+import axios from '@/plugins/axios';
 
   const route = useRoute();
   const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
