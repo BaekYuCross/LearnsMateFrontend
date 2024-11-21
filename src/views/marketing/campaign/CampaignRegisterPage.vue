@@ -384,6 +384,7 @@ fetchTemplates();
   border: 1px solid #ddd;
   font-size: 12px;
   width: 40%;
+  outline: none; 
 }
 
 
