@@ -197,6 +197,5 @@
 
   input:focus {
     outline: none; 
-    border: none; 
   }
   </style>
