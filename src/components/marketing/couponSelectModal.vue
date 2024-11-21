@@ -35,11 +35,11 @@
                         <div class="board-row-name">{{ coupon.coupon_name }}</div>
                         <div class="board-row-contents">{{ coupon.coupon_contents }}</div>
                         <div class="board-row-discount-rate">{{ coupon.coupon_discount_rate }}%</div>
-                        <div class="board-row-type">{{ coupon.coupon_category_code }}</div>
-                        <div class="board-row-start-date">{{ formatDateFromArray(coupon.coupon_start_date) }}</div>
-                        <div class="board-row-expire-date">{{ formatDateFromArray(coupon.coupon_expire_date) }}</div>
-                        <div class="board-row-created-at">{{ formatDateFromArray(coupon.created_at) }}</div>
-                        <div class="board-row-updated-at">{{ formatDateFromArray(coupon.updated_at) }}</div>
+                        <div class="board-row-type">{{ coupon.coupon_category_name }}</div>
+                        <div class="board-row-start-date">{{ coupon.coupon_start_date }}</div>
+                        <div class="board-row-expire-date">{{ coupon.coupon_expire_date }}</div>
+                        <div class="board-row-created-at">{{ coupon.created_at }}</div>
+                        <div class="board-row-updated-at">{{ coupon.updated_at }}</div>
                       </div>
 
                     </div>
