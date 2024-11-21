@@ -194,4 +194,9 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
   }
+
+  input:focus {
+    outline: none; 
+    border: none; 
+  }
   </style>
