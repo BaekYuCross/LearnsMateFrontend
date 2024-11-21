@@ -4,7 +4,7 @@
     <div class="voc-content-container">
       <VOCFilter @search="handleSearch" @reset="handleReset" />
       <div class="voc-actions">
-        <div class="voc-count">등록된 VOC <span class="voc-length">{{ vocList.length }}</span>개</div>
+        <div class="voc-count">등록된 VOC <span class="voc-length">{{ totalCount }}</span>개</div>
         <div class="voc-button-group">
           <button class="voc-excel-button">
             <img src="@/assets/icons/download.svg" alt="다운로드">
@@ -32,7 +32,7 @@
         </div>
 
         <div class="voc-board-body">
-          <div class="voc-board-row" v-for="voc in paginatedVOCs" :key="voc.voc_code">
+          <div class="voc-board-row" v-for="voc in vocList" :key="voc.voc_code">
             <div class="voc-board-row-number">{{ voc.voc_code }}</div>
             <div class="voc-board-row-content">{{ voc.voc_content }}</div>
             <div class="voc-board-row-category">{{ voc.voc_category_name }}</div>
@@ -48,7 +48,7 @@
             </div>
             <div class="voc-board-row-satisfaction">
               <span :class="getSatisfactionClass(voc.voc_answer_satisfaction)">
-                {{ voc.voc_answer_satisfaction || '-' }}
+              {{ voc.voc_answer_satisfaction || '-' }}
               </span>
             </div>
           </div>
@@ -77,53 +77,102 @@ import VOCFilter from '@/components/voc/VOCFilter.vue'
 import axios from 'axios'
 import '@/assets/css/voc/VOCView.css'
 
+const selectedVOC = ref(null)
 const vocList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
 const pageSize = 15
-
-const paginatedVOCs = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return vocList.value.slice(start, end)
-})
+const isFiltered = ref(false)
+const lastFilterData = ref(null)
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbXSwiaWF0IjoxNzMyMDcyMDEyLCJleHAiOjE3NzUyNzIwMTJ9.OI2PLhgf-sf90n-r9yR_deawJ2_iPjzPP4QHb2xcOBlWuhG88-3nszwPLOct-Q22Omvu7GCYt0abH8HYhQO8aw';
 
 const fetchVOCList = async (filters = {}) => {
   try {
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbXSwiaWF0IjoxNzMyMDcyMDEyLCJleHAiOjE3NzUyNzIwMTJ9.OI2PLhgf-sf90n-r9yR_deawJ2_iPjzPP4QHb2xcOBlWuhG88-3nszwPLOct-Q22Omvu7GCYt0abH8HYhQO8aw';
     const response = await axios.get('http://localhost:5000/voc/list', {
       headers: {
         Authorization: token,
       },
       params: {
         ...filters,
-        page: currentPage.value,
+        page: currentPage.value - 1,
         size: pageSize
       }
-    })
-    vocList.value = response.data
-    totalCount.value = response.data.length
-    totalPages.value = Math.ceil(totalCount.value / pageSize)
+    });
+    
+    vocList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
   } catch (error) {
-    console.error('VOC 목록을 불러오는데 실패했습니다:', error)
+    console.error('VOC 목록을 불러오는데 실패했습니다:', error);
   }
-}
+};
 
-const handleSearch = (filters) => {
-  currentPage.value = 1
-  fetchVOCList(filters)
-}
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+const handleSearch = async (filterData) => {
+  try {
+    isFiltered.value = true;
+    lastFilterData.value = filterData;
+
+    const response = await axios.post(
+      `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+      camelToSnake(filterData),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    vocList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    console.error('Failed to filter voc:', error);
+  }
+};
 
 const handleReset = () => {
-  currentPage.value = 1
-  fetchVOCList()
-}
+  fetchVOCList();
+  currentPage.value = 1;
+  selectedVOC.value = null;
+};
 
-const changePage = (page) => {
-  currentPage.value = page
-  fetchVOCList()
-}
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  
+  currentPage.value = newPage;
+  
+  if (isFiltered.value && lastFilterData.value) {
+    // 필터링된 상태일 때는 같은 필터 조건으로 해당 페이지 데이터 요청
+    const response = await axios.post(
+      `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+      camelToSnake(lastFilterData.value),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    vocList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } else {
+    await fetchVOCList();
+  }
+};
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
