@@ -38,22 +38,22 @@
             <tbody>
               <tr 
                 v-for="(tutor, index) in tutors" 
-                :key="tutor.member_code"
+                :key="tutor.memberCode"
                 @click="showDetail(tutor)"
                 class="cursor-pointer hover:bg-gray-50"
-                :class="{ 'tutor-selected': selectedTutor?.member_code === tutor.member_code }"
+                :class="{ 'tutor-selected': selectedTutor?.memberCode === tutor.memberCode }"
               >
                 <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ tutor.member_code }}</td>
-                <td>{{ tutor.member_name }}</td>
-                <td>{{ tutor.member_email }}</td>
-                <td>{{ tutor.member_phone }}</td>
-                <td>{{ tutor.member_address }}</td>
-                <td>{{ tutor.member_age }}</td>
-                <td>{{ tutor.member_birth }}</td>
-                <td>{{ tutor.member_flag === true ? '활성' : '비활성' }}</td>
-                <td>{{ tutor.created_at }}</td>
-                <td>{{ tutor.member_dormant_flag === true ? '휴면' : '활성' }}</td>
+                <td>{{ tutor.memberCode }}</td>
+                <td>{{ tutor.memberName }}</td>
+                <td>{{ tutor.memberEmail }}</td>
+                <td>{{ tutor.memberPhone }}</td>
+                <td>{{ tutor.memberAddress }}</td>
+                <td>{{ tutor.memberAge }}</td>
+                <td>{{ tutor.memberBirth }}</td>
+                <td>{{ tutor.memberFlag === true ? '활성' : '비활성' }}</td>
+                <td>{{ tutor.createdAt }}</td>
+                <td>{{ tutor.memberDormantFlag === true ? '휴면' : '활성' }}</td>
               </tr>
             </tbody>
           </table>
@@ -75,26 +75,25 @@
           <div class="tutor-detail-content">
             <h3>상세 정보</h3>
             <div class="tutor-info-grid">
-              <!-- 기본 정보 -->
               <div class="tutor-info-item">
                 <span class="tutor-label">강사 코드</span>
-                <span>{{ selectedTutor.member_code }}</span>
+                <span>{{ selectedTutor.memberCode }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">이름</span>
-                <span>{{ selectedTutor.member_name }}</span>
+                <span>{{ selectedTutor.memberName }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">이메일</span>
-                <span>{{ selectedTutor.member_email }}</span>
+                <span>{{ selectedTutor.memberEmail }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">연락처</span>
-                <span>{{ selectedTutor.member_phone }}</span>
+                <span>{{ selectedTutor.memberPhone }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">주소</span>
-                <span>{{ selectedTutor.member_address }}</span>
+                <span>{{ selectedTutor.memberAddress }}</span>
               </div>
         
               <!-- 강의 정보 -->
@@ -128,7 +127,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
+import axios from '@/plugins/axios';
+
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/TutorView.css'
