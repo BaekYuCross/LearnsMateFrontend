@@ -126,20 +126,39 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
 
-const route = useRoute();
-const memberType = route.params.type || 'student';
-
-const memberTypeText = computed(() => ({
+  const route = useRoute();
+  const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
+  const memberTypeText = computed(() => ({
   'tutor': '강사',
   'student': '학생'
-}[memberType]));
+}[memberType.value])); 
+
+watch(
+  () => route.path,
+  (newPath) => {
+    memberType.value = newPath.includes('/tutor') ? 'tutor' : 'student';
+    resetData();
+  }
+);
+
+const resetData = () => {
+  currentPage.value = 1;
+  selectedReserved.value = null;
+  reportDetails.value = [];
+  reservedList.value = [];
+  totalCount.value = 0;
+  totalPages.value = 1;
+  isFiltered.value = false;
+  lastFilterData.value = null;
+  fetchReservedList();
+};
 
 const selectedReserved = ref(null);
 const reservedList = ref([]);
@@ -174,7 +193,7 @@ const groupedReports = computed(() => {
 
 const fetchReservedList = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/blacklist/${memberType}/reserved`, {
+    const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved`, {
       params: {
         page: currentPage.value - 1,
         size: pageSize
@@ -202,7 +221,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType}/reserved/filter`,
+      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
       filterData,
       {
         params: {
@@ -239,7 +258,7 @@ const changePage = async (newPage) => {
   
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType}/reserved/filter`,
+      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
       lastFilterData.value,
       {
         params: {
@@ -293,7 +312,7 @@ const showDetail = async (blacklist) => {
     selectedReserved.value = blacklist;
     try {
       const response = await axios.get(
-        `http://localhost:5000/blacklist/${memberType}/reserved/${blacklist.member_code}`, 
+        `http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.member_code}`, 
         {
           headers: {
             Authorization: token,
