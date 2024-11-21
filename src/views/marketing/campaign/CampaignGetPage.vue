@@ -1,7 +1,10 @@
 <template>
   <div class="marketing-container">
     <MarketingSideMenu />
-    <CampaignFilter/>
+    <CampaignFilter
+      @search="handleSearch" 
+      @reset="handleReset"
+    />
     <div class="content-container">
       <div class="campaign-actions">
       <div class="campaign-count">등록된 캠페인 <span class="campaign-length">{{ campaigns.length }}</span>개</div>
@@ -89,8 +92,8 @@
 
   const currentPage = ref(1);
   const pageSize = 15;
-
   const totalPages = computed(() => Math.ceil(campaigns.value.length / pageSize));
+  
 
   const paginatedCampaigns = computed(() =>
     campaigns.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
@@ -100,8 +103,53 @@
   const changePage = (page) => {
     if (page > 0 && page <= totalPages.value) {
       currentPage.value = page;
+      handleSearch(filters.value); 
     }
+  };
+
+  const camelToSnake = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(camelToSnake);
+    return Object.keys(obj).reduce((acc, key) => {
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      acc[snakeKey] = camelToSnake(obj[key]);
+      return acc;
+    }, {});
+  };
+
+
+const handleSearch = async (preparedFilters) => {
+  try {
+    console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
+    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+    const response = await axios.post(
+      'http://localhost:5000/campaign/filter',
+      camelToSnake(preparedFilters),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+        params: {
+          page: currentPage.value - 1, // 0-based pagination
+          size: pageSize,
+        },
+      }
+    );
+    campaigns.value = response.data.content; // API의 응답 구조에 따라 조정
+    console.log('Filtered campaigns:', campaigns.value);
+    totalPages.value = response.data.totalPages; 
+  } catch (error) {
+    console.error('Error while fetching filtered campaigns:', error);
+  }
 };
+
+const handleReset = async () => {
+  await fetchCampaigns(); // 초기 캠페인 데이터 다시 불러오기
+  currentPage.value = 1;  // 페이지도 초기화
+};
+
+
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
