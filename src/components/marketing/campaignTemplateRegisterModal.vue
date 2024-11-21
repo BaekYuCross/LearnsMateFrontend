@@ -1,5 +1,4 @@
 <template>
-  <Teleport to="body">
     <div v-if="isOpen" class="modal-overlay" @click="closeModal">
       <div class="modal-container" @click.stop>
         <div class="modal-header">
@@ -37,7 +36,6 @@
         </div>
       </div>
     </div>
-  </Teleport>
   <FalseModule 
     v-if="cancleModal"
     @close="handleModalClose"
@@ -47,7 +45,7 @@
 
 <script setup>
 import { ref, defineEmits } from 'vue';
-import FalseModule from './modules/FalseModule.vue';
+import FalseModule from '@/components/modules/FalseModule.vue';
 
 const emit = defineEmits(['close', 'submit']);
 const cancleModal = ref(false);
