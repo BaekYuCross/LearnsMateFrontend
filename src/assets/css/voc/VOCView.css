@@ -1,12 +1,13 @@
 .voc-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  min-height: 100vh;
   padding: 20px;
 }
 
 .voc-content-container {
-  display: block;
-  flex-grow: 1;
+  flex : 1;
+  padding: 20px;
   margin-left: 160px;
   margin-top: 50px;
 }
