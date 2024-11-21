@@ -61,8 +61,6 @@
                     </div>
                 </div>
                 </div>
-            
-            
           </div>
           <div class="coupon-select-modal-footer">
             <button class="coupon-select-submit-button" @click='saveSelection'>저장</button>
