@@ -1,9 +1,5 @@
 <template>
     <div class="target-filter-card">
-      <div class="target-section-header">
-        <h2 class="target-section-title">타겟 유저</h2>
-      </div>
-  
       <div class="target-filter-container">
         <!-- Gray Row -->
         <div class="target-filter-row gray">
@@ -87,26 +83,16 @@
               <button @click="reset" class="reset-button">
                 <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
               </button>
-              <button class="excel-download-btn">
-                <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />엑셀 업로드
-              </button>
-              <button class="add-coupon-btn" @click="openTargetUserModal">+</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <TargetUserSelectModal
-      v-if="showTargetUserModal"
-      @close="handleModalClose"
-      @submit="handleTargetUserSubmit"
-    />
   </template>
   
   
 <script setup>
 import { ref } from 'vue';
-import TargetUserSelectModal from './TargetUserSelectModal.vue';
 
 const filters = ref({
   name: '',
@@ -117,22 +103,6 @@ const filters = ref({
   address: '',
   memberFlag: '',
 });
-
-const showTargetUserModal = ref(false);
-const attachedTargetUsers = ref([]); // 선택된 타겟 유저 리스트
-
-const handleTargetUserSubmit = (selectedUsers) => {
-  attachedTargetUsers.value = [...attachedTargetUsers.value, ...selectedUsers]; // 선택된 유저 추가
-};
-
-
-const openTargetUserModal = async() => {
-  showTargetUserModal.value = true;
-};
-
-const handleModalClose = () => {
-  showTargetUserModal.value = false;
-  };
 
 const emit = defineEmits(['search', 'reset']);
 
@@ -153,7 +123,6 @@ const reset = () => {
   margin-bottom: 16px;
   background-color: white;
   padding: 0;
-  margin-top: 50px;
 }
 
 .target-section-header {
@@ -232,7 +201,7 @@ const reset = () => {
 .target-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 433px;
+  margin-left: 470px;
 }
 
 .target-search-button {
@@ -293,5 +262,10 @@ const reset = () => {
   outline: none;
   box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
 }
+
+input:focus {
+  outline: none;  
+}
+
 
 </style>
