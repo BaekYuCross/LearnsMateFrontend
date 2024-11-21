@@ -2,7 +2,7 @@
   <MarketingSideMenu />
   <div class="coupon-main-container"
   @click="deselectCoupon">
-    <CouponFilter @search="applyFilters" />
+    <CouponFilter @search="applyFilters" @reset="resetFilters"/>
     <div class="coupon-content-container"
     @click.stop>
       <div class="coupon-table-container" :class="{ 'shrink': selectedCoupon }">
@@ -37,22 +37,22 @@
             <tbody>
               <tr
                 class="coupon-table-row"
-                v-for="(coupon, index) in paginatedCoupons"
-                :key="coupon.id"
+                v-for="(coupon, index) in paginatedCoupons || []"
+                :key="coupon.coupon_code"
                 @click="selectCoupon(coupon)"
               >
-                <td>{{ coupon.code }}</td>
-                <td>{{ coupon.name }}</td>
-                <td>{{ coupon.contents }}</td>
-                <td>{{ coupon.discountRate }}</td>
-                <td>{{ coupon.type }}</td>
-                <td>{{ coupon.status }}</td>
-                <td>{{ coupon.startDate }}</td>
-                <td>{{ coupon.expireDate }}</td>
-                <td>{{ coupon.createdAt }}</td>
-                <td>{{ coupon.updatedAt }}</td>
-                <td>{{ coupon.admin || '-' }}</td>
-                <td>{{ coupon.tutor || '-' }}</td>
+                <td>{{ coupon.coupon_code }}</td>
+                <td>{{ coupon.coupon_name }}</td>
+                <td>{{ coupon.coupon_contents }}</td>
+                <td>{{ coupon.coupon_discount_rate }}</td>
+                <td>{{ coupon.coupon_category_name }}</td>
+                <td>{{ coupon.active_state ? '활성' : '비활성' }}</td>
+                <td>{{ formatDate(coupon.coupon_start_date) }}</td>
+                <td>{{ formatDate(coupon.coupon_expire_date) }}</td>
+                <td>{{ formatDate(coupon.created_at) }}</td>
+                <td>{{ formatDate(coupon.updated_at) }}</td>
+                <td>{{ coupon.admin_name || '-' }}</td>
+                <td>{{ coupon.tutor_name || '-' }}</td>
               </tr>
             </tbody>
           </table>
@@ -93,380 +93,84 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponFilter from '@/components/marketing/CouponFilter.vue';
 import CouponDetail from '@/components/marketing/CouponDetail.vue';
 
-const coupon = [
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-  {
-    id: 1,
-    code: "C001-20241118eidj23isjle",
-    name: "10% 일반 할인",
-    contents: "일반 할인쿠폰입니다.",
-    discountRate: "10",
-    type: "일반",
-    status: "O",
-    startDate: "2024-11-01",
-    expireDate: "2024-11-30",
-    createdAt: "2024-10-031",
-    updatedAt: "2024-10-031",
-    admin: "이서현",
-    tutor: "",
-  },
-
-];
-
+const coupon = ref([]);
 const selectedCoupon = ref(null);
 const currentPage = ref(1);
 const pageSize = 15;
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDUwMDMiLCJlbWFpbCI6IjY5NDA5MEBnbWFpbC5jb20iLCJuYW1lIjoi7J207ISc7ZiEIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE3MzIxNTEzNzYsImV4cCI6MTc3NTM1MTM3Nn0.09oguvlZSs2ZX3WuZtjt8cATCF7uxYv1Jv7bphGSJd_UZqN97cHG0RRU_5CFGVNONJLRf-x-QtBpIEAi2R2ZgQ';
+// 전체 페이지 계산
+// const totalPages = computed(() => Math.ceil(coupon.length / pageSize));
+const totalPages = computed(() => {
+  if (Array.isArray(coupon.value)) {
+    return Math.ceil(coupon.value.length / pageSize);
+  }
+  return 1; // 기본값 1로 반환
+});
 
-const totalPages = computed(() => Math.ceil(coupon.length / pageSize));
+// 페이지별로 보여줄 쿠폰 계산
+// const paginatedCoupons = computed(() =>
+//   coupon.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+// );
+const paginatedCoupons = computed(() => {
+  if (Array.isArray(coupon.value)) {
+    return coupon.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
+  }
+  return []; // 배열이 아닌 경우 빈 배열 반환
+});
 
-const paginatedCoupons = computed(() =>
-  coupon.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-);
 
+// 페이지 변경
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
   }
 };
 
+// 선택된 쿠폰 설정
+const selectCoupon = (couponData) => {
+  selectedCoupon.value = couponData;
+};
+
+// 선택 해제
+const deselectCoupon = () => {
+  selectedCoupon.value = null;
+};
+
+const fetchCoupons = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/coupon/coupons'); // API 호출
+    console.log('Fetched data:', response.data); // 응답 데이터 확인
+
+    // 응답 데이터가 배열인지 확인하고 처리
+    if (Array.isArray(response.data)) {
+      coupon.value = response.data; // 응답 데이터가 배열일 경우 그대로 사용
+    } else {
+      console.error('Error: Unexpected API response format');
+      coupon.value = []; // 배열이 아닌 경우 빈 배열로 초기화
+    }
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    coupon.value = []; // 오류 발생 시 빈 배열로 초기화
+  }
+};
+
 const applyFilters = async (filters) => {
   try {
-    const response = await axios.post('/api/coupons/filter', filters);
+    const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
+    {
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
+      }
+    }
+    );
+    console.log(filters);
     coupon.value = response.data;
     currentPage.value = 1;
   } catch (error) {
@@ -474,13 +178,36 @@ const applyFilters = async (filters) => {
   }
 };
 
-const selectCoupon = (coupon) => {
-  selectedCoupon.value = coupon;
+const resetFilters = () => {
+  fetchCoupons();
+  currentPage.value = 1;
+}
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
 };
 
-const deselectCoupon = () => {
-  selectedCoupon.value = null;
+// 컴포넌트가 로드될 때 데이터 가져오기
+onMounted(() => {
+  fetchCoupons(); // 처음 로드 시 쿠폰 데이터를 가져옴
+});
+
+const formatDate = (isoDate) => {
+  if (!isoDate) return '-';
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 };
+
 </script>
 
 <style>
@@ -618,61 +345,73 @@ const deselectCoupon = () => {
   padding: 0px 10px;
 }
 
+/* 쿠폰 번호 */
 .coupon-table th:nth-child(1),
 .coupon-table td:nth-child(1) {
-  width: 150px;
+  width: 100px;
 }
 
+/* 쿠폰 이름 */
 .coupon-table th:nth-child(2),
 .coupon-table td:nth-child(2) {
   width: 150px;
 }
 
+/* 쿠폰 내용 */
 .coupon-table th:nth-child(3),
 .coupon-table td:nth-child(3) {
-  width: 200px;
+  width: 250px;
 }
 
+/* 쿠폰 할인율 */
 .coupon-table th:nth-child(4),
 .coupon-table td:nth-child(4) {
   width: 120px;
 }
 
+/* 쿠폰 종류 */
 .coupon-table th:nth-child(5),
 .coupon-table td:nth-child(5) {
   width: 100px;
 }
 
+/* 상태 */
 .coupon-table th:nth-child(6),
 .coupon-table td:nth-child(6) {
   width: 80px;
 }
 
+/* 시작일 */
 .coupon-table th:nth-child(7),
 .coupon-table td:nth-child(7) {
-  width: 100px;
+  width: 120px;
 }
 
+/* 만료일 */
 .coupon-table th:nth-child(8),
 .coupon-table td:nth-child(8) {
   width: 120px;
 }
 
+/* 생성일 */
 .coupon-table th:nth-child(9),
 .coupon-table td:nth-child(9) {
   width: 120px;
 }
 
+/* 수정일 */
 .coupon-table th:nth-child(10),
 .coupon-table td:nth-child(10) {
   width: 120px;
 }
 
+/* 직원 */
 .coupon-table th:nth-child(11),
 .coupon-table td:nth-child(11) {
   width: 100px;
 }
 
+/* 강사 */
 .coupon-table th:nth-child(12),
 .coupon-table td:nth-child(12) {
   width: 100px;
