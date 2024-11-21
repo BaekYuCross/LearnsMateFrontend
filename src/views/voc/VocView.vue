@@ -6,7 +6,7 @@
       <div class="voc-actions">
         <div class="voc-count">등록된 VOC <span class="voc-length">{{ totalCount }}</span>개</div>
         <div class="voc-button-group">
-          <button class="voc-excel-button">
+          <button class="voc-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
           </button>
@@ -75,6 +75,7 @@ import { ref, computed, onMounted } from 'vue'
 import VOCSideMenu from '@/components/sideMenu/VOCSideMenu.vue'
 import VOCFilter from '@/components/voc/VOCFilter.vue'
 import axios from 'axios'
+import { saveAs } from 'file-saver'
 import '@/assets/css/voc/VOCView.css'
 
 const selectedVOC = ref(null)
@@ -85,7 +86,7 @@ const totalPages = ref(1)
 const pageSize = 15
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbXSwiaWF0IjoxNzMyMDcyMDEyLCJleHAiOjE3NzUyNzIwMTJ9.OI2PLhgf-sf90n-r9yR_deawJ2_iPjzPP4QHb2xcOBlWuhG88-3nszwPLOct-Q22Omvu7GCYt0abH8HYhQO8aw';
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMTkwNjQ5LCJleHAiOjE3NzUzOTA2NDl9.s5zI4ks5zECjYtKA1UOO7NpoSrT5U1i9RKAfoBD2j2aeQYy-6niqRbShEfIsofBlqiJYX6kZ-4CdsKp-w6toUA';
 
 const fetchVOCList = async (filters = {}) => {
   try {
@@ -171,6 +172,40 @@ const changePage = async (newPage) => {
     totalPages.value = response.data.totalPages;
   } else {
     await fetchVOCList();
+  }
+};
+
+const handleExcelDownload = async () => {
+  try {
+    const params = {
+      page: currentPage.value - 1,
+      size: pageSize
+    };
+    
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/voc/excel/download',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      },
+      params: params
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = camelToSnake(lastFilterData.value);
+    }
+
+    const response = await axios(config);
+
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+    
+    saveAs(blob, 'voc_data.xlsx');
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
   }
 };
 
