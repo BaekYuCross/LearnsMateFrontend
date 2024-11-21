@@ -90,15 +90,23 @@
               <button class="excel-download-btn">
                 <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />엑셀 업로드
               </button>
+              <button class="add-coupon-btn" @click="openTargetUserModal">+</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <TargetUserSelectModal
+      v-if="showTargetUserModal"
+      @close="handleModalClose"
+      @submit="handleTargetUserSubmit"
+    />
   </template>
+  
   
 <script setup>
 import { ref } from 'vue';
+import TargetUserSelectModal from './TargetUserSelectModal.vue';
 
 const filters = ref({
   name: '',
@@ -109,6 +117,22 @@ const filters = ref({
   address: '',
   memberFlag: '',
 });
+
+const showTargetUserModal = ref(false);
+const attachedTargetUsers = ref([]); // 선택된 타겟 유저 리스트
+
+const handleTargetUserSubmit = (selectedUsers) => {
+  attachedTargetUsers.value = [...attachedTargetUsers.value, ...selectedUsers]; // 선택된 유저 추가
+};
+
+
+const openTargetUserModal = async() => {
+  showTargetUserModal.value = true;
+};
+
+const handleModalClose = () => {
+  showTargetUserModal.value = false;
+  };
 
 const emit = defineEmits(['search', 'reset']);
 
