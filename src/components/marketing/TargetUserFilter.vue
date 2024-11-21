@@ -6,7 +6,7 @@
           <div class="target-filter-item">
             <span class="target-filter-label">이름</span>
             <input 
-              v-model="filters.name" 
+              v-model="filters.member_name" 
               type="text" 
               placeholder="이름을 입력하세요" 
               class="target-filter-input" 
@@ -16,7 +16,7 @@
           <div class="target-filter-item">
             <span class="target-filter-label">연락처</span>
             <input 
-              v-model="filters.phone" 
+              v-model="filters.member_phone" 
               type="text" 
               placeholder="연락처를 입력하세요" 
               class="target-filter-input" 
@@ -27,13 +27,13 @@
             <span class="target-filter-label">생년월일</span>
             <div class="date-range-container">
               <input 
-                v-model="filters.startBirDate" 
+                v-model="filters.birth_start_date" 
                 type="date" 
                 class="target-filter-input date-input" 
               />
               <span class="date-separator">~</span>
               <input 
-                v-model="filters.endBirDate" 
+                v-model="filters.birth_end_date" 
                 type="date" 
                 class="target-filter-input date-input" 
               />
@@ -43,7 +43,7 @@
           <div class="target-filter-item">
             <span class="target-filter-label">이메일</span>
             <input 
-              v-model="filters.email" 
+              v-model="filters.member_email" 
               type="email" 
               placeholder="이메일을 입력하세요" 
               class="target-filter-input" 
@@ -56,7 +56,7 @@
           <div class="target-filter-item partial">
             <span class="target-filter-label">주소</span>
             <input 
-              v-model="filters.address" 
+              v-model="filters.member_address" 
               type="text" 
               placeholder="주소를 입력하세요" 
               class="target-filter-input" 
@@ -66,7 +66,7 @@
           <div class="target-filter-item partial">
             <span class="target-filter-label">계정상태</span>
             <select 
-              v-model="filters.memberFlag" 
+              v-model="filters.member_flag" 
               class="target-filter-input"
             >
               <option value="">전체</option>
@@ -92,16 +92,16 @@
   
   
 <script setup>
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 
 const filters = ref({
-  name: '',
-  phone: '',
-  startBirDate: '',
-  endBirDate: '',
-  email: '',
-  address: '',
-  memberFlag: '',
+  member_name: '',
+  member_phone: '',
+  birth_start_date: '',
+  birth_end_date: '',
+  member_email: '',
+  member_address: '',
+  member_flag: '',
 });
 
 const emit = defineEmits(['search', 'reset']);
