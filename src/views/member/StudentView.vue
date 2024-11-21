@@ -58,6 +58,7 @@
             </tbody>
           </table>
 
+          <!-- template의 페이지네이션 부분 수정 -->
           <div class="pagination">
             <button 
               class="page-button prev-button" 
@@ -66,7 +67,7 @@
             >
               ◀이전
             </button>
-            <span v-for="page in totalPages" :key="page" class="page-number">
+            <span v-for="page in visiblePages" :key="page" class="page-number">
               <button 
                 class="page-button" 
                 :class="{ active: currentPage === page }" 
@@ -107,14 +108,11 @@ import axios from 'axios';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 
-// 날짜 변환 헬퍼 함수
-const convertToLocalDateTime = (date, isEndDate = false) => {
-  if (!date) return null;
-  
-  // 날짜 문자열에 시간 추가
-  const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
-  return `${date}${timeString}`;
-};
+const selectedStudent = ref(null);
+const currentPage = ref(1);
+const pageSize = 15;
+const students = ref([]);
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
 
 // Snake Case 변환 헬퍼 함수
 const camelToSnake = (obj) => {
@@ -126,13 +124,6 @@ const camelToSnake = (obj) => {
     return acc;
   }, {});
 };
-
-const selectedStudent = ref(null);
-const currentPage = ref(1);
-const pageSize = 15;
-const students = ref([]);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
-
 
 // 전체 학생 목록 가져오기
 const fetchStudents = async () => {
@@ -192,6 +183,29 @@ const changePage = (page) => {
     selectedStudent.value = null;
   }
 };
+
+const visiblePages = computed(() => {
+  const maxVisible = 11; // 최대 보여질 페이지 수
+  const halfVisible = Math.floor(maxVisible / 2); // 현재 페이지 기준 양쪽에 보여질 페이지 수
+  
+  let startPage = Math.max(currentPage.value - halfVisible, 1);
+  let endPage = Math.min(startPage + maxVisible - 1, totalPages.value);
+  
+  // endPage가 totalPages보다 작을 때, startPage를 조정
+  if (endPage - startPage + 1 < maxVisible && startPage > 1) {
+    startPage = Math.max(endPage - maxVisible + 1, 1);
+  }
+  
+  // startPage가 1일 때, endPage를 조정
+  if (startPage === 1) {
+    endPage = Math.min(maxVisible, totalPages.value);
+  }
+  
+  return Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
+});
 
 const showDetail = (student) => {
   selectedStudent.value = selectedStudent.value?.member_code === student.member_code ? null : student;

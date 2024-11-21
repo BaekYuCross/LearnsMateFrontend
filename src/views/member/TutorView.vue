@@ -1,334 +1,286 @@
 <template>
-    <div class="tutor-layout-container">
-      <div class="tutor-side-menu">
-        <MemberSideMenu/>
-      </div>
-      <div class="tutor-main-content">
-        <!-- 필터 -->
-        <MemberFilter 
-            type="tutor" 
-            @search="handleSearch" 
-            @reset="handleReset"
-        />
+  <div class="tutor-layout-container">
+    <div class="tutor-side-menu"><MemberSideMenu/></div>
+    <div class="tutor-main-content">
+      <MemberFilter 
+        type="tutor" 
+        @search="handleSearch" 
+        @reset="handleReset"
+      />
 
-        <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
-          <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
-            <!-- 전체 강사 수 표시 -->
-            <div class="header-container">
+      <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
+        <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
+          <div class="header-container">
             <div class="tutor-count">전체 강사 수 <span class="count-number">{{ tutors.length }}</span>명</div>
             <div class="tutor-button-group">
-              <button class="tutor-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
-            </div>
-            </div>
-            
-            <table>
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>강사 코드</th>
-                  <th>이름</th>
-                  <th>이메일</th>
-                  <th>연락처</th>
-                  <th>주소</th>
-                  <th>나이</th>
-                  <th>생년월일</th>
-                  <th>계정상태</th>
-                  <th>생성일</th>
-                  <th>휴면상태</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr 
-                  v-for="(tutor, index) in paginatedTutors" 
-                  :key="tutor.code"
-                  @click="showDetail(tutor)"
-                  class="cursor-pointer hover:bg-gray-50"
-                  :class="{ 'tutor-selected': selectedTutor?.code === tutor.code }"
-                >
-                  <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
-                  <td>{{ tutor.code }}</td>
-                  <td>{{ tutor.name }}</td>
-                  <td>{{ tutor.email }}</td>
-                  <td>{{ tutor.phone }}</td>
-                  <td>{{ tutor.address }}</td>
-                  <td>{{ tutor.age }}</td>
-                  <td>{{ tutor.birthDate }}</td>
-                  <td>{{ tutor.memberFlag === 'Y' ? '활성' : '비활성' }}</td>
-                  <td>{{ tutor.createDate }}</td>
-                  <td>{{ tutor.dormantFlag === 'Y' ? '휴면' : '활성' }}</td>
-                </tr>
-              </tbody>
-            </table>
-  
-            <!-- 페이지네이션 -->
-            <div class="tutor-pagination">
-              <button 
-                class="tutor-page-button prev-button" 
-                @click="changePage(currentPage - 1)" 
-                :disabled="currentPage === 1"
-              >
-                ◀이전
-              </button>
-              <span v-for="page in totalPages" :key="page" class="tutor-page-number">
-                <button 
-                  class="tutor-page-button" 
-                  :class="{ active: currentPage === page }" 
-                  @click="changePage(page)"
-                >
-                  {{ page }}
-                </button>
-              </span>
-              <button 
-                class="tutor-page-button next-button"
-                @click="changePage(currentPage + 1)" 
-                :disabled="currentPage === totalPages"
-              >
-                다음▶
+              <button class="tutor-excel-button">
+                <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
           </div>
-          <div v-if="selectedTutor" class="tutor-detail-container">
-            <div class="tutor-detail-content">
-              <h3>상세 정보</h3>
-              <div class="tutor-info-grid">
-                <div class="tutor-info-item">
-                  <span class="tutor-label">강사 코드</span>
-                  <span>{{ selectedTutor.code }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">이름</span>
-                  <span>{{ selectedTutor.name }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">이메일</span>
-                  <span>{{ selectedTutor.email }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">연락처</span>
-                  <span>{{ selectedTutor.phone }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">생년월일</span>
-                  <span>{{ selectedTutor.birthDate }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">주소</span>
-                  <span>{{ selectedTutor.address }}</span>
-                </div>
-                <div class="tutor-info-item">
-                  <span class="tutor-label">총 수강생 수</span>
-                  <span>{{ tutorDetail?.tutorLectureDetailList?.reduce((sum, lecture) => sum + lecture.totalStudents, 0).toLocaleString() }}명</span>
-                </div>
+            
+          <table>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>강사 코드</th>
+                <th>이름</th>
+                <th>이메일</th>
+                <th>연락처</th>
+                <th>주소</th>
+                <th>나이</th>
+                <th>생년월일</th>
+                <th>계정상태</th>
+                <th>생성일</th>
+                <th>휴면상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                v-for="(tutor, index) in paginatedTutors" 
+                :key="tutor.member_code"
+                @click="showDetail(tutor)"
+                class="cursor-pointer hover:bg-gray-50"
+                :class="{ 'tutor-selected': selectedTutor?.member_code === tutor.member_code }"
+              >
+                <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+                <td>{{ tutor.member_code }}</td>
+                <td>{{ tutor.member_name }}</td>
+                <td>{{ tutor.member_email }}</td>
+                <td>{{ tutor.member_phone }}</td>
+                <td>{{ tutor.member_address }}</td>
+                <td>{{ tutor.member_age }}</td>
+                <td>{{ tutor.member_birth }}</td>
+                <td>{{ tutor.member_flag === true ? '활성' : '비활성' }}</td>
+                <td>{{ tutor.created_at }}</td>
+                <td>{{ tutor.member_dormant_flag === true ? '휴면' : '활성' }}</td>
+              </tr>
+            </tbody>
+          </table>
 
-                <!-- 강의 목록 -->
-                <div v-if="tutorDetail?.tutorLectureDetailList?.length">
-                  <div class="tutor-info-item">
-                    <span class="tutor-label">강의 목록</span>
-                  </div>
-                  <ul class="lecture-list">
-                    <li v-for="lecture in tutorDetail.tutorLectureDetailList" 
-                        :key="lecture.lectureCode" 
-                        class="lecture-item">
-                      {{ lecture.lectureTitle }}, {{ lecture.videoCount }}강
-                    </li>
-                  </ul>
-                </div>
-              </div>
+          <!-- template의 페이지네이션 부분 수정 -->
+          <div class="tutor-pagination">
+            <button 
+              class="tutor-page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >
+              ◀이전
+            </button>
+            <span v-for="page in visiblePages" :key="page" class="tutor-page-number">
+              <button 
+                class="tutor-page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
+            </span>
+            <button 
+              class="tutor-page-button next-button"
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >
+              다음▶
+            </button>
+          </div>
+        </div>
 
-              <!-- 로딩 상태 표시 -->
-              <div v-if="isLoading" class="loading-spinner">
-                데이터를 불러오는 중...
+        <div v-if="selectedTutor" class="tutor-detail-container">
+        <div class="tutor-detail-content">
+          <h3>상세 정보</h3>
+          <div class="tutor-info-grid">
+            <!-- 기본 정보 -->
+            <div class="tutor-info-item">
+              <span class="tutor-label">강사 코드</span>
+              <span>{{ selectedTutor.member_code }}</span>
+            </div>
+            <div class="tutor-info-item">
+              <span class="tutor-label">이름</span>
+              <span>{{ selectedTutor.member_name }}</span>
+            </div>
+            <div class="tutor-info-item">
+              <span class="tutor-label">이메일</span>
+              <span>{{ selectedTutor.member_email }}</span>
+            </div>
+            <div class="tutor-info-item">
+              <span class="tutor-label">연락처</span>
+              <span>{{ selectedTutor.member_phone }}</span>
+            </div>
+            <div class="tutor-info-item">
+              <span class="tutor-label">주소</span>
+              <span>{{ selectedTutor.member_address }}</span>
+            </div>
+      
+                    <!-- 강의 정보 -->
+          <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-section">
+            <h4 class="lecture-title">강의 목록</h4>
+            <div class="lecture-list">
+              <div v-for="lecture in tutorDetail.tutorLectureDetailList" 
+                  :key="lecture.lectureCode" 
+                  class="lecture-item">
+                <div class="lecture-header">
+                  <span class="lecture-name">{{ lecture.lectureTitle }}</span>
+                </div>
+                <div class="lecture-stats">
+                  <span class="stat-item">
+                    <strong>강의 수:</strong> {{ lecture.videoCount }}개
+                  </span>
+                  <span class="stat-item">
+                    <strong>수강생:</strong> {{ lecture.totalStudents }}명
+                  </span>
+                </div>
               </div>
             </div>
           </div>
     </div>
   </div>
+</div>
+      </div>
+    </div>
   </div>
 </template>
 
-  <script setup>
-  import { ref, computed } from 'vue'
-  import axios from 'axios';
-  import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
-  import MemberFilter from '@/components/member/MemberFilter.vue';
-  
-  const selectedTutor = ref(null);
-  const currentPage = ref(1);
-  const pageSize = 15; // 한 페이지당 보여줄 항목 수
-  const tutorDetail = ref(null);
-  const isLoading = ref(false);
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import MemberFilter from '@/components/member/MemberFilter.vue';
 
-  const tutors = ref([
-    // 더미 데이터 예시
-    {
-      code: 1,
-      name: '김철수',
-      email: 'test@example.com',
-      phone: '010-1234-5678',
-      birthDate: '1999-01-01',
-      address: '서울시 강남구'
-    },
-    {
-      code: 'TTR002',
-      name: '이영희',
-      email: 'lee@example.com',
-      phone: '010-2345-6789',
-      address: '서울시 서초구 서초동',
-      age: '23',
-      birthDate: '2001-03-15',
-      memberFlag: 'Y',
-      createDate: '2024-01-20',
-      dormantFlag: 'N'
-    },
-  ])
-  
-  // 더미 데이터 20개로 확장
-  const expandData = () => {
-    const baseData = tutors.value.slice(0, 2);
-    for (let i = 3; i <= 20; i++) {
-      tutors.value.push({
-        ...baseData[i % 2],
-        code: `TTR${String(i).padStart(3, '0')}`,
-      });
-    }
-  };
-  expandData();
-  
-  // 페이지네이션 관련 computed 속성들
-  const totalPages = computed(() => Math.ceil(tutors.value.length / pageSize));
-  
-  const paginatedTutors = computed(() => 
-    tutors.value.slice(
-      (currentPage.value - 1) * pageSize,
-      currentPage.value * pageSize
-    )
-  );
-  
-  // 페이지 변경 함수
-  const changePage = (page) => {
-    if (page > 0 && page <= totalPages.value) {
-      currentPage.value = page;
-      selectedTutor.value = null;
-    }
-  };
+const selectedTutor = ref(null);
+const currentPage = ref(1);
+const pageSize = 15;
+const tutors = ref([]);
+const tutorDetail = ref(null);
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjA3OTAxOSwiZXhwIjoxNzc1Mjc5MDE5fQ._JTJSjD1BhNEOBbx3ZUYDVHgjeWplEjqOoj99imN_7aGyvkPyVihF8dU23HWlX6s3TO0GfAaMP4wgqaOS29zKw';
 
-  
-  const loadTutorDetail = async () => {
-  if (!selectedTutor.value) return;
-  
-  isLoading.value = true;
-  tutorDetail.value = null;
-  
-  tutorDetail.value = {
-  memberDTO: {
-    name: "김용승",
-    email: "dhkdkd12@gmail.com",
-    phone: "010-9090-2020",
-    birthDate: "2002-02-06",
-    address: "서울특별시 강남구 선릉로 627"
-  },
-  tutorLectureDetailList: [
-    {
-      lectureCode: "LEC001",
-      lectureTitle: "백엔드 고수가 되기싶은자, 나에게로 - 42강",
-      videoCount: 42,
-      totalStudents: 328
-    },
-    {
-      lectureCode: "LEC002",
-      lectureTitle: "자바(JAVA)를 잡아보자 - 40강",
-      videoCount: 40,
-      totalStudents: 256
-    },
-    {
-      lectureCode: "LEC003",
-      lectureTitle: "자바를 기초부터! JAVA BASIC - 22강",
-      videoCount: 22,
-      totalStudents: 415
-    },
-    {
-      lectureCode: "LEC004",
-      lectureTitle: "스프링부트 마스터 클래스 - 35강",
-      videoCount: 35,
-      totalStudents: 281
-    }
-  ]
+// Snake Case 변환 헬퍼 함수
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+// Snake Case to Camel Case 변환 헬퍼 함수 추가
+const snakeToCamel = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(snakeToCamel);
+  return Object.keys(obj).reduce((acc, key) => {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    acc[camelKey] = snakeToCamel(obj[key]);
+    return acc;
+  }, {});
 };
 
-isLoading.value = false;
-
-  // try {
-  //   const response = await axios.get(`/tutor/${selectedTutor.value.code}`)
-  //   tutorDetail.value = response.data
-  // } catch (error) {
-  //   console.error('Failed to load tutor detail:', error)
-  // } finally {
-  //   isLoading.value = false
-  // }
-}
-
-  const showDetail = (tutor) => {
-    if (selectedTutor.value?.code === tutor.code) {
-      selectedTutor.value = null;
-      tutorDetail.value = null;
-    } else {
-      selectedTutor.value = tutor
-
-    // loadTutorDetail 로직 통합
-    isLoading.value = true;
-    tutorDetail.value = null;
-    
-    tutorDetail.value = {
-      memberDTO: {
-        name: "김용승",
-        email: "dhkdkd12@gmail.com",
-        phone: "010-9090-2020",
-        birthDate: "2002-02-06",
-        address: "서울특별시 강남구 선릉로 627"
+// 전체 강사 목록 가져오기
+const fetchTutors = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/member/tutors', {
+      headers: {
+        Authorization: token,
       },
-      tutorLectureDetailList: [
-        {
-          lectureCode: "LEC001",
-          lectureTitle: "백엔드 고수가 되기싶은자, 나에게로 - 42강",
-          videoCount: 42,
-          totalStudents: 328
+    });
+    tutors.value = response.data;
+    console.log(tutors.value);
+  } catch (error) {
+    console.error('Failed to fetch tutors:', error);
+  }
+};
+
+// 필터링 검색
+const handleSearch = async (filterData) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/member/filter/tutor',
+      camelToSnake(filterData),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
         },
-        {
-          lectureCode: "LEC002",
-          lectureTitle: "자바(JAVA)를 잡아보자 - 40강",
-          videoCount: 40,
-          totalStudents: 256
+      }
+    );
+    tutors.value = response.data;
+    currentPage.value = 1;
+    selectedTutor.value = null;
+  } catch (error) {
+    console.error('Failed to filter tutors:', error);
+  }
+};
+
+// 초기화
+const handleReset = () => {
+  fetchTutors();
+  currentPage.value = 1;
+  selectedTutor.value = null;
+};
+
+onMounted(() => {
+  fetchTutors();
+});
+
+// 페이지네이션 관련
+const totalPages = computed(() => Math.ceil(tutors.value.length / pageSize));
+const paginatedTutors = computed(() =>
+  tutors.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+);
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) {
+    currentPage.value = page;
+    selectedTutor.value = null;
+  }
+};
+
+// script 부분에 추가할 computed 속성
+const visiblePages = computed(() => {
+  const maxVisible = 11; // 최대 보여질 페이지 수
+  const halfVisible = Math.floor(maxVisible / 2); // 현재 페이지 기준 양쪽에 보여질 페이지 수
+  
+  let startPage = Math.max(currentPage.value - halfVisible, 1);
+  let endPage = Math.min(startPage + maxVisible - 1, totalPages.value);
+  
+  // endPage가 totalPages보다 작을 때, startPage를 조정
+  if (endPage - startPage + 1 < maxVisible && startPage > 1) {
+    startPage = Math.max(endPage - maxVisible + 1, 1);
+  }
+  
+  // startPage가 1일 때, endPage를 조정
+  if (startPage === 1) {
+    endPage = Math.min(maxVisible, totalPages.value);
+  }
+  
+  return Array.from(
+    { length: endPage - startPage + 1 },
+    (_, i) => startPage + i
+  );
+});
+
+const showDetail = async (tutor) => {
+  if (selectedTutor.value?.member_code === tutor.member_code) {
+    selectedTutor.value = null;
+    tutorDetail.value = null;
+  } else {
+    selectedTutor.value = tutor;
+    try {
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.member_code}`, {
+        headers: {
+          Authorization: token,
         },
-        {
-          lectureCode: "LEC003",
-          lectureTitle: "자바를 기초부터! JAVA BASIC - 22강",
-          videoCount: 22,
-          totalStudents: 415
-        },
-        {
-          lectureCode: "LEC004",
-          lectureTitle: "스프링부트 마스터 클래스 - 35강",
-          videoCount: 35,
-          totalStudents: 281
-        }
-      ]
-    };
-    
-    isLoading.value = false;
-    
-    // API 연동 시에는 아래 코드 사용
-    // try {
-    //   const response = await axios.get(`/tutor/${selectedTutor.value.code}`)
-    //   tutorDetail.value = response.data
-    // } catch (error) {
-    //   console.error('Failed to load tutor detail:', error)
-    // } finally {
-    //   isLoading.value = false
-    // }
+      });
+      // snake_case를 camelCase로 변환
+      const convertedData = snakeToCamel(response.data);
+      tutorDetail.value = convertedData;
+      console.log(tutorDetail.value);
+    } catch (error) {
+      console.error('Failed to load tutor detail:', error);
     }
   }
+};
+</script>
 
-  </script>
   <style scoped>
   .tutor-layout-container {
     display: flex;
@@ -548,4 +500,49 @@ isLoading.value = false;
 .tutor-table-container.shrink {
   flex: 0 0 50%;
 }
+
+.lecture-section {
+  margin-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 20px;
+}
+
+.lecture-title {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.lecture-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lecture-item {
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.lecture-header {
+  margin-bottom: 8px;
+}
+
+.lecture-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.lecture-stats {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #666;
+}
+
+.stat-item strong {
+  color: #333;
+}
+
   </style>

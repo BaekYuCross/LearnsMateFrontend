@@ -107,8 +107,8 @@ const filters = ref({
   memberType: '',
   vocAnswerStatus: '',
   vocAnswerSatisfaction: '',
-  startDate: '',
-  endDate: ''
+  startCreateDate: '',
+  endCreateDate: ''
 })
 
 const emit = defineEmits(['search', 'reset'])
