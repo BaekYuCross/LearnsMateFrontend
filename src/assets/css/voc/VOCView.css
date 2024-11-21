@@ -1,12 +1,13 @@
 .voc-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  min-height: 100vh;
   padding: 20px;
 }
 
 .voc-content-container {
-  display: block;
-  flex-grow: 1;
+  flex : 1;
+  padding: 20px;
   margin-left: 160px;
   margin-top: 50px;
 }
@@ -58,10 +59,10 @@
 
 .voc-board-header {
   display: grid;
-  grid-template-columns: 0.8fr 2fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
-  padding: 10px 20px;
+  grid-template-columns: 0.8fr 1.8fr 0.6fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr;
+  padding: 7px 14px;
   background-color: #f9f9f9;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
   color: #595656;
   text-align: center;
@@ -75,8 +76,8 @@
 
 .voc-board-row {
   display: grid;
-  grid-template-columns: 0.8fr 2fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr;
-  padding: 10px 20px;
+  grid-template-columns: 0.8fr 1.8fr 0.6fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr;
+  padding: 7px 14px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
   color: #333333;
@@ -92,7 +93,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: left;
   padding: 0 5px;
 }
 
@@ -147,17 +147,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
-  gap: 10px;
+  gap: 5px;
+  margin-top: 10px;
 }
 
 .voc-page-button {
-  background: none;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
   border: none;
-  color: #333;
-  padding: 5px 10px;
+  background: none;
+  font-size: 14px;
+  color: #666;
   cursor: pointer;
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .voc-page-button.active {
@@ -175,12 +181,12 @@
   color: #005950;
 }
 
-.voc-prev-button:disabled,
-.voc-next-button:disabled {
-  color: #ccc;
-}
-
 .voc-excel-button img {
   width: 16px;
   height: 16px;
+}
+
+.voc-pagination span {
+  color: #666;
+  margin: 0 5px;
 }

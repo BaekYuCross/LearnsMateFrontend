@@ -1,141 +1,185 @@
 <template>
-    <div class="filter-card">
-      <div class="section-header">
-        <h2 class="section-title">{{ title }}</h2>
-        <div class="button-group">
-          <button @click="search" class="search-button">
-            <i class="fas fa-search"></i>
-            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-          </button>
-          <button @click="reset" class="reset-button">
-            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
-          </button>
+  <div class="filter-card">
+    <div class="section-header">
+      <h2 class="section-title">{{ title }}</h2>
+      <div class="button-group">
+        <button @click="search" class="search-button">
+          <i class="fas fa-search"></i>
+          <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+        </button>
+        <button @click="reset" class="reset-button">
+          <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
+        </button>
+      </div>
+    </div>
+
+    <div class="filter-container">
+      <!-- 첫째 줄 - 회색 배경 -->
+      <div class="filter-row gray">
+        <div class="filter-item">
+          <span class="filter-label">{{ memberType }} 코드</span>
+          <input v-model="filters.memberCode" type="text" placeholder="코드를 입력하세요" class="filter-input"/>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">{{ memberType }}명</span>
+          <input v-model="filters.memberName" type="text" placeholder="이름을 입력하세요" class="filter-input"/>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">이메일</span>
+          <input v-model="filters.memberEmail" type="email" placeholder="이메일을 입력하세요" class="filter-input"/>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">연락처</span>
+          <input v-model="filters.memberPhone" type="text" placeholder="연락처를 입력하세요" class="filter-input"/>
         </div>
       </div>
-  
-      <div class="filter-container">
-        <!-- 첫째 줄 - 회색 배경 -->
-        <div class="filter-row gray">
-          <div class="filter-item">
-            <span class="filter-label">{{ memberType }} 코드</span>
-            <input v-model="filters.code" type="text" placeholder="코드를 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">{{ memberType }}명</span>
-            <input v-model="filters.name" type="text" placeholder="이름을 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">이메일</span>
-            <input v-model="filters.email" type="email" placeholder="이메일을 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">연락처</span>
-            <input v-model="filters.phone" type="text" placeholder="연락처를 입력하세요" class="filter-input"/>
+
+      <!-- 둘째 줄 - 흰색 배경 -->
+      <div class="filter-row white">
+        <div class="filter-item">
+          <span class="filter-label">주소</span>
+          <input v-model="filters.memberAddress" type="text" placeholder="주소를 입력하세요" class="filter-input"/>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">나이</span>
+          <div class="date-range-container">
+            <input v-model="filters.memberStartAge" type="text" placeholder="시작 나이" class="filter-input"/>
+            <span class="date-separator">~</span>
+            <input v-model="filters.memberEndAge" type="text" placeholder="끝 나이" class="filter-input"/>
           </div>
         </div>
-
-        <!-- 둘째 줄 - 흰색 배경 -->
-        <div class="filter-row white">
-          <div class="filter-item">
-            <span class="filter-label">주소</span>
-            <input v-model="filters.address" type="text" placeholder="주소를 입력하세요" class="filter-input"/>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">나이</span>
-            <div class="date-range-container">
-              <input v-model="filters.startAge" type="text" placeholder="시작 나이" class="filter-input"/>
-              <span class="date-separator">~</span>
-              <input v-model="filters.endAge" type="text" placeholder="끝 나이" class="filter-input"/>
-            </div>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">계정상태</span>
-            <select v-model="filters.memberFlag" class="filter-input">
-              <option value="">전체</option>
-              <option value="Y">활성</option>
-              <option value="N">비활성</option>
-            </select>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">휴면상태</span>
-            <select v-model="filters.dormantFlag" class="filter-input">
-              <option value="">전체</option>
-              <option value="Y">휴면</option>
-              <option value="N">비휴면</option>
-            </select>
-          </div>
+        <div class="filter-item">
+          <span class="filter-label">계정상태</span>
+          <select v-model="filters.memberFlag" class="filter-input">
+            <option value="">전체</option>
+            <option value="true">활성</option>
+            <option value="false">비활성</option>
+          </select>
         </div>
-
-        <!-- 셋째 줄 - 회색 배경 -->
-        <div class="filter-row gray">
-          <div class="filter-item">
-            <span class="filter-label">생년월일</span>
-            <div class="date-range-container">
-              <input v-model="filters.startBirDate" type="date" class="filter-input date-input"/>
-              <span class="date-separator">~</span>
-              <input v-model="filters.endBirDate" type="date" class="filter-input date-input"/>
-            </div>
-          </div>
-          <div class="filter-item">
-            <span class="filter-label">생성일</span>
-            <div class="date-range-container">
-              <input v-model="filters.startCreateDate" type="date" class="filter-input date-input"/>
-              <span class="date-separator">~</span>
-              <input v-model="filters.endCreateDate" type="date" class="filter-input date-input"/>
-            </div>
-          </div>
-        </div>
-
-
+        <div class="filter-item">
+          <span class="filter-label">휴면상태</span>
+          <select v-model="filters.memberDormantFlag" class="filter-input">
+            <option value="">전체</option>
+            <option value="true">휴면</option>
+            <option value="false">비휴면</option>
+          </select>
         </div>
       </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue'
 
-  // props 정의
-  const props = defineProps({
-    type: {
-      type: String,
-      required: true,
-      validator: (value) => ['student', 'tutor'].includes(value)
+      <!-- 셋째 줄 - 회색 배경 -->
+      <div class="filter-row gray">
+        <div class="filter-item">
+          <span class="filter-label">생년월일</span>
+          <div class="date-range-container">
+            <input v-model="filters.birthStartDate" type="date" class="filter-input date-input"/>
+            <span class="date-separator">~</span>
+            <input v-model="filters.birthEndDate" type="date" class="filter-input date-input"/>
+          </div>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">생성일</span>
+          <div class="date-range-container">
+            <input v-model="filters.createdStartDate" type="date" class="filter-input date-input"/>
+            <span class="date-separator">~</span>
+            <input v-model="filters.createdEndDate" type="date" class="filter-input date-input"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+// 날짜 변환 헬퍼 함수 추가
+const convertToLocalDateTime = (date, isEndDate = false) => {
+  if (!date) return null;
+  const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
+  return `${date}${timeString}`;
+};
+
+// Props 정의
+const props = defineProps({
+  type: {
+    type: String,
+    required: true,
+    validator: (value) => ['student', 'tutor'].includes(value),
+  },
+});
+
+// 컴포넌트 데이터 및 computed 속성
+const title = computed(() => (props.type === 'student' ? '학생' : '강사'));
+const memberType = computed(() => (props.type === 'student' ? '학생' : '강사'));
+
+const filters = ref({
+  memberCode: '',
+  memberName: '',
+  memberEmail: '',
+  memberPhone: '',
+  memberAddress: '',
+  memberStartAge: '',
+  memberEndAge: '',
+  birthStartDate: '',
+  birthEndDate: '',
+  memberFlag: '',
+  memberDormantFlag: '',
+  createdStartDate: '',
+  createdEndDate: '',
+});
+
+// Emit 정의
+const emit = defineEmits(['search', 'reset']);
+
+// MemberFilter.vue의 search 함수 수정
+const search = () => {
+  const filterData = {
+    memberCode: filters.value.memberCode,
+    memberName: filters.value.memberName,
+    memberEmail: filters.value.memberEmail,
+    memberPhone: filters.value.memberPhone,
+    memberAddress: filters.value.memberAddress,
+    memberStartAge: filters.value.memberStartAge,
+    memberEndAge: filters.value.memberEndAge,
+    memberFlag: filters.value.memberFlag,
+    memberDormantFlag: filters.value.memberDormantFlag,
+    birthStartDate: convertToLocalDateTime(filters.value.birthStartDate),
+    birthEndDate: convertToLocalDateTime(filters.value.birthEndDate, true),
+    createdStartDate: convertToLocalDateTime(filters.value.createdStartDate),
+    createdEndDate: convertToLocalDateTime(filters.value.createdEndDate, true),
+  };
+
+  // 빈 값 제거
+  Object.keys(filterData).forEach(key => {
+    if (filterData[key] === '' || filterData[key] === null || filterData[key] === undefined) {
+      delete filterData[key];
     }
   });
-  // 타입에 따른 표시 텍스트 계산
-  const title = computed(() => props.type === 'student' ? '학생' : '강사')
-  const memberType = computed(() => props.type === 'student' ? '학생' : '강사')
+  
+  emit('search', filterData);
+};
 
-  
-  const filters = ref({
-    code: '',
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    startAge: '',
-    endAge: '',
-    startBirDate: '',
-    endBirDate: '',
+// 초기화 함수
+const reset = () => {
+  filters.value = {
+    memberCode: '',
+    memberName: '',
+    memberEmail: '',
+    memberPhone: '',
+    memberAddress: '',
+    memberStartAge: '',
+    memberEndAge: '',
+    birthStartDate: '',
+    birthEndDate: '',
     memberFlag: '',
-    dormantFlag: '',
-    startCreateDate: '',
-    endCreateDate: '',
-  })
-  
-  const emit = defineEmits(['search', 'reset'])
-  
-  const search = () => {
-    emit('search', filters.value)
-  }
-  
-  const reset = () => {
-    Object.keys(filters.value).forEach(key => {
-      filters.value[key] = ''
-    })
-    emit('reset')
-  }
-  </script>
+    memberDormantFlag: '',
+    createdStartDate: '',
+    createdEndDate: '',
+  };
+  emit('reset');
+};
+
+</script>
   
   <style scoped>
 .filter-card {
@@ -200,25 +244,6 @@
   width: 100%; /* 입력창 너비 제한 */
 }
 
-/* 나이 범위 입력을 위한 특별 스타일 */
-.age-range-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 4px; /* 간격 축소 */
-}
-
-.age-input {
-  width: calc(50% - 8px); /* 물결 표시 공간 확보 */
-  min-width: 0;
-}
-
-.date-separator {
-  color: #64748b;
-  padding: 0 4px;
-  font-size: 12px;
-}
-
 /* 날짜 입력 필드용 스타일 */
 .date-range-container {
   flex: 1;
@@ -231,10 +256,11 @@
   min-width: 0;
 }
   
-  .date-separator {
-    color: #64748b;
-    padding: 0 0.25rem;
-  }
+.date-separator {
+  color: #64748b;
+  padding: 0 4px;  /* 0.25rem 대신 4px로 통일 */
+  font-size: 12px;
+}
   
   .button-group {
     display: flex;

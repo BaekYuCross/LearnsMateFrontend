@@ -172,4 +172,9 @@ export default {
     margin-left: 20px;
     padding: 10px 20px;
 }
+
+.coupon-edit-button:hover,
+.coupon-delete-button:hover {
+  cursor: pointer;
+}
 </style>

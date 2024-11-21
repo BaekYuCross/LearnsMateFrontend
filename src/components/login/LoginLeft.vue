@@ -1,18 +1,87 @@
 <template>
-    <div class="login-left">
-      <h1>Login</h1>
-      <form class="login-form">
-        <input type="text" placeholder="사번 ID" class="login-input" />
-        <input type="password" placeholder="비밀번호" class="login-input" />
-        <button type="submit" class="login-button">로그인</button>
-        <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
-      </form>
-    </div>
-  </template>
+  <div class="login-left">
+    <h1>Login</h1>
+    <!-- @submit.prevent를 사용하여 재로딩 방지 -->
+    <form class="login-form" @submit.prevent="loginUser">
+      <input v-model="formData.adminCode" type="text" placeholder="사번 ID" class="login-input" />
+      <input v-model="formData.adminPassword" type="password" placeholder="비밀번호" class="login-input" />
+      <button type="submit" class="login-button">로그인</button>
+      <!-- 비밀번호 재설정 버튼 -->
+      <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import axios from 'axios';
+import { RouterView, useRoute, useRouter } from 'vue-router';
+import { jwtDecode } from 'jwt-decode';
+import { ref } from 'vue';
+import { useLoginState } from '@/stores/loginState';
+
+// 폼 데이터
+const formData = ref({
+  adminCode: '',
+  adminPassword: ''
+});
+
+// 에러 메시지 관리
+const errorMessage = ref('');
+const loginState = useLoginState(); // 로그인 상태 관리 Store
+
+// 로그인 함수
+const loginUser = async () => {
+  // 필수 입력 확인
+  if (!formData.value.adminCode || !formData.value.adminPassword) {
+    alert("사번과 비밀번호를 입력해주세요.");
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://localhost:5000/users/login', {
+      admin_code: formData.value.adminCode,
+      admin_password: formData.value.adminPassword
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    console.log('HTTP 응답 상태 코드:', response.status);
+    console.log('전체 응답 데이터:', response);
+
+    // 응답 헤더에서 토큰 가져오기
+    const token = response.headers.authorization;
+    if (token) {
+      // 토큰 저장
+      localStorage.setItem('token', token);
+
+      // JWT 디코딩
+      const decodedToken = jwtDecode(token);
+      console.log('Decoded JWT Token:', decodedToken);
+
+      // 로그인 상태 업데이트
+      loginState.isLoggedIn = true;
+      loginState.adminName = decodedToken.name; // JWT에서 이름 추출하여 상태 설정
+
+      // 성공 메시지
+      alert(`${decodedToken.name}님, 환영합니다.`);
+
+      // 메인 페이지로 이동
+      window.location.href = '/';
+    } else {
+      errorMessage.value = '인증 토큰이 없습니다. 로그인 실패';
+      alert("아이디와 비밀번호를 확인해주세요.");
+    }
+  } catch (error) {
+    console.error('로그인 중 오류 발생:', error);
+    errorMessage.value = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
+    alert(errorMessage.value);
+  }
+};
+</script>
+
   
-  <script setup>
-  // 필요한 로직이 있다면 여기에 추가
-  </script>
   
   <style scoped>
   .login-left {
