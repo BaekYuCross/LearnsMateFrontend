@@ -131,15 +131,30 @@ const filters = ref({
 // Emit 정의
 const emit = defineEmits(['search', 'reset']);
 
-// 검색 함수
+// MemberFilter.vue의 search 함수 수정
 const search = () => {
-  const filterData = { ...filters.value };
-  
-  // 날짜 필드 LocalDateTime 변환
-  filterData.birthStartDate = convertToLocalDateTime(filterData.birthStartDate);
-  filterData.birthEndDate = convertToLocalDateTime(filterData.birthEndDate, true);
-  filterData.createdStartDate = convertToLocalDateTime(filterData.createdStartDate);
-  filterData.createdEndDate = convertToLocalDateTime(filterData.createdEndDate, true);
+  const filterData = {
+    memberCode: filters.value.memberCode,
+    memberName: filters.value.memberName,
+    memberEmail: filters.value.memberEmail,
+    memberPhone: filters.value.memberPhone,
+    memberAddress: filters.value.memberAddress,
+    memberStartAge: filters.value.memberStartAge,
+    memberEndAge: filters.value.memberEndAge,
+    memberFlag: filters.value.memberFlag,
+    memberDormantFlag: filters.value.memberDormantFlag,
+    birthStartDate: convertToLocalDateTime(filters.value.birthStartDate),
+    birthEndDate: convertToLocalDateTime(filters.value.birthEndDate, true),
+    createdStartDate: convertToLocalDateTime(filters.value.createdStartDate),
+    createdEndDate: convertToLocalDateTime(filters.value.createdEndDate, true),
+  };
+
+  // 빈 값 제거
+  Object.keys(filterData).forEach(key => {
+    if (filterData[key] === '' || filterData[key] === null || filterData[key] === undefined) {
+      delete filterData[key];
+    }
+  });
   
   emit('search', filterData);
 };
