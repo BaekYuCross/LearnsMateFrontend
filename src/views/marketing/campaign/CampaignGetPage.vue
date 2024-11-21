@@ -25,16 +25,16 @@
           <div
             class="board-row"
             v-for="(campaign, index) in paginatedCampaigns"
-            :key="campaign.campaignCode"
+            :key="campaign.campaign_code"
           >
-            <div class="board-row-number">{{ campaign.campaignCode }}</div>
-            <div class="board-row-title">{{ campaign.campaignTitle }}</div>
-            <div class="board-row-contents">{{ campaign.campaignContents }}</div>
-            <div class="board-row-type">{{ campaign.campaignType }}</div>
-            <div class="board-row-send">{{ campaign.campaignSendDate }}</div>
-            <div class="board-row-created">{{ campaign.createdAt }}</div>
-            <div class="board-row-updated">{{ campaign.updatedAt }}</div>
-            <div class="board-row-admin">{{ campaign.adminCode }}</div>
+            <div class="board-row-number">{{ campaign.campaign_code }}</div>
+            <div class="board-row-title">{{ campaign.campaign_title }}</div>
+            <div class="board-row-contents">{{ campaign.campaign_contents }}</div>
+            <div class="board-row-type">{{ campaign.campaign_type }}</div>
+            <div class="board-row-send">{{ formatDateFromArray(campaign.campaign_send_date) }}</div>
+            <div class="board-row-created">{{ formatDateFromArray(campaign.created_at) }}</div>
+            <div class="board-row-updated">{{ formatDateFromArray(campaign.updated_at) }}</div>
+            <div class="board-row-admin">{{ campaign.admin_name }}</div>
           </div>
         </div>
         <!-- 페이지네이션 버튼 -->
@@ -63,17 +63,25 @@
   <script setup>
   import { ref, computed, onMounted  } from 'vue';
   import { useRouter } from 'vue-router';
+  import axios from 'axios';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CampaignFilter from '@/components/marketing/CampaignFilter.vue';
 
   const router = useRouter(); 
 
-  const campaigns = [];
+  const campaigns = ref([]);
 
   const fetchCampaigns = async () => {
     try {
-      const response = await fetch('/https://learnsmate.site/campaign/campaigns');
+      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+      const response = await axios.get('http://localhost:5000/campaign/campaigns',{
+      method: 'GET',
+      headers: {
+        Authorization: token,
+        }
+      });
       campaigns.value = response.data;
+      console.log(campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
@@ -82,11 +90,12 @@
   const currentPage = ref(1);
   const pageSize = 15;
 
-  const totalPages = computed(() => Math.ceil(campaigns.length / pageSize));
+  const totalPages = computed(() => Math.ceil(campaigns.value.length / pageSize));
 
   const paginatedCampaigns = computed(() =>
-    campaigns.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+    campaigns.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
   );
+
 
   const changePage = (page) => {
     if (page > 0 && page <= totalPages.value) {
@@ -94,14 +103,21 @@
     }
 };
 
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
+  const [year, month, day, hours, minutes, seconds] = dateArray;
+  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+
 const navigateTo = () => {
     router.push({ 
         path: "/marketing/register-campaign",
     });
 };
 
-onMounted(() => {
-  fetchCampaigns();
+onMounted(async() => {
+  await fetchCampaigns();
 });
   </script>
   
@@ -157,7 +173,7 @@ onMounted(() => {
     
     .board-header {
       display: grid;
-      grid-template-columns: 1fr 2fr 3fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
       padding: 10px 20px;
       background-color: #f9f9f9;
       font-size: 13px;
@@ -173,7 +189,7 @@ onMounted(() => {
     
     .board-row {
       display: grid;
-      grid-template-columns: 1fr 2fr 3fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
       padding: 10px 20px;
       border-bottom: 1px solid #eaeaea;
       font-size: 11px;
