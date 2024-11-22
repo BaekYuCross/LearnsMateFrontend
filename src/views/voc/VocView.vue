@@ -83,7 +83,7 @@ const vocList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const pageSize = 15
+const pageSize = 50
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMTkwNjQ5LCJleHAiOjE3NzUzOTA2NDl9.s5zI4ks5zECjYtKA1UOO7NpoSrT5U1i9RKAfoBD2j2aeQYy-6niqRbShEfIsofBlqiJYX6kZ-4CdsKp-w6toUA';
@@ -119,14 +119,35 @@ const camelToSnake = (obj) => {
   }, {});
 };
 
+const processFilterData = (data) => {
+  if (!data) return null;
+  return {
+    ...data,
+    vocAnswerStatus: data.vocAnswerStatus === "true" ? true :
+                    data.vocAnswerStatus === "false" ? false : null,
+    vocCategoryCode: data.vocCategoryCode ? parseInt(data.vocCategoryCode) : null
+  };
+};
+
 const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
-    lastFilterData.value = filterData;
+    // 필터 데이터 처리
+    const processedData = {
+      ...filterData,
+      vocAnswerStatus: filterData.vocAnswerStatus === "true" ? true :
+                      filterData.vocAnswerStatus === "false" ? false : null,
+      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null
+    };
+    
+    console.log('원본 필터 데이터:', filterData);
+    console.log('처리된 필터 데이터:', processedData);
+    lastFilterData.value = processedData;
+    console.log('저장된 필터 데이터:', lastFilterData.value);
 
     const response = await axios.post(
       `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-      camelToSnake(filterData),
+      camelToSnake(processedData),
       {
         headers: {
           Authorization: token,
@@ -155,7 +176,6 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    // 필터링된 상태일 때는 같은 필터 조건으로 해당 페이지 데이터 요청
     const response = await axios.post(
       `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
       camelToSnake(lastFilterData.value),
@@ -177,11 +197,6 @@ const changePage = async (newPage) => {
 
 const handleExcelDownload = async () => {
   try {
-    const params = {
-      page: currentPage.value - 1,
-      size: pageSize
-    };
-    
     const config = {
       method: 'POST',
       url: 'http://localhost:5000/voc/excel/download',
@@ -189,16 +204,27 @@ const handleExcelDownload = async () => {
       headers: {
         'Authorization': token,
         'Content-Type': 'application/json'
-      },
-      params: params
+      }
     };
 
     if (isFiltered.value && lastFilterData.value) {
-      config.data = camelToSnake(lastFilterData.value);
+      const snakeCaseData = camelToSnake(lastFilterData.value);
+      console.log('Request data before conversion:', lastFilterData.value);
+      console.log('Request data after snake case:', snakeCaseData);
+      config.data = snakeCaseData;
     }
 
     const response = await axios(config);
-
+    
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
     const blob = new Blob([response.data], { 
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
     });
@@ -206,6 +232,13 @@ const handleExcelDownload = async () => {
     saveAs(blob, 'voc_data.xlsx');
   } catch (error) {
     console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
   }
 };
 
