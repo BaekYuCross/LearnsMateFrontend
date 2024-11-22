@@ -1,12 +1,12 @@
 <template>
-  <div class="voc-register-modal-backdrop" v-if="isModalOpen">
-    <div class="voc-register-modal-container">
-      <button class="voc-register-modal-close" @click="closeModal">×</button>
-      <h2 class="voc-register-modal-title">{{ modalTitle }}</h2>
-      <p class="voc-register-modal-message">{{ confirmMessage }}</p>
-      <div class="voc-register-modal-actions">
-        <button class="voc-register-modal-button" @click="confirmAction">예</button>
-        <button class="voc-register-modal-button" @click="closeModal">아니오</button>
+  <div class="voc-edit-modal-backdrop" v-if="isModalOpen">
+    <div class="voc-edit-modal-container">
+      <button class="voc-edit-modal-close" @click="closeModal">×</button>
+      <h2 class="voc-edit-modal-title">{{ modalTitle }}</h2>
+      <p class="voc-edit-modal-message">{{ confirmMessage }}</p>
+      <div class="voc-edit-modal-actions">
+        <button class="voc-edit-modal-button" @click="confirmAction">예</button>
+        <button class="voc-edit-modal-button" @click="closeModal">아니오</button>
       </div>
     </div>
   </div>
@@ -30,9 +30,9 @@ const confirmAction = () => {
 };
 </script>
   
-<style lang="scss" scoped>
+  <style lang="scss" scoped>
   /* 배경 투명도 */
-  .voc-register-modal-backdrop {
+  .voc-edit-modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
@@ -47,7 +47,7 @@ const confirmAction = () => {
 
   
   /* 모달 창 스타일 */
-  .voc-register-modal-container {
+  .voc-edit-modal-container {
   background-color: #ffffff;
   width: 500px;
   height: 200px;
@@ -86,7 +86,7 @@ const confirmAction = () => {
 
   
   /* 닫기 버튼 */
-  .voc-register-modal-close {
+  .voc-edit-modal-close {
     position: absolute;
     top: 15px;
     right: 10px;
@@ -97,20 +97,20 @@ const confirmAction = () => {
   }
   
   /* 제목 스타일 */
-  .voc-register-modal-title {
+  .voc-edit-modal-title {
     margin-top: 35px;
     font-size: 23px;
     color: #193325; /* 제목 글자 색 */
   }
   
   /* 버튼 컨테이너 */
-  .voc-register-modal-actions {
+  .voc-edit-modal-actions {
     display: flex;
     justify-content: center; 
     margin-top: 40px;
     gap: 70px;
     
-    .voc-register-modal-button {
+    .voc-edit-modal-button {
       background-color: #145f58;
       color: #ffffff;
       border: none;
