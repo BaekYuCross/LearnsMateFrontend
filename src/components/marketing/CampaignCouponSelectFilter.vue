@@ -8,7 +8,7 @@
           <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">쿠폰 이름</span>
               <input 
-                v-model="filters.name"
+                v-model="filters.coupon_name"
                 type="text" 
                 placeholder="쿠폰 이름을 입력하세요"
                 class="coupon-select-filter-input"
@@ -17,7 +17,7 @@
           <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">쿠폰 내용</span>
               <input 
-                v-model="filters.contents"
+                v-model="filters.coupon_contents"
                 type="text" 
                 placeholder="쿠폰 내용을 입력하세요"
                 class="coupon-select-filter-input"
@@ -26,7 +26,7 @@
           <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">쿠폰 종류</span>
               <select
-                v-model="filters.type"
+                v-model="filters.coupon_category_code"
                 class="coupon-select-filter-input">
                 <option value = "">전체</option>
                 <option value = "1">일반</option>
@@ -43,7 +43,7 @@
           <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">쿠폰 상태</span>
               <select
-                v-model="filters.status"
+                v-model="filters.coupon_flag"
                 class="coupon-select-filter-input">
                 <option value = "">전체</option>
                 <option value = true>활성화</option>
@@ -54,13 +54,13 @@
             <span class="coupon-select-filter-label">쿠폰 할인율</span>
               <div class="coupon-select-discount-rate-container">
               <input 
-                v-model="filters.minDiscountRate"
+                v-model="filters.min_discount_rate"
                 type="number" 
                 class="coupon-select-filter-input discount-input"
               />
               <span class="discount-rate-separator">~</span>
               <input 
-                v-model="filters.maxDiscountRate"
+                v-model="filters.max_discount_rate"
                 type="number" 
                 class="coupon-select-filter-input discount-input"
               />
@@ -70,13 +70,13 @@
             <span class="coupon-select-filter-label">쿠폰 시작일</span>
               <div class="coupon-select-date-range-container">
               <input 
-                v-model="filters.startDate"
+                v-model="filters.start_coupon_start_date"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
               <span class="coupon-select-date-separator">~</span>
               <input 
-                v-model="filters.endDate"
+                v-model="filters.end_coupon_start_date"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
@@ -88,13 +88,13 @@
             <span class="coupon-select-filter-label">쿠폰 만료일</span>
             <div class="coupon-select-date-range-container">
               <input 
-                v-model="filters.startExpireDate"
+                v-model="filters.start_expire_date"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
               <span class="coupon-select-date-separator">~</span>
               <input 
-                v-model="filters.endExpireDate"
+                v-model="filters.end_expire_date"
                 type="date"
                 class="coupon-select-filter-input date-input"
               />
@@ -104,13 +104,13 @@
             <span class="coupon-select-filter-label">쿠폰 생성일</span>
             <div class="coupon-select-date-range-container">
               <input 
-                v-model="filters.startCreatedAt"
+                v-model="filters.start_created_at"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
               <span class="coupon-select-date-separator">~</span>
               <input 
-                v-model="filters.endCreatedAt"
+                v-model="filters.end_created_at"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
@@ -120,13 +120,13 @@
             <span class="coupon-select-filter-label">쿠폰 수정일</span>
             <div class="coupon-select-date-range-container">
               <input 
-                v-model="filters.startUpdatedAt"
+                v-model="filters.updated_at"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
               <span class="coupon-select-date-separator">~</span>
               <input 
-                v-model="filters.endUpdatedAt"
+                v-model="filters.updated_at"
                 type="date" 
                 class="coupon-select-filter-input date-input"
               />
@@ -137,7 +137,7 @@
         <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">직원</span>
             <input 
-                v-model="filters.admin"
+                v-model="filters.admin_code"
                 type="text" 
                 placeholder="직원 이름을 입력하세요"
                 class="coupon-select-filter-input"
@@ -146,7 +146,7 @@
         <div class="coupon-select-filter-item">
             <span class="coupon-select-filter-label">강사</span>
             <input 
-                v-model="filters.tutor"
+                v-model="filters.tutor_code"
                 type="text" 
                 placeholder="강사 이름을 입력하세요"
                 class="coupon-select-filter-input"
@@ -168,25 +168,25 @@
 
   
   <script setup>
-  import { ref } from 'vue'
+  import { ref, defineEmits  } from 'vue'
   
   const filters = ref({
-    name: '',
-    contents: '',
-    type: '',
-    status: '',
-    minDiscountRate: '',
-    maxDiscountRate: '',
-    startDate: '',
-    endDate: '',
-    startExpireDate: '',
-    endExpireDate: '',
-    startCreatedAt: '',
-    endCreatedAt: '',
-    startUpdatedAt: '',
-    endUpdatedAt: '',
-    admin: '',
-    tutor: '',
+    coupon_name: '',
+    coupon_contents: '',
+    coupon_category_code: '',
+    coupon_flag: '',
+    min_discount_rate: '',
+    max_discount_rate: '',
+    start_coupon_start_date: '',
+    end_coupon_start_date: '',
+    start_expire_date: '',
+    end_expire_date: '',
+    start_created_at: '',
+    end_created_at: '',
+    start_updated_at: '',
+    end_updated_at: '',
+    admin_code: '',
+    tutor_code: '',
   })
   
   const emit = defineEmits(['search', 'reset'])
@@ -208,14 +208,13 @@
     margin-bottom: 16px;
     background-color: white;
     padding: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
   
   .coupon-select-section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 10px;
+    padding: 0px 10px;
     border-bottom: 1px solid #e9ecef;
   }
   
@@ -334,5 +333,9 @@
   .coupon-select-reset-button:focus {
     outline: none;
     box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+  }
+
+  input:focus {
+    outline: none; 
   }
 </style>

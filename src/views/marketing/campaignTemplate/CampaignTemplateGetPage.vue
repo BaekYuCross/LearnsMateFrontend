@@ -66,7 +66,7 @@
   import { useRouter } from 'vue-router';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CampaignTemplateFilter from '@/components/marketing/CampaignTemplateFilter.vue';
-  import campaignTemplateRegisterModal from '@/components/campaignTemplateRegisterModal.vue';
+  import campaignTemplateRegisterModal from '@/components/marketing/campaignTemplateRegisterModal.vue';
   
   const router = useRouter(); 
   

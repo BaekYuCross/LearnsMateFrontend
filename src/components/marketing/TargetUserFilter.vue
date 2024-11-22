@@ -1,125 +1,148 @@
 <template>
-    <div class="target-filter-card">
-      <div class="target-section-header">
-        <h2 class="target-section-title">타겟 유저</h2>
-      </div>
-  
-      <div class="target-filter-container">
-        <!-- Gray Row -->
-        <div class="target-filter-row gray">
-          <div class="target-filter-item">
-            <span class="target-filter-label">이름</span>
+  <div class="target-filter-card">
+    <div class="target-filter-container">
+      <!-- Gray Row -->
+      <div class="target-filter-row gray">
+        <div class="target-filter-item">
+          <span class="target-filter-label">이름</span>
+          <input 
+            v-model="filters.memberName" 
+            type="text" 
+            placeholder="이름을 입력하세요" 
+            class="target-filter-input" 
+          />
+        </div>
+
+        <div class="target-filter-item">
+          <span class="target-filter-label">연락처</span>
+          <input 
+            v-model="filters.memberPhone" 
+            type="text" 
+            placeholder="연락처를 입력하세요" 
+            class="target-filter-input" 
+          />
+        </div>
+
+        <div class="target-filter-item">
+          <span class="target-filter-label">생년월일</span>
+          <div class="date-range-container">
             <input 
-              v-model="filters.name" 
-              type="text" 
-              placeholder="이름을 입력하세요" 
-              class="target-filter-input" 
+              v-model="filters.birthStartDate" 
+              type="date" 
+              class="target-filter-input date-input" 
             />
-          </div>
-  
-          <div class="target-filter-item">
-            <span class="target-filter-label">연락처</span>
+            <span class="date-separator">~</span>
             <input 
-              v-model="filters.phone" 
-              type="text" 
-              placeholder="연락처를 입력하세요" 
-              class="target-filter-input" 
-            />
-          </div>
-  
-          <div class="target-filter-item">
-            <span class="target-filter-label">생년월일</span>
-            <div class="date-range-container">
-              <input 
-                v-model="filters.startBirDate" 
-                type="date" 
-                class="target-filter-input date-input" 
-              />
-              <span class="date-separator">~</span>
-              <input 
-                v-model="filters.endBirDate" 
-                type="date" 
-                class="target-filter-input date-input" 
-              />
-            </div>
-          </div>
-  
-          <div class="target-filter-item">
-            <span class="target-filter-label">이메일</span>
-            <input 
-              v-model="filters.email" 
-              type="email" 
-              placeholder="이메일을 입력하세요" 
-              class="target-filter-input" 
+              v-model="filters.birthEndDate" 
+              type="date" 
+              class="target-filter-input date-input" 
             />
           </div>
         </div>
-  
-        <!-- White Row -->
-        <div class="target-filter-row white">
-          <div class="target-filter-item partial">
-            <span class="target-filter-label">주소</span>
-            <input 
-              v-model="filters.address" 
-              type="text" 
-              placeholder="주소를 입력하세요" 
-              class="target-filter-input" 
-            />
-          </div>
-  
-          <div class="target-filter-item partial">
-            <span class="target-filter-label">계정상태</span>
-            <select 
-              v-model="filters.memberFlag" 
-              class="target-filter-input"
-            >
-              <option value="">전체</option>
-              <option value="Y">활성</option>
-              <option value="N">비활성</option>
-            </select>
-          </div>
-  
-          <div class="target-filter-item">
-            <div class="target-button-group">
-              <button @click="search" class="target-search-button">
-                <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-              </button>
-              <button @click="reset" class="reset-button">
-                <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
-              </button>
-              <button class="excel-download-btn">
-                <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />엑셀 업로드
-              </button>
-            </div>
+
+        <div class="target-filter-item">
+          <span class="target-filter-label">이메일</span>
+          <input 
+            v-model="filters.memberEmail" 
+            type="email" 
+            placeholder="이메일을 입력하세요" 
+            class="target-filter-input" 
+          />
+        </div>
+      </div>
+
+      <!-- White Row -->
+      <div class="target-filter-row white">
+        <div class="target-filter-item partial">
+          <span class="target-filter-label">주소</span>
+          <input 
+            v-model="filters.memberAddress" 
+            type="text" 
+            placeholder="주소를 입력하세요" 
+            class="target-filter-input" 
+          />
+        </div>
+
+        <div class="target-filter-item partial">
+          <span class="target-filter-label">계정상태</span>
+          <select 
+            v-model="filters.memberFlag" 
+            class="target-filter-input"
+          >
+            <option value="">전체</option>
+            <option value="true">활성</option>
+            <option value="false">비활성</option>
+          </select>
+        </div>
+
+        <div class="target-filter-item">
+          <div class="target-button-group">
+            <button @click="search" class="target-search-button">
+              <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+            </button>
+            <button @click="reset" class="reset-button">
+              <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
+  </div>
+</template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
+
+// 날짜 변환 헬퍼 함수 추가
+const convertToLocalDateTime = (date, isEndDate = false) => {
+  if (!date) return null;
+  const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
+  return `${date}${timeString}`;
+};
 
 const filters = ref({
-  name: '',
-  phone: '',
-  startBirDate: '',
-  endBirDate: '',
-  email: '',
-  address: '',
+  memberName: '',
+  memberPhone: '',
+  birthStartDate: '',
+  birthEndDate: '',
+  memberEmail: '',
+  memberAddress: '',
   memberFlag: '',
 });
 
 const emit = defineEmits(['search', 'reset']);
 
 const search = () => {
-  emit('search', filters.value);
+  const filterData = {
+    memberName: filters.value.memberName,
+    memberPhone: filters.value.memberPhone,
+    memberEmail: filters.value.memberEmail,
+    memberAddress: filters.value.memberAddress,
+    memberFlag: filters.value.memberFlag,
+    birthStartDate: convertToLocalDateTime(filters.value.birthStartDate),
+    birthEndDate: convertToLocalDateTime(filters.value.birthEndDate, true),
+  };
+
+  // 빈 값 제거
+  Object.keys(filterData).forEach(key => {
+    if (filterData[key] === '' || filterData[key] === null || filterData[key] === undefined) {
+      delete filterData[key];
+    }
+  });
+  
+  emit('search', filterData);
 };
 
 const reset = () => {
-  Object.keys(filters.value).forEach((key) => {
-    filters.value[key] = '';
-  });
+  filters.value = {
+    memberName: '',
+    memberPhone: '',
+    birthStartDate: '',
+    birthEndDate: '',
+    memberEmail: '',
+    memberAddress: '',
+    memberFlag: '',
+  };
   emit('reset');
 };
 </script>
@@ -129,7 +152,6 @@ const reset = () => {
   margin-bottom: 16px;
   background-color: white;
   padding: 0;
-  margin-top: 50px;
 }
 
 .target-section-header {
@@ -208,7 +230,7 @@ const reset = () => {
 .target-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 433px;
+  margin-left: 470px;
 }
 
 .target-search-button {
@@ -269,5 +291,10 @@ const reset = () => {
   outline: none;
   box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
 }
+
+input:focus {
+  outline: none;  
+}
+
 
 </style>
