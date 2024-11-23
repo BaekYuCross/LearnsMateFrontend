@@ -17,7 +17,7 @@ const isTransitioning = ref(false);
 const isLoginPage = computed(() => route.path === '/login');
 const isClientLoginPage = computed(() => route.path === '/client-login');
 const isClientMainPage = computed(() => route.path === '/client-main');
-
+const isClientVocPage = computed(() => route.path === '/client-voc');
 
 
 const showHeader = computed(() => {
