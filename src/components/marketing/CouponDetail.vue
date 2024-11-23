@@ -5,51 +5,51 @@
     <tbody>
         <tr>
             <th>쿠폰 번호</th>
-            <td>{{ selectedCoupon.code }}</td>
+            <td>{{ selectedCoupon.coupon_code }}</td>
         </tr>
         <tr>
             <th>쿠폰 이름</th>
-            <td>{{ selectedCoupon.name }}</td>
+            <td>{{ selectedCoupon.coupon_name }}</td>
         </tr>
         <tr>
             <th>쿠폰 내용</th>
-            <td>{{ selectedCoupon.contents || '-' }}</td>
+            <td>{{ selectedCoupon.coupon_contents || '-' }}</td>
         </tr>
         <tr>
             <th>쿠폰 할인율</th>
-            <td>{{ selectedCoupon.discountRate }}</td>
+            <td>{{ selectedCoupon.coupon_discount_rate }}</td>
         </tr>
         <tr>
             <th>쿠폰 종류</th>
-            <td>{{ selectedCoupon.type }}</td>
+            <td>{{ selectedCoupon.coupon_category_name }}</td>
         </tr>
         <tr>
             <th>상태</th>
-            <td>{{ selectedCoupon.status }}</td>
+            <td>{{ selectedCoupon.active_state ? '활성' : '비활성' }}</td>
         </tr>
         <tr>
             <th>시작일</th>
-            <td>{{ selectedCoupon.startDate }}</td>
+            <td>{{ formatDate(selectedCoupon.coupon_start_date) }}</td>
         </tr>
         <tr>
             <th>만료일</th>
-            <td>{{ selectedCoupon.expireDate }}</td>
+            <td>{{ formatDate(selectedCoupon.coupon_expire_date) }}</td>
         </tr>
         <tr>
             <th>생성일</th>
-            <td>{{ selectedCoupon.createdAt }}</td>
+            <td>{{ formatDate(selectedCoupon.created_at) }}</td>
         </tr>
         <tr>
             <th>수정일</th>
-            <td>{{ selectedCoupon.updatedAt }}</td>
+            <td>{{ formatDate(selectedCoupon.updated_at) }}</td>
         </tr>
         <tr>
             <th>직원</th>
-            <td>{{ selectedCoupon.admin || '-' }}</td>
+            <td>{{ selectedCoupon.admin_name || '-' }}</td>
         </tr>
         <tr>
             <th>강사</th>
-            <td>{{ selectedCoupon.tutor || '-' }}</td>
+            <td>{{ selectedCoupon.tutor_name || '-' }}</td>
         </tr>
     </tbody>
   </table>
@@ -76,17 +76,20 @@
     <button class="coupon-delete-button">쿠폰 삭제</button>
   </div>
 </div>
-  <!-- <button class="close-button" @click="selectedCoupon = null">닫기</button> -->
 </template>
 
-<script>
-export default {
-  props: {
-    selectedCoupon: {
-      type: Object,
-      required: true,
-    }
-  }
+<script setup>
+defineProps(['selectedCoupon']);
+
+// 날짜 포맷 함수
+const formatDate = (isoDate) => {
+  if (!isoDate) return '-';
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
 };
 </script>
 
@@ -114,7 +117,8 @@ export default {
   font-weight: bold;
   color: #595656;
   text-align: right;
-  width: 18%;
+  width: 100px;
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
 }
 
 .coupon-detail-table td {
@@ -155,6 +159,7 @@ export default {
 .lecture-by-coupon-table {
     width: 100%;
     margin-top: 20px;
+    border-collapse: collapse;
 }
 
 .coupon-buttons {
@@ -170,11 +175,12 @@ export default {
     border: none;
     border-radius: 3px;
     margin-left: 20px;
-    padding: 10px 20px;
+    padding: 5px 10px;
 }
 
 .coupon-edit-button:hover,
 .coupon-delete-button:hover {
   cursor: pointer;
+  background-color: #004c42;
 }
 </style>

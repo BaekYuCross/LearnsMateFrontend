@@ -295,10 +295,12 @@
     align-items: center;
     margin-bottom: 4px;
     margin-top: 4px;
+    padding: 2px 4px;
   }
   
   .coupon-search-button:hover {
-    background-color: #004c42;  
+    background-color: #004c42;
+    cursor: pointer;
   }
   
   .reset-button {
@@ -313,6 +315,7 @@
   
   .reset-button:hover {
     background-color: #f8fafc;
+    cursor: pointer;
   }
   
   .coupon-search-button:focus,

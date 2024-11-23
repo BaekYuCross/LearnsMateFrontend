@@ -86,7 +86,8 @@
       </div>
       <!-- 쿠폰 단건 조회 -->
       <div class="coupon-detail-container" v-if="selectedCoupon">
-        <CouponDetail :selectedCoupon="selectedCoupon" />
+        <CouponDetail :selectedCoupon="selectedCoupon"
+        :token="token"/>
       </div>
     </div>
   </div>
@@ -330,13 +331,14 @@ const formatDate = (isoDate) => {
   background-color: #005950;
     color: #ffffff;
     border: none;
-    border-radius: 3px;
+    border-radius: 5px;
     margin-left: 20px;
-    padding: 10px 20px;
+    padding: 5px 10px;
 }
 
 .coupon-register-button:hover {
   cursor: pointer;
+  background-color: #004c42;
 }
 
 .coupon-table-top {
