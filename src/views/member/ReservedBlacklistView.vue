@@ -3,7 +3,7 @@
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
       <BlacklistFilter 
-        type="student" 
+        :type="filterType"
         @search="handleSearch" 
         @reset="handleReset"
       />
@@ -139,7 +139,7 @@ import axios from '@/plugins/axios';
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
-
+const filterType = computed(() => memberType.value);
 watch(
   () => route.path,
   (newPath) => {
@@ -169,6 +169,8 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
+
+
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 // 댓글별로 그룹화된 신고 내역
 const groupedReports = computed(() => {

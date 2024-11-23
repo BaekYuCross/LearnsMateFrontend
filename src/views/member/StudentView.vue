@@ -241,9 +241,11 @@ const showDetail = async (student) => {
     selectedStudent.value = student;
     try {
       const response = await axios.get(
-        `http://localhost:5000/member/student/${student.memberCode}`,
-        { headers: { Authorization: token } }
-      );
+        `http://localhost:5000/member/student/${student.memberCode}`, {
+           headers: { 
+            Authorization: token 
+          } 
+        });
       console.log('Student details:', response.data);
     } catch (error) {
       console.error('Failed to load student details:', error);
