@@ -347,9 +347,9 @@ const showCancelModal = () => {
 
 const confirmRegister = async () => {
   try {
-    await registerCampaign(); // 등록 요청 수행
-    isRegisterModalOpen.value = false; // 모달 닫기
-    window.location.href = '/marketing'; // 다른 페이지로 이동
+    await registerCampaign(); 
+    isRegisterModalOpen.value = false;
+    window.location.href = '/marketing'; 
   } catch (error) {
     console.error('캠페인 등록 실패:', error);
     alert('등록에 실패했습니다.');
