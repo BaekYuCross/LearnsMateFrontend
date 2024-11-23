@@ -1,7 +1,7 @@
 <template>
     <div class="modal-backdrop" v-if="isModalOpen">
       <div class="modal-container">
-        <button class="modal-close" @click="cancelAction">×</button>
+        <button class="modal-close" @click="closeModal">×</button>
         <h2 class="modal-title">{{ modalTitle }}</h2>
         <div class="modal-actions">
           <button class="modal-button" @click="confirmAction">예</button>
@@ -16,7 +16,7 @@
   
   // 상태 관리
   const isModalOpen = ref(true);
-  const modalTitle = ref('등록하시겠습니까?'); // 모달의 제목을 동적으로 설정
+  const modalTitle = ref('취소하시겠습니까?'); // 모달의 제목을 동적으로 설정
 
   defineProps({
     modalTitle: String, // 모달 제목

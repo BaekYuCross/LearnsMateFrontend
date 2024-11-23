@@ -156,10 +156,10 @@
         </div>
 
         <div class="campaign-register-button-group">
-          <button class="campaign-register-button" @click="registerCampaign">
+          <button class="campaign-register-button" @click="showRegisterModal">
             등록하기
           </button>
-          <button class="campaign-cancel-button" @click="cancelCampaign">
+          <button class="campaign-cancel-button" @click="showCancelModal">
             취소하기
           </button>
         </div>
@@ -176,6 +176,18 @@
     @Close="handleTargetUserModalClose"
     @Submit="handleTargetUserSubmit"
   />
+  <RegisterModule
+      v-if="isRegisterModalOpen"
+      modalTitle="캠페인을 등록하시겠습니까?"
+      @confirm="confirmRegister"
+      @cancel="cancelRegister"
+    />
+    <CancelModule
+      v-if="isCancelModalOpen"
+      modalTitle="캠페인 등록을 취소하시겠습니까?"
+      @confirm="confirmCancel"
+      @cancel="cancelRegister"
+    />
 </template>
 
 <script setup>
@@ -185,11 +197,15 @@ import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
 import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
+import RegisterModule from '@/components/modules/RegisterModule.vue';
+import CancelModule from '@/components/modules/CancelModule.vue';
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 const userCode = jwtDecode(token).sub;
 const userName = jwtDecode(token).name;
 
+const isRegisterModalOpen = ref(false);
+const isCancelModalOpen = ref(false);
 const showCouponSelectModal = ref(false);
 const showTargetUserSelectModal = ref(false);
 const templates = ref([]);
@@ -201,15 +217,12 @@ const campaignType = ref('INSTANT');
 const selectedDate = ref('');
 const selectedTime = ref('');
 
-// Set을 사용하여 중복 방지
 const attachedCouponMap = ref(new Map());
 const targetUserMap = ref(new Map());
 
-// computed 속성으로 배열 변환
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
-// 쿠폰 관련 함수들
 const clickCouponSelect = () => {
   showCouponSelectModal.value = true;
 };
@@ -235,7 +248,6 @@ const clearAllCoupons = () => {
   }
 };
 
-// 타겟 유저 관련 함수들
 const clickTargetUserSelect = () => {
   showTargetUserSelectModal.value = true;
 };
@@ -301,13 +313,11 @@ const selectSendType = (type) => {
 
 const registerCampaign = async () => {
   if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
-    alert('예약 발송 시 날짜와 시간을 설정해주세요.');
-    return;
+    throw new Error('예약 발송 시 날짜와 시간을 설정해주세요.');
   }
 
   if (!campaignTitle.value || !campaignContents.value) {
-    alert('캠페인 제목과 내용을 입력해주세요.');
-    return;
+    throw new Error('캠페인 제목과 내용을 입력해주세요.');
   }
 
   const payload = {
@@ -319,22 +329,43 @@ const registerCampaign = async () => {
     student_list: targetUsers.value,
     admin_code: userCode,
   };
-
   try {
     await axios.post('http://localhost:5000/campaign/register', payload);
-    alert('캠페인이 등록되었습니다.');
-    window.location.href = '/marketing';
   } catch (error) {
     console.error('Failed to register campaign:', error);
     alert('캠페인 등록에 실패했습니다.');
   }
 };
 
-const cancelCampaign = () => {
- if (confirm('캠페인 등록을 취소하시겠습니까?')) {
-   window.location.href = '/marketing';
- }
+const showRegisterModal = () => {
+  isRegisterModalOpen.value = true;
 };
+
+const showCancelModal = () => {
+  isCancelModalOpen.value = true;
+};
+
+const confirmRegister = async () => {
+  try {
+    await registerCampaign(); 
+    isRegisterModalOpen.value = false;
+    window.location.href = '/marketing'; 
+  } catch (error) {
+    console.error('캠페인 등록 실패:', error);
+    alert('등록에 실패했습니다.');
+  }
+};
+
+const confirmCancel = () => {
+    isCancelModalOpen.value = false; 
+    window.location.href = '/marketing'; 
+};
+
+const cancelRegister = () => {
+  isRegisterModalOpen.value = false;
+  isCancelModalOpen.value = false;
+};
+
 
 const formatDateTimeFromArray = (dateArray) => {
  if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
@@ -564,9 +595,9 @@ fetchTemplates();
    width: 25px;
    height: 25px;
    font-size: 15px;
-   background-color: #dc3545;
+   background-color: #858282;
    color: white;
-   border: 1px solid #dc3545;
+   border: 1px solid #858282;
    border-radius: 4px;
    cursor: pointer;
    display: flex;
@@ -575,20 +606,20 @@ fetchTemplates();
 }
 
 .remove-all-btn:hover {
-   background-color: #c82333;
+   background-color: #39ac75;
 }
 
 .remove-item-btn {
    background: none;
    border: none;
-   color: #dc3545;
+   color: #004c42;
    font-size: 18px;
    cursor: pointer;
    padding: 0 5px;
 }
 
 .remove-item-btn:hover {
-   color: #c82333;
+   color: #39ac75;
 }
 
 .coupon-list {
