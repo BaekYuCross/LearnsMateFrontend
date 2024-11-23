@@ -99,7 +99,7 @@
   const fetchCoupons = async () => {
     try {
       const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-      const response = await axios.get('http://localhost:5000/coupon/coupons',{
+      const response = await axios.get('http://localhost:5000/coupon/admin-coupons',{
         method: 'GET',
         headers: {
           Authorization: token,
@@ -129,14 +129,6 @@ const paginatedCoupons = computed(() =>
     ? coupons.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
     : []
 );
-
-const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
-  const [year, month, day, hours, minutes, seconds] = dateArray;
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
-
-
 
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
