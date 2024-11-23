@@ -1,7 +1,7 @@
 <template>
     <div class="modal-backdrop" v-if="isModalOpen">
       <div class="modal-container">
-        <button class="modal-close" @click="closeModal">×</button>
+        <button class="modal-close" @click="cancelAction">×</button>
         <h2 class="modal-title">{{ modalTitle }}</h2>
         <div class="modal-actions">
           <button class="modal-button" @click="confirmAction">예</button>
@@ -12,11 +12,17 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, defineProps, defineEmits } from 'vue';
   
   // 상태 관리
   const isModalOpen = ref(true);
   const modalTitle = ref('등록하시겠습니까?'); // 모달의 제목을 동적으로 설정
+
+  defineProps({
+    modalTitle: String, // 모달 제목
+  });
+
+  const emit = defineEmits(['confirm', 'cancel']);
   
   // 모달 닫기
   const closeModal = () => {
@@ -25,14 +31,11 @@
   
   // "예" 버튼 클릭 시 동작
   const confirmAction = () => {
-    //참고해서 부모에서 구현 하세요 알아서 화이팅 ㅎㅎ 하투
-    closeModal();
+    emit('confirm'); // "예" 버튼 클릭 시 이벤트 전달
   };
-  
-  // "아니오" 버튼 클릭 시 동작
+
   const cancelAction = () => {
-     //참고해서 부모에서 구현 하세요 알아서 화이팅 ㅎㅎ 하투
-    closeModal();
+    emit('cancel'); // "아니오" 버튼 클릭 시 이벤트 전달
   };
   </script>
   
