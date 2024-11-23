@@ -142,8 +142,7 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const tutorDetail = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjA3OTAxOSwiZXhwIjoxNzc1Mjc5MDE5fQ._JTJSjD1BhNEOBbx3ZUYDVHgjeWplEjqOoj99imN_7aGyvkPyVihF8dU23HWlX6s3TO0GfAaMP4wgqaOS29zKw';
-
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 // Snake Case 변환 함수
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
