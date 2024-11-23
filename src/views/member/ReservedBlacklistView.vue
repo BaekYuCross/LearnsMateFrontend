@@ -3,7 +3,7 @@
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
       <BlacklistFilter 
-        type="student" 
+        :type="filterType"
         @search="handleSearch" 
         @reset="handleReset"
       />
@@ -29,7 +29,7 @@
             <tbody>
               <tr 
                 v-for="(blacklist, index) in reservedList" 
-                :key="blacklist.member_code"
+                :key="blacklist.memberCode"
                 @click="showDetail(blacklist)"
                 class="reserved-cursor-pointer hover:bg-gray-50"
                 :class="{ 'reserved-selected': selectedReserved?.memberCode === blacklist.memberCode }"
@@ -109,9 +109,9 @@
                   </div>
                 </div>
                 <div class="reserved-reports-section">
-                  <div v-for="report in group.reports" :key="report.report_dto.reportCode" class="reserved-report-entry">
-                    <p>신고 코드: {{ report.report_dto.reportCode }}</p>
-                    <p>신고 사유: {{ report.report_dto.reportReason }}</p>
+                  <div v-for="report in group.reports" :key="report.reportDto.reportCode" class="reserved-report-entry">
+                    <p>신고 코드: {{ report.reportDto.reportCode }}</p>
+                    <p>신고 사유: {{ report.reportDto.reportReason }}</p>
                   </div>
                 </div>
               </div>
@@ -139,7 +139,7 @@ import axios from '@/plugins/axios';
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
-
+const filterType = computed(() => memberType.value);
 watch(
   () => route.path,
   (newPath) => {
@@ -169,18 +169,19 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMjIwMDEwMDEiLCJlbWFpbCI6InRlc3RAdGVzdGNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjE3MDI0MywiZXhwIjoxNzc1MzcwMjQzfQ.siOUx66zZE72QyxF6LVCOHQefZRRs_ZscsUfZRbEYlQY7E1GWrO5K9IRIhnBzCA0cIoQvmnoHqvPKEMn_h1HOw';
 
+
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 // 댓글별로 그룹화된 신고 내역
 const groupedReports = computed(() => {
   const grouped = {};
   
   reportDetails.value.forEach(detail => {
-    const commentCode = detail.comment_dto.commentCode;
+    const commentCode = detail.commentDto.commentCode;
     
     if (!grouped[commentCode]) {
       grouped[commentCode] = {
-        commentInfo: detail.comment_dto,
+        commentInfo: detail.commentDto,
         reports: []
       };
     }
@@ -305,14 +306,14 @@ const startPage = computed(() => displayedPages.value[0]);
 const endPage = computed(() => displayedPages.value[displayedPages.value.length - 1]);
 
 const showDetail = async (blacklist) => {
-  if (selectedReserved.value?.member_code === blacklist.member_code) {
+  if (selectedReserved.value?.memberCode === blacklist.memberCode) {
     selectedReserved.value = null;
     reportDetails.value = [];
   } else {
     selectedReserved.value = blacklist;
     try {
       const response = await axios.get(
-        `http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.member_code}`, 
+        `http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, 
         {
           headers: {
             Authorization: token,
@@ -333,7 +334,7 @@ const registerBlacklist = async () => {
   
   try {
     await axios.post(
-      `http://localhost:5000/blacklist/${selectedReserved.value.member_code}`,  // membercode를 URL에 포함
+      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,  // membercode를 URL에 포함
        "신고 누적으로 인한 블랙리스트 등록",  // RequestSaveBlacklistVO에 맞는 형식
       {
         headers: {
