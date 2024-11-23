@@ -100,28 +100,31 @@
             </div>
 
             <h4 class="report-title">신고 내역</h4>
-            <div class="report-list">
-              <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
-                <div class="report-header">
-                  <span class="report-number">신고 #{{ index + 1 }}</span>
-                  <span class="report-date">{{ report.reportDto.reportDate }}</span>
-                </div>
-                <div class="report-content">
-                  <div class="report-info">
-                    <p><strong>신고 사유:</strong> {{ report.reportDto.reportReason }}</p>
-                    <p><strong>신고자:</strong> {{ report.reportDto.reportMemberCode }}</p>
+              <div class="report-list">
+                <div v-for="(group, commentCode) in groupedReports" :key="commentCode" class="report-group">
+                  <div class="comment-section">
+                    <div class="comment-header">
+                      <span>댓글 코드: {{ commentCode }}</span>
+                      <span>작성일: {{ group.commentInfo.createdAt }}</span>
+                    </div>
+                    <div class="comment-content">
+                      <p>댓글 내용: {{ group.commentInfo.commentContent }}</p>
+                      <p class="lecture-code">강의 코드: {{ group.commentInfo.lectureCode }}</p>
+                    </div>
                   </div>
-                  <div class="comment-info">
-                    <p><strong>댓글 내용:</strong> {{ report.commentDto.commentContent }}</p>
-                    <p><strong>작성일:</strong> {{ report.commentDto.createdAt }}</p>
-                    <p><strong>강의:</strong> {{ report.commentDto.lectureCode }}</p>
+                  <div class="reports-section">
+                    <div v-for="report in group.reports" :key="report.reportDto.reportCode" class="report-entry">
+                      <p>신고 코드: {{ report.reportDto.reportCode }}</p>
+                      <p>신고 사유: {{ report.reportDto.reportReason }}</p>
+                      <p>신고일: {{ report.reportDto.reportDate }}</p>
+                      <p>신고자: {{ report.reportDto.reportMemberCode }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+          </div>
     </div>
   </div>
 </template>
@@ -152,18 +155,7 @@ const memberTypeText = computed(() => ({
 const filterType = computed(() => memberType.value);
 
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
-
-// Snake Case 변환 함수
-const camelToSnake = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  return Object.keys(obj).reduce((acc, key) => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    acc[snakeKey] = camelToSnake(obj[key]);
-    return acc;
-  }, {});
-};
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 
 watch(
   () => route.path,
@@ -185,6 +177,32 @@ const resetData = () => {
   fetchBlacklists();
 };
 
+const groupedReports = computed(() => {
+  const grouped = {};
+  
+  if (!reportDetails.value || !Array.isArray(reportDetails.value)) {
+    return {};
+  }
+  
+  reportDetails.value.forEach(detail => {
+    if (!detail.commentDto) return;
+    
+    const commentCode = detail.commentDto.commentCode;
+    
+    if (!grouped[commentCode]) {
+      grouped[commentCode] = {
+        commentInfo: detail.commentDto,
+        reports: []
+      };
+    }
+    
+    grouped[commentCode].reports.push(detail);
+  });
+  
+  return grouped;
+});
+
+
 const fetchBlacklists = async () => {
   try {
     const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}`, {
@@ -205,6 +223,7 @@ const fetchBlacklists = async () => {
     console.error('Failed to fetch blacklists:', error);
   }
 };
+
 
 // 블랙리스트 필터링 검색
 const handleSearch = async (filterData) => {
