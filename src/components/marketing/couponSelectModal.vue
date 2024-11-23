@@ -1,5 +1,4 @@
 <template>
-    <Teleport to="body">
       <div v-if="isOpen" class="coupon-select-modal-overlay" @click="closeModal">
         <div class="coupon-select-modal-container" @click.stop>
           <div class="coupon-select-modal-header">
@@ -7,7 +6,7 @@
             <button class="coupon-select-close-button" @click="closeModal">&times;</button>
           </div>
           <div>
-            <CampaignCouponSelectFilter/>
+            <CampaignCouponSelectFilter @search="applyFilters" @reset="applyFilters({})" />
           </div>
           <div class="coupon-select-modal-content">
             <div class="content-container">
@@ -25,21 +24,24 @@
                     <div class="board-header-updated-at">수정일</div>
                     </div>
                     <div class="board-body">
-                    <div
-                        class="board-row"
-                        v-for="(coupons, index) in paginatedCoupons"
-                        :key="coupons.id"
-                    >
-                        <div class="board-row-select"></div> /* 체크박스 */
-                        <div class="board-row-name">{{ coupons.name }}</div>
-                        <div class="board-row-contents">{{ coupons.contents }}</div>
-                        <div class="board-row-discount-rate">{{ coupons.discountRate }}</div>
-                        <div class="board-row-type">{{ coupons.type }}</div>
-                        <div class="board-row-start-date">{{ coupons.startDate }}</div>
-                        <div class="board-row-expire-date">{{ coupons.expireDate }}</div>
-                        <div class="board-row-created-at">{{ coupons.createdAt }}</div>
-                        <div class="board-row-updated-at">{{ coupons.updatedAt }}</div>
-                    </div>
+                      <div class="board-row" v-for="coupon in paginatedCoupons" :key="coupon.coupon_code">
+                        <div class="board-row-select">
+                          <input
+                            type="checkbox"
+                            :value="coupon"
+                            v-model="selectedCoupons"
+                          />
+                        </div>
+                        <div class="board-row-name">{{ coupon.coupon_name }}</div>
+                        <div class="board-row-contents">{{ coupon.coupon_contents }}</div>
+                        <div class="board-row-discount-rate">{{ coupon.coupon_discount_rate }}%</div>
+                        <div class="board-row-type">{{ coupon.coupon_category_name }}</div>
+                        <div class="board-row-start-date">{{ coupon.coupon_start_date }}</div>
+                        <div class="board-row-expire-date">{{ coupon.coupon_expire_date }}</div>
+                        <div class="board-row-created-at">{{ coupon.created_at }}</div>
+                        <div class="board-row-updated-at">{{ coupon.updated_at }}</div>
+                      </div>
+
                     </div>
                     <div class="pagination">
                     <button 
@@ -59,39 +61,27 @@
                     </div>
                 </div>
                 </div>
-            
-            
           </div>
           <div class="coupon-select-modal-footer">
-            <button class="coupon-select-submit-button" @click="handleSubmit">저장</button>
+            <button class="coupon-select-submit-button" @click='saveSelection'>저장</button>
           </div>
         </div>
       </div>
-    </Teleport>
-    <FalseModule 
-      v-if="cancleModal"
-      @close="handleModalClose"
-      @submit="handleSubmit"
-    />
   </template>
   
   <script setup>
-  import { ref, defineEmits, computed } from 'vue';
+  import { ref, defineEmits, computed, onMounted } from 'vue';
   import axios from 'axios';
-  import FalseModule from './modules/FalseModule.vue';  
-  import CampaignCouponSelectFilter from './marketing/CampaignCouponSelectFilter.vue';
+  import CampaignCouponSelectFilter from '@/components/marketing/CampaignCouponSelectFilter.vue';
   
-  const emit = defineEmits(['close', 'submit']);
+  const emit = defineEmits(['submit', 'close']);
   const cancleModal = ref(false);
-  
-  const isOpen = ref(true);
-  const formData = ref({
-    campaignTemplateTitle: '',
-    campaignTemplateContents: '',
-    adminCode: ''
-  });
 
-  const coupons = [];
+  const isOpen = ref(true);
+
+  const coupons = ref([]);
+  const selectedCoupons = ref([]);
+
   
   const clickCancel = () => {
     cancleModal.value = true;
@@ -105,36 +95,48 @@
     isOpen.value = false;
     emit('close');
   };
-  
-  const handleSubmit = async () => {
+
+  const fetchCoupons = async () => {
     try {
-      const response = await fetch('https://learnsmate.site/campaign-template/register', {
-        method: 'POST',
+      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+      const response = await axios.get('http://localhost:5000/coupon/coupons',{
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData.value)
-      });
-  
-      if (response.ok) {
-        emit('submit', formData.value);
-        closeModal();
-      } else {
-        console.error('Failed to submit template');
-      }
+          Authorization: token,
+          }
+        });
+        coupons.value = response.data;
+        console.log(coupons.value);
+        console.log(coupons.value.length);
     } catch (error) {
-      console.error('Error submitting template:', error);
+      console.error('Failed to fetch coupons:', error);
     }
   };
+  
+
+  const saveSelection = () => {
+    emit('submit', selectedCoupons.value);
+  };
+    
 
 const currentPage = ref(1);
 const pageSize = 15;
 
-const totalPages = computed(() => Math.ceil(coupons.length / pageSize));
+const totalPages = computed(() => Math.ceil(coupons.value.length / pageSize));
 
 const paginatedCoupons = computed(() =>
-  coupons.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+  Array.isArray(coupons.value)
+    ? coupons.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
+    : []
 );
+
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
+  const [year, month, day, hours, minutes, seconds] = dateArray;
+  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+
 
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
@@ -144,13 +146,28 @@ const changePage = (page) => {
 
 const applyFilters = async (filters) => {
   try {
-    const response = await axios.post('/https://learnsmate.site/coupons/filter', filters);
+    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+    const response = await axios.post(
+      'http://localhost:5000/coupon/filters', // 필터링 API 엔드포인트
+      filters,
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
     coupons.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
     currentPage.value = 1; // 필터링 후 첫 페이지로 이동
+    console.log('Filtered Coupons:', coupons.value);
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
   }
 };
+
+
+  onMounted(async() => {
+    await fetchCoupons();
+  });
   </script>
   
   <style scoped>
@@ -270,6 +287,7 @@ const applyFilters = async (filters) => {
   .content-container {
       display: block;
       flex-grow: 1;
+      overflow-y: auto;
     }
     
     .coupon-count {

@@ -1,3 +1,4 @@
+
 <template>
   <div class="campaign-register-container">
     <MarketingSideMenu />
@@ -21,8 +22,8 @@
                 <span class="detail-title">캠페인 템플릿 선택</span>
                 <select v-model="selectedTemplateCode" @change="updateTemplate" class="template-select">
                   <option value="">직접 입력</option>
-                  <option v-for="template in templates" :key="template.campaignTemplateCode" :value="template.campaignTemplateCode">
-                    {{ template.campaignTemplateTitle }}
+                  <option v-for="template in templates" :key="template.campaign_template_code" :value="template.campaign_template_code">
+                    {{ template.campaign_template_title }}
                   </option>
                 </select>
               </div>
@@ -49,22 +50,22 @@
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">담당자</span>
-                <span class="detail-content">조제훈</span>
+                <span class="detail-content">{{ userName }}</span>
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">발송 유형</span>
                 <div class="detail-content send-type">
                   <button
                     class="send-type-btn"
-                    :class="{ active: campaignType === '즉시 발송' }"
-                    @click="selectSendType('즉시 발송')"
+                    :class="{ active: campaignType === 'INSTANT' }"
+                    @click="selectSendType('INSTANT')"
                   >
                     즉시 발송
                   </button>
                   <button
                     class="send-type-btn"
-                    :class="{ active: campaignType === '예약 발송' }"
-                    @click="selectSendType('예약 발송')"
+                    :class="{ active: campaignType === 'RESERVATION' }"
+                    @click="selectSendType('RESERVATION')"
                   >
                     예약 발송
                   </button>
@@ -72,13 +73,13 @@
                     type="date"
                     v-model="selectedDate"
                     class="date-input"
-                    :disabled="campaignType === '즉시 발송'"
+                    :disabled="campaignType === 'INSTANT'"
                   />
                   <input
                     type="time"
                     v-model="selectedTime"
                     class="time-input"
-                    :disabled="campaignType === '즉시 발송'"
+                    :disabled="campaignType === 'INSTANT'"
                   />
                 </div>
               </div>
@@ -93,23 +94,67 @@
                   엑셀 업로드
                 </button>
                 <button class="add-coupon-btn" @click="clickCouponSelect">+</button>
+                <button 
+                  class="remove-all-btn" 
+                  @click="clearAllCoupons"
+                  v-if="attachedCoupons.length > 0"
+                >-</button>
               </div>
             </div>
             <div class="coupon-list">
-              <div v-for="coupon in attachedCoupons" :key="coupon.couponCode" class="coupon-item">
-                {{ coupon.couponName }}
+              <div v-for="coupon in attachedCoupons" :key="coupon.coupon_code" class="coupon-item">
+                <span class="coupon-name">{{ coupon.coupon_name }}</span>
+                <button class="remove-item-btn" @click="removeCoupon(coupon)">×</button>
               </div>
             </div>
           </div>
         </div>
-        <div class="campaign-target">
-          <TargetUserFilter @applyFilter="applyTargetUserFilter" />
-        </div>
-        <div class="target-user-list">
-          <div v-for="user in targetUsers" :key="user.memberCode" class="coupon-item">
-            {{ user.memberCode }}
+        <div class="campaign-header">
+          <span class="campaign-select-span">타겟 유저</span>
+          <div class="target-buttons">
+            <button class="excel-download-btn">
+              <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
+              엑셀 업로드
+            </button>
+            <button class="add-target-user-btn" @click="clickTargetUserSelect">+</button>
+            <button 
+              class="remove-all-btn" 
+              @click="clearAllUsers"
+              v-if="targetUsers.length > 0"
+            >-</button>
           </div>
         </div>
+        <div class="target-user-list">
+          <div class="target-user-board-header">
+            <div class="target-user-board-header-code">학생 코드</div>
+            <div class="target-user-board-header-name">이름</div>
+            <div class="target-user-board-header-email">이메일</div>
+            <div class="target-user-board-header-phone">연락처</div>
+            <div class="target-user-board-header-address">주소</div>
+            <div class="target-user-board-header-age">나이</div>
+            <div class="target-user-board-header-birth">생년월일</div>
+            <div class="target-user-board-header-memberflag">계정상태</div>
+            <div class="target-user-board-header-createdat">생성일</div>
+            <div class="target-user-board-header-dormantflag">휴면상태</div>
+            <div class="target-user-board-header-action">삭제</div>
+          </div>
+          <div v-for="user in targetUsers" :key="user.member_code" class="target-user-item">
+            <div class="target-user-board-row-code">{{ user.member_code }}</div>
+            <div class="target-user-board-row-name">{{ user.member_name }}</div>
+            <div class="target-user-board-row-email">{{ user.member_email }}</div>
+            <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
+            <div class="target-user-board-row-address">{{ user.member_address }}</div>
+            <div class="target-user-board-row-age">{{ user.member_age }}</div>
+            <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
+            <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
+            <div class="target-user-board-row-createdat">{{ formatDateTimeFromArray(user.created_at) }}</div>
+            <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
+            <div class="target-user-board-row-action">
+              <button class="remove-item-btn" @click="removeUser(user)">×</button>
+            </div>
+          </div>
+        </div>
+
         <div class="campaign-register-button-group">
           <button class="campaign-register-button" @click="registerCampaign">
             등록하기
@@ -122,39 +167,99 @@
     </div>
   </div>
   <CouponSelectModal
-  v-if="showCouponSelectModal"
-  @Close="handleModalClose"
-  @Submit="handleModalSubmit"
+    v-if="showCouponSelectModal"
+    @Close="handleCouponModalClose"
+    @Submit="handleCouponSubmit"
+  />
+  <TargetUserSelctModal
+    v-if="showTargetUserSelectModal"
+    @Close="handleTargetUserModalClose"
+    @Submit="handleTargetUserSubmit"
   />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-import TargetUserFilter from '@/components/marketing/TargetUserFilter.vue';
-import CouponSelectModal from '@/components/couponSelectModal.vue';
+import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
+import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
+
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+const userCode = jwtDecode(token).sub;
+const userName = jwtDecode(token).name;
 
 const showCouponSelectModal = ref(false);
-
-const clickCouponSelect = () => {
-  fetchCoupons;
-  showCouponSelectModal.value = true;
-  }
-
-const handleModalClose = () => {
-  showCouponSelectModal.value = false;
-  };
-
+const showTargetUserSelectModal = ref(false);
 const templates = ref([]);
 const selectedTemplateCode = ref('');
 const campaignTitle = ref('');
 const campaignContents = ref('');
 const isEditMode = ref(false);
-const campaignType = ref('즉시 발송');
+const campaignType = ref('INSTANT');
 const selectedDate = ref('');
 const selectedTime = ref('');
-const attachedCoupons = ref([]);
-const targetUsers = ref([]);
+
+// Set을 사용하여 중복 방지
+const attachedCouponMap = ref(new Map());
+const targetUserMap = ref(new Map());
+
+// computed 속성으로 배열 변환
+const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
+const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
+
+// 쿠폰 관련 함수들
+const clickCouponSelect = () => {
+  showCouponSelectModal.value = true;
+};
+
+const handleCouponModalClose = () => {
+  showCouponSelectModal.value = false;
+};
+
+const handleCouponSubmit = (coupons) => {
+  coupons.forEach(coupon => {
+    attachedCouponMap.value.set(coupon.coupon_code, coupon);
+  });
+  showCouponSelectModal.value = false;
+};
+
+const removeCoupon = (coupon) => {
+  attachedCouponMap.value.delete(coupon.coupon_code);
+};
+
+const clearAllCoupons = () => {
+  if (confirm('선택한 모든 쿠폰을 삭제하시겠습니까?')) {
+    attachedCouponMap.value.clear();
+  }
+};
+
+// 타겟 유저 관련 함수들
+const clickTargetUserSelect = () => {
+  showTargetUserSelectModal.value = true;
+};
+
+const handleTargetUserModalClose = () => {
+  showTargetUserSelectModal.value = false;
+};
+
+const handleTargetUserSubmit = (users) => {
+  users.forEach(user => {
+    targetUserMap.value.set(user.member_code, user);
+  });
+  showTargetUserSelectModal.value = false;
+};
+
+const removeUser = (user) => {
+  targetUserMap.value.delete(user.member_code);
+};
+
+const clearAllUsers = () => {
+  if (confirm('선택한 모든 사용자를 삭제하시겠습니까?')) {
+    targetUserMap.value.clear();
+  }
+};
 
 const toggleEditMode = () => {
   isEditMode.value = !isEditMode.value;
@@ -165,46 +270,37 @@ const updateTemplate = async () => {
     campaignTitle.value = '';
     campaignContents.value = '';
   } else {
-    const template = templates.value.find((t) => t.id === selectedTemplateCode.value);
+    const template = templates.value.find((t) => t.campaign_template_code === selectedTemplateCode.value);
     if (template) {
-      campaignTitle.value = template.title;
-      campaignContents.value = template.content;
+      campaignTitle.value = template.campaign_template_title;
+      campaignContents.value = template.campaign_template_contents;
     }
   }
 };
 
 const fetchTemplates = async () => {
   try {
-    const response = await fetch('/https://learnsmate.site/campaign-template/list');
+    const response = await axios.get('http://localhost:5000/campaign-template/list', {
+      headers: {
+        Authorization: token,
+      }
+    });
     templates.value = response.data;
   } catch (error) {
     console.error('Failed to fetch templates:', error);
   }
 };
 
-const fetchCoupons = async () => {
-  try {
-    const response = await fetch('/https://learnsmate.site/coupon/coupons');
-    attachedCoupons.value = response.data;
-  } catch (error) {
-    console.error('Failed to fetch coupons:', error);
-  }
-};
-
-const applyTargetUserFilter = (filteredUsers) => {
-  targetUsers.value = filteredUsers;
-};
-
 const selectSendType = (type) => {
   campaignType.value = type;
-  if (type === '즉시 발송') {
+  if (type === 'INSTANT') {
     selectedDate.value = '';
     selectedTime.value = '';
   }
 };
 
 const registerCampaign = async () => {
-  if (campaignType.value === '예약 발송' && (!selectedDate.value || !selectedTime.value)) {
+  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
     alert('예약 발송 시 날짜와 시간을 설정해주세요.');
     return;
   }
@@ -215,304 +311,374 @@ const registerCampaign = async () => {
   }
 
   const payload = {
-    campaignTitle: campaignTitle.value,
-    campaignContents: campaignContents.value,
-    campaignType: campaignType.value,
-    campaignSendDate: campaignType.value === '예약 발송' ? `${selectedDate.value}T${selectedTime.value}` : null,
-    coupons: attachedCoupons.value, // coupons, targetUsers 이름 바꿔야함.
-    targetUsers: targetUsers.value,
+    campaign_title: campaignTitle.value,
+    campaign_contents: campaignContents.value,
+    campaign_type: campaignType.value,
+    campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
+    coupon_list: attachedCoupons.value,
+    student_list: targetUsers.value,
+    admin_code: userCode,
   };
 
   try {
-    await post('/https://learnsmate.site/campaign/register', payload);
-    alert('캠페인이 등록되었습니다.'); // 모달창으로 변경하기
-    window.location.href = '/'; // 해당 캠페인 조회 페이지로? 아니면 전체 조회 페이지로?
+    await axios.post('http://localhost:5000/campaign/register', payload);
+    alert('캠페인이 등록되었습니다.');
+    window.location.href = '/marketing';
   } catch (error) {
     console.error('Failed to register campaign:', error);
-    alert('캠페인 등록에 실패했습니다.'); // 모달창으로 변경하기
-  } 
+    alert('캠페인 등록에 실패했습니다.');
+  }
 };
 
 const cancelCampaign = () => {
-  if (confirm('캠페인 등록을 취소하시겠습니까?')) { // 모달창으로 변경하기
-    window.location.href = '/marketing';
-  }
+ if (confirm('캠페인 등록을 취소하시겠습니까?')) {
+   window.location.href = '/marketing';
+ }
+};
+
+const formatDateTimeFromArray = (dateArray) => {
+ if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
+ const [year, month, day, hours, minutes, seconds] = dateArray;
+ return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const formatDateFromArray = (dateArray) => {
+ if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+ const [year, month, day] = dateArray;
+ return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 };
 
 fetchTemplates();
 </script>
 
-
-
 <style scoped>
 .campaign-register-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
+   display: flex;
+   flex-direction: column;
+   padding: 20px;
 }
 
 .campaign-contents-container {
-    display: block;
-    flex-grow: 1;
-    margin-left: 160px;
-    margin-top: 50px;
-    padding: 20px 30px;
-    background-color: white;
-    height: auto;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+   display: block;
+   flex-grow: 1;
+   margin-left: 160px;
+   margin-top: 50px;
+   padding: 20px 30px;
+   background-color: white;
+   height: auto;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .campaign-contents-column {
-    display: flex;
-    flex-direction: column;
+   display: flex;
+   flex-direction: column;
 }
 
 .campaign-contents-row {
-    display: flex;
-    flex-direction: row;
-    gap: 10%;
-    margin-bottom: 20px;
+   display: flex;
+   flex-direction: row;
+   gap: 10%;
+   margin-bottom: 20px;
 }
 
 .campaign-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   margin-bottom: 15px;
 }
 
 .edit-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #666;
+   background: none;
+   border: none;
+   cursor: pointer;
+   font-size: 18px;
+   color: #666;
 }
 
 .campaign-select {
-    width: 45%;
+   width: 45%;
 }
 
 .campaign-select-span {
-    font-size: 18px;
-    font-weight: bold;
+   font-size: 18px;
+   font-weight: bold;
 }
 
 .campaign-attach-span {
-    font-size: 18px;
-    font-weight: bold;
+   font-size: 18px;
+   font-weight: bold;
 }
 
 .campaign-target-span {
-    font-size: 18px;
-    font-weight: bold;
+   font-size: 18px;
+   font-weight: bold;
 }
 
 .campaign-details {
-    display: flex;
-    flex-direction: column;
-    border-top: 2px solid #333;
+   display: flex;
+   flex-direction: column;
+   border-top: 2px solid #333;
 }
 
 .campaign-detail-row {
-    display: flex;
-    border-bottom: 1px solid #ddd;
+   display: flex;
+   border-bottom: 1px solid #ddd;
 }
 
 .detail-title {
-    font-size: 12px;
-    padding: 12px;
-    background-color: #f9f9f9;
-    color: #333;
-    width: 150px;
-    text-align: left;
+   font-size: 12px;
+   padding: 12px;
+   background-color: #f9f9f9;
+   color: #333;
+   width: 150px;
+   text-align: left;
 }
 
 .detail-content {
-    flex: 1;
-    padding: 12px;
-    font-size: 12px;
-    color: #555;
+   flex: 1;
+   padding: 12px;
+   font-size: 12px;
+   color: #555;
 }
 
 .detail-content-textarea {
-  padding: 5px 8px;
-  margin: 4px;
-  border: 1px solid #ddd;
-  font-size: 12px;
-  width: 70%;
-  font-family: inherit;
+   padding: 5px 8px;
+   margin: 4px;
+   border: 1px solid #ddd;
+   font-size: 12px;
+   width: 70%;
+   font-family: inherit;
 }
 
 .detail-content-input {
-  padding: 5px 8px;
-  margin: 4px;
-  border: 1px solid #ddd;
-  font-size: 12px;
-  width: 40%;
-  font-family: inherit;
+   padding: 5px 8px;
+   margin: 4px;
+   border: 1px solid #ddd;
+   font-size: 12px;
+   width: 40%;
+   font-family: inherit;
 }
 
 .template-select {
-  padding: 5px 8px;
-  margin: 4px;
-  border: 1px solid #ddd;
-  font-size: 12px;
-  width: 40%;
+   padding: 5px 8px;
+   margin: 4px;
+   border: 1px solid #ddd;
+   font-size: 12px;
+   width: 40%;
+   outline: none;
 }
 
-
 .content-multiline {
-    white-space: pre-line;
-    line-height: 1.6;
-    min-height: 171.6px;
+   white-space: pre-line;
+   line-height: 1.6;
+   min-height: 171.6px;
 }
 
 .send-type {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+   display: flex;
+   gap: 10px;
+   align-items: center;
 }
 
 .send-type-btn {
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 10px;
-    cursor: pointer;
+   padding: 5px 10px;
+   background-color: #f0f0f0;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   font-size: 10px;
+   cursor: pointer;
 }
 
 .send-type-btn.active {
-  color: #FFFFFF;
-  background-color: #005950;
+   color: #FFFFFF;
+   background-color: #005950;
 }
 
 .date-input,
 .time-input {
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
+   padding: 5px 10px;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   font-size: 14px;
+   font-family: inherit;
 }
 
 .time-input {
-    width: 100px;
+   width: 100px;
 }
 
 .campaign-attach {
-  width: 45%;
+   width: 45%;
 }
 
-.campaign-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.attach-buttons {
-  display: flex;
-  align-items: center; 
-  gap: 10px;
+.attach-buttons,
+.target-buttons {
+   display: flex;
+   align-items: center;
+   gap: 10px;
 }
 
 .excel-download-btn {
-  display: flex;
-  gap: 5px;
-  font-size: 12px;
-  background-color: #005950;
-  color: white;
-  border: 1px solid #005950;
-  border-radius: 4px;
-  cursor: pointer;             
+   display: flex;
+   gap: 5px;
+   font-size: 12px;
+   background-color: #005950;
+   color: white;
+   border: 1px solid #005950;
+   border-radius: 4px;
+   cursor: pointer;
+   padding: 4px 8px;
 }
 
 .excel-download-btn img {
-  width: 16px;
-  height: 16px;
+   width: 16px;
+   height: 16px;
 }
 
 .excel-download-btn:hover {
-  background-color: #004c42;
+   background-color: #004c42;
 }
 
-.add-coupon-btn {
-  width: 25px;
-  height: 25px;
-  font-size: 15px;
-  background-color: #005950;
-  color: white;
-  border: 1px solid #005950;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.add-coupon-btn,
+.add-target-user-btn {
+   width: 25px;
+   height: 25px;
+   font-size: 15px;
+   background-color: #005950;
+   color: white;
+   border: 1px solid #005950;
+   border-radius: 4px;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 
-.add-coupon-btn:hover {
-  background-color: #004c42;
+.add-coupon-btn:hover,
+.add-target-user-btn:hover {
+   background-color: #004c42;
+}
+
+.remove-all-btn {
+   width: 25px;
+   height: 25px;
+   font-size: 15px;
+   background-color: #dc3545;
+   color: white;
+   border: 1px solid #dc3545;
+   border-radius: 4px;
+   cursor: pointer;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.remove-all-btn:hover {
+   background-color: #c82333;
+}
+
+.remove-item-btn {
+   background: none;
+   border: none;
+   color: #dc3545;
+   font-size: 18px;
+   cursor: pointer;
+   padding: 0 5px;
+}
+
+.remove-item-btn:hover {
+   color: #c82333;
 }
 
 .coupon-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #ddd;
-  height: 335px;
-  overflow-y: auto; 
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1); 
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   background-color: #f9f9f9;
+   padding: 10px;
+   border: 1px solid #ddd;
+   height: 335px;
+   overflow-y: auto;
+   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .target-user-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border: 1px solid #ddd;
-  height: 335px;
-  overflow-y: auto; 
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1); 
-}
-    
-.coupon-item {
-  padding: 10px;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 12px;
-  color: #333;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   background-color: #f9f9f9;
+   padding: 10px;
+   border: 1px solid #ddd;
+   height: 335px;
+   overflow-y: auto;
+   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.coupon-item:hover {
-  background-color: #f4f4f4;
+.target-user-board-header {
+   display: grid;
+   grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
+   padding: 10px 20px;
+   background-color: #f9f9f9;
+   font-size: 13px;
+   font-weight: bold;
+   color: #595656;
+   text-align: center;
+}
+
+.coupon-item {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 8px 12px;
+   background-color: white;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   font-size: 12px;
+}
+
+.target-user-item {
+   display: grid;
+   grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
+   padding: 10px 20px;
+   background-color: white;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   font-size: 12px;
+   text-align: center;
+   align-items: center;
+}
+
+.target-user-board-row-action {
+   display: flex;
+   justify-content: center;
+   align-items: center;
 }
 
 .campaign-register-button-group {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 20px;
-  gap: 8%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   margin-top: 20px;
+   gap: 8%;
 }
 
-.campaign-register-button, .campaign-cancel-button {
-  display: flex;
-  gap: 5px;
-  font-size: 15px;
-  align-items: center;
-  padding: 2px 10px;
-  background-color: #005950;
-  color: white;
-  border: 1px solid #005950;
-  border-radius: 4px;
-  cursor: pointer;   
+.campaign-register-button,
+.campaign-cancel-button {
+   display: flex;
+   gap: 5px;
+   font-size: 15px;
+   align-items: center;
+   padding: 2px 10px;
+   background-color: #005950;
+   color: white;
+   border: 1px solid #005950;
+   border-radius: 4px;
+   cursor: pointer;
 }
 
-
+.campaign-register-button:hover,
+.campaign-cancel-button:hover {
+   background-color: #004c42;
+}
 </style>
