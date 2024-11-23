@@ -14,7 +14,7 @@ const routes = [
   {
     path: '/lecture',
     name: 'Lecture',
-    component: () => import('../views/LectureView.vue')
+    component: () => import('../views/lecture/LectureView.vue')
   },
 
   ...MemberRouter,
