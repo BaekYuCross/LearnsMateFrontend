@@ -21,7 +21,9 @@ const isClientVocPage = computed(() => route.path === '/client-voc');
 const isClientMyVocPage = computed(() => route.path === '/client-myvoc');
 const isClientLecturePage = computed(() => route.path === '/client-lecture');
 const isClientMyLecturePage = computed(() => route.path === '/client-mylecture');
-
+const isClientLectureDetailPage = computed(() =>
+  route.matched.some((record) => record.path === '/client-lecturedetail/:id')
+);
 
 
 const showHeader = computed(() => {
