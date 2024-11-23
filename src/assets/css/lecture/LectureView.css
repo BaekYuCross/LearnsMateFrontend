@@ -43,7 +43,8 @@
     gap: 10px;
   }
   
-  .lecture-excel-button {
+  .lecture-excel-button,
+  .lecture-monthly-counts-button {
     background: #005950;
     padding: 3px 5px;
     margin-bottom: 3px;
@@ -250,6 +251,11 @@
   }
   
   .lecture-excel-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .lecture-monthly-counts-button img {
     width: 16px;
     height: 16px;
   }

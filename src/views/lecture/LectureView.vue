@@ -10,6 +10,10 @@
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
           </button>
+          <button class="lecture-monthly-counts-button">
+            <img src="@/assets/icons/ai.svg" alt="월별/연도별 강의 수 조회">
+            월별/연도별 강의 수 보기
+          </button>
         </div>
       </div>
 
@@ -31,7 +35,7 @@
           <div class="lecture-board-body">
             <div 
               class="lecture-board-row" 
-              v-for="lecture in lectureList" 
+              v-for="lecture in displayedLectures" 
               :key="lecture.lecture_code" 
               @click="showLectureDetail(lecture)"
               :class="{ 'selected': selectedLecture?.lecture_code === lecture.lecture_code }"
@@ -150,7 +154,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import LectureSideMenu from '@/components/sideMenu/LectureSideMenu.vue'
 import LectureFilter from '@/components/lecture/LectureFilter.vue'
 import axios from 'axios'
@@ -163,7 +167,10 @@ const lectureList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const pageSize = 50
+const displaySize = 15;
+const pageSize = 50;
+const cursors = ref({});
+const displayedLectures = ref([]);
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
@@ -190,12 +197,14 @@ const snakeToCamel = (obj) => {
 
 const fetchLectureList = async (filters = {}) => {
   try {
+    const cursor = cursors.value[currentPage.value];
     const response = await axios.get('http://localhost:5000/lecture/list', {
       headers: {
         Authorization: token,
       },
       params: {
         ...filters,
+        cursor: cursor,
         page: currentPage.value - 1,
         size: pageSize
       }
@@ -205,9 +214,35 @@ const fetchLectureList = async (filters = {}) => {
     totalCount.value = response.data.totalElements;
     totalPages.value = Math.ceil(response.data.totalElements / pageSize);
 
+    if (response.data.nextCursor) {
+      cursors.value[currentPage.value + 1] = response.data.nextCursor;
+    }
+
+    updateDisplayedLectures();
   } catch (error) {
     console.error('강의 목록을 불러오는데 실패했습니다:', error);
   }
+};
+
+const handleScroll = () => {
+  const container = document.querySelector('.lecture-board-body');
+  if (!container) return;
+
+  const { scrollTop, scrollHeight, clientHeight } = container;
+  if (scrollTop + clientHeight >= scrollHeight - 100) {  // 하단에서 100px 전에 로드
+    loadMoreLectures();
+  }
+};
+
+const loadMoreLectures = () => {
+  const currentDisplayed = displayedLectures.value.length;
+  if (currentDisplayed < lectureList.value.length) {
+    displayedLectures.value = lectureList.value.slice(0, currentDisplayed + displaySize);
+  }
+};
+
+const updateDisplayedLectures = () => {
+  displayedLectures.value = lectureList.value.slice(0, displaySize);
 };
 
 const showSingleLecture = () => {
@@ -365,5 +400,16 @@ const endPage = computed(() => {
 
 onMounted(() => {
   fetchLectureList();
+  const container = document.querySelector('.lecture-board-body');
+  if (container) {
+    container.addEventListener('scroll', handleScroll);
+  }
+});
+
+onUnmounted(() => {
+  const container = document.querySelector('.lecture-board-body');
+  if (container) {
+    container.removeEventListener('scroll', handleScroll);
+  }
 });
 </script>
