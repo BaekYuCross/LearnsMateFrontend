@@ -35,7 +35,7 @@
           <div class="lecture-board-body">
             <div 
               class="lecture-board-row" 
-              v-for="lecture in displayedLectures" 
+              v-for="lecture in lectureList" 
               :key="lecture.lecture_code" 
               @click="showLectureDetail(lecture)"
               :class="{ 'selected': selectedLecture?.lecture_code === lecture.lecture_code }"
@@ -62,8 +62,7 @@
           </div>
 
           <div class="lecture-pagination">
-            <button 
-              class="lecture-page-button lecture-prev-button" 
+            <button class="lecture-page-button lecture-prev-button" 
               @click="changePage(currentPage - 1)" 
               :disabled="currentPage === 1"
             >◀</button>
@@ -154,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import LectureSideMenu from '@/components/sideMenu/LectureSideMenu.vue'
 import LectureFilter from '@/components/lecture/LectureFilter.vue'
 import axios from 'axios'
@@ -167,10 +166,7 @@ const lectureList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const displaySize = 15;
-const pageSize = 50;
-const cursors = ref({});
-const displayedLectures = ref([]);
+const pageSize = 50
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
@@ -185,19 +181,9 @@ const camelToSnake = (obj) => {
   }, {});
 };
 
-const snakeToCamel = (obj) => {
-  if (!obj || typeof obj !== "object") return obj;
-  if (Array.isArray(obj)) return obj.map(snakeToCamel);
-  return Object.keys(obj).reduce((acc, key) => {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    acc[camelKey] = snakeToCamel(obj[key]);
-    return acc;
-  }, {});
-};
-
 const fetchLectureList = async (filters = {}) => {
   try {
-    const response = await axios.get("http://localhost:5000/lecture/list", {
+    const response = await axios.get('http://localhost:5000/lecture/list', {
       headers: {
         Authorization: token,
       },
@@ -207,42 +193,14 @@ const fetchLectureList = async (filters = {}) => {
         size: pageSize
       }
     });
+    console.log(response.data);
     
-    if (!response.data?.data) {
-      console.error('No data received from server');
-      return;
-    }
-
-    lectureList.value = response.data.data;
-    totalCount.value = response.data.totalElements || 0;
-    totalPages.value = Math.ceil((response.data.totalElements || 0) / pageSize);
-    displayedLectures.value = lectureList.value.slice(0, displaySize);
+    lectureList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
 
   } catch (error) {
     console.error('강의 목록을 불러오는데 실패했습니다:', error);
-    if (error.response) {
-      console.error('Error response:', error.response.data);
-    }
-  }
-};
-
-const handleScroll = () => {
-  const container = document.querySelector('.lecture-board-body');
-  if (!container) return;
-
-  const { scrollTop, scrollHeight, clientHeight } = container;
-  if (scrollTop + clientHeight >= scrollHeight - 100) {
-    loadMoreLectures();
-  }
-};
-
-
-const loadMoreLectures = () => {
-  const currentDisplayed = displayedLectures.value.length;
-  if (currentDisplayed < Math.min(lectureList.value.length, pageSize)) {
-    displayedLectures.value = lectureList.value.slice(0, 
-      Math.min(currentDisplayed + displaySize, pageSize)
-    );
   }
 };
 
@@ -256,17 +214,20 @@ const hideSingleLecture = () => {
 
 const handleSearch = async (filterData) => {
   try {
+    isFiltered.value = true;
+    lastFilterData.value = filterData;
     const response = await axios.post(
       `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
       camelToSnake(filterData),
       {
         headers: {
           Authorization: token,
+          'Content-Type': 'application/json',
         },
       }
     );
 
-    console.log("API Response:", response.data);
+    console.log("Filter Response Data:", response.data);
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -278,58 +239,35 @@ const handleSearch = async (filterData) => {
 };
 
 const handleReset = () => {
-  fetchLectureList();
-  currentPage.value = 1;
-  selectedLecture.value = null;
   isFiltered.value = false;
   lastFilterData.value = null;
+  currentPage.value = 1;
+  selectedLecture.value = null;
+  fetchLectureList();
 };
 
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
-  
   currentPage.value = newPage;
-  
+
   if (isFiltered.value && lastFilterData.value) {
-    await handleSearch(lastFilterData.value);
-  } else {
-    const cursor = cursors.value[currentPage.value - 1];
-    
-    try {
-      const response = await axios.get("http://localhost:5000/lecture/list", {
+    const response = await axios.post(
+      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+      camelToSnake(lastFilterData.value),
+      {
         headers: {
           Authorization: token,
+          'Content-Type': 'application/json',
         },
-        params: {
-          cursor: cursor,
-          size: pageSize
-        }
-      });
-
-      if (response.data?.data) {
-        lectureList.value = response.data.data;
-        displayedLectures.value = lectureList.value.slice(0, displaySize);
-
-        if (response.data.data.length > 0) {
-          const lastItem = response.data.data[response.data.data.length - 1];
-          if (lastItem.created_at) {
-            const cursorDate = Array.isArray(lastItem.created_at) 
-              ? new Date(
-                  lastItem.created_at[0],
-                  lastItem.created_at[1] - 1,
-                  lastItem.created_at[2],
-                  lastItem.created_at[3] || 0,
-                  lastItem.created_at[4] || 0,
-                  lastItem.created_at[5] || 0
-                ).toISOString()
-              : lastItem.created_at;
-            cursors.value[currentPage.value] = cursorDate;
-          }
-        }
       }
-    } catch (error) {
-      console.error('페이지 변경 중 오류 발생:', error);
-    }
+    );
+
+    lectureList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+
+  } else {
+    await fetchLectureList();
   }
 };
 
@@ -437,16 +375,5 @@ const endPage = computed(() => {
 
 onMounted(() => {
   fetchLectureList();
-  const container = document.querySelector('.lecture-board-body');
-  if (container) {
-    container.addEventListener('scroll', handleScroll);
-  }
-});
-
-onUnmounted(() => {
-  const container = document.querySelector('.lecture-board-body');
-  if (container) {
-    container.removeEventListener('scroll', handleScroll);
-  }
 });
 </script>
