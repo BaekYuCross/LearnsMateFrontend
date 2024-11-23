@@ -180,3 +180,168 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
   margin-bottom: 20px;
   color: #333;
 }
+
+/* 상세 정보 섹션 스타일 */
+.info-section, .course-section, .voc-section, .coupon-section {
+  border-bottom: 1px solid #eee;
+  padding: 20px 0;
+ }
+ 
+ .info-section h4, .course-section h4, .voc-section h4, .coupon-section h4 {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: bold;
+ }
+ 
+ /* 강의 진행 현황 */
+ .course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+ }
+ 
+ .course-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #eee;
+ }
+ 
+ .course-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+ }
+ 
+ .progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 3px;
+  margin: 10px 0;
+  overflow: hidden;
+ }
+ 
+ .progress {
+  height: 100%;
+  background: #00bfa5;  /* 이미지의 초록색과 비슷한 색상 */
+  transition: width 0.3s ease;
+ }
+ 
+ .progress-text {
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+ }
+ 
+ /* VOC 섹션 */
+ .voc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+ }
+ 
+ .voc-grid {
+  display: grid;
+  gap: 10px;
+ }
+ 
+ .voc-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #eee;
+ }
+ 
+ .voc-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 10px;
+ }
+ 
+ .voc-content {
+  padding: 10px 0;
+  font-size: 13px;
+ }
+ 
+ .voc-category {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+ }
+ 
+ .voc-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+ }
+ 
+ /* 쿠폰 섹션 */
+ .coupon-list {
+  display: grid;
+  gap: 20px;
+ }
+ 
+ .coupon-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+ }
+ 
+ .coupon-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #eee;
+ }
+ 
+ .coupon-detail {
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+ }
+ 
+ /* 섹션 제목 스타일 */
+ h5 {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 500;
+ }
+ 
+ /* 상세 정보 스크롤 */
+ .detail-container {
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+ }
+ 
+ .detail-content {
+  padding-right: 10px;
+ }
+ 
+ /* 스크롤바 스타일 */
+ .detail-container::-webkit-scrollbar {
+  width: 6px;
+ }
+ 
+ .detail-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+ }
+ 
+ .detail-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+ }
+ 
+ .detail-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+ }
