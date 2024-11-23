@@ -197,30 +197,32 @@ const snakeToCamel = (obj) => {
 
 const fetchLectureList = async (filters = {}) => {
   try {
-    const cursor = cursors.value[currentPage.value];
-    const response = await axios.get('http://localhost:5000/lecture/list', {
+    const response = await axios.get("http://localhost:5000/lecture/list", {
       headers: {
         Authorization: token,
       },
       params: {
         ...filters,
-        cursor: cursor,
         page: currentPage.value - 1,
         size: pageSize
       }
     });
     
-    lectureList.value = response.data.data;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = Math.ceil(response.data.totalElements / pageSize);
-
-    if (response.data.nextCursor) {
-      cursors.value[currentPage.value + 1] = response.data.nextCursor;
+    if (!response.data?.data) {
+      console.error('No data received from server');
+      return;
     }
 
-    updateDisplayedLectures();
+    lectureList.value = response.data.data;
+    totalCount.value = response.data.totalElements || 0;
+    totalPages.value = Math.ceil((response.data.totalElements || 0) / pageSize);
+    displayedLectures.value = lectureList.value.slice(0, displaySize);
+
   } catch (error) {
     console.error('강의 목록을 불러오는데 실패했습니다:', error);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+    }
   }
 };
 
@@ -229,20 +231,19 @@ const handleScroll = () => {
   if (!container) return;
 
   const { scrollTop, scrollHeight, clientHeight } = container;
-  if (scrollTop + clientHeight >= scrollHeight - 100) {  // 하단에서 100px 전에 로드
+  if (scrollTop + clientHeight >= scrollHeight - 100) {
     loadMoreLectures();
   }
 };
 
+
 const loadMoreLectures = () => {
   const currentDisplayed = displayedLectures.value.length;
-  if (currentDisplayed < lectureList.value.length) {
-    displayedLectures.value = lectureList.value.slice(0, currentDisplayed + displaySize);
+  if (currentDisplayed < Math.min(lectureList.value.length, pageSize)) {
+    displayedLectures.value = lectureList.value.slice(0, 
+      Math.min(currentDisplayed + displaySize, pageSize)
+    );
   }
-};
-
-const updateDisplayedLectures = () => {
-  displayedLectures.value = lectureList.value.slice(0, displaySize);
 };
 
 const showSingleLecture = () => {
@@ -292,7 +293,43 @@ const changePage = async (newPage) => {
   if (isFiltered.value && lastFilterData.value) {
     await handleSearch(lastFilterData.value);
   } else {
-    await fetchLectureList();
+    const cursor = cursors.value[currentPage.value - 1];
+    
+    try {
+      const response = await axios.get("http://localhost:5000/lecture/list", {
+        headers: {
+          Authorization: token,
+        },
+        params: {
+          cursor: cursor,
+          size: pageSize
+        }
+      });
+
+      if (response.data?.data) {
+        lectureList.value = response.data.data;
+        displayedLectures.value = lectureList.value.slice(0, displaySize);
+
+        if (response.data.data.length > 0) {
+          const lastItem = response.data.data[response.data.data.length - 1];
+          if (lastItem.created_at) {
+            const cursorDate = Array.isArray(lastItem.created_at) 
+              ? new Date(
+                  lastItem.created_at[0],
+                  lastItem.created_at[1] - 1,
+                  lastItem.created_at[2],
+                  lastItem.created_at[3] || 0,
+                  lastItem.created_at[4] || 0,
+                  lastItem.created_at[5] || 0
+                ).toISOString()
+              : lastItem.created_at;
+            cursors.value[currentPage.value] = cursorDate;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('페이지 변경 중 오류 발생:', error);
+    }
   }
 };
 
