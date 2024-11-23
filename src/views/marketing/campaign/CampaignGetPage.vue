@@ -37,7 +37,6 @@
             <div class="campaign-get-detail-row">
               <span class="detail-title">발송 유형</span>
               <div class="detail-content send-type">
-                  <!-- INSTANT 상태 -->
                   <button
                       class="send-type-btn"
                       :class="{ active: campaignType === 'INSTANT' }"
@@ -45,8 +44,6 @@
                   >
                       즉시 발송
                   </button>
-
-                  <!-- RESERVATION 상태 -->
                   <button
                       class="send-type-btn"
                       :class="{ active: campaignType === 'RESERVATION' }"
@@ -55,12 +52,9 @@
                       예약 발송
                   </button>
 
-                  <!-- 예약 발송 시간 -->
                   <span v-if="campaignType === 'RESERVATION' && !isEditMode">
                       {{ selectedDate }} {{ selectedTime }}
                   </span>
-
-                  <!-- 수정 모드에서만 예약 시간 변경 가능 -->
                   <input
                       v-if="isEditMode && campaignType === 'RESERVATION'"
                       type="date"
@@ -156,16 +150,16 @@
               v-if="!isEditMode"
               @click="toggleEditMode"
           >
-              수정하기
+              수정
           </button>
           <button 
               class="campaign-get-cancel-button" 
               :class="{ 'instant-button': campaignType === 'INSTANT' }"
               :disabled="campaignType === 'INSTANT'"
               v-if="!isEditMode" 
-              @click="cancelCampaign"
+              @click="confirmCancelCampaign"
           >
-              취소하기
+              예약 취소
           </button>
           <button 
               class="campaign-get-register-button"
@@ -179,7 +173,7 @@
               v-if="isEditMode"
               @click="cancelEditMode"
           >
-              취소하기
+              취소
           </button>
       </div>
 
@@ -195,6 +189,12 @@
       @Close="handleTargetUserModalClose"
       @Submit="handleTargetUserSubmit"
     />
+    <CancelModule
+      v-if="isCancelModalOpen"
+      modalTitle="예약을 취소하시겠습니까?"
+      @confirm="confirmCancel"
+      @cancel="cancelRegister"
+    />
   </div>
 </template>
 
@@ -208,6 +208,7 @@
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
   import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
+  import CancelModule from '@/components/modules/CancelModule.vue';
   
   const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjI2MTY5MywiZXhwIjoxNzc1NDYxNjkzfQ.sfY4-uvhksfHdeuFUY216KJbfjkK8jeBWAVBzFttMYpn_zC4ao2FB9DZt6xEleAGh7VsteoloNjAPCWbzxD6xg';
   const userCode = jwtDecode(token).sub;
@@ -220,6 +221,7 @@
   
   const showCouponSelectModal = ref(false);
   const showTargetUserSelectModal = ref(false);
+  const isCancelModalOpen = ref(false);
   
   const campaignType = ref('RESERVATION'); 
   const selectedDate = ref('');
@@ -239,20 +241,18 @@
         });
         campaign.value = response.data;
 
-        // 발송 상태에 따른 초기 설정
-        campaignType.value = campaign.value.campaign_type; // INSTANT 또는 RESERVATION
+        campaignType.value = campaign.value.campaign_type; 
 
         if (campaignType.value === 'RESERVATION' && Array.isArray(campaign.value.campaign_send_date)) {
             const formattedDateTime = formatSendDateFromArray(campaign.value.campaign_send_date);
             const [date, time] = formattedDateTime.split(' ');
-            selectedDate.value = date; // "YYYY-MM-DD"
-            selectedTime.value = time; // "HH:MM"
+            selectedDate.value = date; 
+            selectedTime.value = time; 
         } else {
             selectedDate.value = '';
             selectedTime.value = '';
         }
 
-        // 쿠폰 및 타겟 유저 설정
         attachedCouponMap.value.clear();
         if (campaign.value.coupons) {
             campaign.value.coupons.forEach((coupon) => {
@@ -294,7 +294,7 @@ const toggleEditMode = () => {
         campaign_code: campaign.value.campaign_code,
         campaign_title: campaign.value.campaign_title,
         campaign_contents: campaign.value.campaign_contents,
-        campaign_type: campaignType.value, // 타입 변경 불가
+        campaign_type: campaignType.value, 
         campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
         coupons: attachedCoupons.value,
         members: targetUsers.value,
@@ -310,12 +310,11 @@ const toggleEditMode = () => {
                   'Content-Type': 'application/json',
               },
           });
-          alert('수정이 완료되었습니다.');
           isEditMode.value = false;
-          fetchTemplate(); // 업데이트된 데이터 다시 불러오기
+          fetchTemplate(); 
       } catch (error) {
           console.error('캠페인 수정 실패:', error);
-          alert('수정에 실패했습니다.');
+          alert('발송 날짜/시간을 입력해주세요');
       }
   };
 
@@ -326,9 +325,11 @@ const toggleEditMode = () => {
       fetchTemplate(); 
     }
   };
+  const confirmCancelCampaign = async () => {
+    isCancelModalOpen.value = true;
+  };
   
   const cancelCampaign = async () => {
-    // 삭제하시겠습니까 물어보고하기
     const campaignCode = route.query.campaignCode;
     try {
       await axios.delete(`http://localhost:5000/campaign/delete/${campaignCode}`, {
@@ -356,7 +357,6 @@ const toggleEditMode = () => {
     coupons.forEach((coupon) => {
       attachedCouponMap.value.set(coupon.coupon_code, coupon);
     });
-    // campaign.value의 coupons 배열 업데이트
     campaign.value.coupons = Array.from(attachedCouponMap.value.values());
     showCouponSelectModal.value = false;
   };
@@ -388,7 +388,17 @@ const toggleEditMode = () => {
     campaign.value.members = Array.from(targetUserMap.value.values());
     showTargetUserSelectModal.value = false;
   };
-  
+
+  const confirmCancel = () => {
+    isCancelModalOpen.value = false; 
+    cancelCampaign();
+  };
+
+  const cancelRegister = () => {
+    isCancelModalOpen.value = false;
+    return;
+  };
+
   const removeUser = (user) => {
     targetUserMap.value.delete(user.member_code);
     campaign.value.members = Array.from(targetUserMap.value.values());
@@ -401,16 +411,6 @@ const toggleEditMode = () => {
       campaign.value.members = [];
     }
   };
-
-  const selectSendType = (type) => {
-    if (!isEditMode.value) return; 
-    campaignType.value = type;
-
-    if (type === 'INSTANT') {
-        selectedDate.value = '';
-        selectedTime.value = '';
-    }
-    };
 
   const formatDateTimeFromArray = (dateArray) => {
     if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
