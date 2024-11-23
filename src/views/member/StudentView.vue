@@ -59,15 +59,33 @@
           </table>
 
           <div class="pagination">
-            <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
-            <button class="page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
-            <span v-if="startPage > 2">...</span>
+            <button 
+              class="page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >
+              ◀
+            </button>
+            
             <template v-for="page in displayedPages" :key="page">
-              <button v-if="page !== 1 && page !== totalPages" class="page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+              <span v-if="page === '...'" class="page-dots">...</span>
+              <button 
+                v-else
+                class="page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
             </template>
-            <span v-if="endPage < totalPages - 1">...</span>
-            <button v-if="totalPages > 1" class="page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
-            <button class="page-button next-button" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
+            
+            <button 
+              class="page-button next-button"
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >
+              ▶
+            </button>
           </div>
         </div>
 
@@ -102,33 +120,16 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const memberCodeCursor = ref(null);
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 
-// 커서 상태를 저장하는 맵 (페이지별 커서를 저장)
-const pageCursors = ref(new Map());
-
-// 전체 학생 목록 가져오기
+// 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
-    const params = {
-      size: pageSize,
-    };
-
-    // 첫 페이지는 offset 방식
-    if (currentPage.value === 1) {
-      params.page = 0;
-    } else {
-      const cursor = pageCursors.value.get(currentPage.value);
-      if (!cursor) {
-        console.error('No cursor available for page:', currentPage.value);
-        return;
-      }
-      params.memberCodeCursor = cursor;
-    }
-
     const response = await axios.get('http://localhost:5000/member/students', {
-      params,
+      params: {
+        page: currentPage.value - 1, // 0-based page
+        size: pageSize,
+      },
       headers: {
         Authorization: token,
       },
@@ -137,28 +138,30 @@ const fetchStudents = async () => {
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-
-    // 다음 페이지 커서 저장
-    if (response.data.nextCursor) {
-      const nextPage = currentPage.value + 1;
-      pageCursors.value.set(nextPage, response.data.nextCursor); // 커서 저장
-      console.log(`Cursor for page ${nextPage}:`, response.data.nextCursor);
-    } else {
-      console.warn('No nextCursor in response for page:', currentPage.value);
-    }
   } catch (error) {
     console.error('Failed to fetch students:', error);
-    if (error.response?.data) {
-      console.error('Error details:', error.response.data);
-    }
   }
 };
+
 // 필터링된 학생 목록 가져오기
 const fetchFilteredStudents = async () => {
+  if (!lastFilterData.value) return;  // lastFilterData가 없으면 종료
+
   try {
+    console.log('Sending filter data:', lastFilterData.value);  // 디버깅용
+
+    // 날짜 데이터가 있는 경우 ISO 문자열로 변환
+    const processedFilterData = {
+      ...lastFilterData.value,
+      birthStartDate: lastFilterData.value.birthStartDate ? new Date(lastFilterData.value.birthStartDate).toISOString() : null,
+      birthEndDate: lastFilterData.value.birthEndDate ? new Date(lastFilterData.value.birthEndDate).toISOString() : null,
+      createdStartDate: lastFilterData.value.createdStartDate ? new Date(lastFilterData.value.createdStartDate).toISOString() : null,
+      createdEndDate: lastFilterData.value.createdEndDate ? new Date(lastFilterData.value.createdEndDate).toISOString() : null,
+    };
+
     const response = await axios.post(
       'http://localhost:5000/member/filter/student',
-      lastFilterData.value,
+      processedFilterData,  // 가공된 필터 데이터 사용
       {
         params: {
           page: currentPage.value - 1,
@@ -171,15 +174,19 @@ const fetchFilteredStudents = async () => {
       }
     );
 
+    console.log('Filter response:', response.data);  // 디버깅용
+
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-
-    console.log('Filtered API Response:', response.data);
   } catch (error) {
     console.error('Failed to fetch filtered students:', error);
+    if (error.response?.data) {
+      console.error('Error response:', error.response.data);
+    }
   }
 };
+
 // 페이지 변경 처리
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
@@ -187,28 +194,18 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
 
   if (isFiltered.value) {
-    // 필터링된 상태일 때
     await fetchFilteredStudents();
   } else {
-    // 일반 페이징
     await fetchStudents();
   }
-
-  selectedStudent.value = null; // 선택된 학생 초기화
 };
 
 // 필터링 검색
 const handleSearch = async (filterData) => {
-  try {
-    isFiltered.value = true; // 필터링 활성화
-    lastFilterData.value = filterData; // 필터 데이터 저장
-    currentPage.value = 1; // 페이지 초기화
-    pageCursors.value.clear(); // 커서 초기화
-
-    await fetchFilteredStudents();
-  } catch (error) {
-    console.error('Failed to search students with filters:', error);
-  }
+  isFiltered.value = true;
+  lastFilterData.value = filterData;
+  currentPage.value = 1;
+  await fetchFilteredStudents();
 };
 
 // 초기화
@@ -216,33 +213,38 @@ const handleReset = () => {
   isFiltered.value = false;
   lastFilterData.value = null;
   currentPage.value = 1;
-  selectedStudent.value = null;
-
-  memberCodeCursor.value = null;
-  pageCursors.value.clear();
   fetchStudents();
 };
 
 const displayedPages = computed(() => {
-  const start = Math.max(currentPage.value - 2, 2);
-  const end = Math.min(start + 4, totalPages.value - 1);
-
   const pages = [];
-  for (let i = start; i <= end; i++) {
+  // const range = 2;
+  
+  pages.push(1);
+
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
+  }
+  
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
     pages.push(i);
   }
+  
+  if (totalPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  
+  // 마지막 페이지 추가 (첫 페이지와 같지 않은 경우만)
+  if (totalPages.value > 1) {
+    pages.push(totalPages.value);
+  }
+  
   return pages;
 });
 
-const startPage = computed(() => {
-  return displayedPages.value.length > 0 ? displayedPages.value[0] : 1;
-});
-
-const endPage = computed(() => {
-  return displayedPages.value.length > 0 ? displayedPages.value[displayedPages.value.length - 1] : totalPages.value;
-});
-
-// 학생 상세 정보 보기
+// 학생 상세 보기
 const showDetail = async (student) => {
   if (selectedStudent.value?.memberCode === student.memberCode) {
     selectedStudent.value = null;
@@ -251,11 +253,7 @@ const showDetail = async (student) => {
     try {
       const response = await axios.get(
         `http://localhost:5000/member/student/${student.memberCode}`,
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
+        { headers: { Authorization: token } }
       );
       console.log('Student details:', response.data);
     } catch (error) {
@@ -264,7 +262,7 @@ const showDetail = async (student) => {
   }
 };
 
-// 컴포넌트 마운트 시 데이터 로드
+// 초기 로드
 onMounted(() => {
   fetchStudents();
 });
