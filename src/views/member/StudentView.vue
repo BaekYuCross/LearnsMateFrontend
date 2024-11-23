@@ -148,20 +148,9 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;  // lastFilterData가 없으면 종료
 
   try {
-    console.log('Sending filter data:', lastFilterData.value);  // 디버깅용
+    console.log(lastFilterData.value);
 
-    // 날짜 데이터가 있는 경우 ISO 문자열로 변환
-    const processedFilterData = {
-      ...lastFilterData.value,
-      birthStartDate: lastFilterData.value.birthStartDate ? new Date(lastFilterData.value.birthStartDate).toISOString() : null,
-      birthEndDate: lastFilterData.value.birthEndDate ? new Date(lastFilterData.value.birthEndDate).toISOString() : null,
-      createdStartDate: lastFilterData.value.createdStartDate ? new Date(lastFilterData.value.createdStartDate).toISOString() : null,
-      createdEndDate: lastFilterData.value.createdEndDate ? new Date(lastFilterData.value.createdEndDate).toISOString() : null,
-    };
-
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/student',
-      processedFilterData,  // 가공된 필터 데이터 사용
+    const response = await axios.post('http://localhost:5000/member/filter/student', lastFilterData.value,
       {
         params: {
           page: currentPage.value - 1,
