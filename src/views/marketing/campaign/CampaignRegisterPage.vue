@@ -157,46 +157,45 @@
           </div>
           <!-- 페이지네이션 -->
           <div class="pagination">
-    <button 
-      class="page-button prev-button" 
-      @click="changePage(currentPage - 1)" 
-      :disabled="currentPage === 1"
-    >◀</button>
-    <button 
-      class="page-button" 
-      :class="{ active: currentPage === 1 }" 
-      @click="changePage(1)"
-    >1</button>
-    <span v-if="startPage > 2">...</span>
-    <template v-for="page in displayedPages" :key="page">
-      <button 
-        v-if="page !== 1 && page !== totalPages" 
-        class="page-button" 
-        :class="{ active: currentPage === page }" 
-        @click="changePage(page)"
-      >{{ page }}</button>
-    </template>
-    <span v-if="endPage < totalPages - 1">...</span>
-    <button 
-      v-if="totalPages > 1" 
-      class="page-button" 
-      :class="{ active: currentPage === totalPages }" 
-      @click="changePage(totalPages)"
-    >{{ totalPages }}</button>
-    <button 
-      class="page-button next-button" 
-      @click="changePage(currentPage + 1)" 
-      :disabled="currentPage === totalPages"
-    >▶</button>
-  </div>
+            <button 
+              class="page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >◀</button>
+            <button 
+              class="page-button" 
+              :class="{ active: currentPage === 1 }" 
+              @click="changePage(1)"
+            >1</button>
+            <span v-if="startPage > 2">...</span>
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== 1 && page !== totalPages" 
+                class="page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >{{ page }}</button>
+            </template>
+            <span v-if="endPage < totalPages - 1">...</span>
+            <button 
+              v-if="totalPages > 1" 
+              class="page-button" 
+              :class="{ active: currentPage === totalPages }" 
+              @click="changePage(totalPages)"
+            >{{ totalPages }}</button>
+            <button 
+              class="page-button next-button" 
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >▶</button>
+          </div>
         </div>
-
         <div class="campaign-register-button-group">
           <button class="campaign-register-button" @click="showRegisterModal">
-            등록하기
+            등록
           </button>
           <button class="campaign-cancel-button" @click="showCancelModal">
-            취소하기
+            취소
           </button>
         </div>
       </div>
@@ -816,6 +815,7 @@ fetchTemplates();
     align-items: center;
     margin-top: 20px;
     gap: 5px;
+    background-color: #f9f9f9;
   }
 
   .page-button {
