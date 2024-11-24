@@ -46,7 +46,7 @@
                 <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
                 <div class="target-user-board-row-address">{{ user.member_address }}</div>
                 <div class="target-user-board-row-age">{{ user.member_age }}</div>
-                <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
+                <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
                 <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
                 <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
                 <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
@@ -93,17 +93,6 @@ const lastFilterData = ref(null);
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 
-// Snake Case 변환 헬퍼 함수
-const camelToSnake = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  return Object.keys(obj).reduce((acc, key) => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    acc[snakeKey] = camelToSnake(obj[key]);
-    return acc;
-  }, {});
-};
-
 const fetchUsers = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
@@ -139,7 +128,7 @@ const selectAll = async (event) => {
         // 필터링된 전체 데이터 가져오기
         response = await axios.post(
           'http://localhost:5000/member/filter/student',
-          camelToSnake(lastFilterData.value),
+          lastFilterData.value,
           {
             params: {
               page: 0,
@@ -178,10 +167,10 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
     selectedUsers.value = []; // 검색 시 선택 초기화 추가
-
+    console.log("필터링 내용: ",lastFilterData.value);
     const response = await axios.post(
       'http://localhost:5000/member/filter/student',
-      camelToSnake(filterData),
+      filterData,
       {
         params: {
           page: currentPage.value - 1,
