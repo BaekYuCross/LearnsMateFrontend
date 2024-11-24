@@ -236,6 +236,104 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
   text-align: right;
  }
  
+/* 추천 강의 섹션 스타일 */
+.recommended-section {
+  border-bottom: 1px solid #eee;
+  padding: 20px 0;
+}
+
+.recommended-section h4 {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.recommended-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.recommended-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  transition: transform 0.2s ease;
+}
+
+.recommended-item:hover {
+  transform: translateX(5px);
+  cursor: pointer;
+}
+
+.recommended-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lecture-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.lecture-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.lecture-level {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+.lecture-level.beginner {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.lecture-level.intermediate {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.lecture-level.advanced {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.lecture-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.lecture-info .info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lecture-info .label {
+  font-size: 11px;
+  color: #666;
+}
+
+.lecture-info .info-item span:last-child {
+  font-size: 13px;
+  color: #333;
+}
+
  /* VOC 섹션 */
  .voc-list {
   display: flex;
