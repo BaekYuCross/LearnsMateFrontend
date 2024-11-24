@@ -26,25 +26,29 @@
         </div>
         <div class="board-body">
           <div
-            class="board-row"
-            v-for="(campaign, index) in paginatedCampaigns"
-            :key="campaign.campaign_code"
-            @click="getCampaign(campaign.campaign_code)"
-          >
-            <div class="board-row-number">{{ campaign.campaign_code }}</div>
-            <div class="board-row-title">{{ campaign.campaign_title }}</div>
-            <div class="board-row-contents">{{ campaign.campaign_contents }}</div>
-            <div class="board-row-type">{{ campaign.campaign_type }}</div>
-            <div class="board-row-send">
-              {{ campaign.campaign_type === 'INSTANT' 
-                  ? formatDateFromArray(campaign.campaign_send_date) 
-                  : formatSendDateFromArray(campaign.campaign_send_date) 
-              }}
-            </div>
-            <div class="board-row-created">{{ formatDateFromArray(campaign.created_at) }}</div>
-            <div class="board-row-updated">{{ formatDateFromArray(campaign.updated_at) }}</div>
-            <div class="board-row-admin">{{ campaign.admin_name }}</div>
-          </div>
+    class="board-row"
+    v-for="(campaign, index) in paginatedCampaigns"
+    :key="campaign.campaign_code"
+    @click="getCampaign(campaign.campaign_code)"
+  >
+    <div class="board-row-number">{{ campaign.campaign_code }}</div>
+    <div class="board-row-title" :title="campaign.campaign_title">
+      {{ campaign.campaign_title }}
+    </div>
+    <div class="board-row-contents" :title="campaign.campaign_contents">
+      {{ campaign.campaign_contents }}
+    </div>
+    <div class="board-row-type">{{ campaign.campaign_type }}</div>
+    <div class="board-row-send">
+      {{ campaign.campaign_type === 'INSTANT' 
+          ? formatDateFromArray(campaign.campaign_send_date) 
+          : formatSendDateFromArray(campaign.campaign_send_date) 
+      }}
+    </div>
+    <div class="board-row-created">{{ formatDateFromArray(campaign.created_at) }}</div>
+    <div class="board-row-updated">{{ formatDateFromArray(campaign.updated_at) }}</div>
+    <div class="board-row-admin">{{ campaign.admin_name }}</div>
+  </div>
         </div>
         <!-- 페이지네이션 버튼 -->
         <div class="pagination">
@@ -160,14 +164,14 @@ const handleSearch = async (preparedFilters) => {
 };
 
 const handleReset = async () => {
-  await fetchCampaigns(); // 초기 캠페인 데이터 다시 불러오기
-  currentPage.value = 1;  // 페이지도 초기화
+  await fetchCampaigns(); 
+  currentPage.value = 1;  
 };
 
 
 
 const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; // 유효하지 않은 데이터 처리
+  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; 
   const [year, month, day, hours, minutes, seconds] = dateArray;
   return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
@@ -271,6 +275,20 @@ onMounted(async() => {
       background-color: #f4f4f4;
     }
     
+    .board-row-title,
+    .board-row-contents {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .board-row-title {
+      max-width: 100%;
+    }
+
+    .board-row-contents {
+      max-width: 100%;
+    }
     .pagination {
       display: flex;
       justify-content: center;
