@@ -13,7 +13,7 @@
           <div class="tutor-header-container">
             <div class="tutor-count">전체 강사 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="tutor-button-group">
-              <button class="tutor-excel-button">
+              <button class="tutor-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -128,7 +128,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from '@/plugins/axios';
-
+import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/TutorView.css'
@@ -193,6 +193,56 @@ const handleSearch = async (filterData) => {
     console.error('Failed to filter tutors:', error);
   }
 };
+
+const handleExcelDownload = async() => {
+  try{
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/member/excel/download/tutor',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+    
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `학생_목록_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 // 초기화
 const handleReset = () => {
