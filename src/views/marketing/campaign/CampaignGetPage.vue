@@ -3,7 +3,7 @@
     <MarketingSideMenu />
     <div class="campaign-get-contents-container">
       <div class="campaign-get-contents-column">
-         <div class="campaign-get-contents-row">
+        <div class="campaign-get-contents-row">
         <div class="campaign-get-select">
           <div class="campaign-get-header">
             <span class="campaign-get-select-span">캠페인 조회</span>
@@ -127,40 +127,74 @@
             <div>휴면상태</div>
             <div>삭제</div>
           </div>
-          <div v-for="user in campaign.members" :key="user.member_code" class="target-user-item">
+          <div v-for="user in paginatedTargetUsers" :key="user.member_code" class="target-user-item">
             <div>{{ user.member_code }}</div>
             <div>{{ user.member_name }}</div>
             <div>{{ user.member_email }}</div>
             <div>{{ user.member_phone }}</div>
             <div>{{ user.member_address }}</div>
             <div>{{ user.member_age }}</div>
-            <div>{{ formatDateFromArray(user.member_birth) }}</div>
+            <div>{{ user.member_birth }}</div>
             <div>{{ user.member_flag ? '활성' : '비활성' }}</div>
-            <div>{{ formatDateTimeFromArray(user.created_at) }}</div>
+            <div>{{ user.created_at }}</div>
             <div>{{ user.member_dormant_flag ? '휴면' : '활성' }}</div>
             <div><button class="remove-item-btn" @click="removeUser(user)" v-if="isEditMode">×</button></div>
           </div>
+          <div class="pagination">
+            <button 
+              class="page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >◀</button>
+            <button 
+              class="page-button" 
+              :class="{ active: currentPage === 1 }" 
+              @click="changePage(1)"
+            >1</button>
+            <span v-if="startPage > 2">...</span>
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== 1 && page !== totalPages" 
+                class="page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >{{ page }}</button>
+            </template>
+            <span v-if="endPage < totalPages - 1">...</span>
+            <button 
+              v-if="totalPages > 1" 
+              class="page-button" 
+              :class="{ active: currentPage === totalPages }" 
+              @click="changePage(totalPages)"
+            >{{ totalPages }}</button>
+            <button 
+              class="page-button next-button" 
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >▶</button>
+          </div>
         </div>
-
         <div class="campaign-get-register-button-group">
           <button 
-              class="campaign-get-register-button"
-              :class="{ 'instant-button': campaignType === 'INSTANT' }"
-              :disabled="campaignType === 'INSTANT'"
-              v-if="!isEditMode"
-              @click="toggleEditMode"
+            class="campaign-get-register-button"
+            :class="{ 'instant-button': campaignType === 'INSTANT' || isPastSendDate }"
+            :disabled="campaignType === 'INSTANT' || isPastSendDate"
+            v-if="!isEditMode"
+            @click="toggleEditMode"
           >
-              수정
+            수정
           </button>
+
           <button 
-              class="campaign-get-cancel-button" 
-              :class="{ 'instant-button': campaignType === 'INSTANT' }"
-              :disabled="campaignType === 'INSTANT'"
-              v-if="!isEditMode" 
-              @click="confirmCancelCampaign"
+            class="campaign-get-cancel-button" 
+            :class="{ 'instant-button': campaignType === 'INSTANT' || isPastSendDate }"
+            :disabled="campaignType === 'INSTANT' || isPastSendDate"
+            v-if="!isEditMode"
+            @click="confirmCancelCampaign"
           >
-              예약 취소
+            예약 취소
           </button>
+          <button class="campaign-get-cancel-button" @click="backCampaign">뒤로 가기</button>
           <button 
               class="campaign-get-register-button"
               v-if="isEditMode"
@@ -203,7 +237,7 @@
   <script setup>
   import { ref, computed, watch  } from 'vue';
   import axios from 'axios';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { jwtDecode } from 'jwt-decode'; 
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
@@ -215,6 +249,7 @@
   const userName = jwtDecode(token).name;
   
   const route = useRoute();
+  const router = useRouter();
   
   const campaign = ref({});
   const isEditMode = ref(false);
@@ -232,7 +267,57 @@
   
   const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
   const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
+
+  const currentPage = ref(1);
+const pageSize = 50;
+
+// 페이지네이션된 사용자 목록 계산
+const paginatedTargetUsers = computed(() => {
+  if (!campaign.value.members) return [];
+  const start = (currentPage.value - 1) * pageSize;
+  return campaign.value.members.slice(start, start + pageSize);
+});
+
+// 전체 페이지 수 계산
+const totalPages = computed(() => {
+  if (!campaign.value.members) return 1;
+  return Math.ceil(campaign.value.members.length / pageSize);
+});
+
+// 표시할 페이지 번호 계산
+const displayedPages = computed(() => {
+  let start = Math.max(currentPage.value - 2, 2);
+  let end = Math.min(start + 4, totalPages.value - 1);
   
+  if (end === totalPages.value - 1) {
+    start = Math.max(end - 4, 2);
+  }
+  
+  if (start === 2) {
+    end = Math.min(6, totalPages.value - 1);
+  }
+  
+  let pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
+const startPage = computed(() => {
+  return displayedPages.value[0];
+});
+
+const endPage = computed(() => {
+  return displayedPages.value[displayedPages.value.length - 1];
+});
+
+// 페이지 변경 함수
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
   const fetchTemplate = async () => {
     const campaignCode = route.query.campaignCode;
     try {
@@ -270,9 +355,6 @@
     }
 };
 
-
-
-  
 const toggleEditMode = () => {
     if (campaignType.value === 'RESERVATION' && Array.isArray(campaign.value.campaign_send_date)) {
         const formattedDateTime = formatSendDateFromArray(campaign.value.campaign_send_date);
@@ -282,6 +364,16 @@ const toggleEditMode = () => {
     }
     isEditMode.value = true;
 };
+
+const isPastSendDate = computed(() => {
+  if (!campaign.value.campaign_send_date || campaign.value.campaign_send_date.length < 5) {
+    return false; 
+  }
+  const [year, month, day, hour, minute] = campaign.value.campaign_send_date;
+  const sendDate = new Date(year, month - 1, day, hour, minute); 
+  return sendDate < new Date(); 
+});
+
 
   
   const saveChanges = async () => {
@@ -327,6 +419,12 @@ const toggleEditMode = () => {
   };
   const confirmCancelCampaign = async () => {
     isCancelModalOpen.value = true;
+  };
+
+  const backCampaign =  () => {
+    router.push({ 
+            path: '/marketing', 
+        });
   };
   
   const cancelCampaign = async () => {
@@ -454,132 +552,132 @@ const toggleEditMode = () => {
   
 <style scoped>
 .campaign-get-container {
-   display: flex;
-   flex-direction: column;
-   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 }
 
 .campaign-get-contents-container {
-   display: block;
-   flex-grow: 1;
-   margin-left: 160px;
-   margin-top: 50px;
-   padding: 20px 30px;
-   background-color: white;
-   height: auto;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: block;
+  flex-grow: 1;
+  margin-left: 160px;
+  margin-top: 50px;
+  padding: 20px 30px;
+  background-color: white;
+  height: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .campaign-get-contents-column {
-   display: flex;
-   flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .campaign-get-contents-row {
-   display: flex;
-   flex-direction: row;
-   gap: 10%;
-   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  gap: 10%;
+  margin-bottom: 20px;
 }
 
 .campaign-get-header {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .edit-button {
-   background: none;
-   border: none;
-   cursor: pointer;
-   font-size: 18px;
-   color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
 }
 
 .campaign-get-select {
-   width: 45%;
+  width: 45%;
 }
 
 .campaign-get-select-span {
-   font-size: 18px;
-   font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .campaign-get-attach-span {
-   font-size: 18px;
-   font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .campaign-get-target-span {
-   font-size: 18px;
-   font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 .campaign-get-details {
-   display: flex;
-   flex-direction: column;
-   border-top: 2px solid #333;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid #333;
 }
 
 .campaign-get-detail-row {
-   display: flex;
-   border-bottom: 1px solid #ddd;
+  display: flex;
+  border-bottom: 1px solid #ddd;
 }
 
 .detail-title {
-   font-size: 12px;
-   padding: 12px;
-   background-color: #f9f9f9;
-   color: #333;
-   width: 150px;
-   text-align: left;
+  font-size: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  color: #333;
+  width: 150px;
+  text-align: left;
 }
 
 .detail-content {
-   flex: 1;
-   padding: 12px;
-   font-size: 12px;
-   color: #555;
+  flex: 1;
+  padding: 12px;
+  font-size: 12px;
+  color: #555;
 }
 
 .detail-content-textarea {
-   padding: 5px 8px;
-   margin: 4px;
-   border: 1px solid #ddd;
-   font-size: 12px;
-   width: 70%;
-   font-family: inherit;
+  padding: 5px 8px;
+  margin: 4px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  width: 70%;
+  font-family: inherit;
 }
 
 .detail-content-input {
-   padding: 5px 8px;
-   margin: 4px;
-   border: 1px solid #ddd;
-   font-size: 12px;
-   width: 40%;
-   font-family: inherit;
+  padding: 5px 8px;
+  margin: 4px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  width: 40%;
+  font-family: inherit;
 }
 
 .template-select {
-   padding: 5px 8px;
-   margin: 4px;
-   border: 1px solid #ddd;
-   font-size: 12px;
-   width: 40%;
-   outline: none;
+  padding: 5px 8px;
+  margin: 4px;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  width: 40%;
+  outline: none;
 }
 
 .content-multiline {
-   white-space: pre-line;
-   line-height: 1.6;
-   min-height: 171.6px;
+  white-space: pre-line;
+  line-height: 1.6;
+  min-height: 171.6px;
 }
 
 .send-type {
-   display: flex;
-   gap: 10px;
-   align-items: center;
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .send-type-btn {
@@ -598,193 +696,193 @@ const toggleEditMode = () => {
 
 .date-input,
 .time-input {
-   padding: 5px 10px;
-   border: 1px solid #ddd;
-   border-radius: 4px;
-   font-size: 14px;
-   font-family: inherit;
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
 }
 
 .time-input {
-   width: 100px;
+  width: 100px;
 }
 
 .campaign-get-attach {
-   width: 45%;
+  width: 45%;
 }
 
 .attach-buttons,
 .target-buttons {
-   display: flex;
-   align-items: center;
-   gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .excel-download-btn {
-   display: flex;
-   gap: 5px;
-   font-size: 12px;
-   background-color: #005950;
-   color: white;
-   border: 1px solid #005950;
-   border-radius: 4px;
-   cursor: pointer;
-   padding: 4px 8px;
+  display: flex;
+  gap: 5px;
+  font-size: 12px;
+  background-color: #005950;
+  color: white;
+  border: 1px solid #005950;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px 8px;
 }
 
 .excel-download-btn img {
-   width: 16px;
-   height: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 .excel-download-btn:hover {
-   background-color: #004c42;
+  background-color: #004c42;
 }
 
 .add-coupon-btn,
 .add-target-user-btn {
-   width: 25px;
-   height: 25px;
-   font-size: 15px;
-   background-color: #005950;
-   color: white;
-   border: 1px solid #005950;
-   border-radius: 4px;
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   justify-content: center;
+  width: 25px;
+  height: 25px;
+  font-size: 15px;
+  background-color: #005950;
+  color: white;
+  border: 1px solid #005950;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .add-coupon-btn:hover,
 .add-target-user-btn:hover {
-   background-color: #004c42;
+  background-color: #004c42;
 }
 
 .remove-all-btn {
-   width: 25px;
-   height: 25px;
-   font-size: 15px;
-   background-color: #858282;
-   color: white;
-   border: 1px solid #858282;
-   border-radius: 4px;
-   cursor: pointer;
-   display: flex;
-   align-items: center;
-   justify-content: center;
+  width: 25px;
+  height: 25px;
+  font-size: 15px;
+  background-color: #858282;
+  color: white;
+  border: 1px solid #858282;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .remove-all-btn:hover {
-   background-color: #39ac75;
+  background-color: #39ac75;
 }
 
 .remove-item-btn {
-   background: none;
-   border: none;
-   color: #004c42;
-   font-size: 18px;
-   cursor: pointer;
-   padding: 0 5px;
+  background: none;
+  border: none;
+  color: #004c42;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 5px;
 }
 
 .remove-item-btn:hover {
-   color: #39ac75;
+  color: #39ac75;
 }
 
 .campaign-get-coupon-list {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-   background-color: #f9f9f9;
-   padding: 10px;
-   border: 1px solid #ddd;
-   height: 335px;
-   overflow-y: auto;
-   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ddd;
+  height: 335px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .target-user-list {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-   background-color: #f9f9f9;
-   padding: 10px;
-   border: 1px solid #ddd;
-   height: 335px;
-   overflow-y: auto;
-   box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ddd;
+  height: 335px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .target-user-board-header {
-   display: grid;
-   grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
-   padding: 10px 20px;
-   background-color: #f9f9f9;
-   font-size: 13px;
-   font-weight: bold;
-   color: #595656;
-   text-align: center;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  font-size: 13px;
+  font-weight: bold;
+  color: #595656;
+  text-align: center;
 }
 
 .campaign-get-coupon-item {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   padding: 8px 12px;
-   background-color: white;
-   border: 1px solid #ddd;
-   border-radius: 4px;
-   font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
 }
 
 .target-user-item {
-   display: grid;
-   grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
-   padding: 10px 20px;
-   background-color: white;
-   border: 1px solid #ddd;
-   border-radius: 4px;
-   font-size: 12px;
-   text-align: center;
-   align-items: center;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 2fr 1fr 3fr 1fr 1fr 1fr 1fr 1fr 0.5fr;
+  padding: 10px 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  align-items: center;
 }
 
 .target-user-board-row-action {
-   display: flex;
-   justify-content: center;
-   align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .campaign-get-register-button-group {
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   margin-top: 20px;
-   gap: 8%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8%;
 }
 
 .campaign-get-register-button,
 .campaign-get-cancel-button {
-   display: flex;
-   gap: 5px;
-   font-size: 15px;
-   align-items: center;
-   padding: 2px 10px;
-   background-color: #005950;
-   color: white;
-   border: 1px solid #005950;
-   border-radius: 4px;
-   cursor: pointer;
+  display: flex;
+  gap: 5px;
+  font-size: 15px;
+  align-items: center;
+  padding: 2px 10px;
+  background-color: #005950;
+  color: white;
+  border: 1px solid #005950;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .campaign-get-register-button:hover,
 .campaign-get-cancel-button:hover {
-   background-color: #004c42;
+  background-color: #004c42;
 }
 
 .instant-button {
-  background-color: #ddd; /* 원하는 색상 */
+  background-color: #ddd; 
   border-color: #ddd;
   color: white;
   cursor: not-allowed;
@@ -792,6 +890,40 @@ const toggleEditMode = () => {
 
 .instant-button:hover {
   background-color: #ddd;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  gap: 5px;
+  background-color: #f9f9f9;
+}
+
+.page-button {
+  background: none;
+  border: none;
+  color: #333;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 0 2px;
+}
+
+.page-button.active {
+  font-weight: bold;
+  color: #005950;
+}
+
+.page-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.prev-button,
+.next-button {
+  font-size: 12px;
 }
 
 </style>
