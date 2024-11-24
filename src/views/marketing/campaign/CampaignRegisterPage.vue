@@ -1,4 +1,3 @@
-
 <template>
   <div class="campaign-register-container">
     <MarketingSideMenu />
@@ -73,12 +72,15 @@
                     type="date"
                     v-model="selectedDate"
                     class="date-input"
+                    :min="minDate"
                     :disabled="campaignType === 'INSTANT'"
+                    @change="handleDateChange"
                   />
                   <input
                     type="time"
                     v-model="selectedTime"
                     class="time-input"
+                    :min="minTime"
                     :disabled="campaignType === 'INSTANT'"
                   />
                 </div>
@@ -138,21 +140,55 @@
             <div class="target-user-board-header-dormantflag">휴면상태</div>
             <div class="target-user-board-header-action">삭제</div>
           </div>
-          <div v-for="user in targetUsers" :key="user.member_code" class="target-user-item">
+          <div v-for="user in paginatedTargetUsers" :key="user.member_code" class="target-user-item">
             <div class="target-user-board-row-code">{{ user.member_code }}</div>
             <div class="target-user-board-row-name">{{ user.member_name }}</div>
             <div class="target-user-board-row-email">{{ user.member_email }}</div>
             <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
             <div class="target-user-board-row-address">{{ user.member_address }}</div>
             <div class="target-user-board-row-age">{{ user.member_age }}</div>
-            <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
-            <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
-            <div class="target-user-board-row-createdat">{{ formatDateTimeFromArray(user.created_at) }}</div>
-            <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
+            <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
+            <div class="target-user-board-row-memberflag">{{ user.member_flag ? '활성' : '비활성' }}</div>
+            <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
+            <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag ? '휴면' : '활성' }}</div>
             <div class="target-user-board-row-action">
               <button class="remove-item-btn" @click="removeUser(user)">×</button>
             </div>
           </div>
+          <!-- 페이지네이션 -->
+          <div class="pagination">
+    <button 
+      class="page-button prev-button" 
+      @click="changePage(currentPage - 1)" 
+      :disabled="currentPage === 1"
+    >◀</button>
+    <button 
+      class="page-button" 
+      :class="{ active: currentPage === 1 }" 
+      @click="changePage(1)"
+    >1</button>
+    <span v-if="startPage > 2">...</span>
+    <template v-for="page in displayedPages" :key="page">
+      <button 
+        v-if="page !== 1 && page !== totalPages" 
+        class="page-button" 
+        :class="{ active: currentPage === page }" 
+        @click="changePage(page)"
+      >{{ page }}</button>
+    </template>
+    <span v-if="endPage < totalPages - 1">...</span>
+    <button 
+      v-if="totalPages > 1" 
+      class="page-button" 
+      :class="{ active: currentPage === totalPages }" 
+      @click="changePage(totalPages)"
+    >{{ totalPages }}</button>
+    <button 
+      class="page-button next-button" 
+      @click="changePage(currentPage + 1)" 
+      :disabled="currentPage === totalPages"
+    >▶</button>
+  </div>
         </div>
 
         <div class="campaign-register-button-group">
@@ -222,6 +258,44 @@ const targetUserMap = ref(new Map());
 
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
+
+const currentPage = ref(1);
+const pageSize = 50;
+const totalPages = computed(() => Math.ceil(targetUsers.value.length / pageSize));
+const paginatedTargetUsers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  return targetUsers.value.slice(start, start + pageSize);
+});
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) currentPage.value = page;
+};
+
+const displayedPages = computed(() => {
+    let start = Math.max(currentPage.value - 2, 2);
+    let end = Math.min(start + 4, totalPages.value - 1);
+    
+    if (end === totalPages.value - 1) {
+      start = Math.max(end - 4, 2);
+    }
+    
+    if (start === 2) {
+      end = Math.min(6, totalPages.value - 1);
+    }
+    
+    let pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  const startPage = computed(() => {
+    return displayedPages.value[0];
+  });
+
+  const endPage = computed(() => {
+    return displayedPages.value[displayedPages.value.length - 1];
+  });
 
 const clickCouponSelect = () => {
   showCouponSelectModal.value = true;
@@ -311,6 +385,29 @@ const selectSendType = (type) => {
   }
 };
 
+const minDate = computed(() => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+});
+
+const minTime = computed(() => {
+  if (selectedDate.value === minDate.value) {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+  return '00:00';
+});
+
+const handleDateChange = () => {
+  if (selectedDate.value === minDate.value) {
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (selectedTime.value && selectedTime.value < currentTime) {
+      selectedTime.value = '';
+    }
+  }
+};
+
 const registerCampaign = async () => {
   if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
     throw new Error('예약 발송 시 날짜와 시간을 설정해주세요.');
@@ -372,6 +469,12 @@ const formatDateTimeFromArray = (dateArray) => {
  const [year, month, day, hours, minutes, seconds] = dateArray;
  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
+
+const formatDateFromArray = (dateArray) => {
+    if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+    const [year, month, day] = dateArray;
+    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+  };
 
 fetchTemplates();
 </script>
@@ -706,4 +809,37 @@ fetchTemplates();
 .campaign-cancel-button:hover {
    background-color: #004c42;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 5px;
+  }
+
+  .page-button {
+    background: none;
+    border: none;
+    color: #333;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    margin: 0 2px;
+  }
+
+  .page-button.active {
+    font-weight: bold;
+    color: #005950;
+  }
+
+  .page-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .prev-button,
+  .next-button {
+    font-size: 12px;
+  }
 </style>
