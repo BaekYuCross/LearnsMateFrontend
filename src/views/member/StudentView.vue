@@ -293,8 +293,7 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ0NTQzMywiZXhwIjoxNzc1NjQ1NDMzfQ.kPoTj7VtKsk4vF6aoanlm5rQgWNv4subNZCpm8Rib7WcfemYPJjO5nhYRQj_oaeOroAAYT6TODI5PTuNeDrbsw';
-
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ1Mjc4MywiZXhwIjoxNzc1NjUyNzgzfQ.xLHlCXMO-7yPd_Gd1xb0sQy1SSU9O9buW0dx8zbWSIOQRAw6mTGc9p8_tJerr3tjIlI23Rd0_u6XPs-5prRhlg';
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
@@ -388,11 +387,8 @@ const handleSearch = async (filterData) => {
   await fetchFilteredStudents();
 };
 
-// 엑셀 다운로드 핸들러
-const handleExcelDownload = async () => {
-  try {
-    console.log("bbb");
-
+const handleExcelDownload = async() => {
+  try{
     const config = {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/student',
@@ -403,13 +399,11 @@ const handleExcelDownload = async () => {
       }
     };
 
-    console.log("aaa");
-    // 필터링된 상태라면 필터 데이터를 그대로 포함
     if (isFiltered.value && lastFilterData.value) {
       config.data = lastFilterData.value;
       console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
     }
-
+    
     const response = await axios(config);
     
     // 에러 응답 체크
@@ -428,7 +422,7 @@ const handleExcelDownload = async () => {
     });
 
     const now = new Date();
-    const fileName = `학생_목록_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    const fileName = `student_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
     
     saveAs(blob, fileName);
   } catch (error) {
@@ -441,7 +435,7 @@ const handleExcelDownload = async () => {
       reader.readAsText(error.response.data);
     }
   }
-};
+}
 
 // 초기화
 const handleReset = () => {

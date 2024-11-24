@@ -229,7 +229,7 @@ const handleExcelDownload = async() => {
     });
 
     const now = new Date();
-    const fileName = `학생_목록_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    const fileName = `tutor_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
     
     saveAs(blob, fileName);
   } catch (error) {
