@@ -13,7 +13,7 @@
           <div class="student-header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="button-group">
-              <button class="excel-button">
+              <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -279,6 +279,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from '@/plugins/axios';
+import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/StudentView.css';
@@ -292,7 +293,7 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ0NTQzMywiZXhwIjoxNzc1NjQ1NDMzfQ.kPoTj7VtKsk4vF6aoanlm5rQgWNv4subNZCpm8Rib7WcfemYPJjO5nhYRQj_oaeOroAAYT6TODI5PTuNeDrbsw';
 
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
@@ -385,6 +386,61 @@ const handleSearch = async (filterData) => {
   lastFilterData.value = filterData;
   currentPage.value = 1;
   await fetchFilteredStudents();
+};
+
+// 엑셀 다운로드 핸들러
+const handleExcelDownload = async () => {
+  try {
+    console.log("bbb");
+
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/member/excel/download/student',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    console.log("aaa");
+    // 필터링된 상태라면 필터 데이터를 그대로 포함
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `학생_목록_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
 };
 
 // 초기화
