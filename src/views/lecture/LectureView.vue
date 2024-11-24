@@ -161,6 +161,62 @@
                 </li>
               </span>
             </div>
+            <div class="lecture-stats-section">
+              <div class="lecture-stats-header">
+                <h3 class="lecture-stats-title">클릭수 및 구매 통계</h3>
+                <div class="lecture-stats-filter">
+                  <div class="lecture-stats-period">
+                    <span class="lecture-stats-label">조회 기간</span>
+                    <div class="lecture-stats-dates">
+                      <div class="lecture-stats-date-group">
+                        <select v-model="statsFilter.startYear" class="lecture-stats-select">
+                          <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
+                        </select>
+                        <select v-model="statsFilter.startMonth" class="lecture-stats-select">
+                          <option v-for="month in months" :key="month" :value="month">
+                            {{ String(month).padStart(2, '0') }}월
+                          </option>
+                        </select>
+                      </div>
+                      <span class="lecture-stats-separator">~</span>
+                      <div class="lecture-stats-date-group">
+                        <select v-model="statsFilter.endYear" class="lecture-stats-select">
+                          <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
+                        </select>
+                        <select v-model="statsFilter.endMonth" class="lecture-stats-select">
+                          <option v-for="month in months" :key="month" :value="month">
+                            {{ String(month).padStart(2, '0') }}월
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="lecture-stats-actions">
+                    <button @click="fetchLectureStats" class="lecture-stats-search">
+                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
+                    </button>
+                    <button @click="resetStatsFilter" class="lecture-stats-reset">
+                      <img src="@/assets/icons/reset.svg" alt="초기화">
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lecture-stats-charts">
+                <div class="lecture-stats-chart">
+                  <h4 class="lecture-stats-chart-title">전체 통계</h4>
+                  <div class="lecture-stats-chart-wrapper">
+                    <canvas ref="totalStatsChart"></canvas>
+                  </div>
+                </div>
+                <div class="lecture-stats-chart">
+                  <h4 class="lecture-stats-chart-title">현재 강의 통계</h4>
+                  <div class="lecture-stats-chart-wrapper">
+                    <canvas ref="lectureStatsChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -180,6 +236,7 @@ import MonthlyLectureModal from '@/components/lecture/MonthlyLectureModal.vue';
 import axios from 'axios'
 import { saveAs } from 'file-saver'
 import '@/assets/css/lecture/LectureView.css'
+import Chart from 'chart.js/auto'
 
 const isMonthlyModalOpen = ref(false);
 const isSingleView = ref(false)
@@ -191,6 +248,14 @@ const totalPages = ref(1)
 const pageSize = 50
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
+const totalStatsChart = ref(null)
+const lectureStatsChart = ref(null)
+let totalChart = null
+let lectureChart = null
+const currentYear = new Date().getFullYear()
+const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i))
+const months = ref(Array.from({length: 12}, (_, i) => i + 1))
+
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
 
 const camelToSnake = (obj) => {
@@ -202,6 +267,13 @@ const camelToSnake = (obj) => {
     return acc;
   }, {});
 };
+
+const statsFilter = ref({
+  startYear: new Date().getFullYear() - 1,
+  startMonth: 1,
+  endYear: new Date().getFullYear(),
+  endMonth: 12
+})
 
 const fetchLectureList = async (filters = {}) => {
   try {
@@ -355,23 +427,175 @@ const getLectureStatusClass = (status) => {
 
 const showLectureDetail = async (lecture) => {
   if (selectedLecture.value?.lecture_code === lecture.lecture_code) {
-    closeLectureDetail();
+    closeLectureDetail()
   } else {
     try {
-      const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`);
-      selectedLecture.value = response.data;
-      console.log(selectedLecture.value);
-      showSingleLecture();
+      const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`)
+      selectedLecture.value = response.data
+      console.log(response.data);
+      showSingleLecture()
+      fetchLectureStats()
     } catch (error) {
-      console.error('Failed to fetch lecture details:', error);
+      console.error('Failed to fetch lecture details:', error)
     }
   }
-};
+}
 
 const closeLectureDetail = () => {
   selectedLecture.value = null;
   hideSingleLecture();
 };
+
+const createStatsCharts = (data) => {
+  const safeData = {
+    totalStudentCount: data.total_student_count || 0,
+    totalLectureClickCount: data.total_lecture_click_count || 0,
+    totalConversionRate: data.total_conversion_rate || 0,
+    studentCount: data.student_count || 0,
+    lectureClickCount: data.lecture_click_count || 0,
+    conversionRate: data.conversion_rate || 0
+  };
+
+  console.log("Safe data for charts:", safeData);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 1.5,
+    plugins: {
+      legend: {
+        display: false
+      },
+      title: {
+        display: true,
+        font: {
+          size: 11
+        },
+        padding: {
+          top: 5,
+          bottom: 5
+        }
+      }
+    },
+    layout: {
+      padding: {
+        left: 5,
+        right: 5,
+        top: 5,
+        bottom: 5
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          font: {
+            size: 10
+          }
+        },
+        grid: {
+          display: false
+        }
+      },
+      x: {
+        ticks: {
+          font: {
+            size: 10
+          }
+        },
+        grid: {
+          display: false
+        }
+      }
+    }
+  };
+
+  if (totalChart) totalChart.destroy();
+  const totalCtx = totalStatsChart.value.getContext('2d');
+  totalChart = new Chart(totalCtx, {
+    type: 'bar',
+    data: {
+      labels: ['총 학생 수', '총 클릭 수'],
+      datasets: [{
+        label: '전체',
+        data: [safeData.totalStudentCount, safeData.totalLectureClickCount], // 8777, 141579
+        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      ...chartOptions,
+      plugins: {
+        ...chartOptions.plugins,
+        title: {
+          ...chartOptions.plugins.title,
+          text: `전체 전환율: ${safeData.totalConversionRate.toFixed(2)}%`
+        }
+      }
+    }
+  });
+
+  // 현재 강의 통계 차트
+  if (lectureChart) lectureChart.destroy();
+  const lectureCtx = lectureStatsChart.value.getContext('2d');
+  lectureChart = new Chart(lectureCtx, {
+    type: 'bar',
+    data: {
+      labels: ['구매 학생 수', '클릭 수'],
+      datasets: [{
+        label: selectedLecture.value.lecture_title,
+        data: [safeData.studentCount, safeData.lectureClickCount], // 22, 362
+        backgroundColor: ['rgba(255, 206, 86, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        borderColor: ['rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      ...chartOptions,
+      plugins: {
+        ...chartOptions.plugins,
+        title: {
+          ...chartOptions.plugins.title,
+          text: `강의 전환율: ${safeData.conversionRate.toFixed(2)}%`
+        }
+      }
+    }
+  });
+};
+
+const fetchLectureStats = async () => {
+  try {
+    const response = await axios.post(
+      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
+      camelToSnake(statsFilter.value),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    console.log(response.data);
+    if (response.data) {
+      createStatsCharts(response.data)
+    } else {
+      console.error('No data received from stats API')
+    }
+  } catch (error) {
+    console.error('Failed to fetch lecture stats:', error)
+  }
+}
+
+const resetStatsFilter = () => {
+  statsFilter.value = {
+    startYear: currentYear - 1,
+    startMonth: 1,
+    endYear: currentYear,
+    endMonth: 12
+  }
+  fetchLectureStats()
+}
 
 const displayedPages = computed(() => {
   let start = Math.max(currentPage.value - 2, 2);
