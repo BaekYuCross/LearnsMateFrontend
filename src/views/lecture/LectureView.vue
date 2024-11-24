@@ -145,6 +145,22 @@
                 {{ selectedLecture.lecture_status ? '운영중' : '종료' }}
               </span>
             </div>
+            <div class="lecture-detail-item">
+              <span class="label">총 학생 수:</span>
+              <span class="value">{{ selectedLecture.purchase_count }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">구매 전환율:</span>
+              <span class="value">{{ selectedLecture.purchase_conversion_rate }}%</span>
+            </div>
+            <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
+              강의 비디오 목록
+              <span>
+                <li v-for="(title, index) in selectedLecture.formatted_video_titles" :key="index">
+                  {{ title }}
+                </li>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -338,6 +354,7 @@ const showLectureDetail = async (lecture) => {
     try {
       const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`);
       selectedLecture.value = response.data;
+      console.log(selectedLecture.value);
       showSingleLecture();
     } catch (error) {
       console.error('Failed to fetch lecture details:', error);
