@@ -141,6 +141,38 @@
               </div>
             </div>
 
+            <div class="recommended-section">
+              <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})</h4>
+              <div class="recommended-list">
+                <div v-for="lecture in studentDetail.recommendedLectureList" 
+                    :key="lecture.lectureCode" 
+                    class="recommended-item">
+                  <div class="recommended-content">
+                    <div class="lecture-header">
+                      <span class="lecture-title">{{ lecture.lectureTitle }}</span>
+                      <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+                        {{ lecture.lectureLevel }}
+                      </span>
+                    </div>
+                    <div class="lecture-info">
+                      <div class="info-item">
+                        <span class="label">강의 가격</span>
+                        <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">조회수</span>
+                        <span>{{ lecture.lectureClickCount }}회</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">등록일</span>
+                        <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- 쿠폰 정보 -->
             <div class="coupon-section">
               <h4>쿠폰 정보</h4>
