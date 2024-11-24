@@ -10,9 +10,9 @@
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
           </button>
-          <button class="lecture-monthly-counts-button">
+          <button class="lecture-monthly-counts-button" @click="openMonthlyModal">
             <img src="@/assets/icons/ai.svg" alt="월별/연도별 강의 수 조회">
-            월별/연도별 강의 수 보기
+            월별 데이터
           </button>
         </div>
       </div>
@@ -166,16 +166,22 @@
       </div>
     </div>
   </div>
+  <MonthlyLectureModal 
+    :isOpen="isMonthlyModalOpen"
+    @close="closeMonthlyModal"
+  />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import LectureSideMenu from '@/components/sideMenu/LectureSideMenu.vue'
 import LectureFilter from '@/components/lecture/LectureFilter.vue'
+import MonthlyLectureModal from '@/components/lecture/MonthlyLectureModal.vue';
 import axios from 'axios'
 import { saveAs } from 'file-saver'
 import '@/assets/css/lecture/LectureView.css'
 
+const isMonthlyModalOpen = ref(false);
 const isSingleView = ref(false)
 const selectedLecture = ref(null)
 const lectureList = ref([])
@@ -389,6 +395,14 @@ const startPage = computed(() => {
 const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
+
+const openMonthlyModal = () => {
+  isMonthlyModalOpen.value = true;
+};
+
+const closeMonthlyModal = () => {
+  isMonthlyModalOpen.value = false;
+};
 
 onMounted(() => {
   fetchLectureList();
