@@ -24,13 +24,15 @@ const isClientMyLecturePage = computed(() => route.path === '/client-mylecture')
 const isClientLectureDetailPage = computed(() =>
   route.matched.some((record) => record.path === '/client-lecturedetail/:id')
 );
+const isClientLectureCartPage = computed(() => route.path === '/client-lecturecart');
 
 
 const showHeader = computed(() => {
   return !isLoginPage.value && !isClientLoginPage.value 
   && !isClientMainPage.value && !isClientVocPage.value 
   && !isClientMyVocPage.value && !isClientLecturePage.value 
-  && !isClientMyLecturePage.value && !isClientLectureDetailPage.value;
+  && !isClientMyLecturePage.value && !isClientLectureDetailPage.value
+  && !isClientLectureCartPage.value;
 });
 
 watch(route, () => {
