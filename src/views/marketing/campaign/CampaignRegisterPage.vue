@@ -145,7 +145,7 @@
             <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
             <div class="target-user-board-row-address">{{ user.member_address }}</div>
             <div class="target-user-board-row-age">{{ user.member_age }}</div>
-            <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
+            <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
             <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
             <div class="target-user-board-row-createdat">{{ formatDateTimeFromArray(user.created_at) }}</div>
             <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
@@ -371,12 +371,6 @@ const formatDateTimeFromArray = (dateArray) => {
  if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
  const [year, month, day, hours, minutes, seconds] = dateArray;
  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
-
-const formatDateFromArray = (dateArray) => {
- if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
- const [year, month, day] = dateArray;
- return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
 };
 
 fetchTemplates();
