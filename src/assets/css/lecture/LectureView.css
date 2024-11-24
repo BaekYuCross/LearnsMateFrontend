@@ -411,3 +411,46 @@
   width: 16px;
   height: 16px;
 }
+
+.lecture-column-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.lecture-dropdown-button {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  padding: 3px 5px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 0.5px solid #000000;
+  cursor: pointer;
+}
+
+.lecture-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 100;
+  width: 100px;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: 4px;
+}
+
+.lecture-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lecture-dropdown-item label {
+  font-size: 12px;
+  color: #333;
+  cursor: pointer;
+}

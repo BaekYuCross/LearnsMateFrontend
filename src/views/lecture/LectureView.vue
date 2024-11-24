@@ -6,6 +6,23 @@
       <div class="lecture-actions">
         <div class="lecture-count">등록된 강의 <span class="lecture-length">{{ totalCount }}</span>개</div>
         <div class="lecture-button-group">
+          <div class="lecture-column-selector">
+            <button @click="toggleDropdown" class="lecture-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="lecture-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="lecture-dropdown-item">
+                <input 
+                  type="checkbox" 
+                  :value="key" 
+                  v-model="selectedColumns" 
+                  @change="updateSelectedColumns" 
+                  id="key"
+                />
+                <label :for="key">{{ label }}</label>
+              </div>
+            </div>
+          </div>
           <button class="lecture-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
@@ -20,16 +37,16 @@
       <div class="lecture-content-body">
         <div class="lecture-board-container">
           <div class="lecture-board-header">
-            <div class="lecture-board-header-code">강의 코드</div>
-            <div class="lecture-board-header-title">강의 제목</div>
-            <div class="lecture-board-header-category">카테고리</div>
-            <div class="lecture-board-header-level">난이도</div>
-            <div class="lecture-board-header-tutor">강사명</div>
-            <div class="lecture-board-header-tutorcode">강사 코드</div>
-            <div class="lecture-board-header-date">등록일</div>
-            <div class="lecture-board-header-price">가격</div>
-            <div class="lecture-board-header-confirm">승인 상태</div>
-            <div class="lecture-board-header-status">강의 상태</div>
+            <div v-if="selectedColumns.includes('lectureCode')" class="lecture-board-header-code">강의 코드</div>
+            <div v-if="selectedColumns.includes('lectureTitle')" class="lecture-board-header-title">강의 제목</div>
+            <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-header-category">카테고리</div>
+            <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-header-level">난이도</div>
+            <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-header-tutor">강사명</div>
+            <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-header-tutorcode">강사 코드</div>
+            <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-header-date">등록일</div>
+            <div v-if="selectedColumns.includes('price')" class="lecture-board-header-price">가격</div>
+            <div v-if="selectedColumns.includes('lectureConfirmStatus')" class="lecture-board-header-confirm">승인 상태</div>
+            <div v-if="selectedColumns.includes('lectureStatus')" class="lecture-board-header-status">강의 상태</div>
           </div>
 
           <div class="lecture-board-body">
@@ -40,20 +57,36 @@
               @click="showLectureDetail(lecture)"
               :class="{ 'selected': selectedLecture?.lecture_code === lecture.lecture_code }"
             >
-              <div class="lecture-board-row-code">{{ lecture.lecture_code.slice(0, 15) }}...</div>
-              <div class="lecture-board-row-title">{{ lecture.lecture_title.slice(0, 20) }}...</div>
-              <div class="lecture-board-row-category">{{ lecture.lecture_category_name.slice(0, 10) }}</div>
-              <div class="lecture-board-row-level">{{ lecture.lecture_level }}</div>
-              <div class="lecture-board-row-tutor">{{ lecture.tutor_name }}</div>
-              <div class="lecture-board-row-tutorcode">{{ lecture.tutor_code }}</div>
-              <div class="lecture-board-row-date">{{ formatDateFromArray(lecture.created_at).slice(0, 10) }}</div>
-              <div class="lecture-board-row-price">{{ formatPrice(lecture.lecture_price) }}</div>
-              <div class="lecture-board-row-confirm">
+              <div v-if="selectedColumns.includes('lectureCode')" class="lecture-board-row-code">
+                {{ lecture.lecture_code.slice(0, 15) }}...
+              </div>
+              <div v-if="selectedColumns.includes('lectureTitle')" class="lecture-board-row-title">
+                {{ lecture.lecture_title.slice(0, 20) }}...
+              </div>
+              <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-row-category">
+                {{ lecture.lecture_category_name.slice(0, 10) }}
+              </div>
+              <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-row-level">
+                {{ lecture.lecture_level }}
+              </div>
+              <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-row-tutor">
+                {{ lecture.tutor_name }}
+              </div>
+              <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-row-tutorcode">
+                {{ lecture.tutor_code }}
+              </div>
+              <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-row-date">
+                {{ formatDateFromArray(lecture.created_at).slice(0, 10) }}
+              </div>
+              <div v-if="selectedColumns.includes('price')" class="lecture-board-row-price">
+                {{ formatPrice(lecture.lecture_price) }}
+              </div>
+              <div v-if="selectedColumns.includes('lectureConfirmStatus')" class="lecture-board-row-confirm">
                 <span :class="getConfirmStatusClass(lecture.lecture_confirm_status)">
                   {{ lecture.lecture_confirm_status ? '승인완료' : '미승인' }}
                 </span>
               </div>
-              <div class="lecture-board-row-status">
+              <div v-if="selectedColumns.includes('lectureStatus')" class="lecture-board-row-status">
                 <span :class="getLectureStatusClass(lecture.lecture_status)">
                   {{ lecture.lecture_status ? '운영중' : '종료' }}
                 </span>
@@ -255,6 +288,20 @@ let lectureChart = null
 const currentYear = new Date().getFullYear()
 const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i))
 const months = ref(Array.from({length: 12}, (_, i) => i + 1))
+const isDropdownOpen = ref(false);
+const columns = ref({
+  lectureCode: "강의 코드",
+  lectureTitle: "강의명",
+  lectureCategoryName: "카테고리",
+  lectureLevel: "난이도",
+  tutorName: "강사명",
+  tutorCode: "강사 코드",
+  price: "가격",
+  createdAt: "등록일",
+  lectureConfirmStatus: "승인 상태",
+  lectureStatus: "강의 상태",
+});
+const selectedColumns = ref(Object.keys(columns.value));
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
 
@@ -365,6 +412,14 @@ const changePage = async (newPage) => {
   }
 };
 
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
+
 const handleExcelDownload = async () => {
   try {
     const config = {
@@ -373,20 +428,20 @@ const handleExcelDownload = async () => {
       responseType: 'blob',
       headers: {
         Authorization: token,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
+      data: {
+        selectedColumns: camelToSnake(selectedColumns.value),
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {}),
+      },
     };
 
-    if (isFiltered.value && lastFilterData.value) {
-      config.data = lastFilterData.value;
-    }
-
     const response = await axios(config);
-    
-    const blob = new Blob([response.data], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    
+
     saveAs(blob, 'lecture_data.xlsx');
   } catch (error) {
     console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
