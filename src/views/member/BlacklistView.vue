@@ -233,8 +233,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/filter`,
-      camelToSnake(filterData),
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData,
       {
         params: {
           page: currentPage.value - 1,
@@ -272,8 +271,7 @@ const changePage = async (newPage) => {
   
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      'http://localhost:5000/blacklist/student/filter',
-      camelToSnake(lastFilterData.value),
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, 
       {
         params: {
           page: currentPage.value - 1,
