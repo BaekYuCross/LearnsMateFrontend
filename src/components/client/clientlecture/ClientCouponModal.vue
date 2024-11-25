@@ -13,7 +13,7 @@
           <button class="register-button" @click="registerCoupon">등록</button>
         </div>
   
-        <!-- 쿠폰 목록 -->
+      
         <table class="coupon-table">
           <thead>
             <tr>
