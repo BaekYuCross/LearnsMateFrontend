@@ -25,6 +25,7 @@ const isClientLectureDetailPage = computed(() =>
   route.matched.some((record) => record.path === '/client-lecturedetail/:id')
 );
 const isClientLectureCartPage = computed(() => route.path === '/client-lecturecart');
+const isClientAddCouponPage = computed(() => route.path === '/client-addcoupon');
 
 
 const showHeader = computed(() => {
@@ -32,7 +33,7 @@ const showHeader = computed(() => {
   && !isClientMainPage.value && !isClientVocPage.value 
   && !isClientMyVocPage.value && !isClientLecturePage.value 
   && !isClientMyLecturePage.value && !isClientLectureDetailPage.value
-  && !isClientLectureCartPage.value;
+  && !isClientLectureCartPage.value && !isClientAddCouponPage.value;
 });
 
 watch(route, () => {
