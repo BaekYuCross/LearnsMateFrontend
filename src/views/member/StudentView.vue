@@ -21,6 +21,9 @@
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
+              <button class="excel-button" @click="showCategoryModal = true">
+                카테고리 비율
+              </button>
             </div>
           </div>
             
@@ -278,7 +281,12 @@
         </div>
       </div>
     </div>
-  </div>
+  <!-- 여기에 모달 컴포넌트 추가 -->
+  <CategoryRatioModal 
+      :is-open="showCategoryModal" 
+      @close="showCategoryModal = false" 
+    />
+  </div>  
 </template>
 
 <script setup>
@@ -288,7 +296,8 @@ import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/StudentView.css';
-
+import CategoryRatioModal from '@/components/member/StudentCategoryRatioModal.vue';
+const showCategoryModal = ref(false);
 const selectedStudent = ref(null);
 const studentDetail = ref(null);
 const students = ref([]);
