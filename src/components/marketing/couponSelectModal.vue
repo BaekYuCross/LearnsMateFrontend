@@ -140,7 +140,7 @@ const applyFilters = async (filters) => {
   try {
     const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const response = await axios.post(
-      'http://localhost:5000/coupon/filters', // 필터링 API 엔드포인트
+      'http://localhost:5000/coupon/filters',
       filters,
       {
         headers: {
@@ -148,8 +148,8 @@ const applyFilters = async (filters) => {
         },
       }
     );
-    coupons.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
-    currentPage.value = 1; // 필터링 후 첫 페이지로 이동
+    coupons.value = response.data;
+    currentPage.value = 1; 
     console.log('Filtered Coupons:', coupons.value);
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);

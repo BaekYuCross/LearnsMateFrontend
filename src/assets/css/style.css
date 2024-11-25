@@ -26,3 +26,25 @@ html, body {
 ::-webkit-scrollbar-thumb:hover {
     background: #00423b;
 }
+
+.clientvoc-app-container {
+    background-color: #f9f9f9;
+    height: 100vh;
+    overflow-y: auto; 
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar-thumb {
+    background-color: #7671f4; 
+    border-radius: 10px;
+    height: 10px; 
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+  }
+  
