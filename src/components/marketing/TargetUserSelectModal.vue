@@ -93,7 +93,6 @@ const lastFilterData = ref(null);
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 
-// Snake Case 변환 헬퍼 함수
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(camelToSnake);
@@ -115,7 +114,7 @@ const fetchUsers = async () => {
         Authorization: token,
       }
     });
-    users.value = response.data.content;
+    users.value = camelToSnake(response.data.content);
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -163,7 +162,7 @@ const selectAll = async (event) => {
           }
         });
       }
-      selectedUsers.value = response.data.content;
+      selectedUsers.value = camelToSnake(response.data.content);
     } catch (error) {
       console.error('Failed to fetch all users:', error);
     }
@@ -178,10 +177,10 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
     selectedUsers.value = []; // 검색 시 선택 초기화 추가
-
+    console.log("필터링 내용: ",lastFilterData.value);
     const response = await axios.post(
       'http://localhost:5000/member/filter/student',
-      camelToSnake(filterData),
+      filterData,
       {
         params: {
           page: currentPage.value - 1,
@@ -193,7 +192,7 @@ const handleSearch = async (filterData) => {
         },
       }
     );
-    users.value = response.data.content;
+    users.value = camelToSnake(response.data.content);
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -259,12 +258,6 @@ const closeModal = () => {
 
 const saveSelection = () => {
   emit('submit', selectedUsers.value);
-};
-
-const formatDateTimeFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
-  const [year, month, day, hours, minutes, seconds] = dateArray;
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const formatDateFromArray = (dateArray) => {

@@ -13,7 +13,7 @@
           <div class="tutor-header-container">
             <div class="tutor-count">전체 강사 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="tutor-button-group">
-              <button class="tutor-excel-button">
+              <button class="tutor-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -128,7 +128,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from '@/plugins/axios';
-
+import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/TutorView.css'
@@ -142,31 +142,9 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const tutorDetail = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjA3OTAxOSwiZXhwIjoxNzc1Mjc5MDE5fQ._JTJSjD1BhNEOBbx3ZUYDVHgjeWplEjqOoj99imN_7aGyvkPyVihF8dU23HWlX6s3TO0GfAaMP4wgqaOS29zKw';
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 
-// Snake Case 변환 함수
-const camelToSnake = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  return Object.keys(obj).reduce((acc, key) => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    acc[snakeKey] = camelToSnake(obj[key]);
-    return acc;
-  }, {});
-};
-
-// Snake to Camel Case 변환 함수
-const snakeToCamel = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(snakeToCamel);
-  return Object.keys(obj).reduce((acc, key) => {
-    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    acc[camelKey] = snakeToCamel(obj[key]);
-    return acc;
-  }, {});
-};
-
-// 전체 강사 목록 가져오기
+// 전체 강사 목록
 const fetchTutors = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/tutors', {
@@ -195,8 +173,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor',
-      camelToSnake(filterData),
+      'http://localhost:5000/member/filter/tutor', lastFilterData.value, 
       {
         params: {
           page: currentPage.value - 1,
@@ -216,6 +193,56 @@ const handleSearch = async (filterData) => {
     console.error('Failed to filter tutors:', error);
   }
 };
+
+const handleExcelDownload = async() => {
+  try{
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/member/excel/download/tutor',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+    
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `tutor_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 // 초기화
 const handleReset = () => {
@@ -286,19 +313,18 @@ const endPage = computed(() => {
 });
 
 const showDetail = async (tutor) => {
-  if (selectedTutor.value?.member_code === tutor.member_code) {
+  if (selectedTutor.value?.memberCode === tutor.memberCode) {
     selectedTutor.value = null;
     tutorDetail.value = null;
   } else {
     selectedTutor.value = tutor;
     try {
-      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.member_code}`, {
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`, {
         headers: {
           Authorization: token,
         },
       });
-      const convertedData = snakeToCamel(response.data);
-      tutorDetail.value = convertedData;
+      tutorDetail.value = response.data;
     } catch (error) {
       console.error('Failed to load tutor detail:', error);
     }

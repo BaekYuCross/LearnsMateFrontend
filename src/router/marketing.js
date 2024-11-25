@@ -2,7 +2,7 @@ const MarketingRouter = [
     {
         path: '/marketing',
         name: 'Marketing',
-        component: () => import('../views/marketing/campaign/CampaignGetPage.vue')
+        component: () => import('../views/marketing/campaign/AllCampaignsGetPage.vue')
     },
     {
         path: '/marketing/coupons',
@@ -18,6 +18,11 @@ const MarketingRouter = [
         path: '/marketing/campaign-template',
         name: 'Campaign-template',
         component: () => import('../views/marketing/campaignTemplate/CampaignTemplateGetPage.vue'),
+      },
+      {
+        path: '/marketing/campaign',
+        name: 'Campaign',
+        component: () => import('../views/marketing/campaign/CampaignGetPage.vue'),
       },
       {
         path: '/marketing/issued-coupons',

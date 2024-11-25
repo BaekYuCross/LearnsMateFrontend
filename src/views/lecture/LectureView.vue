@@ -1,0 +1,689 @@
+<template>
+  <div class="lecture-container">
+    <LectureSideMenu />
+    <div class="lecture-content-container" :class="{ 'single-view': isSingleView }">
+      <LectureFilter @search="handleSearch" @reset="handleReset" />
+      <div class="lecture-actions">
+        <div class="lecture-count">등록된 강의 <span class="lecture-length">{{ totalCount }}</span>개</div>
+        <div class="lecture-button-group">
+          <div class="lecture-column-selector">
+            <button @click="toggleDropdown" class="lecture-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="lecture-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="lecture-dropdown-item">
+                <input 
+                  type="checkbox" 
+                  :value="key" 
+                  v-model="selectedColumns" 
+                  @change="updateSelectedColumns" 
+                  id="key"
+                />
+                <label :for="key">{{ label }}</label>
+              </div>
+            </div>
+          </div>
+          <button class="lecture-excel-button" @click="handleExcelDownload">
+            <img src="@/assets/icons/download.svg" alt="다운로드">
+            엑셀 다운로드
+          </button>
+          <button class="lecture-monthly-counts-button" @click="openMonthlyModal">
+            <img src="@/assets/icons/ai.svg" alt="월별/연도별 강의 수 조회">
+            월별 데이터
+          </button>
+        </div>
+      </div>
+
+      <div class="lecture-content-body">
+        <div class="lecture-board-container">
+          <div class="lecture-board-header">
+            <div v-if="selectedColumns.includes('lectureCode')" class="lecture-board-header-code">강의 코드</div>
+            <div v-if="selectedColumns.includes('lectureTitle')" class="lecture-board-header-title">강의 제목</div>
+            <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-header-category">카테고리</div>
+            <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-header-level">난이도</div>
+            <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-header-tutor">강사명</div>
+            <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-header-tutorcode">강사 코드</div>
+            <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-header-date">등록일</div>
+            <div v-if="selectedColumns.includes('price')" class="lecture-board-header-price">가격</div>
+            <div v-if="selectedColumns.includes('lectureConfirmStatus')" class="lecture-board-header-confirm">승인 상태</div>
+            <div v-if="selectedColumns.includes('lectureStatus')" class="lecture-board-header-status">강의 상태</div>
+          </div>
+
+          <div class="lecture-board-body">
+            <div 
+              class="lecture-board-row" 
+              v-for="lecture in lectureList" 
+              :key="lecture.lecture_code" 
+              @click="showLectureDetail(lecture)"
+              :class="{ 'selected': selectedLecture?.lecture_code === lecture.lecture_code }"
+            >
+              <div v-if="selectedColumns.includes('lectureCode')" class="lecture-board-row-code">
+                {{ lecture.lecture_code.slice(0, 15) }}...
+              </div>
+              <div v-if="selectedColumns.includes('lectureTitle')" class="lecture-board-row-title">
+                {{ lecture.lecture_title.slice(0, 20) }}...
+              </div>
+              <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-row-category">
+                {{ lecture.lecture_category_name.slice(0, 10) }}
+              </div>
+              <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-row-level">
+                {{ lecture.lecture_level }}
+              </div>
+              <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-row-tutor">
+                {{ lecture.tutor_name }}
+              </div>
+              <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-row-tutorcode">
+                {{ lecture.tutor_code }}
+              </div>
+              <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-row-date">
+                {{ formatDateFromArray(lecture.created_at).slice(0, 10) }}
+              </div>
+              <div v-if="selectedColumns.includes('price')" class="lecture-board-row-price">
+                {{ formatPrice(lecture.lecture_price) }}
+              </div>
+              <div v-if="selectedColumns.includes('lectureConfirmStatus')" class="lecture-board-row-confirm">
+                <span :class="getConfirmStatusClass(lecture.lecture_confirm_status)">
+                  {{ lecture.lecture_confirm_status ? '승인완료' : '미승인' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('lectureStatus')" class="lecture-board-row-status">
+                <span :class="getLectureStatusClass(lecture.lecture_status)">
+                  {{ lecture.lecture_status ? '운영중' : '종료' }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lecture-pagination">
+            <button class="lecture-page-button lecture-prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >◀</button>
+            <button 
+              class="lecture-page-button" 
+              :class="{ active: currentPage === 1 }" 
+              @click="changePage(1)"
+            >1</button>
+            <span v-if="startPage > 2">...</span>
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== 1 && page !== totalPages"
+                class="lecture-page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >{{ page }}</button>
+            </template>
+            <span v-if="endPage < totalPages - 1">...</span>
+            <button 
+              v-if="totalPages > 1"
+              class="lecture-page-button" 
+              :class="{ active: currentPage === totalPages }" 
+              @click="changePage(totalPages)"
+            >{{ totalPages }}</button>
+            <button 
+              class="lecture-page-button lecture-next-button"
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >▶</button>
+          </div>
+        </div>
+
+        <div v-if="selectedLecture" class="lecture-detail-container" :class="{ active: isSingleView }">
+          <div class="lecture-detail-header">
+            <h3 class="lecture-detail-title">강의 상세 정보</h3>
+            <button class="close-button" @click="closeLectureDetail">×</button>
+          </div>
+          <div class="lecture-detail-content">
+            <div class="lecture-detail-item">
+              <span class="label">강의 코드</span>
+              <span class="value">{{ selectedLecture.lecture_code }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">강의 제목</span>
+              <span class="value">{{ selectedLecture.lecture_title }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">카테고리</span>
+              <span class="value">{{ selectedLecture.lecture_category_name }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">난이도</span>
+              <span class="value">{{ selectedLecture.lecture_level }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">강사명</span>
+              <span class="value">{{ selectedLecture.tutor_name }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">강사 코드</span>
+              <span class="value">{{ selectedLecture.tutor_code }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">등록일</span>
+              <span class="value">{{ formatDateFromArray(selectedLecture.created_at) }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">가격</span>
+              <span class="value">{{ formatPrice(selectedLecture.lecture_price) }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">승인 상태</span>
+              <span class="value" :class="getConfirmStatusClass(selectedLecture.lecture_confirm_status)">
+                {{ selectedLecture.lecture_confirm_status ? '승인완료' : '미승인' }}
+              </span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">강의 상태</span>
+              <span class="value" :class="getLectureStatusClass(selectedLecture.lecture_status)">
+                {{ selectedLecture.lecture_status ? '운영중' : '종료' }}
+              </span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">총 학생 수:</span>
+              <span class="value">{{ selectedLecture.purchase_count }}</span>
+            </div>
+            <div class="lecture-detail-item">
+              <span class="label">구매 전환율:</span>
+              <span class="value">{{ selectedLecture.purchase_conversion_rate }}%</span>
+            </div>
+            <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
+              강의 비디오 목록
+              <span>
+                <li v-for="(title, index) in selectedLecture.formatted_video_titles" :key="index">
+                  {{ title }}
+                </li>
+              </span>
+            </div>
+            <div class="lecture-stats-section">
+              <div class="lecture-stats-header">
+                <h3 class="lecture-stats-title">클릭수 및 구매 통계</h3>
+                <div class="lecture-stats-filter">
+                  <div class="lecture-stats-period">
+                    <span class="lecture-stats-label">조회 기간</span>
+                    <div class="lecture-stats-dates">
+                      <div class="lecture-stats-date-group">
+                        <select v-model="statsFilter.startYear" class="lecture-stats-select">
+                          <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
+                        </select>
+                        <select v-model="statsFilter.startMonth" class="lecture-stats-select">
+                          <option v-for="month in months" :key="month" :value="month">
+                            {{ String(month).padStart(2, '0') }}월
+                          </option>
+                        </select>
+                      </div>
+                      <span class="lecture-stats-separator">~</span>
+                      <div class="lecture-stats-date-group">
+                        <select v-model="statsFilter.endYear" class="lecture-stats-select">
+                          <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
+                        </select>
+                        <select v-model="statsFilter.endMonth" class="lecture-stats-select">
+                          <option v-for="month in months" :key="month" :value="month">
+                            {{ String(month).padStart(2, '0') }}월
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="lecture-stats-actions">
+                    <button @click="fetchLectureStats" class="lecture-stats-search">
+                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
+                    </button>
+                    <button @click="resetStatsFilter" class="lecture-stats-reset">
+                      <img src="@/assets/icons/reset.svg" alt="초기화">
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="lecture-stats-charts">
+                <div class="lecture-stats-chart">
+                  <h4 class="lecture-stats-chart-title">전체 통계</h4>
+                  <div class="lecture-stats-chart-wrapper">
+                    <canvas ref="totalStatsChart"></canvas>
+                  </div>
+                </div>
+                <div class="lecture-stats-chart">
+                  <h4 class="lecture-stats-chart-title">현재 강의 통계</h4>
+                  <div class="lecture-stats-chart-wrapper">
+                    <canvas ref="lectureStatsChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <MonthlyLectureModal 
+    :isOpen="isMonthlyModalOpen"
+    @close="closeMonthlyModal"
+  />
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import LectureSideMenu from '@/components/sideMenu/LectureSideMenu.vue'
+import LectureFilter from '@/components/lecture/LectureFilter.vue'
+import MonthlyLectureModal from '@/components/lecture/MonthlyLectureModal.vue';
+import axios from 'axios'
+import { saveAs } from 'file-saver'
+import '@/assets/css/lecture/LectureView.css'
+import Chart from 'chart.js/auto'
+
+const isMonthlyModalOpen = ref(false);
+const isSingleView = ref(false)
+const selectedLecture = ref(null)
+const lectureList = ref([])
+const totalCount = ref(0)
+const currentPage = ref(1)
+const totalPages = ref(1)
+const pageSize = 50
+const isFiltered = ref(false)
+const lastFilterData = ref(null)
+const totalStatsChart = ref(null)
+const lectureStatsChart = ref(null)
+let totalChart = null
+let lectureChart = null
+const currentYear = new Date().getFullYear()
+const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i))
+const months = ref(Array.from({length: 12}, (_, i) => i + 1))
+const isDropdownOpen = ref(false);
+const columns = ref({
+  lectureCode: "강의 코드",
+  lectureTitle: "강의명",
+  lectureCategoryName: "카테고리",
+  lectureLevel: "난이도",
+  tutorName: "강사명",
+  tutorCode: "강사 코드",
+  price: "가격",
+  createdAt: "등록일",
+  lectureConfirmStatus: "승인 상태",
+  lectureStatus: "강의 상태",
+});
+const selectedColumns = ref(Object.keys(columns.value));
+
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+const statsFilter = ref({
+  startYear: new Date().getFullYear() - 1,
+  startMonth: 1,
+  endYear: new Date().getFullYear(),
+  endMonth: 12
+})
+
+const fetchLectureList = async (filters = {}) => {
+  try {
+    const response = await axios.get('http://localhost:5000/lecture/list', {
+      headers: {
+        Authorization: token,
+      },
+      params: {
+        ...filters,
+        page: currentPage.value - 1,
+        size: pageSize
+      }
+    });
+    console.log(response.data);
+    
+    lectureList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+
+  } catch (error) {
+    console.error('강의 목록을 불러오는데 실패했습니다:', error);
+  }
+};
+
+const showSingleLecture = () => {
+  isSingleView.value = true;
+};
+
+const hideSingleLecture = () => {
+  isSingleView.value = false;
+};
+
+const handleSearch = async (filterData) => {
+  try {
+    isFiltered.value = true;
+    lastFilterData.value = filterData;
+    const response = await axios.post(
+      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+      camelToSnake(filterData),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    console.log("Filter Response Data:", response.data);
+
+    lectureList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+
+  } catch (error) {
+    console.error("Failed to filter lectures:", error);
+  }
+};
+
+const handleReset = () => {
+  isFiltered.value = false;
+  lastFilterData.value = null;
+  currentPage.value = 1;
+  selectedLecture.value = null;
+  fetchLectureList();
+};
+
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  currentPage.value = newPage;
+
+  if (isFiltered.value && lastFilterData.value) {
+    const response = await axios.post(
+      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+      camelToSnake(lastFilterData.value),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    lectureList.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+
+  } else {
+    await fetchLectureList();
+  }
+};
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
+
+const handleExcelDownload = async () => {
+  try {
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/lecture/excel/download',
+      responseType: 'blob',
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
+      },
+      data: {
+        selectedColumns: camelToSnake(selectedColumns.value),
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {}),
+      },
+    };
+
+    const response = await axios(config);
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    saveAs(blob, 'lecture_data.xlsx');
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+  }
+};
+
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+
+  const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateArray;
+
+  if (dateArray.length === 5 && hours === 0 && minutes === 0) {
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
+  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const formatPrice = (price) => {
+  return price?.toLocaleString('ko-KR') + '원' || '0원';
+};
+
+const getConfirmStatusClass = (status) => {
+  return {
+    'lecture-status': true,
+    'lecture-status-completed': status,
+    'lecture-status-pending': !status
+  }
+};
+
+const getLectureStatusClass = (status) => {
+  return {
+    'lecture-status': true,
+    'lecture-status-active': status,
+    'lecture-status-inactive': !status
+  }
+};
+
+const showLectureDetail = async (lecture) => {
+  if (selectedLecture.value?.lecture_code === lecture.lecture_code) {
+    closeLectureDetail()
+  } else {
+    try {
+      const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`)
+      selectedLecture.value = response.data
+      console.log(response.data);
+      showSingleLecture()
+      fetchLectureStats()
+    } catch (error) {
+      console.error('Failed to fetch lecture details:', error)
+    }
+  }
+}
+
+const closeLectureDetail = () => {
+  selectedLecture.value = null;
+  hideSingleLecture();
+};
+
+const createStatsCharts = (data) => {
+  const safeData = {
+    totalStudentCount: data.total_student_count || 0,
+    totalLectureClickCount: data.total_lecture_click_count || 0,
+    totalConversionRate: data.total_conversion_rate || 0,
+    studentCount: data.student_count || 0,
+    lectureClickCount: data.lecture_click_count || 0,
+    conversionRate: data.conversion_rate || 0
+  };
+
+  console.log("Safe data for charts:", safeData);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 1.5,
+    plugins: {
+      legend: {
+        display: false
+      },
+      title: {
+        display: true,
+        font: {
+          size: 11
+        },
+        padding: {
+          top: 5,
+          bottom: 5
+        }
+      }
+    },
+    layout: {
+      padding: {
+        left: 5,
+        right: 5,
+        top: 5,
+        bottom: 5
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          font: {
+            size: 10
+          }
+        },
+        grid: {
+          display: false
+        }
+      },
+      x: {
+        ticks: {
+          font: {
+            size: 10
+          }
+        },
+        grid: {
+          display: false
+        }
+      }
+    }
+  };
+
+  if (totalChart) totalChart.destroy();
+  const totalCtx = totalStatsChart.value.getContext('2d');
+  totalChart = new Chart(totalCtx, {
+    type: 'bar',
+    data: {
+      labels: ['총 학생 수', '총 클릭 수'],
+      datasets: [{
+        label: '전체',
+        data: [safeData.totalStudentCount, safeData.totalLectureClickCount], // 8777, 141579
+        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)'],
+        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      ...chartOptions,
+      plugins: {
+        ...chartOptions.plugins,
+        title: {
+          ...chartOptions.plugins.title,
+          text: `전체 전환율: ${safeData.totalConversionRate.toFixed(2)}%`
+        }
+      }
+    }
+  });
+
+  // 현재 강의 통계 차트
+  if (lectureChart) lectureChart.destroy();
+  const lectureCtx = lectureStatsChart.value.getContext('2d');
+  lectureChart = new Chart(lectureCtx, {
+    type: 'bar',
+    data: {
+      labels: ['구매 학생 수', '클릭 수'],
+      datasets: [{
+        label: selectedLecture.value.lecture_title,
+        data: [safeData.studentCount, safeData.lectureClickCount], // 22, 362
+        backgroundColor: ['rgba(255, 206, 86, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+        borderColor: ['rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      ...chartOptions,
+      plugins: {
+        ...chartOptions.plugins,
+        title: {
+          ...chartOptions.plugins.title,
+          text: `강의 전환율: ${safeData.conversionRate.toFixed(2)}%`
+        }
+      }
+    }
+  });
+};
+
+const fetchLectureStats = async () => {
+  try {
+    const response = await axios.post(
+      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
+      camelToSnake(statsFilter.value),
+      {
+        headers: {
+          Authorization: token,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    console.log(response.data);
+    if (response.data) {
+      createStatsCharts(response.data)
+    } else {
+      console.error('No data received from stats API')
+    }
+  } catch (error) {
+    console.error('Failed to fetch lecture stats:', error)
+  }
+}
+
+const resetStatsFilter = () => {
+  statsFilter.value = {
+    startYear: currentYear - 1,
+    startMonth: 1,
+    endYear: currentYear,
+    endMonth: 12
+  }
+  fetchLectureStats()
+}
+
+const displayedPages = computed(() => {
+  let start = Math.max(currentPage.value - 2, 2);
+  let end = Math.min(start + 2, totalPages.value - 1);
+  
+  if (end === totalPages.value - 1) {
+    start = Math.max(end - 2, 2);
+  }
+  
+  let pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  return pages;
+});
+
+const startPage = computed(() => {
+  return displayedPages.value[0];
+});
+
+const endPage = computed(() => {
+  return displayedPages.value[displayedPages.value.length - 1];
+});
+
+const openMonthlyModal = () => {
+  isMonthlyModalOpen.value = true;
+};
+
+const closeMonthlyModal = () => {
+  isMonthlyModalOpen.value = false;
+};
+
+onMounted(() => {
+  fetchLectureList();
+});
+</script>

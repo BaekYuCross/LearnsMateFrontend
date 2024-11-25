@@ -83,9 +83,9 @@
   const emit = defineEmits(['search', 'reset'])
 
   const convertToLocalDateTime = (date, isEndDate = false) => {
-    if (!date) return null; // date가 없으면 null 반환
+    if (!date) return null; 
     const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
-    return `${date}${timeString}`; // 'yyyy-MM-ddT00:00:00' 또는 'yyyy-MM-ddT23:59:59'
+    return `${date}${timeString}`; 
   };
 
   const prepareFilters = (filters) => {

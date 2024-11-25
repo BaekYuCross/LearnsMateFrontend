@@ -13,8 +13,16 @@
           <div class="student-header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="button-group">
-              <button class="excel-button">
+              
+              <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
+              <button class="excel-button" @click="$refs.fileInput.click()">
+                <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
+              </button>
+              <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
+              </button>
+              <button class="excel-button" @click="showCategoryModal = true">
+                카테고리 비율
               </button>
             </div>
           </div>
@@ -59,43 +67,239 @@
           </table>
 
           <div class="pagination">
-            <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
-            <button class="page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
-            <span v-if="startPage > 2">...</span>
+            <button 
+              class="page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >
+              ◀
+            </button>
+            
             <template v-for="page in displayedPages" :key="page">
-              <button v-if="page !== 1 && page !== totalPages" class="page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+              <span v-if="page === '...'" class="page-dots">...</span>
+              <button 
+                v-else
+                class="page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >
+                {{ page }}
+              </button>
             </template>
-            <span v-if="endPage < totalPages - 1">...</span>
-            <button v-if="totalPages > 1" class="page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
-            <button class="page-button next-button" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
+            
+            <button 
+              class="page-button next-button"
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >
+              ▶
+            </button>
           </div>
         </div>
 
-        <div v-if="selectedStudent" class="detail-container">
+        <div v-if="selectedStudent && studentDetail" class="detail-container">
           <div class="detail-content">
             <h3>상세 정보</h3>
-            <div class="info-grid">
-              <div class="info-item" v-for="(value, key) in selectedStudent" :key="key">
-                <span class="label">{{ key }}</span>
-                <span>{{ value }}</span>
+            
+            <!-- 기본 정보 -->
+            <div class="info-section">
+              <h4>기본 정보</h4>
+              <div class="info-grid">
+                <div class="info-row">
+                  <span class="label">이름</span>
+                  <span>{{ studentDetail.memberDto.memberName }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">이메일</span>
+                  <span>{{ studentDetail.memberDto.memberEmail }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">연락처</span>
+                  <span>{{ studentDetail.memberDto.memberPhone }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">생년월일</span>
+                  <span>{{ studentDetail.memberDto.memberBirth }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">주소</span>
+                  <span>{{ studentDetail.memberDto.memberAddress }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 수강 진행 현황 -->
+            <div class="course-section">
+              <h4>수강 진행 현황</h4>
+              <div class="course-list">
+                <div v-for="lecture in studentDetail.lectureVideoProgressDtolist" 
+                     :key="lecture.lectureCode" 
+                     class="course-item">
+                     <h1></h1>
+                  <div class="course-title">{{ lecture.lectureTitle }}</div>
+                  <div class="progress-bar">
+                    <div class="progress" 
+                         :style="{width: `${(lecture.completedVideos/lecture.totalVideos) * 100}%`}">
+                    </div>
+                  </div>
+                  <div class="progress-text">
+                    {{lecture.completedVideos}}/{{lecture.totalVideos}} ({{Math.round((lecture.completedVideos/lecture.totalVideos) * 100)}}%)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="recommended-section">
+              <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})</h4>
+              <div class="recommended-list">
+                <div v-for="lecture in studentDetail.recommendedLectureList" 
+                    :key="lecture.lectureCode" 
+                    class="recommended-item">
+                  <div class="recommended-content">
+                    <div class="lecture-header">
+                      <span class="lecture-title">{{ lecture.lectureTitle }}</span>
+                      <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+                        {{ lecture.lectureLevel }}
+                      </span>
+                    </div>
+                    <div class="lecture-info">
+                      <div class="info-item">
+                        <span class="label">강의 가격</span>
+                        <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">조회수</span>
+                        <span>{{ lecture.lectureClickCount }}회</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">등록일</span>
+                        <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 쿠폰 정보 -->
+            <div class="coupon-section">
+              <h4>쿠폰 정보</h4>
+              <div class="coupon-list">
+                <!-- 미사용 쿠폰 -->
+                <div class="unused-coupons">
+                  <h5>미사용 쿠폰 ({{ studentDetail.unusedCouponsList?.length || 0 }})</h5>
+                  <div class="coupon-grid">
+                    <div v-for="coupon in studentDetail.unusedCouponsList" 
+                        :key="coupon.couponIssuanceCode" 
+                        class="coupon-item">
+                      <div class="coupon-detail">
+                        <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
+                        <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
+                        <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
+                        <div>쿠폰 코드: {{ coupon.couponCode }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 사용완료 쿠폰 -->
+                <div class="used-coupons">
+                  <h5>사용완료 쿠폰 ({{ studentDetail.usedCouponsList?.length || 0 }})</h5>
+                  <div class="coupon-grid">
+                    <div v-for="coupon in studentDetail.usedCouponsList" 
+                        :key="coupon.couponIssuanceCode" 
+                        class="coupon-item">
+                      <div class="coupon-detail">
+                        <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
+                        <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
+                        <div>사용일: {{ formatDate(coupon.couponUseDate) }}</div>
+                        <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
+                        <div>쿠폰 코드: {{ coupon.couponCode }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VOC 내역 -->
+            <div class="voc-section">
+              <h4>문의 내역</h4>
+              <div class="voc-list">
+                <!-- 미답변 문의 -->
+                <div class="unanswered">
+                  <h5>미답변 문의 ({{ studentDetail.unansweredvocbyMemberList?.length || 0 }})</h5>
+                  <div class="voc-grid">
+                    <div v-for="voc in studentDetail.unansweredvocbyMemberList" 
+                        :key="voc.vocCode" 
+                        class="voc-item">
+                      <div class="voc-detail">
+                        <div class="voc-header">
+                          <span>문의 코드: {{ voc.vocCode }}</span>
+                          <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                        </div>
+                        <div class="voc-body">
+                          <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                          <div class="voc-content">{{ voc.vocContent }}</div>
+                        </div>
+                        <div class="voc-footer">
+                          <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
+                          <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 답변완료 문의 -->
+                <div class="answered">
+                  <h5>답변완료 문의 ({{ studentDetail.answeredVocbyMemberList?.length || 0 }})</h5>
+                  <div class="voc-grid">
+                    <div v-for="voc in studentDetail.answeredVocbyMemberList" 
+                        :key="voc.vocCode" 
+                        class="voc-item">
+                      <div class="voc-detail">
+                        <div class="voc-header">
+                          <span>문의 코드: {{ voc.vocCode }}</span>
+                          <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                        </div>
+                        <div class="voc-body">
+                          <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                          <div class="voc-content">{{ voc.vocContent }}</div>
+                        </div>
+                        <div class="voc-footer">
+                          <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
+                          <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  <!-- 여기에 모달 컴포넌트 추가 -->
+  <CategoryRatioModal 
+      :is-open="showCategoryModal" 
+      @close="showCategoryModal = false" 
+    />
+  </div>  
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from '@/plugins/axios';
-
+import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
-import '@/assets/css/member/StudentView.css'
-
+import '@/assets/css/member/StudentView.css';
+import CategoryRatioModal from '@/components/member/StudentCategoryRatioModal.vue';
+const showCategoryModal = ref(false);
 const selectedStudent = ref(null);
+const studentDetail = ref(null);
 const students = ref([]);
 const totalCount = ref(0);
 const currentPage = ref(1);
@@ -103,44 +307,40 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
-
-// 전체 학생 목록 가져오기
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ1Mjc4MywiZXhwIjoxNzc1NjUyNzgzfQ.xLHlCXMO-7yPd_Gd1xb0sQy1SSU9O9buW0dx8zbWSIOQRAw6mTGc9p8_tJerr3tjIlI23Rd0_u6XPs-5prRhlg';
+// 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
       params: {
         page: currentPage.value - 1,
-        size: pageSize
+        size: pageSize,
       },
       headers: {
         Authorization: token,
       },
     });
-    
+
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-    console.log(students.value);
   } catch (error) {
     console.error('Failed to fetch students:', error);
   }
 };
 
-// 필터링 검색
-const handleSearch = async (filterData) => {
-  try {
-    isFiltered.value = true;
-    lastFilterData.value = filterData;
-    currentPage.value = 1;
+// 필터링된 학생 목록 가져오기
+const fetchFilteredStudents = async () => {
+  if (!lastFilterData.value) return;
 
+  try {
     const response = await axios.post(
       'http://localhost:5000/member/filter/student',
-      camelToSnake(filterData),
+      lastFilterData.value,
       {
         params: {
           page: currentPage.value - 1,
-          size: pageSize
+          size: pageSize,
         },
         headers: {
           Authorization: token,
@@ -148,106 +348,204 @@ const handleSearch = async (filterData) => {
         },
       }
     );
+
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-    selectedStudent.value = null;
   } catch (error) {
-    console.error('Failed to filter students:', error);
+    console.error('Failed to fetch filtered students:', error);
   }
 };
+
+// 학생 상세정보 가져오기
+const showDetail = async (student) => {
+  if (selectedStudent.value?.memberCode === student.memberCode) {
+    selectedStudent.value = null;
+    studentDetail.value = null;
+  } else {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/member/student/${student.memberCode}`,
+        {
+          headers: { 
+            Authorization: token 
+          }
+        }
+      );
+      selectedStudent.value = student;
+      studentDetail.value = response.data;
+      console.log("상세 정보:", response.data);
+      console.log("상세 정보:", studentDetail.value);
+    } catch (error) {
+      console.error('Failed to load student details:', error);
+    }
+  }
+};
+
+// 페이지 변경 처리
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  currentPage.value = newPage;
+  if (isFiltered.value) {
+    await fetchFilteredStudents();
+  } else {
+    await fetchStudents();
+  }
+};
+
+// 필터링 검색
+const handleSearch = async (filterData) => {
+  isFiltered.value = true;
+  lastFilterData.value = filterData;
+  currentPage.value = 1;
+  await fetchFilteredStudents();
+};
+
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    await axios.post(
+      'http://localhost:5000/member/excel/upload/student',
+      formData,
+      {
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+    
+    // 업로드 성공 후 목록 새로고침
+    await fetchStudents();
+    alert('엑셀 파일이 성공적으로 업로드되었습니다.');
+  } catch (error) {
+    console.error('엑셀 업로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+    alert('엑셀 업로드에 실패했습니다.');
+  } finally {
+    // input 초기화 (같은 파일 재선택 가능하도록)
+    event.target.value = '';
+  }
+};
+
+const handleExcelDownload = async() => {
+  try{
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/member/excel/download/student',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+    
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `student_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 // 초기화
 const handleReset = () => {
   isFiltered.value = false;
   lastFilterData.value = null;
   currentPage.value = 1;
-  selectedStudent.value = null;
   fetchStudents();
 };
 
-const changePage = async (newPage) => {
-  if (newPage < 1 || newPage > totalPages.value) return;
-  
-  currentPage.value = newPage;
-  
-  if (isFiltered.value && lastFilterData.value) {
-    // 필터링된 상태일 때는 같은 필터 조건으로 해당 페이지 데이터 요청
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/student',
-      camelToSnake(lastFilterData.value),
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    students.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-  } else {
-    await fetchStudents();
-  }
-  
-  selectedStudent.value = null;
-};
+// 페이지네이션
 const displayedPages = computed(() => {
-  // 앞뒤로 2페이지씩 보이도록 수정
-  let start = Math.max(currentPage.value - 2, 2);
-  let end = Math.min(start + 4, totalPages.value - 1); // 4로 변경하여 더 많은 페이지 표시
-  
-  // end가 마지막 페이지에 가까울 때 start를 조정
-  if (end === totalPages.value - 1) {
-    start = Math.max(end - 4, 2); // 마찬가지로 4로 변경
+  const pages = [];
+  pages.push(1);
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
   }
-  
-  // start가 2에 가까울 때 end를 조정
-  if (start === 2) {
-    end = Math.min(6, totalPages.value - 1); // 첫 페이지 다음부터 5개 페이지 표시
-  }
-  
-  let pages = [];
-  for (let i = start; i <= end; i++) {
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
     pages.push(i);
+  }
+  if (totalPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  if (totalPages.value > 1) {
+    pages.push(totalPages.value);
   }
   return pages;
 });
 
-const startPage = computed(() => {
-  return displayedPages.value[0];
-});
-
-const endPage = computed(() => {
-  return displayedPages.value[displayedPages.value.length - 1];
-});
-
-const showDetail = async (student) => {
-  if (selectedStudent.value?.memberCode === student.memberCode) {
-    selectedStudent.value = null;
-    // reportDetails.value = [];
-  } else {
-    selectedStudent.value = student;
-    try {
-      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
-          headers: {
-            Authorization: token,
-          },
-        }
-      );
-      // reportDetails.value = response.data;
-      // console.log('학생 상세 정보:', reportDetails.value);
-    } catch (error) { 
-      console.error('Failed to load student details:', error);
-      // reportDetails.value = []; 
-    }
-  }
+const getVocCategory = (categoryCode) => {
+  const categories = {
+    1: '강의 관련',
+    2: '결제 관련',
+    3: '시스템 관련',
+    4: '기타'
+    // 실제 카테고리 코드에 맞게 수정해주세요
+  };
+  return categories[categoryCode] || '기타';
 };
+
+const formatDate = (dateArray) => {
+  if (!dateArray || !Array.isArray(dateArray)) return '-';
+  
+  // 배열의 값이 [2024, 12, 1, 1, 1] 이런 형태라고 가정
+  const [year, month, day, hour, minute] = dateArray;
+  
+  // 월과 일이 한자리수일 경우 앞에 0을 붙임
+  const formattedMonth = month.toString().padStart(2, '0');
+  const formattedDay = day.toString().padStart(2, '0');
+  const formattedHour = hour.toString().padStart(2, '0');
+  const formattedMinute = minute.toString().padStart(2, '0');
+  
+  return `${year}-${formattedMonth}-${formattedDay}T${formattedHour}:${formattedMinute}:00`;
+};
+
+// 초기 로드
 onMounted(() => {
   fetchStudents();
 });

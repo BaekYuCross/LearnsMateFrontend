@@ -13,7 +13,7 @@
           <div class="blacklist-header-container">
             <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="blacklist-button-group">
-              <button class="blacklist-excel-button">
+              <button class="blacklist-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -100,28 +100,31 @@
             </div>
 
             <h4 class="report-title">신고 내역</h4>
-            <div class="report-list">
-              <div v-for="(report, index) in reportDetails" :key="index" class="report-item">
-                <div class="report-header">
-                  <span class="report-number">신고 #{{ index + 1 }}</span>
-                  <span class="report-date">{{ report.reportDto.reportDate }}</span>
-                </div>
-                <div class="report-content">
-                  <div class="report-info">
-                    <p><strong>신고 사유:</strong> {{ report.reportDto.reportReason }}</p>
-                    <p><strong>신고자:</strong> {{ report.reportDto.reportMemberCode }}</p>
+              <div class="report-list">
+                <div v-for="(group, commentCode) in groupedReports" :key="commentCode" class="report-group">
+                  <div class="comment-section">
+                    <div class="comment-header">
+                      <span>댓글 코드: {{ commentCode }}</span>
+                      <span>작성일: {{ group.commentInfo.createdAt }}</span>
+                    </div>
+                    <div class="comment-content">
+                      <p>댓글 내용: {{ group.commentInfo.commentContent }}</p>
+                      <p class="lecture-code">강의 코드: {{ group.commentInfo.lectureCode }}</p>
+                    </div>
                   </div>
-                  <div class="comment-info">
-                    <p><strong>댓글 내용:</strong> {{ report.commentDto.commentContent }}</p>
-                    <p><strong>작성일:</strong> {{ report.commentDto.createdAt }}</p>
-                    <p><strong>강의:</strong> {{ report.commentDto.lectureCode }}</p>
+                  <div class="reports-section">
+                    <div v-for="report in group.reports" :key="report.reportDto.reportCode" class="report-entry">
+                      <p>신고 코드: {{ report.reportDto.reportCode }}</p>
+                      <p>신고 사유: {{ report.reportDto.reportReason }}</p>
+                      <p>신고일: {{ report.reportDto.reportDate }}</p>
+                      <p>신고자: {{ report.reportDto.reportMemberCode }}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+          </div>
     </div>
   </div>
 </template>
@@ -130,6 +133,7 @@
 import axios from '@/plugins/axios';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { saveAs } from 'file-saver';
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import '@/assets/css/member/BlacklistView.css';
@@ -152,18 +156,7 @@ const memberTypeText = computed(() => ({
 const filterType = computed(() => memberType.value);
 
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2NjkzMSwiZXhwIjoxNzc1MjY2OTMxfQ.CJuiirAQ9dsPG5_uDuM4lwCC4zczgFIvURxycLzmZsoF86lO4DfkRlR10gdBgWrAtk4apIrABNawISfVwgx47w';
-
-// Snake Case 변환 함수
-const camelToSnake = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(camelToSnake);
-  return Object.keys(obj).reduce((acc, key) => {
-    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-    acc[snakeKey] = camelToSnake(obj[key]);
-    return acc;
-  }, {});
-};
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ5NzkyOCwiZXhwIjoxNzc1Njk3OTI4fQ.iJX2dHA_lMbKIpHlX9xcFKrVUoB8Gr_cW1xMCcCdetS3T6rBAY2YHlJH3uarkP6NAXX-zbkSd7vAXkEQIYRG6A';
 
 watch(
   () => route.path,
@@ -184,6 +177,32 @@ const resetData = () => {
   lastFilterData.value = null;
   fetchBlacklists();
 };
+
+const groupedReports = computed(() => {
+  const grouped = {};
+  
+  if (!reportDetails.value || !Array.isArray(reportDetails.value)) {
+    return {};
+  }
+  
+  reportDetails.value.forEach(detail => {
+    if (!detail.commentDto) return;
+    
+    const commentCode = detail.commentDto.commentCode;
+    
+    if (!grouped[commentCode]) {
+      grouped[commentCode] = {
+        commentInfo: detail.commentDto,
+        reports: []
+      };
+    }
+    
+    grouped[commentCode].reports.push(detail);
+  });
+  
+  return grouped;
+});
+
 
 const fetchBlacklists = async () => {
   try {
@@ -206,6 +225,7 @@ const fetchBlacklists = async () => {
   }
 };
 
+
 // 블랙리스트 필터링 검색
 const handleSearch = async (filterData) => {
   try {
@@ -214,8 +234,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/filter`,
-      camelToSnake(filterData),
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData,
       {
         params: {
           page: currentPage.value - 1,
@@ -236,6 +255,56 @@ const handleSearch = async (filterData) => {
   }
 };
 
+const handleExcelDownload = async() => {
+  try{
+    const config = {
+      method: 'POST',
+      url: `http://localhost:5000/blacklist/excel/download/${memberType.value}`,
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `${memberType.value}_blacklist_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
+
 // 초기화
 const handleReset = () => {
   isFiltered.value = false;
@@ -253,8 +322,7 @@ const changePage = async (newPage) => {
   
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      'http://localhost:5000/blacklist/student/filter',
-      camelToSnake(lastFilterData.value),
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, 
       {
         params: {
           page: currentPage.value - 1,

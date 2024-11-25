@@ -1,4 +1,3 @@
-
 <template>
   <div class="campaign-register-container">
     <MarketingSideMenu />
@@ -73,12 +72,15 @@
                     type="date"
                     v-model="selectedDate"
                     class="date-input"
+                    :min="minDate"
                     :disabled="campaignType === 'INSTANT'"
+                    @change="handleDateChange"
                   />
                   <input
                     type="time"
                     v-model="selectedTime"
                     class="time-input"
+                    :min="minTime"
                     :disabled="campaignType === 'INSTANT'"
                   />
                 </div>
@@ -89,7 +91,8 @@
             <div class="campaign-header">
               <span class="campaign-attach-span">쿠폰 첨부</span>
               <div class="attach-buttons">
-                <button class="excel-download-btn">
+                <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
+                <button class="excel-download-btn"  @click="triggerFileUpload">
                   <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
                   엑셀 업로드
                 </button>
@@ -112,7 +115,8 @@
         <div class="campaign-header">
           <span class="campaign-select-span">타겟 유저</span>
           <div class="target-buttons">
-            <button class="excel-download-btn">
+            <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
+            <button class="excel-download-btn" @click="triggerFileUpload">
               <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
               엑셀 업로드
             </button>
@@ -138,29 +142,62 @@
             <div class="target-user-board-header-dormantflag">휴면상태</div>
             <div class="target-user-board-header-action">삭제</div>
           </div>
-          <div v-for="user in targetUsers" :key="user.member_code" class="target-user-item">
+          <div v-for="user in paginatedTargetUsers" :key="user.member_code" class="target-user-item">
             <div class="target-user-board-row-code">{{ user.member_code }}</div>
             <div class="target-user-board-row-name">{{ user.member_name }}</div>
             <div class="target-user-board-row-email">{{ user.member_email }}</div>
             <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
             <div class="target-user-board-row-address">{{ user.member_address }}</div>
             <div class="target-user-board-row-age">{{ user.member_age }}</div>
-            <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
-            <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
-            <div class="target-user-board-row-createdat">{{ formatDateTimeFromArray(user.created_at) }}</div>
-            <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
+            <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
+            <div class="target-user-board-row-memberflag">{{ user.member_flag ? '활성' : '비활성' }}</div>
+            <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
+            <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag ? '휴면' : '활성' }}</div>
             <div class="target-user-board-row-action">
               <button class="remove-item-btn" @click="removeUser(user)">×</button>
             </div>
           </div>
+          <!-- 페이지네이션 -->
+          <div class="pagination">
+            <button 
+              class="page-button prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >◀</button>
+            <button 
+              class="page-button" 
+              :class="{ active: currentPage === 1 }" 
+              @click="changePage(1)"
+            >1</button>
+            <span v-if="startPage > 2">...</span>
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== 1 && page !== totalPages" 
+                class="page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >{{ page }}</button>
+            </template>
+            <span v-if="endPage < totalPages - 1">...</span>
+            <button 
+              v-if="totalPages > 1" 
+              class="page-button" 
+              :class="{ active: currentPage === totalPages }" 
+              @click="changePage(totalPages)"
+            >{{ totalPages }}</button>
+            <button 
+              class="page-button next-button" 
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >▶</button>
+          </div>
         </div>
-
         <div class="campaign-register-button-group">
-          <button class="campaign-register-button" @click="registerCampaign">
-            등록하기
+          <button class="campaign-register-button" @click="showRegisterModal">
+            등록
           </button>
-          <button class="campaign-cancel-button" @click="cancelCampaign">
-            취소하기
+          <button class="campaign-cancel-button" @click="showCancelModal">
+            취소
           </button>
         </div>
       </div>
@@ -176,6 +213,18 @@
     @Close="handleTargetUserModalClose"
     @Submit="handleTargetUserSubmit"
   />
+  <RegisterModule
+      v-if="isRegisterModalOpen"
+      modalTitle="캠페인을 등록하시겠습니까?"
+      @confirm="confirmRegister"
+      @cancel="cancelRegister"
+    />
+    <CancelModule
+      v-if="isCancelModalOpen"
+      modalTitle="캠페인 등록을 취소하시겠습니까?"
+      @confirm="confirmCancel"
+      @cancel="cancelRegister"
+    />
 </template>
 
 <script setup>
@@ -185,11 +234,15 @@ import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
 import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
+import RegisterModule from '@/components/modules/RegisterModule.vue';
+import CancelModule from '@/components/modules/CancelModule.vue'; 
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 const userCode = jwtDecode(token).sub;
 const userName = jwtDecode(token).name;
 
+const isRegisterModalOpen = ref(false);
+const isCancelModalOpen = ref(false);
 const showCouponSelectModal = ref(false);
 const showTargetUserSelectModal = ref(false);
 const templates = ref([]);
@@ -201,15 +254,64 @@ const campaignType = ref('INSTANT');
 const selectedDate = ref('');
 const selectedTime = ref('');
 
-// Set을 사용하여 중복 방지
 const attachedCouponMap = ref(new Map());
 const targetUserMap = ref(new Map());
 
-// computed 속성으로 배열 변환
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
-// 쿠폰 관련 함수들
+const excelFile = ref(null);
+
+const currentPage = ref(1);
+const pageSize = 50;
+const totalPages = computed(() => Math.ceil(targetUsers.value.length / pageSize));
+const paginatedTargetUsers = computed(() => {
+  const start = (currentPage.value - 1) * pageSize;
+  return targetUsers.value.slice(start, start + pageSize);
+});
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+
+const changePage = (page) => {
+  if (page > 0 && page <= totalPages.value) currentPage.value = page;
+};
+
+const displayedPages = computed(() => {
+    let start = Math.max(currentPage.value - 2, 2);
+    let end = Math.min(start + 4, totalPages.value - 1);
+    
+    if (end === totalPages.value - 1) {
+      start = Math.max(end - 4, 2);
+    }
+    
+    if (start === 2) {
+      end = Math.min(6, totalPages.value - 1);
+    }
+    
+    let pages = [];
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  const startPage = computed(() => {
+    return displayedPages.value[0];
+  });
+
+  const endPage = computed(() => {
+    return displayedPages.value[displayedPages.value.length - 1];
+  });
+
 const clickCouponSelect = () => {
   showCouponSelectModal.value = true;
 };
@@ -235,7 +337,6 @@ const clearAllCoupons = () => {
   }
 };
 
-// 타겟 유저 관련 함수들
 const clickTargetUserSelect = () => {
   showTargetUserSelectModal.value = true;
 };
@@ -299,16 +400,80 @@ const selectSendType = (type) => {
   }
 };
 
+const minDate = computed(() => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+});
+
+const minTime = computed(() => {
+  if (selectedDate.value === minDate.value) {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+  return '00:00';
+});
+
+const handleDateChange = () => {
+  if (selectedDate.value === minDate.value) {
+    const now = new Date();
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (selectedTime.value && selectedTime.value < currentTime) {
+      selectedTime.value = '';
+    }
+  }
+};
+
+const triggerFileUpload = () => {
+  if (excelFile.value) {
+    excelFile.value.click();
+  }
+};
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+  if (file) {
+    try {
+      const response = await axios.post("http://localhost:5000/member/excel/upload/target-student", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: token,
+        },
+      });
+
+      console.log("파일 업로드 성공:", response.data);
+      camelToSnake(response.data).forEach((user) => {
+        targetUserMap.value.set(user.member_code, user);
+      });
+    } catch (error) {
+      console.error("파일 업로드 실패:", error.message);
+    }
+  }
+};
+
+
 const registerCampaign = async () => {
-  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
-    alert('예약 발송 시 날짜와 시간을 설정해주세요.');
-    return;
+  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {   
+    throw new Error('예약 발송 시 날짜와 시간을 설정해주세요.');
   }
 
   if (!campaignTitle.value || !campaignContents.value) {
-    alert('캠페인 제목과 내용을 입력해주세요.');
-    return;
+    throw new Error('캠페인 제목과 내용을 입력해주세요.');
   }
+
+  function formatToLocalDateTime(dateString) {
+    if (!dateString || dateString.includes('T')) return dateString; // 이미 변환된 경우
+    return `${dateString}T00:00:00`; // 시간 추가
+  }
+
+  const formattedStudentList = targetUsers.value.map(user => {
+    return {
+      ...user,
+      member_birth: formatToLocalDateTime(user.member_birth) // 생일 변환
+    };
+  });
+
 
   const payload = {
     campaign_title: campaignTitle.value,
@@ -316,36 +481,44 @@ const registerCampaign = async () => {
     campaign_type: campaignType.value,
     campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
     coupon_list: attachedCoupons.value,
-    student_list: targetUsers.value,
+    student_list: formattedStudentList,
     admin_code: userCode,
   };
-
   try {
     await axios.post('http://localhost:5000/campaign/register', payload);
-    alert('캠페인이 등록되었습니다.');
-    window.location.href = '/marketing';
   } catch (error) {
     console.error('Failed to register campaign:', error);
     alert('캠페인 등록에 실패했습니다.');
   }
 };
 
-const cancelCampaign = () => {
- if (confirm('캠페인 등록을 취소하시겠습니까?')) {
-   window.location.href = '/marketing';
- }
+const showRegisterModal = () => {
+  isRegisterModalOpen.value = true;
 };
 
-const formatDateTimeFromArray = (dateArray) => {
- if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
- const [year, month, day, hours, minutes, seconds] = dateArray;
- return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+const showCancelModal = () => {
+  isCancelModalOpen.value = true;
 };
 
-const formatDateFromArray = (dateArray) => {
- if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
- const [year, month, day] = dateArray;
- return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+const confirmRegister = async () => {
+  try {
+    await registerCampaign(); 
+    isRegisterModalOpen.value = false;
+    window.location.href = '/marketing'; 
+  } catch (error) {
+    console.error('캠페인 등록 실패:', error);
+    alert('등록에 실패했습니다.');
+  }
+};
+
+const confirmCancel = () => {
+    isCancelModalOpen.value = false; 
+    window.location.href = '/marketing'; 
+};
+
+const cancelRegister = () => {
+  isRegisterModalOpen.value = false;
+  isCancelModalOpen.value = false;
 };
 
 fetchTemplates();
@@ -564,9 +737,9 @@ fetchTemplates();
    width: 25px;
    height: 25px;
    font-size: 15px;
-   background-color: #dc3545;
+   background-color: #858282;
    color: white;
-   border: 1px solid #dc3545;
+   border: 1px solid #858282;
    border-radius: 4px;
    cursor: pointer;
    display: flex;
@@ -575,20 +748,20 @@ fetchTemplates();
 }
 
 .remove-all-btn:hover {
-   background-color: #c82333;
+   background-color: #39ac75;
 }
 
 .remove-item-btn {
    background: none;
    border: none;
-   color: #dc3545;
+   color: #004c42;
    font-size: 18px;
    cursor: pointer;
    padding: 0 5px;
 }
 
 .remove-item-btn:hover {
-   color: #c82333;
+   color: #39ac75;
 }
 
 .coupon-list {
@@ -681,4 +854,38 @@ fetchTemplates();
 .campaign-cancel-button:hover {
    background-color: #004c42;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 5px;
+    background-color: #f9f9f9;
+  }
+
+  .page-button {
+    background: none;
+    border: none;
+    color: #333;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    margin: 0 2px;
+  }
+
+  .page-button.active {
+    font-weight: bold;
+    color: #005950;
+  }
+
+  .page-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .prev-button,
+  .next-button {
+    font-size: 12px;
+  }
 </style>

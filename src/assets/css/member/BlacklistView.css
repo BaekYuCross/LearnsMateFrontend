@@ -240,3 +240,44 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
 .hover\:bg-gray-50:hover {
   background-color: #f9fafb;
 }
+
+.report-group {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.comment-section {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.comment-content {
+  margin-bottom: 1rem;
+}
+
+.reports-section {
+  padding: 0.5rem;
+}
+
+.report-entry {
+  border-left: 3px solid #3b82f6;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #f3f4f6;
+}
+
+.report-entry p {
+  margin: 0.25rem 0;
+}
