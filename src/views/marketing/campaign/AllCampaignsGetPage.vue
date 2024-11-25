@@ -10,7 +10,7 @@
       <div class="campaign-count">등록된 캠페인 <span class="campaign-length">{{ campaigns.length }}</span>개</div>
       <div class="campaign-button-group">
         <button class="campaign-register-button" @click="navigateTo()">캠페인 등록</button>
-        <button class="campaign-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+        <button class="campaign-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
     </div>
     </div>
       <div class="board-container">
@@ -77,12 +77,16 @@
   import { ref, computed, onMounted  } from 'vue';
   import { useRouter } from 'vue-router';
   import axios from 'axios';
+  import { saveAs } from 'file-saver';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CampaignFilter from '@/components/marketing/CampaignFilter.vue';
 
   const router = useRouter(); 
 
   const campaigns = ref([]);
+
+  const isFiltered = ref(false);
+  const lastFilterData = ref(null);
 
   const fetchCampaigns = async () => {
     try {
@@ -138,6 +142,8 @@
 
 
 const handleSearch = async (preparedFilters) => {
+  isFiltered.value = true;
+  lastFilterData.value = preparedFilters;
   try {
     console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
     const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
@@ -164,8 +170,10 @@ const handleSearch = async (preparedFilters) => {
 };
 
 const handleReset = async () => {
-  await fetchCampaigns(); 
+  isFiltered.value = false;
+  lastFilterData.value = null;
   currentPage.value = 1;  
+  await fetchCampaigns(); 
 };
 
 
@@ -188,6 +196,57 @@ const navigateTo = () => {
         path: "/marketing/register-campaign",
     });
 };
+
+const handleExcelDownload = async() => {
+  try{
+    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/campaign/excel/download/campaigns',
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+    
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `campaign_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 onMounted(async() => {
   await fetchCampaigns();
