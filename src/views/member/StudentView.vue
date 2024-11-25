@@ -13,6 +13,11 @@
           <div class="student-header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="button-group">
+              
+              <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
+              <button class="excel-button" @click="$refs.fileInput.click()">
+                <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
+              </button>
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
@@ -385,6 +390,45 @@ const handleSearch = async (filterData) => {
   lastFilterData.value = filterData;
   currentPage.value = 1;
   await fetchFilteredStudents();
+};
+
+
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    await axios.post(
+      'http://localhost:5000/member/excel/upload/student',
+      formData,
+      {
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
+    
+    // 업로드 성공 후 목록 새로고침
+    await fetchStudents();
+    alert('엑셀 파일이 성공적으로 업로드되었습니다.');
+  } catch (error) {
+    console.error('엑셀 업로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+    alert('엑셀 업로드에 실패했습니다.');
+  } finally {
+    // input 초기화 (같은 파일 재선택 가능하도록)
+    event.target.value = '';
+  }
 };
 
 const handleExcelDownload = async() => {
