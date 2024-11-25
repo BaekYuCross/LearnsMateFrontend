@@ -53,24 +53,6 @@
         </tr>
     </tbody>
   </table>
-  <table class="lecture-by-coupon-table">
-      <thead>
-        <tr>
-            <th>강의 코드</th>
-            <th>강의 이름</th>
-            <th>강사 이름</th>
-            <th>강의 가격</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-            <td>{{ selectedCoupon.lectureCode || '-'  }}</td>
-            <td>{{ selectedCoupon.lectureName || '-'  }}</td>
-            <td>{{ selectedCoupon.tutorName || '-'  }}</td>
-            <td>{{ selectedCoupon.lecturePrice || '-'  }}</td>
-        </tr>
-      </tbody>
-  </table>
   <div class="coupon-buttons">
     <button class="coupon-edit-button">쿠폰 수정</button>
     <button class="coupon-delete-button">쿠폰 삭제</button>
