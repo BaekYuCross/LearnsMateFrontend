@@ -13,7 +13,7 @@
           <div class="blacklist-header-container">
             <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
             <div class="blacklist-button-group">
-              <button class="blacklist-excel-button">
+              <button class="blacklist-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
@@ -133,6 +133,7 @@
 import axios from '@/plugins/axios';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { saveAs } from 'file-saver';
 import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import '@/assets/css/member/BlacklistView.css';
@@ -155,7 +156,7 @@ const memberTypeText = computed(() => ({
 const filterType = computed(() => memberType.value);
 
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
+const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ5NzkyOCwiZXhwIjoxNzc1Njk3OTI4fQ.iJX2dHA_lMbKIpHlX9xcFKrVUoB8Gr_cW1xMCcCdetS3T6rBAY2YHlJH3uarkP6NAXX-zbkSd7vAXkEQIYRG6A';
 
 watch(
   () => route.path,
@@ -253,6 +254,56 @@ const handleSearch = async (filterData) => {
     console.error('Failed to filter blacklists:', error);
   }
 };
+
+const handleExcelDownload = async() => {
+  try{
+    const config = {
+      method: 'POST',
+      url: `http://localhost:5000/blacklist/excel/download/${memberType.value}`,
+      responseType: 'blob',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (isFiltered.value && lastFilterData.value) {
+      config.data = lastFilterData.value;
+      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+    }
+
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+
+    const now = new Date();
+    const fileName = `${memberType.value}_blacklist_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 // 초기화
 const handleReset = () => {
