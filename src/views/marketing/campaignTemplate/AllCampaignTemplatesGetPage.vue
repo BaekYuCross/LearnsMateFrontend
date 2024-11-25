@@ -1,7 +1,10 @@
 <template>
     <div class="marketing-container">
       <MarketingSideMenu />
-      <CampaignTemplateFilter/>
+      <CampaignTemplateFilter
+        @Search="handleSearch"
+        @reset="handleReset"
+      />
       <div class="content-container">
         <div class="campaigntemplate-actions">
           <div class="campaigntemplate-count">전체 템플릿 <span class="campaigntemplate-length">{{ campaignTemplates.length }}</span>개</div>
@@ -73,8 +76,11 @@
   const router = useRouter(); 
   
   const campaignTemplates = ref([]);
+
+  const isFiltered = ref(false);
+  const lastFilterData = ref(null);
   
-  const fetchCampaigns = async () => {
+  const fetchCampaignTemplates = async () => {
     try {
       const response = await axios.get('http://localhost:5000/campaign-template/list',{
       method: 'GET',
@@ -105,21 +111,67 @@
       currentPage.value = page;
     }
   };
+
+  const camelToSnake = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(camelToSnake);
+    return Object.keys(obj).reduce((acc, key) => {
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      acc[snakeKey] = camelToSnake(obj[key]);
+      return acc;
+    }, {});
+  };
+
   const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; 
-  const [year, month, day, hours, minutes, seconds] = dateArray;
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
+    if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; 
+    const [year, month, day, hours, minutes, seconds] = dateArray;
+    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
   
   const clickRegister = () => {
     showModal.value = true;
   };
 
 
-    const handleModalClose = () => {
+  const handleModalClose = () => {
     showModal.value = false;
     showCouponSelectModal.value = false;
-    };
+  };
+
+  const handleSearch = async (preparedFilters) => {
+    isFiltered.value = true;
+    lastFilterData.value = preparedFilters;
+    try {
+      console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
+      const response = await axios.post(
+        'http://localhost:5000/campaign-template/filter',
+        camelToSnake(preparedFilters),
+        {
+          headers: {
+            Authorization: token,
+            'Content-Type': 'application/json',
+          },
+          params: {
+            page: currentPage.value - 1, // 0-based pagination
+            size: pageSize,
+          },
+        }
+      );
+      campaignTemplates.value = response.data.content; // API의 응답 구조에 따라 조정
+      console.log('Filtered campaigns:', campaignTemplates.value);
+      totalPages.value = response.data.totalPages; 
+    } catch (error) {
+      console.error('Error while fetching filtered campaigns:', error);
+    }
+  };
+
+  const handleReset = async () => {
+    isFiltered.value = false;
+    lastFilterData.value = null;
+    currentPage.value = 1;  
+    await fetchCampaignTemplates(); 
+  };
+    
 
     const registerCampaignTemplate = async () => {
 
@@ -149,11 +201,11 @@
 
     const handleModalSubmit = (formData) => {
       registerCampaignTemplate();
-      fetchCampaigns();
+      fetchCampaignTemplates();
     };
   
   onMounted(() => {
-    fetchCampaigns();
+    fetchCampaignTemplates();
   });
 
   </script>
