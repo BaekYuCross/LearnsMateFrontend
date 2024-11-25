@@ -1,6 +1,11 @@
 <template>
   <div class="clientmain-app-container">
     <ClientHeader />
+    <InactivityModal
+        v-if="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
     <div class="clientmain-banner-container">
       <img src="@/assets/icons/beyondsw.svg" alt="배너" class="clientmain-banner" />
     </div>
@@ -32,7 +37,10 @@
 <script setup>
 import ClientHeader from "@/components/client/ClientHeader.vue";
 import { useRouter } from 'vue-router';
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from '@/components/client/useActivityMonitor';
 
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 const router = useRouter(); 
 
 const goToLearnsMate = () => {

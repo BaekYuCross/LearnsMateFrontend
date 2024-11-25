@@ -1,6 +1,11 @@
 <template>
     <div class="clientvoc-app-container">
       <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
       <div class="clientlecturecart-container">
         <h1 class="clientlecturecart-title">수강바구니</h1>
         <div class="clientlecturecart-actions">
@@ -108,7 +113,11 @@
   import CouponModal from "@/components/client/clientlecture/ClientCouponModal.vue";
   import PayModal from "@/components/client/clientpaylecture/ClientPayModal1.vue";
   import PaySuccessModal from "@/components/client/clientpaylecture/ClientPayFinishModal.vue";
- import { ref, computed } from "vue";
+  import { ref, computed } from "vue";
+  import InactivityModal from '@/components/client/InactivityModal.vue';
+  import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+  
+  const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
  
  const isModalVisible = ref(false);
 const originalPrice = ref(45000); // 강의 원가

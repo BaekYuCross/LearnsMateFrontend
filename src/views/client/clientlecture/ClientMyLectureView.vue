@@ -1,6 +1,11 @@
 <template>
     <div>
       <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
       <div class="clientmain-app-container">
         <div class="layout">
           <!-- 왼쪽 사이드바 -->
@@ -80,8 +85,12 @@
   import Android from '@/assets/icons/Android.svg';
   import { ref, computed } from 'vue';
   import { useRouter } from "vue-router";
-  const router = useRouter(); // router 선언
+  import InactivityModal from '@/components/client/InactivityModal.vue';
+  import { useActivityMonitor } from '@/components/client/useActivityMonitor';
 
+  const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
+  
+  const router = useRouter(); // router 선언
   
   // 필터와 상태 관리
   const categoryFilters = ["온라인", "모바일/부트캠프"];

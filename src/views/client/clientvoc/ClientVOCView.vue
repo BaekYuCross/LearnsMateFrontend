@@ -1,6 +1,11 @@
 <template>
   <div class="clientvoc-app-container">
     <ClientHeader />
+    <InactivityModal
+        v-if="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
     <div class="clientvoc-header">
       <div class="clientvoc-header-row">
         <div class="clientvoc-text">
@@ -62,6 +67,11 @@ import plusIcon from "@/assets/icons/plus.svg";
 import minusIcon from "@/assets/icons/minus.svg";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 
 const router = useRouter();
 
