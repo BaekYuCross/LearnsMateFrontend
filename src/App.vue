@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppHeader v-if="showHeader" />
+    <AppHeader v-if="showHeader && !isTransitioning" />
   </div>
   <main>
     <RouterView />
@@ -8,21 +8,44 @@
 </template>
 
 <script setup>
-
 import AppHeader from './components/AppHeader.vue';
-import { RouterView , useRoute} from 'vue-router';
-import { computed } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
+import { computed, ref, watch } from 'vue';
 
 const route = useRoute();
+const isTransitioning = ref(false);
 const isLoginPage = computed(() => route.path === '/login');
 const isClientLoginPage = computed(() => route.path === '/client-login');
+const isClientMainPage = computed(() => route.path === '/client-main');
+const isClientVocPage = computed(() => route.path === '/client-voc');
+const isClientMyVocPage = computed(() => route.path === '/client-myvoc');
+const isClientLecturePage = computed(() => route.path === '/client-lecture');
+const isClientMyLecturePage = computed(() => route.path === '/client-mylecture');
+const isClientLectureDetailPage = computed(() =>
+  route.matched.some((record) => record.path === '/client-lecturedetail/:id')
+);
+const isClientLectureCartPage = computed(() => route.path === '/client-lecturecart');
+const isClientAddCouponPage = computed(() => route.path === '/client-addcoupon');
+
 
 const showHeader = computed(() => {
-  return !isLoginPage.value && !isClientLoginPage.value;
+  return !isLoginPage.value && !isClientLoginPage.value 
+  && !isClientMainPage.value && !isClientVocPage.value 
+  && !isClientMyVocPage.value && !isClientLecturePage.value 
+  && !isClientMyLecturePage.value && !isClientLectureDetailPage.value
+  && !isClientLectureCartPage.value && !isClientAddCouponPage.value;
 });
 
+watch(route, () => {
+  isTransitioning.value = true;
+  isTransitioning.value = false;
+ 
+});
 </script>
 
-<style scoped>
-
+<style>
+/* 초기 상태에서 AppHeader 숨김 */
+div[style*="display: none"] {
+  display: none !important;
+}
 </style>
