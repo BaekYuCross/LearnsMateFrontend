@@ -91,7 +91,8 @@
             <div class="campaign-header">
               <span class="campaign-attach-span">쿠폰 첨부</span>
               <div class="attach-buttons">
-                <button class="excel-download-btn">
+                <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
+                <button class="excel-download-btn"  @click="triggerFileUpload">
                   <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
                   엑셀 업로드
                 </button>
@@ -114,7 +115,8 @@
         <div class="campaign-header">
           <span class="campaign-select-span">타겟 유저</span>
           <div class="target-buttons">
-            <button class="excel-download-btn">
+            <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
+            <button class="excel-download-btn" @click="triggerFileUpload">
               <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
               엑셀 업로드
             </button>
@@ -147,7 +149,7 @@
             <div class="target-user-board-row-phone">{{ user.member_phone }}</div>
             <div class="target-user-board-row-address">{{ user.member_address }}</div>
             <div class="target-user-board-row-age">{{ user.member_age }}</div>
-            <div class="target-user-board-row-birth">{{ formatDateFromArray(user.member_birth) }}</div>
+            <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
             <div class="target-user-board-row-memberflag">{{ user.member_flag ? '활성' : '비활성' }}</div>
             <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
             <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag ? '휴면' : '활성' }}</div>
@@ -233,7 +235,7 @@ import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
 import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
 import RegisterModule from '@/components/modules/RegisterModule.vue';
-import CancelModule from '@/components/modules/CancelModule.vue';
+import CancelModule from '@/components/modules/CancelModule.vue'; 
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 const userCode = jwtDecode(token).sub;
@@ -258,6 +260,8 @@ const targetUserMap = ref(new Map());
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
+const excelFile = ref(null);
+
 const currentPage = ref(1);
 const pageSize = 50;
 const totalPages = computed(() => Math.ceil(targetUsers.value.length / pageSize));
@@ -265,6 +269,18 @@ const paginatedTargetUsers = computed(() => {
   const start = (currentPage.value - 1) * pageSize;
   return targetUsers.value.slice(start, start + pageSize);
 });
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) currentPage.value = page;
 };
@@ -407,8 +423,38 @@ const handleDateChange = () => {
   }
 };
 
+const triggerFileUpload = () => {
+  if (excelFile.value) {
+    excelFile.value.click();
+  }
+};
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+  if (file) {
+    try {
+      const response = await axios.post("http://localhost:5000/member/excel/upload/target-student", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: token,
+        },
+      });
+
+      console.log("파일 업로드 성공:", response.data);
+      camelToSnake(response.data).forEach((user) => {
+        targetUserMap.value.set(user.member_code, user);
+      });
+    } catch (error) {
+      console.error("파일 업로드 실패:", error.message);
+    }
+  }
+};
+
+
 const registerCampaign = async () => {
-  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
+  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {   
     throw new Error('예약 발송 시 날짜와 시간을 설정해주세요.');
   }
 
@@ -416,13 +462,26 @@ const registerCampaign = async () => {
     throw new Error('캠페인 제목과 내용을 입력해주세요.');
   }
 
+  function formatToLocalDateTime(dateString) {
+    if (!dateString || dateString.includes('T')) return dateString; // 이미 변환된 경우
+    return `${dateString}T00:00:00`; // 시간 추가
+  }
+
+  const formattedStudentList = targetUsers.value.map(user => {
+    return {
+      ...user,
+      member_birth: formatToLocalDateTime(user.member_birth) // 생일 변환
+    };
+  });
+
+
   const payload = {
     campaign_title: campaignTitle.value,
     campaign_contents: campaignContents.value,
     campaign_type: campaignType.value,
     campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
     coupon_list: attachedCoupons.value,
-    student_list: targetUsers.value,
+    student_list: formattedStudentList,
     admin_code: userCode,
   };
   try {
@@ -461,19 +520,6 @@ const cancelRegister = () => {
   isRegisterModalOpen.value = false;
   isCancelModalOpen.value = false;
 };
-
-
-const formatDateTimeFromArray = (dateArray) => {
- if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
- const [year, month, day, hours, minutes, seconds] = dateArray;
- return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
-
-const formatDateFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
-    const [year, month, day] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-  };
 
 fetchTemplates();
 </script>
