@@ -2,11 +2,11 @@
   <div class="reserved-layout-container">
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
-      <BlacklistFilter 
+      <!-- <BlacklistFilter 
         :type="filterType"
         @search="handleSearch" 
         @reset="handleReset"
-      />
+      /> -->
 
       <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
         <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
@@ -117,7 +117,36 @@
               </div>
             </div>
 
-            <button @click="registerBlacklist" class="reserved-insert">등록하기</button>
+            <div v-if="showRegisterModal" class="modal-overlay">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3>블랙리스트 등록</h3>
+                  <button class="modal-close" @click="closeRegisterModal">×</button>
+                </div>
+                <div class="modal-body">
+                  <div class="form-group">
+                    <label>{{ memberTypeText }} 정보</label>
+                    <div class="member-info">
+                      <p>{{ memberTypeText }} 코드: {{ selectedReserved?.memberCode }}</p>
+                      <p>이름: {{ selectedReserved?.memberName }}</p>
+                      <p>신고 횟수: {{ selectedReserved?.reportCount }}회</p>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>블랙리스트 등록 사유</label>
+                    <textarea 
+                      v-model="blacklistReason" 
+                      placeholder="블랙리스트 등록 사유를 입력해주세요"
+                      rows="4"
+                    ></textarea>
+                  </div>
+                  <div class="modal-actions">
+                    <button class="register-button" @click="confirmRegister">등록</button>
+                    <button class="cancel-button" @click="closeRegisterModal">취소</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -128,18 +157,28 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
 import axios from '@/plugins/axios';
 
-  const route = useRoute();
-  const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
-  const memberTypeText = computed(() => ({
+const route = useRoute();
+const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
+const memberTypeText = computed(() => ({
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
 const filterType = computed(() => memberType.value);
+const showRegisterModal = ref(false);
+const blacklistReason = ref('');
+const openRegisterModal = () => {
+  showRegisterModal.value = true;
+};
+
+const closeRegisterModal = () => {
+  showRegisterModal.value = false;
+  blacklistReason.value = '';
+};
+
 watch(
   () => route.path,
   (newPath) => {
@@ -215,42 +254,41 @@ const fetchReservedList = async () => {
   }
 };
 
-const handleSearch = async (filterData) => {
-  try {
-    isFiltered.value = true;
-    lastFilterData.value = filterData;
-    currentPage.value = 1;
+// const handleSearch = async (filterData) => {
+//   try {
+//     isFiltered.value = true;
+//     lastFilterData.value = filterData;
+//     currentPage.value = 1;
 
-    const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
-      filterData,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    reservedList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-    selectedReserved.value = null;
-  } catch (error) {
-    console.error('Failed to filter reserved list:', error);
-  }
-};
-
-const handleReset = () => {
-  isFiltered.value = false;
-  lastFilterData.value = null;
-  currentPage.value = 1;
-  selectedReserved.value = null;
-  fetchReservedList();
-};
+//     const response = await axios.post(
+//       `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
+//       filterData,
+//       {
+//         params: {
+//           page: currentPage.value - 1,
+//           size: pageSize
+//         },
+//         headers: {
+//           Authorization: token,
+//           'Content-Type': 'application/json',
+//         },
+//       }
+//     );
+//     reservedList.value = response.data.content;
+//     totalCount.value = response.data.totalElements;
+//     totalPages.value = response.data.totalPages;
+//     selectedReserved.value = null;
+//   } catch (error) {
+//     console.error('Failed to filter reserved list:', error);
+//   }
+// };
+// const handleReset = () => {
+//   isFiltered.value = false;
+//   lastFilterData.value = null;
+//   currentPage.value = 1;
+//   selectedReserved.value = null;
+//   fetchReservedList();
+// };
 
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
@@ -329,13 +367,21 @@ const showDetail = async (blacklist) => {
   }
 };
 
-const registerBlacklist = async () => {
+const registerBlacklist = () => {
   if (!selectedReserved.value) return;
+  openRegisterModal();
+};
+
+const confirmRegister = async () => {
+  if (!blacklistReason.value.trim()) {
+    alert('등록 사유를 입력해주세요.');
+    return;
+  }
   
   try {
     await axios.post(
-      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,  // membercode를 URL에 포함
-       "신고 누적으로 인한 블랙리스트 등록",  // RequestSaveBlacklistVO에 맞는 형식
+      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,
+      blacklistReason.value,
       {
         headers: {
           Authorization: token,
@@ -344,6 +390,7 @@ const registerBlacklist = async () => {
       }
     );
     
+    closeRegisterModal();
     await fetchReservedList();
     selectedReserved.value = null;
   } catch (error) {
