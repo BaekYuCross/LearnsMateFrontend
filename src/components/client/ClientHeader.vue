@@ -21,11 +21,21 @@
       <router-link to="/client-mylecture" class="clientheader-user-link">내 강의</router-link>
       <router-link to="#" class="clientheader-user-link">로그아웃</router-link>
       <div class="clientheader-user-icon">
-        <img src="@/assets/icons/person.svg" alt="유저 아이콘" />
+        <img src="@/assets/icons/person.svg" alt="유저 아이콘"  @click="goToLogin"/>
       </div>
     </div>
   </header>
 </template>
+
+<script setup>
+import { useRouter, useRoute } from 'vue-router';
+
+const router = useRouter();
+
+const goToLogin = (path) => {
+  router.push('/client-login');
+};
+</script>
 
 <style lang="scss" scoped>
 .clientheader-app-header {
