@@ -47,6 +47,12 @@ const ClientRouter = [
         component: () => import('../views/client/clientlecture/ClientLectureCart.vue'),
         props: true
     },
+    {
+        path: '/client-addcoupon',
+        name: 'AddCoupon',
+        component: () => import('../views/client/clientlecture/ClientCouponAddView.vue'),
+        props: true
+    },
 ];
 
 export default ClientRouter;
