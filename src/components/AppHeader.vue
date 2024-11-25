@@ -24,7 +24,7 @@
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
         <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
-        <img src="@/assets/icons/settings.svg" alt="설정" class="icon">
+        <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
     </nav>
   </header>
@@ -63,6 +63,10 @@ const currentGroup = computed(() => {
 
 const navigateTo = (path) => {
   router.push(path);
+};
+
+const goToLearnsBuddy = (path) => {
+  router.push('/client-main');
 };
 </script>
   
