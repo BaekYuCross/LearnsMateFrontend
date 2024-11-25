@@ -30,7 +30,6 @@
             <input v-model="newCoupon.expiryDay" type="number" class="clientaddcoupon-modal-date-input" placeholder="DD" />
           </div>
         </label>
-  
         <button class="clientaddcoupon-save-button" @click="saveCoupon">저장하기</button>
       </div>
     </div>
