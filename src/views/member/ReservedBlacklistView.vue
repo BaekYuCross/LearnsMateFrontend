@@ -1,13 +1,118 @@
+오늘 내가 만들어야하는거
+
+1. 학생 블랙리스트 필터링
+2. 학생 블랙리스트 표
+3. 예비 블랙리스트 표
+
+학생에서 한거를 그대로 강사에 적용시키기
+
+
+
+    private Long reportCode;
+    private String reportReason;
+    private LocalDateTime reportDate;
+    private Long commentCode;
+    private Long reportMemberCode;
+    private Long reportedMemberCode;
+
+
+    private Long commentCode;
+    private String commentContent;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Long memberCode;
+    private String lectureCode;
+
+댓글코드 - 댓글내용이 오고 그옆에 신고코드 - 신고사유
+이때 댓글 + 댓글내용이 너무 길수도 있으니까 최대 길이 제한 주기
+
+학생코드
+학생명 
+신고 받은 횟수 -> list 개수
+신고 자세히보기 		댓코 - 댓내, 신코 - 신사
+				2번째꺼
+				3번째꺼
+				4번째꺼
+
+담당자(블랙리스트 등록한)
+
+
+
+총 수강생 수를 아직 안해놨네?
+total student를 모두 합치면 되겠네
+
+
+
+blacklist/student/{studentcode}
+1. 블랙리스트 코드
+2. 학생 코드
+3. 학생 이름
+4. 학생 이메일
+-> 댓글 코드, 댓글 내용, 신고 사유 
+5. 블랙리스트 사유
+6. 정지일
+7. 담당자
+
+
+예비 블랙리스트도 추가해야함.
+
+
+저 메서드를 사용할 수도 있지만 pinia를 쓰면 캐싱 가능
+아니지... 멤버가 계속해서 추가되ㅣㄹ텐데 계속 최신화된 데이터를 가져와야지?
+
+
+
+    private Long memberCode;
+    private String memberName;
+    private MemberType memberType;
+    private String memberEmail;
+    private String memberPhone;
+    private String memberAddress;
+
+    // 나이 범위
+    private Integer memberStartAge;
+    private Integer memberEndAge;
+
+    // 생년월일 범위
+    private LocalDateTime birthStartDate;
+    private LocalDateTime birthEndDate;
+
+    private Boolean memberFlag;
+    private Boolean memberDormantFlag;
+
+    // 생성일 범위
+    private LocalDateTime createdStartDate;
+    private LocalDateTime createdEndDate;
+
+('STUDENT', 'gimhyejin@yu.kr', 'z)6$07sOdA', '김서영', 19, '044-307-8406', '대구광역시 구로구 도산대길', '2000-12-08 00:00:00', True, False, '2024-05-16 14:23:44', '2021-06-04 22:13:23'),
+
+
+
+
+0. 멤버 전체 조회 -> 강사 or 학생
+0-2. 강사, 학생 필터링 조회 -> 전체 조회하기 때문에.
+
+블랙리스트쪽 -> 블랙리스트에 등록은 된거같은데 안보임
+-> 데이터 처리해주기
+
+블랙리스트 등록할때 이유도 적어서 등록해야함.
+
+1. 멤버 상세조회
+
+
+블랙리스트 필터, 
+블랙리스트 -> 학생 -> 데이터가 제대로 안나옴
+학생 조회할때 flag가 false인놈들을 안가져옴. 가져오게 바꾸기
+
+
+유저코드 -> 자동으로 들어감 -> builder 할때 안넣어주면 됨.
+비밀번호 -> 엑셀에 있는 비밀번호에다가 bcrypt 해야함.
+수정일 -> createdAt과 동일하게 바꿔줘야함.
+
 <template>
   <div class="reserved-layout-container">
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
-      <BlacklistFilter 
-        :type="filterType"
-        @search="handleSearch" 
-        @reset="handleReset"
-      />
-
       <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
         <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
           <div class="reserved-header-container">
@@ -116,8 +221,29 @@
                 </div>
               </div>
             </div>
+            <!-- 블랙리스트 등록 버튼 -->
+            <button 
+              v-if="selectedReserved" 
+              @click="openReasonModal" 
+              class="register-button mt-4"
+            >
+              블랙리스트 등록
+            </button>
 
-            <button @click="registerBlacklist" class="reserved-insert">등록하기</button>
+            <!-- 사유 입력 모달 -->
+            <BlackReason
+              :is-open="isReasonModalOpen"
+              @cancel="closeReasonModal"
+              @confirm="handleReasonConfirm"
+            />
+
+            <!-- 모달 컴포넌트 사용 -->
+            <RegisterModule
+              v-if="isConfirmModalOpen"
+              :modalTitle="modalTitle"
+              @confirm="confirmRegister"
+              @cancel="closeConfirmModal"
+            />
           </div>
         </div>
       </div>
@@ -128,18 +254,27 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import RegisterModule from '@/components/modules/RegisterModule.vue';
+import BlackReason from '@/components/member/BlackReason.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
 import axios from '@/plugins/axios';
 
-  const route = useRoute();
-  const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
-  const memberTypeText = computed(() => ({
+const route = useRoute();
+const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
+const memberTypeText = computed(() => ({
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
+
 const filterType = computed(() => memberType.value);
+
+// 모달 관련 상태
+const isModalOpen = ref(false);
+const modalTitle = ref('블랙리스트를 등록하시겠습니까?');
+const blacklistReason = ref('');
+const isReasonModalOpen = ref(false);
+const isConfirmModalOpen = ref(false);
 watch(
   () => route.path,
   (newPath) => {
@@ -170,9 +305,8 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 
-
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
-// 댓글별로 그룹화된 신고 내역
+
 const groupedReports = computed(() => {
   const grouped = {};
   
@@ -213,43 +347,6 @@ const fetchReservedList = async () => {
   } catch (error) {
     console.error('Failed to fetch reserved list:', error);
   }
-};
-
-const handleSearch = async (filterData) => {
-  try {
-    isFiltered.value = true;
-    lastFilterData.value = filterData;
-    currentPage.value = 1;
-
-    const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
-      filterData,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    reservedList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-    selectedReserved.value = null;
-  } catch (error) {
-    console.error('Failed to filter reserved list:', error);
-  }
-};
-
-const handleReset = () => {
-  isFiltered.value = false;
-  lastFilterData.value = null;
-  currentPage.value = 1;
-  selectedReserved.value = null;
-  fetchReservedList();
 };
 
 const changePage = async (newPage) => {
@@ -329,13 +426,33 @@ const showDetail = async (blacklist) => {
   }
 };
 
-const registerBlacklist = async () => {
-  if (!selectedReserved.value) return;
-  
+// 사유 입력 모달 열기
+const openReasonModal = () => {
+  isReasonModalOpen.value = true;
+};
+
+// 사유 입력 모달 닫기
+const closeReasonModal = () => {
+  isReasonModalOpen.value = false;
+};
+
+// 사유 입력 후 확인
+const handleReasonConfirm = (reason) => {
+  blacklistReason.value = reason;
+  isReasonModalOpen.value = false;
+  isConfirmModalOpen.value = true;
+};
+// 최종 확인 모달 닫기
+const closeConfirmModal = () => {
+  isConfirmModalOpen.value = false;
+  blacklistReason.value = '';
+};
+
+const confirmRegister = async () => {
   try {
     await axios.post(
-      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,  // membercode를 URL에 포함
-       "신고 누적으로 인한 블랙리스트 등록",  // RequestSaveBlacklistVO에 맞는 형식
+      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,
+      { blackReason: blacklistReason.value },
       {
         headers: {
           Authorization: token,
@@ -343,17 +460,14 @@ const registerBlacklist = async () => {
         },
       }
     );
-    
+    alert('블랙리스트 등록이 완료되었습니다.');
+    closeConfirmModal();
     await fetchReservedList();
     selectedReserved.value = null;
   } catch (error) {
     console.error('Failed to register blacklist:', error);
+    alert('블랙리스트 등록에 실패했습니다.');
   }
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleString();
 };
 
 onMounted(() => {
