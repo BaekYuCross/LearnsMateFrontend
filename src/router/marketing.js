@@ -17,7 +17,7 @@ const MarketingRouter = [
       {
         path: '/marketing/campaign-template',
         name: 'Campaign-template',
-        component: () => import('../views/marketing/campaignTemplate/CampaignTemplateGetPage.vue'),
+        component: () => import('../views/marketing/campaignTemplate/AllCampaignTemplatesGetPage.vue'),
       },
       {
         path: '/marketing/campaign',
