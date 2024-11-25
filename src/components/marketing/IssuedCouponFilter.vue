@@ -118,13 +118,13 @@
           <span class="issued-coupon-filter-label">쿠폰 만료일</span>
           <div class="issued-coupon-date-range-container">
             <input 
-              v-model="filters.start_expire_date"
+              v-model="filters.start_coupon_expire_date"
               type="date" 
               class="issued-coupon-filter-input date-input"
             />
             <span class="issued-coupon-date-separator">~</span>
             <input 
-              v-model="filters.end_expire_date"
+              v-model="filters.end_coupon_expire_date"
               type="date"
               class="issued-coupon-filter-input date-input"
             />
@@ -132,22 +132,6 @@
         </div>
       </div>
       <div class="issued-coupon-filter-row white">
-        <div class="issued-coupon-filter-item">
-          <span class="issued-coupon-filter-label">쿠폰 사용일</span>
-          <div class="issued-coupon-date-range-container">
-            <input 
-              v-model="filters.start_coupon_use_date"
-              type="date" 
-              class="issued-coupon-filter-input date-input"
-            />
-            <span class="issued-coupon-date-separator">~</span>
-            <input 
-              v-model="filters.end_coupon_use_date"
-              type="date" 
-              class="issued-coupon-filter-input date-input"
-            />
-          </div>
-        </div>
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">쿠폰 발급일</span>
           <div class="issued-coupon-date-range-container">
@@ -159,6 +143,22 @@
             <span class="issued-coupon-date-separator">~</span>
             <input 
               v-model="filters.end_coupon_issue_date"
+              type="date" 
+              class="issued-coupon-filter-input date-input"
+            />
+          </div>
+        </div>
+        <div class="issued-coupon-filter-item">
+          <span class="issued-coupon-filter-label">쿠폰 사용일</span>
+          <div class="issued-coupon-date-range-container">
+            <input 
+              v-model="filters.start_coupon_use_date"
+              type="date" 
+              class="issued-coupon-filter-input date-input"
+            />
+            <span class="issued-coupon-date-separator">~</span>
+            <input 
+              v-model="filters.end_coupon_use_date"
               type="date" 
               class="issued-coupon-filter-input date-input"
             />
@@ -183,8 +183,8 @@
     max_discount_rate: '',
     start_coupon_start_date: '',
     end_coupon_start_date: '',
-    start_expire_date: '',
-    end_expire_date: '',
+    start_coupon_expire_date: '',
+    end_coupon_expire_date: '',
     start_coupon_use_date: '',
     end_coupon_use_date: '',
     start_coupon_issue_date: '',
@@ -194,15 +194,26 @@
   const emit = defineEmits(['search', 'reset'])
   
   const search = () => {
-    emit('search', filters.value)
-  }
+    const formattedFilters = { ...filters.value };
+
+  // 날짜 필드와 빈 문자열 처리
+  Object.keys(formattedFilters).forEach(key => {
+    if (formattedFilters[key] === '') {
+      formattedFilters[key] = null;
+    } else if (key.includes('date') && formattedFilters[key]) {
+      formattedFilters[key] = new Date(formattedFilters[key]).toISOString();
+    }
+  });
+
+  emit('search', formattedFilters);
+  };
   
   const reset = () => {
     Object.keys(filters.value).forEach(key => {
-      filters.value[key] = ''
-    })
+      filters.value[key] = '';
+    });
     emit('reset')
-  }
+  };
 </script>
   
 <style scoped>
