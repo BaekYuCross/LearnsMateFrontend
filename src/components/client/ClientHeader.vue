@@ -67,6 +67,7 @@ const goToLogin = (path) => {
 .clientheader-app-header {
   display: flex;
   justify-content: space-between;
+  font-family:'Pretendard-Light';
   align-items: center;
   padding: 10px 40px;
   background-color: #ffffff;
@@ -74,8 +75,9 @@ const goToLogin = (path) => {
 
   .clientheader-logo-link {
     text-decoration: none;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 24px;
-    font-weight: bold;
+    font-weight: bolder;
     color: #6c63ff;
   }
 

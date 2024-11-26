@@ -187,7 +187,8 @@
   <style lang="scss" scoped>
   .clientmain-app-container {
     background-color: #ffffff;
-    text-align: center;
+  height: 92vh;
+  overflow-y: auto;
   }
   
   .layout {
@@ -196,51 +197,46 @@
   
   /* 사이드바 스타일 */
   .clientmylecture-sidebar {
+    height: 92vh;
     width: 350px;
     background-color: #ffffff;
     border-right: 1px solid #ddd;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-
-    nav {
-      ul {
-        list-style: none;
-        padding: 0;
-      }
+  
+    nav ul {
+      list-style: none;
+      padding: 0;
     }
   }
   
   .clientmylecture-menu-item {
     margin-bottom: 10px;
     text-align: left;
-    padding-left: 40px;
-    padding-right: 20px;
+    padding: 0 20px 0 40px;
   }
   
   .clientmylecture-menu-link {
     display: block;
-            padding: 10px 15px;
-            text-decoration: none;
-            color: #333;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
   
-            &:hover {
-                background-color: rgba(163, 160, 255, 0.3); 
-              color: #7671f4;
-            }
+    &:hover,
+    &.active {
+      background-color: rgba(163, 160, 255, 0.3);
+      color: #7671f4;
+    }
+  }
   
-            &.active {
-                background-color: rgba(163, 160, 255, 0.3); 
-              color: #7671f4;
-            }
-          }
- 
-  
+  /* 메인 컨텐츠 */
   .clientmylecture-main-content {
     flex: 1;
     padding: 20px;
+    background-color: #ffffff;
   }
   
   /* 강의 카드 스타일 */
@@ -248,147 +244,176 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    padding: 20px;
+    margin-bottom: 30px;
   }
   
   .clientmylecture-card {
-    background: #fff;
-    border: 1px solid #eaeaea;
+    background: #ffffff;
     border-radius: 10px;
-    padding: 16px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
     text-align: center;
+    cursor: pointer;
+  
+    &:hover .clientmylecture-thumbnail {
+      transform: scale(1.05);
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    }
   }
   
   .clientmylecture-thumbnail {
     width: 100%;
-    height: 150px;
+    max-width: 580px;
+    height: 180px;
     object-fit: cover;
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-
-  .clientmylecture-main-content {
-  padding: 20px;
-  background-color: #ffffff;
-}
-
-/* 내 학습 헤더 */
-.clientmylecture-header {
-  margin-bottom: 20px;
-  text-align: left;
-
-  .clientmylecture-section-title {
-    font-size: 20px;
+  
+  .clientmylecture-title {
+    font-size: 16px;
     font-weight: bold;
-    color: #333;
+    margin: 10px 0 5px;
+  }
+  
+  .clientmylecture-meta,
+  .clientmylecture-stats {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000000;
     margin-bottom: 10px;
   }
-
-  .clientmylecture-tabs {
-    display: flex;
-    gap: 20px;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 10px;
-
-    .clientmylecture-tab-btn {
-      padding: 10px 15px;
-      font-size: 14px;
-      color: #555;
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      cursor: pointer;
-      transition: color 0.3s, border-color 0.3s;
-
-      &:hover {
-        color: #4a4aff;
-      }
-
-      &.active {
-        color: #4a4aff;
-        border-color: #4a4aff;
-        font-weight: bold;
-      }
-    }
+  
+  .clientmylecture-discount {
+    font-size: 14px;
+    color: #e60023;
+    font-weight: bold;
+    margin: 5px 0;
   }
-}
-
-/* 필터 섹션 */
-.clientmylecture-filters {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  justify-content: space-between;
-
-  /* 카테고리 필터 */
-  .clientmylecture-category-filters {
-    display: flex;
-    gap: 10px;
-
-    .clientmylecture-filter-btn {
-        margin-bottom: 10px;
-      padding: 8px 12px;
-      font-size: 14px;
+  
+  .clientmylecture-original-price {
+    font-size: 12px;
+    color: #000000;
+    font-weight: bold;
+    text-decoration: line-through;
+    margin: 5px 0;
+  }
+  
+  /* 내 학습 헤더 */
+  .clientmylecture-header {
+    margin-bottom: 20px;
+    text-align: left;
+  
+    .clientmylecture-section-title {
+      font-size: 20px;
       font-weight: bold;
-      background-color: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s ease;
-
-      &:hover {
-        background-color: #e6e6ff;
-        color: #4a4aff;
-      }
+      color: #333;
+      margin-bottom: 10px;
     }
-  }
-
-  /* 추가 필터 */
-  .clientmylecture-extra-filters {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-
-    .checkbox-wrapper {
+  
+    .clientmylecture-tabs {
       display: flex;
-      align-items: center;
-      font-size: 14px;
-
-      label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-
-        input[type="checkbox"] {
-          cursor: pointer;
+      gap: 20px;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 10px;
+  
+      .clientmylecture-tab-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+        color: #555;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: color 0.3s, border-color 0.3s;
+  
+        &:hover,
+        &.active {
+          color: #4a4aff;
+          border-color: #4a4aff;
+          font-weight: bold;
         }
       }
     }
-
-
-
-    .clientmylecture-dropdown {
-      padding: 8px 12px;
-      font-size: 14px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #ffffff;
-      cursor: pointer;
-    }
   }
-}
-
-    .clientmylecture-search-input {
-      width: 350px;
-      padding: 8px 12px;
-      font-size: 14px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #ffffff;
-      transition: border-color 0.3s ease;
-
-      &::placeholder {
-        color: #aaa;
+  
+  /* 필터 섹션 */
+  .clientmylecture-filters {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: space-between;
+  
+    .clientmylecture-category-filters {
+      display: flex;
+      gap: 10px;
+  
+      .clientmylecture-filter-btn {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        font-size: 14px;
+        font-weight: bold;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+  
+        &:hover {
+          background-color: #e6e6ff;
+          color: #4a4aff;
+        }
       }
     }
-
+  
+    .clientmylecture-extra-filters {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+  
+      .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+  
+        label {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+  
+          input[type='checkbox'] {
+            cursor: pointer;
+          }
+        }
+      }
+  
+      .clientmylecture-dropdown {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #ffffff;
+        cursor: pointer;
+      }
+    }
+  }
+  
+  /* 검색 입력 스타일 */
+  .clientmylecture-search-input {
+    width: 350px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #ffffff;
+    transition: border-color 0.3s ease;
+  
+    &::placeholder {
+      color: #aaa;
+    }
+  }
   </style>
+  
   
