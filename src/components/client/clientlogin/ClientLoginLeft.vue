@@ -60,6 +60,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 
@@ -67,11 +68,33 @@ const userId = ref(""); // 사용자 아이디 입력값
 const password = ref(""); // 사용자 비밀번호 입력값
 
 // 로그인 버튼 처리
-const handleLogin = () => {
-  console.log(`아이디: ${userId.value}, 비밀번호: ${password.value}`);
-  // 페이지 이동
-  router.push("/client-main");
+const handleLogin = async () => {
+  try {
+    const response = await axios.post('http://localhost:5000/client/login', {
+      memberEmail: userId.value,
+      memberPassword: password.value
+    });
+
+    const loginData = {
+      ...response.data,
+      loginTime: new Date().toISOString()
+    };
+
+    localStorage.setItem('clientInfo', JSON.stringify(loginData));
+    localStorage.setItem('isAuthenticated', 'true');
+    
+    router.push("/client-main");
+  } catch (error) {
+    console.error('로그인 실패:', error);
+    if (error.response) {
+      // 서버에서 에러 응답이 온 경우
+      alert(error.response.data.message || '로그인에 실패했습니다.');
+    } else {
+      alert('로그인 처리 중 오류가 발생했습니다.');
+    }
+  }
 };
+
 
 // 카카오 로그인 처리
 const handleKakaoLogin = () => {

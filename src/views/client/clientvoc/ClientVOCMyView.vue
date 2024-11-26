@@ -1,6 +1,12 @@
 <template>
     <div class="clientmyvoc-container">
       <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        :show="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
       <div class="clientmyvoc-wrapper">
         <!-- 질문(Q) -->
         <div class="clientmyvoc-block clientmyvoc-question-block">
@@ -89,6 +95,11 @@
 <script setup>
 import { ref, computed } from "vue";
 import ClientHeader from "@/components/client/ClientHeader.vue";
+
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from "@/composables/useActivityMonitor";
+
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 
 const currentPage = ref(1); // 현재 페이지
 const totalPages = ref(155); // 총 페이지 수

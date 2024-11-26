@@ -238,15 +238,16 @@
   import { ref, computed, watch  } from 'vue';
   import axios from 'axios';
   import { useRoute, useRouter } from 'vue-router';
-  import { jwtDecode } from 'jwt-decode'; 
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
   import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
   import CancelModule from '@/components/modules/CancelModule.vue';
-  
-  const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjI2MTY5MywiZXhwIjoxNzc1NDYxNjkzfQ.sfY4-uvhksfHdeuFUY216KJbfjkK8jeBWAVBzFttMYpn_zC4ao2FB9DZt6xEleAGh7VsteoloNjAPCWbzxD6xg';
-  const userCode = jwtDecode(token).sub;
-  const userName = jwtDecode(token).name;
+  import { useLoginState } from '@/stores/loginState';
+
+  const loginState = useLoginState();
+
+  const userCode = loginState.adminCode;
+  const userName = loginState.adminName;
   
   const route = useRoute();
   const router = useRouter();
@@ -322,7 +323,7 @@ const changePage = (page) => {
     const campaignCode = route.query.campaignCode;
     try {
         const response = await axios.get(`http://localhost:5000/campaign/${campaignCode}`, {
-            headers: { Authorization: token },
+            withCredentials: true,
         });
         campaign.value = response.data;
 
@@ -397,8 +398,8 @@ const isPastSendDate = computed(() => {
 
       try {
           await axios.patch('http://localhost:5000/campaign/edit', payload, {
-              headers: {
-                  Authorization: token,
+            withCredentials: true,  
+            headers: {
                   'Content-Type': 'application/json',
               },
           });
@@ -431,9 +432,7 @@ const isPastSendDate = computed(() => {
     const campaignCode = route.query.campaignCode;
     try {
       await axios.delete(`http://localhost:5000/campaign/delete/${campaignCode}`, {
-              headers: {
-                  Authorization: token,
-              },
+        withCredentials: true,
           });
           window.location.href = '/marketing';
     } catch (error) {
@@ -510,22 +509,10 @@ const isPastSendDate = computed(() => {
     }
   };
 
-  const formatDateTimeFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
-    const [year, month, day, hours, minutes, seconds] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
-  
   const formatSendDateFromArray = (dateArray) => {
     if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
     const [year, month, day, hours, minutes] = dateArray;
     return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-  };
-  
-  const formatDateFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
-    const [year, month, day] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
   };
 
   watch(() => campaign.value, (newCampaign) => {

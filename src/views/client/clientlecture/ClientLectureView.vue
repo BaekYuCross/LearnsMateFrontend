@@ -1,6 +1,12 @@
 <template>
     <div class="clientlecture-app-container">
       <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        :show="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
   
       <!-- 카테고리 섹션 -->
       <div class="clientlecture-course-category">
@@ -119,7 +125,10 @@ import Spring from '@/assets/icons/Spring.svg';
 import Android from '@/assets/icons/Android.svg';
 import Full from '@/assets/icons/Full.svg';
 import { ref, computed } from "vue";
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from "@/composables/useActivityMonitor";
 
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1/12);
 
 const router = useRouter();
 

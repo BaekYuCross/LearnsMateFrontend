@@ -230,16 +230,17 @@
 <script setup>
 import { ref, computed } from 'vue';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
 import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
 import RegisterModule from '@/components/modules/RegisterModule.vue';
 import CancelModule from '@/components/modules/CancelModule.vue'; 
+import { useLoginState } from '@/stores/loginState';
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-const userCode = jwtDecode(token).sub;
-const userName = jwtDecode(token).name;
+const loginState = useLoginState();
+
+const userCode = loginState.adminCode;
+const userName = loginState.adminName;
 
 const isRegisterModalOpen = ref(false);
 const isCancelModalOpen = ref(false);
@@ -382,9 +383,7 @@ const updateTemplate = async () => {
 const fetchTemplates = async () => {
   try {
     const response = await axios.get('http://localhost:5000/campaign-template/list', {
-      headers: {
-        Authorization: token,
-      }
+      withCredentials: true,
     });
     templates.value = response.data;
   } catch (error) {
@@ -436,9 +435,9 @@ const handleFileChange = async (event) => {
   if (file) {
     try {
       const response = await axios.post("http://localhost:5000/member/excel/upload/target-student", formData, {
+        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: token,
         },
       });
 
@@ -485,7 +484,10 @@ const registerCampaign = async () => {
     admin_code: userCode,
   };
   try {
-    await axios.post('http://localhost:5000/campaign/register', payload);
+    await axios.post('http://localhost:5000/campaign/register', payload, {
+      withCredentials:true,
+      headers: { 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Failed to register campaign:', error);
     alert('캠페인 등록에 실패했습니다.');

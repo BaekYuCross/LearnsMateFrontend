@@ -1,6 +1,12 @@
 <template>
     <div>
       <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        :show="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
       <div class="clientlecturecoupon-coupon-management-container">
         <div class="clientlecturecoupon-layout">
           <aside class="clientlecturecoupon-sidebar">
@@ -93,6 +99,11 @@
   import ClientHeader from "@/components/client/ClientHeader.vue";
   import ClientAddCouponModal from "@/components/client/clientlecture/ClientAddCouponModal.vue";
   import { ref, computed, onMounted } from "vue";
+  import InactivityModal from '@/components/client/InactivityModal.vue';
+  import { useActivityMonitor } from "@/composables/useActivityMonitor";
+  
+  // 비활성 모니터링 관련
+  const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1);
   
   const menus = [
     { id: 1, name: "강의 관리", link: "#", active: false },
