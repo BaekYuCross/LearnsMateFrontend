@@ -15,12 +15,8 @@
             >
           </div>
           <div class="input-group">
-            <label>담당자</label>
-            <input 
-              type="text" 
-              v-model="formData.adminCode"
-              placeholder="나중에 로그인한 직원 이름이 들어가용 ^^"
-            >
+            <label>담당자</label> 
+            <span>{{ loginState.adminName }}</span>
           </div>
           <div class="input-group content-group">
             <label>템플릿 내용</label>
@@ -36,60 +32,73 @@
         </div>
       </div>
     </div>
-  <FalseModule 
-    v-if="cancleModal"
-    @close="handleModalClose"
-    @submit="handleSubmit"
+  <RegisterModule 
+    v-if="isRegisterModalOpen"
+    modalTitle="캠페인 템플릿을 등록하시겠습니까?"
+    @cancel="handleModalClose"
+    @confirm="registerCampaignTemplate"
   />
+
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
-import FalseModule from '@/components/modules/FalseModule.vue';
+import { ref, defineEmits, onMounted } from 'vue'; 
+import axios from 'axios';
+import RegisterModule from '../modules/RegisterModule.vue';
+import { useLoginState } from '@/stores/loginState';
+const emit = defineEmits(['confirm', 'cancel']);
 
-const emit = defineEmits(['close', 'submit']);
-const cancleModal = ref(false);
+const loginState = useLoginState();
 
 const isOpen = ref(true);
+const isRegisterModalOpen = ref(false);
+
 const formData = ref({
   campaignTemplateTitle: '',
   campaignTemplateContents: '',
-  adminCode: ''
+  adminCode: loginState.adminCode,
 });
 
-const clickCancel = () => {
-  cancleModal.value = true;
-};
-
-const handleModalClose = () => {
-  cancleModal.value = false;
+const   handleModalClose = () => {
+  isRegisterModalOpen.value = false;
+  formData.value.campaignTemplateTitle = ''; 
+  formData.value.campaignTemplateContents = '';
+  isOpen.value= true;
 };
 
 const closeModal = () => {
   isOpen.value = false;
-  emit('close');
 };
 
 const handleSubmit = async () => {
+  console.log("formData: ",formData.value);
+  isOpen.value = true; 
+  isRegisterModalOpen.value = true;
+};
+
+const registerCampaignTemplate = async () => {
   try {
-    const response = await fetch('http://localhost:8080/campaign-template/register', {
+    await axios.post('http://localhost:5000/campaign-template/register', formData.value,{
+      withCredentials: true,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData.value)
+      }
     });
-
-    if (response.ok) {
-      emit('submit', formData.value);
-      closeModal();
-    } else {
-      console.error('Failed to submit template');
-    }
+    emit('confirm', formData.value);
+    closeModal();
   } catch (error) {
     console.error('Error submitting template:', error);
   }
+  isRegisterModalOpen.value = false;
+  closeModal();
 };
+
+onMounted(async () => {
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); // 로그인 상태 확인
+  }
+});
 </script>
 
 <style scoped>
@@ -156,7 +165,7 @@ const handleSubmit = async () => {
   display: flex;
   justify-content: flex-end;
 }
-
+.input-group span,
 .input-group input,
 .input-group textarea {
   flex: 1;
