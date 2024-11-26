@@ -81,15 +81,6 @@
 
   const coupons = ref([]);
   const selectedCoupons = ref([]);
-
-  
-  const clickCancel = () => {
-    cancleModal.value = true;
-  };
-  
-  const handleModalClose = () => {
-    cancleModal.value = false;
-  };
   
   const closeModal = () => {
     isOpen.value = false;
@@ -98,12 +89,9 @@
 
   const fetchCoupons = async () => {
     try {
-      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
       const response = await axios.get('http://localhost:5000/coupon/admin-coupons',{
         method: 'GET',
-        headers: {
-          Authorization: token,
-          }
+        withCredentials: true,
         });
         coupons.value = response.data;
         console.log(coupons.value);
@@ -138,14 +126,11 @@ const changePage = (page) => {
 
 const applyFilters = async (filters) => {
   try {
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const response = await axios.post(
       'http://localhost:5000/coupon/filters',
       filters,
       {
-        headers: {
-          Authorization: token,
-        },
+        withCredentials: true,
       }
     );
     coupons.value = response.data;
