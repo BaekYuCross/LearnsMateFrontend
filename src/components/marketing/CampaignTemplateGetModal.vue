@@ -60,8 +60,6 @@ import axios from 'axios';
 import DeleteModule from '../modules/DeleteModule.vue';
 import ConfirmModule from '../modules/ConfirmModule.vue';
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ'; 
-
 const closeModal = () => {
   isOpen.value = false;
   emit('close');
@@ -100,9 +98,7 @@ console.log("부모에서 넘어온 템플릿코드: ",props.campaignTemplateCod
 const fetchCampaignTemplate = async () => {
 try {
   const response = await axios.get(`http://localhost:5000/campaign-template/${props.campaignTemplateCode}`, {
-    headers: {
-      Authorization: token,
-    },
+    withCredentials: true,
   });
   campaignTemplate.value = response.data;
   console.log('캠페인 템플릿 조회 성공:', response.data);
@@ -131,9 +127,7 @@ const saveChanges = async () => {
     console.log("요청한 수정 정보: ", payload);
   try {
       await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
-      headers: {
-        Authorization: token,
-      }
+        withCredentials: true,
     });
     isConfirmModalOpen.value = true;
     isEditMode.value = false;
@@ -151,13 +145,11 @@ const deleteCampaignTemplate = async () => {
   console.log('템플릿 삭제 요청');
  try {
   await axios.patch(`http://localhost:5000/campaign-template/delete/${props.campaignTemplateCode}`,{
-    headers: {
-      Authorization: token,
-    }
+    withCredentials: true,
   });
-  fetchCampaignTemplate();
+  await fetchCampaignTemplate();
   isDeleteModalOpen.value = false;
-  closeModal();
+  window.location.href = '/marketing/campaign-template'; 
  } catch (error) {
   console.error("캠페인 템플릿 삭제 실패:",error);
  }

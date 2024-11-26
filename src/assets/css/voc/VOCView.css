@@ -59,6 +59,12 @@
   border-radius: 5px;
 }
 
+.voc-register-button:hover,
+.voc-excel-button:hover,
+.voc-ai-button:hover {
+  background: #00796b;
+}
+
 .voc-board-container {
   background-color: #ffffff;
   border-radius: 4px;
