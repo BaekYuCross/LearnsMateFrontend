@@ -239,42 +239,68 @@
   
   <style scoped>
   .lecture-modal-overlay {
-    position: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+  
+.lecture-modal-container {
+  background-color: #ffffff;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 10px;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 9px;
+    background-color: #b5cfcc;
+  }
+
+  &::before {
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
   }
+
+  &::after {
+    bottom: 0;
+    left: 0;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+}
   
-  .lecture-modal-container {
-    background-color: white;
-    border-radius: 12px;
-    padding: 10px;
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .lecture-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .lecture-modal-header h2 {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-  }
+.lecture-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.lecture-modal-header h2 {
+  padding-top: 10px;
+  padding-left: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
 
   .lecture-filter-card {
     margin-bottom: 16px;
@@ -409,4 +435,16 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: #999;
+
+  &:hover {
+    color: #333;
+  }
+}
   </style>

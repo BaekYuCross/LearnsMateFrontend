@@ -7,10 +7,15 @@
 html, body {
     height: 100%;
     background-color: #F4F4F4;
+    font-family:'Pretendard-Light';
 }
 
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
+}
+
+button {
+  font-family:'Pretendard-Light';
 }
 
 ::-webkit-scrollbar-track {
