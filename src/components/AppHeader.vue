@@ -1,7 +1,7 @@
 <template>
   <header class="header-container">
     <nav class="nav-container">
-      <div class="logo-section">
+      <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
       </div>
 
@@ -76,6 +76,10 @@ const goToLearnsBuddy = (path) => {
   router.push('/client-main');
 };
 
+const Main = (path) => {
+  router.push('/');
+};
+
 const Logout = async () => {
   await loginState.logout();
   alert('로그아웃되었습니다.');
@@ -112,6 +116,7 @@ onMounted(async () => {
   }
   
   .logo-section h1 {
+    cursor: pointer;
     color: #000000;
     font-size: 20px;
     font-weight: bold;
