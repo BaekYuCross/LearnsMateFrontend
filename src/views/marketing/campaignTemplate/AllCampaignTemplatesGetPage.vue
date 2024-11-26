@@ -9,7 +9,7 @@
         <div class="campaigntemplate-actions">
           <div class="campaigntemplate-count">전체 템플릿 <span class="campaigntemplate-length">{{ campaignTemplates.length }}</span>개</div>
           <div class="campaigntemplate-button-group">
-            <button class="campaigntemplate-register-button" @click="clickRegister()">템플릿 등록</button>
+            <button class="campaigntemplate-register-button" @click="clickRegister">템플릿 등록</button>
             <button class="campaigntemplate-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
           </div>
         </div>
@@ -59,8 +59,8 @@
     </div>
     <CampaignTemplateRegisterModal 
       v-if="showRegisterModal"
-      @close="handleRegisterModalClose"
-      @submit="handleModalSubmit"
+      @cancel="handleRegisterModalClose"
+      @confirm="handleModalSubmit"
     />
     <CampaignTemplateGetModal
       v-if="showGetModal"
@@ -144,7 +144,6 @@
   };
 
   const showCampaignTemplateModal = (template) => {
-    console.log("캠페인템플릿코드: ",template);
     selectedCampaignTemplate.value = template;
     showGetModal.value = true;
   };
@@ -188,36 +187,9 @@
     currentPage.value = 1;  
     await fetchCampaignTemplates(); 
   };
-    
 
-    const registerCampaignTemplate = async () => {
-
-        if (!campaignTemplateTitle.value || !campaignTemplateContents.value) {
-            alert('템플릿의 제목과 내용을 입력해주세요.');
-            return;
-        }
-
-        const payload = {
-            campaignTemplateTitle: campaignTitle.value,
-            campaignTemplateContents: campaignContents.value,
-            campaignType: campaignType.value,
-            campaignSendDate: campaignType.value === '예약 발송' ? `${selectedDate.value}T${selectedTime.value}` : null,
-            coupons: attachedCoupons.value, // coupons, targetUsers 이름 바꿔야함.
-            targetUsers: targetUsers.value,
-        };
-
-    try {
-        await post('/https://learnsmate.site/campaign-template/register', camelToSnake(payload));
-        alert('캠페인이 등록되었습니다.'); // 모달창으로 변경하기
-        window.location.href = '/'; // 해당 캠페인 조회 페이지로? 아니면 전체 조회 페이지로?
-    } catch (error) {
-        console.error('Failed to register campaign:', error);
-        alert('캠페인 등록에 실패했습니다.'); // 모달창으로 변경하기
-    } 
-};
-
-  const handleModalSubmit = (formData) => {
-    registerCampaignTemplate();
+  const handleModalSubmit = () => {
+    showRegisterModal.value = false;
     fetchCampaignTemplates();
   };
   
