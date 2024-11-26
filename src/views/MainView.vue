@@ -173,12 +173,13 @@ const sales = ref({
 .dashboard-container {
   display: flex;
   flex-direction: column;
- height: 70vh;
+  height: 70vh;
   background: #f8f9fa;
   font-family: 'Noto Sans KR', sans-serif;
   color: #333;
   padding-top: 70px;
   padding-left: 20px;
+  padding-right: 20px;
 }
 
 /* 섹션 컨테이너 */
