@@ -1,6 +1,12 @@
 <template>
   <div class="clientvoc-app-container">
     <ClientHeader />
+      <InactivityModal
+        v-if="showActivityModal"
+        :show="showActivityModal"
+        @continue="closeActivityModal"
+        @logout="activityLogout"
+      />
 
     <!-- 강의 상세 섹션 -->
     <div class="lecture-detail-header">
@@ -108,6 +114,10 @@
 import ClientHeader from "@/components/client/ClientHeader.vue";
 import Android from "@/assets/icons/Android.svg";
 import { useRouter } from 'vue-router';
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 const router = useRouter();
 
 // 페이지 이동 함수
