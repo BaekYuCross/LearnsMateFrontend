@@ -90,12 +90,9 @@
 
   const fetchCampaigns = async () => {
     try {
-      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
       const response = await axios.get('http://localhost:5000/campaign/campaigns',{
       method: 'GET',
-      headers: {
-        Authorization: token,
-        }
+      withCredentials: true,
       });
       campaigns.value = response.data;
       console.log(campaigns.value);
@@ -146,13 +143,12 @@ const handleSearch = async (preparedFilters) => {
   lastFilterData.value = preparedFilters;
   try {
     console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const response = await axios.post(
       'http://localhost:5000/campaign/filter',
       camelToSnake(preparedFilters),
       {
+        withCredentials: true,
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
         params: {
@@ -199,13 +195,12 @@ const navigateTo = () => {
 
 const handleExcelDownload = async() => {
   try{
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const config = {
       method: 'POST',
+      withCredentials: true,
       url: 'http://localhost:5000/campaign/excel/download/campaigns',
       responseType: 'blob',
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };
