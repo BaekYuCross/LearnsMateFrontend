@@ -1,6 +1,12 @@
 <template>
   <div class="clientmain-app-container">
     <ClientHeader />
+    <InactivityModal
+      v-if="showActivityModal"
+      :show="showActivityModal"
+      @continue="closeActivityModal"
+      @logout="activityLogout"
+    />
     <div class="clientmain-banner-container">
       <img src="@/assets/icons/beyondsw.svg" alt="배너" class="clientmain-banner" />
     </div>
@@ -32,8 +38,15 @@
 <script setup>
 import ClientHeader from "@/components/client/ClientHeader.vue";
 import { useRouter } from 'vue-router';
-
+import { watch } from "vue";
+import InactivityModal from '@/components/client/InactivityModal.vue';
+import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1/12);
 const router = useRouter(); 
+
+watch(showActivityModal, (newVal) => {
+  console.log('Modal visibility changed:', newVal);
+});
 
 const goToLearnsMate = () => {
   router.push('/client-addcoupon'); 
