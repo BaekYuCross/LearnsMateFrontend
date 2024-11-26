@@ -21,7 +21,6 @@ export function useActivityMonitor(timeoutMinutes = 1/12) {
    'scroll', 'touchstart', 'click', 'keypress'
  ];
 
-    // 모달 표시
   const openActivityModal = () => {
     showActivityModal.value = true;
     // 5분 후 자동 로그아웃

@@ -115,7 +115,7 @@ import ClientHeader from "@/components/client/ClientHeader.vue";
 import Android from "@/assets/icons/Android.svg";
 import { useRouter } from 'vue-router';
 import InactivityModal from '@/components/client/InactivityModal.vue';
-import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+import { useActivityMonitor } from "@/composables/useActivityMonitor";
 
 const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 const router = useRouter();

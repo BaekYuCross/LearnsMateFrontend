@@ -100,7 +100,7 @@
   import ClientAddCouponModal from "@/components/client/clientlecture/ClientAddCouponModal.vue";
   import { ref, computed, onMounted } from "vue";
   import InactivityModal from '@/components/client/InactivityModal.vue';
-  import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+  import { useActivityMonitor } from "@/composables/useActivityMonitor";
   
   // 비활성 모니터링 관련
   const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1);
