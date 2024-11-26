@@ -12,28 +12,31 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+   import { ref, defineProps, defineEmits } from 'vue';
   
-  // 상태 관리
-  const isModalOpen = ref(true);
-  const modalTitle = ref('삭제하시겠습니까?'); // 모달의 제목을 동적으로 설정
-  
-  // 모달 닫기
-  const closeModal = () => {
-    isModalOpen.value = false;
-  };
-  
-  // "예" 버튼 클릭 시 동작
-  const confirmAction = () => {
-    //참고해서 부모에서 구현 하세요 알아서 화이팅 ㅎㅎ 하투
-    closeModal();
-  };
-  
-  // "아니오" 버튼 클릭 시 동작
-  const cancelAction = () => {
-     //참고해서 부모에서 구현 하세요 알아서 화이팅 ㅎㅎ 하투
-    closeModal();
-  };
+    // 상태 관리
+    const isModalOpen = ref(true);
+    const modalTitle = ref('취소하시겠습니까?'); // 모달의 제목을 동적으로 설정
+
+    defineProps({
+      modalTitle: String, // 모달 제목
+    });
+
+    const emit = defineEmits(['confirm', 'cancel']);
+    
+    // 모달 닫기
+    const closeModal = () => {
+      isModalOpen.value = false;
+    };
+    
+    // "예" 버튼 클릭 시 동작
+    const confirmAction = () => {
+      emit('confirm'); // "예" 버튼 클릭 시 이벤트 전달
+    };
+
+    const cancelAction = () => {
+      emit('cancel'); // "아니오" 버튼 클릭 시 이벤트 전달
+    };
   </script>
   
   <style lang="scss" scoped>
