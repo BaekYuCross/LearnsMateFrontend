@@ -188,7 +188,9 @@ import '@/assets/css/voc/VOCView.css'
 import VocAiModal from "@/components/voc/VocAiModal.vue";
 import VOCRegisterModule from '@/components/voc/VOCRegisterModule.vue';
 import VOCEditModule from '@/components/voc/VOCEditModule.vue'
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 const isRegisterModalOpen = ref(false);
@@ -419,12 +421,17 @@ const submitRegisterAnswer = async () => {
       `http://localhost:5000/voc-answer/register`,
       {
         voc_answer_content: editAnswerContent.value,
+        admin_code: loginState.adminCode,
         voc_code: selectedVOC.value.voc_code,
       }
     );
-
-    selectedVOC.value.voc_answer_code = response.data.vocAnswerCode;
-    selectedVOC.value.voc_answer_content = response.data.vocAnswerContent;
+    const vocResponse = await axios.get(`http://localhost:5000/voc/${selectedVOC.value.voc_code}`);
+    const updatedVOC = vocResponse.data;
+    selectedVOC.value = updatedVOC;
+    const vocIndex = vocList.value.findIndex(voc => voc.voc_code === updatedVOC.voc_code);
+    if (vocIndex !== -1) {
+      vocList.value[vocIndex] = updatedVOC;
+    }
 
     closeRegisterModal();
     isEditingAnswer.value = false;
@@ -479,8 +486,11 @@ const closeAiModal = () => {
   document.body.style.overflow = '';
 };
 
-onMounted(() => {
+onMounted(async () => {
   fetchVOCList()
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); 
+  }
 })
 
 const displayedPages = computed(() => {
