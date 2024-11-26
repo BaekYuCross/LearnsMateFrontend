@@ -26,7 +26,8 @@
             <div
               class="board-row"
               v-for="(campaignTemplate, index) in paginatedCampaignTemplates"
-              :key="campaignTemplate.campaignCode"
+              :key="campaignTemplate.campaign_template_code"
+              @click="showCampaignTemplateModal(campaignTemplate.campaign_template_code)"
             >
               <div class="board-row-number">{{ campaignTemplate.campaign_template_code }}</div>
               <div class="board-row-title">{{ campaignTemplate.campaign_template_title }}</div>
@@ -56,24 +57,28 @@
         </div>
       </div>
     </div>
-    <campaignTemplateRegisterModal 
-    v-if="showModal"
-    @close="handleModalClose"
-    @submit="handleModalSubmit"
-  />
+    <CampaignTemplateRegisterModal 
+      v-if="showRegisterModal"
+      @close="handleRegisterModalClose"
+      @submit="handleModalSubmit"
+    />
+    <CampaignTemplateGetModal
+      v-if="showGetModal"
+      :campaignTemplateCode="selectedCampaignTemplate"
+      @close="handleGetModalClose"
+    />
   </template>
   
   
   <script setup>
-  import { ref, computed, onMounted  } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CampaignTemplateFilter from '@/components/marketing/CampaignTemplateFilter.vue';
-  import campaignTemplateRegisterModal from '@/components/marketing/campaignTemplateRegisterModal.vue';
+  import CampaignTemplateGetModal from '@/components/marketing/CampaignTemplateGetModal.vue';
+  import CampaignTemplateRegisterModal from '@/components/marketing/campaignTemplateRegisterModal.vue';
   
   const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ'; 
-  const router = useRouter(); 
   
   const campaignTemplates = ref([]);
 
@@ -95,7 +100,9 @@
     }
   };
 
-  const showModal = ref(false);
+  const showRegisterModal = ref(false);
+  const showGetModal = ref(false);
+  const selectedCampaignTemplate = ref(null);
   
   const currentPage = ref(1);
   const pageSize = 15;
@@ -105,7 +112,6 @@
   const paginatedCampaignTemplates = computed(() =>
     campaignTemplates.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
   );
-  
   const changePage = (page) => {
     if (page > 0 && page <= totalPages.value) {
       currentPage.value = page;
@@ -129,14 +135,25 @@
   };
   
   const clickRegister = () => {
-    showModal.value = true;
+    showRegisterModal.value = true;
   };
 
 
-  const handleModalClose = () => {
-    showModal.value = false;
-    showCouponSelectModal.value = false;
+  const handleRegisterModalClose = () => {
+    showRegisterModal.value = false;
   };
+
+  const showCampaignTemplateModal = (template) => {
+    console.log("캠페인템플릿코드: ",template);
+    selectedCampaignTemplate.value = template;
+    showGetModal.value = true;
+  };
+
+  const handleGetModalClose = () => {
+    selectedCampaignTemplate.value = null;
+    showGetModal.value = false; 
+  };
+
 
   const handleSearch = async (preparedFilters) => {
     isFiltered.value = true;
@@ -190,7 +207,7 @@
         };
 
     try {
-        await post('/https://learnsmate.site/campaign-template/register', payload);
+        await post('/https://learnsmate.site/campaign-template/register', camelToSnake(payload));
         alert('캠페인이 등록되었습니다.'); // 모달창으로 변경하기
         window.location.href = '/'; // 해당 캠페인 조회 페이지로? 아니면 전체 조회 페이지로?
     } catch (error) {
@@ -199,10 +216,10 @@
     } 
 };
 
-    const handleModalSubmit = (formData) => {
-      registerCampaignTemplate();
-      fetchCampaignTemplates();
-    };
+  const handleModalSubmit = (formData) => {
+    registerCampaignTemplate();
+    fetchCampaignTemplates();
+  };
   
   onMounted(() => {
     fetchCampaignTemplates();

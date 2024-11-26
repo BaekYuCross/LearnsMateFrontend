@@ -1,42 +1,41 @@
 <template>
     <div class="modal-backdrop" v-if="isModalOpen">
       <div class="modal-container">
-        <button class="modal-close" @click="closeModal">×</button>
+        <button class="modal-close" @click="cancelAction">×</button>
         <h2 class="modal-title">{{ modalTitle }}</h2>
         <div class="modal-actions">
-          <button class="modal-button" @click="confirmAction">예</button>
-          <button class="modal-button" @click="cancelAction">아니오</button>
+          <button class="modal-button" @click="confirmAction">확인</button>
         </div>
       </div>
     </div>
   </template>
   
   <script setup>
-   import { ref, defineProps, defineEmits } from 'vue';
+  import { ref, defineProps, defineEmits } from 'vue';
   
-    // 상태 관리
-    const isModalOpen = ref(true);
-    const modalTitle = ref('취소하시겠습니까?'); // 모달의 제목을 동적으로 설정
+  // 상태 관리
+  const isModalOpen = ref(true);
+  const modalTitle = ref('성공적으로 수정되었습니다.'); // 모달의 제목을 동적으로 설정
 
-    defineProps({
-      modalTitle: String, // 모달 제목
-    });
+  defineProps({
+    modalTitle: String, // 모달 제목
+  });
 
-    const emit = defineEmits(['confirm', 'cancel']);
-    
-    // 모달 닫기
-    const closeModal = () => {
-      isModalOpen.value = false;
-    };
-    
-    // "예" 버튼 클릭 시 동작
-    const confirmAction = () => {
-      emit('confirm'); // "예" 버튼 클릭 시 이벤트 전달
-    };
+  const emit = defineEmits(['confirm', 'cancel']);
+  
+  // 모달 닫기
+  const closeModal = () => {
+    isModalOpen.value = false;
+  };
+  
+  // "예" 버튼 클릭 시 동작
+  const confirmAction = () => {
+    emit('confirm'); // "예" 버튼 클릭 시 이벤트 전달
+  };
 
-    const cancelAction = () => {
-      emit('cancel'); // "아니오" 버튼 클릭 시 이벤트 전달
-    };
+  const cancelAction = () => {
+    emit('cancel'); // "아니오" 버튼 클릭 시 이벤트 전달
+  };
   </script>
   
   <style lang="scss" scoped>
