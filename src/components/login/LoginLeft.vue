@@ -11,77 +11,59 @@
     </form>
   </div>
 </template>
-
 <script setup>
-import axios from 'axios';
-import { RouterView, useRoute, useRouter } from 'vue-router';
-import { jwtDecode } from 'jwt-decode';
-import { ref } from 'vue';
 import { useLoginState } from '@/stores/loginState';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
-// 폼 데이터
+const loginState = useLoginState(); // Pinia 상태
+const router = useRouter(); // Vue Router 사용
+
 const formData = ref({
   adminCode: '',
-  adminPassword: ''
+  adminPassword: '',
 });
 
-// 에러 메시지 관리
-const errorMessage = ref('');
-const loginState = useLoginState(); // 로그인 상태 관리 Store
-
-// 로그인 함수
 const loginUser = async () => {
-  // 필수 입력 확인
   if (!formData.value.adminCode || !formData.value.adminPassword) {
-    alert("사번과 비밀번호를 입력해주세요.");
+    alert('사번과 비밀번호를 입력해주세요.');
     return;
   }
 
   try {
-    const response = await axios.post('http://localhost:5000/users/login', {
-      admin_code: formData.value.adminCode,
-      admin_password: formData.value.adminPassword
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await axios.post(
+      'http://localhost:5000/users/login',
+      {
+        admin_code: formData.value.adminCode,
+        admin_password: formData.value.adminPassword,
+      },
+      {
+        withCredentials: true, // 쿠키 포함
+        headers: { 'Content-Type': 'application/json' },
       }
-    });
+    );
 
-    console.log('HTTP 응답 상태 코드:', response.status);
-    console.log('전체 응답 데이터:', response);
+    console.log('로그인 성공:', response);
 
-    // 응답 헤더에서 토큰 가져오기
-    const token = response.headers.authorization;
-    if (token) {
-      // 토큰 저장
-      localStorage.setItem('token', token);
+    // 로그인 상태 확인 (쿠키 기반)
+    await loginState.fetchLoginState();
 
-      // JWT 디코딩
-      const decodedToken = jwtDecode(token);
-      console.log('Decoded JWT Token:', decodedToken);
-
-      // 로그인 상태 업데이트
-      loginState.isLoggedIn = true;
-      loginState.adminName = decodedToken.name; // JWT에서 이름 추출하여 상태 설정
-
-      // 성공 메시지
-      alert(`${decodedToken.name}님, 환영합니다.`);
-
-      // 메인 페이지로 이동
-      window.location.href = '/';
-    } else {
-      errorMessage.value = '인증 토큰이 없습니다. 로그인 실패';
-      alert("아이디와 비밀번호를 확인해주세요.");
-    }
+    alert(`${loginState.adminName}님, 환영합니다.`);
+    router.push('/'); 
   } catch (error) {
-    console.error('로그인 중 오류 발생:', error);
-    errorMessage.value = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
-    alert(errorMessage.value);
+    console.error('로그인 실패:', error);
+    alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
   }
 };
+
+// 앱 로드 시 로그인 상태 확인
+onMounted(async () => {
+  await loginState.fetchLoginState(); // 쿠키 기반 인증 정보 확인
+});
+
 </script>
 
-  
   
   <style scoped>
   .login-left {
