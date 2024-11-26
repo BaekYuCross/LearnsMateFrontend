@@ -3,6 +3,7 @@
       <ClientHeader />
       <InactivityModal
         v-if="showActivityModal"
+        :show="showActivityModal"
         @continue="closeActivityModal"
         @logout="activityLogout"
       />
@@ -127,7 +128,7 @@ import { ref, computed } from "vue";
 import InactivityModal from '@/components/client/InactivityModal.vue';
 import { useActivityMonitor } from '@/components/client/useActivityMonitor';
 
-const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1/12);
 
 const router = useRouter();
 

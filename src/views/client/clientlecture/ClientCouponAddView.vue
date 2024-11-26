@@ -3,6 +3,7 @@
       <ClientHeader />
       <InactivityModal
         v-if="showActivityModal"
+        :show="showActivityModal"
         @continue="closeActivityModal"
         @logout="activityLogout"
       />
@@ -102,7 +103,7 @@
   import { useActivityMonitor } from '@/components/client/useActivityMonitor';
   
   // 비활성 모니터링 관련
-  const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
+  const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1);
   
   const menus = [
     { id: 1, name: "강의 관리", link: "#", active: false },

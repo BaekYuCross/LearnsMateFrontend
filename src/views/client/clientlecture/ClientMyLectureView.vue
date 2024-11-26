@@ -3,6 +3,7 @@
       <ClientHeader />
       <InactivityModal
         v-if="showActivityModal"
+        :show="showActivityModal"
         @continue="closeActivityModal"
         @logout="activityLogout"
       />

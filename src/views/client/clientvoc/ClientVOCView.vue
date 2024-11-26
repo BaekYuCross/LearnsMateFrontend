@@ -2,10 +2,11 @@
   <div class="clientvoc-app-container">
     <ClientHeader />
     <InactivityModal
-        v-if="showActivityModal"
-        @continue="closeActivityModal"
-        @logout="activityLogout"
-      />
+      v-if="showActivityModal"
+      :show="showActivityModal"
+      @continue="closeActivityModal"
+      @logout="activityLogout"
+    />
     <div class="clientvoc-header">
       <div class="clientvoc-header-row">
         <div class="clientvoc-text">

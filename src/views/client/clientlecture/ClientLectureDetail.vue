@@ -1,8 +1,9 @@
 <template>
   <div class="clientvoc-app-container">
     <ClientHeader />
-    <InactivityModal
+      <InactivityModal
         v-if="showActivityModal"
+        :show="showActivityModal"
         @continue="closeActivityModal"
         @logout="activityLogout"
       />
