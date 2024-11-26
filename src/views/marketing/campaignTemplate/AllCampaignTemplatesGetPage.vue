@@ -10,7 +10,7 @@
           <div class="campaigntemplate-count">전체 템플릿 <span class="campaigntemplate-length">{{ campaignTemplates.length }}</span>개</div>
           <div class="campaigntemplate-button-group">
             <button class="campaigntemplate-register-button" @click="clickRegister">템플릿 등록</button>
-            <button class="campaigntemplate-excel-button"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
+            <button class="campaigntemplate-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
           </div>
         </div>
         <div class="board-container">
@@ -133,6 +133,56 @@
   const clickRegister = () => {
     showRegisterModal.value = true;
   };
+
+  const handleExcelDownload = async() => {
+    try{
+      const config = {
+        method: 'POST',
+        withCredentials: true,
+        url: 'http://localhost:5000/campaign-template/excel/download/campaign-templates',
+        responseType: 'blob',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+
+      if (isFiltered.value && lastFilterData.value) {
+        config.data = lastFilterData.value;
+        console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+      }
+      
+      const response = await axios(config);
+      
+      // 에러 응답 체크
+      if (response.data instanceof Blob) {
+        const isJson = response.data.type === 'application/json';
+        if (isJson) {
+          const textData = await response.data.text();
+          console.error('Server error:', textData);
+          throw new Error(textData);
+        }
+      }
+      
+      // 파일 다운로드
+      const blob = new Blob([response.data], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+
+      const now = new Date();
+      const fileName = `campaign_template_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+      
+      saveAs(blob, fileName);
+    } catch (error) {
+      console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+      if (error.response) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          console.error('상세 에러:', reader.result);
+        };
+        reader.readAsText(error.response.data);
+      }
+    }
+  }
 
 
   const handleRegisterModalClose = () => {

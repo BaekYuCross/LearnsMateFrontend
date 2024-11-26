@@ -95,6 +95,18 @@ th, td {
   font-size: 11px;
 }
 
+.table-container th,
+.table-container td {
+  max-width: 300px; 
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  font-size: 11px;
+}
+
 th {
   font-size: 13px;
 }

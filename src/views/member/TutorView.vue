@@ -11,7 +11,7 @@
       <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
         <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-header-container">
-            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="tutor-button-group">
               <button class="tutor-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
@@ -142,18 +142,19 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const tutorDetail = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
+
+const formatCurrency = (value) => {
+  return value.toLocaleString();
+};
 
 // 전체 강사 목록
 const fetchTutors = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/tutors', {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     
@@ -172,19 +173,16 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
 
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor', lastFilterData.value, 
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/tutor', lastFilterData.value, {
+      withCredentials: true, 
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     tutors.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -200,8 +198,8 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/tutor',
       responseType: 'blob',
+      withCredentials: true, 
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };
@@ -253,27 +251,22 @@ const handleReset = () => {
   fetchTutors();
 };
 
-// 페이지 변경
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor',
-      camelToSnake(lastFilterData.value),
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/tutor',lastFilterData.value, {
+      withCredentials: true,   
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     tutors.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -319,11 +312,7 @@ const showDetail = async (tutor) => {
   } else {
     selectedTutor.value = tutor;
     try {
-      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
     } catch (error) {
       console.error('Failed to load tutor detail:', error);
