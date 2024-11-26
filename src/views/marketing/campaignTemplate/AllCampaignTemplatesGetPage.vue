@@ -26,7 +26,7 @@
             <div
               class="board-row"
               v-for="(campaignTemplate, index) in paginatedCampaignTemplates"
-              :key="campaignTemplate.campaignTemplateCode"
+              :key="campaignTemplate.campaign_template_code"
               @click="showCampaignTemplateModal(campaignTemplate.campaign_template_code)"
             >
               <div class="board-row-number">{{ campaignTemplate.campaign_template_code }}</div>
@@ -112,7 +112,6 @@
   const paginatedCampaignTemplates = computed(() =>
     campaignTemplates.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
   );
-  
   const changePage = (page) => {
     if (page > 0 && page <= totalPages.value) {
       currentPage.value = page;
@@ -208,7 +207,7 @@
         };
 
     try {
-        await post('/https://learnsmate.site/campaign-template/register', payload);
+        await post('/https://learnsmate.site/campaign-template/register', camelToSnake(payload));
         alert('캠페인이 등록되었습니다.'); // 모달창으로 변경하기
         window.location.href = '/'; // 해당 캠페인 조회 페이지로? 아니면 전체 조회 페이지로?
     } catch (error) {
