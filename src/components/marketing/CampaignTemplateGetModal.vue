@@ -35,21 +35,36 @@
       <div class="modal-footer">
         <button v-if="!isEditMode" class="submit-button" @click="handleEdit">수정</button>
         <button v-if="isEditMode" class="submit-button" @click="saveChanges">저장</button>
-        <button calss="delete-button" @click="hnadleDelete">삭제</button>
+        <button v-if="!isEditMode" class="delete-button" @click="handleDelete">삭제</button>
+        <button v-if="isEditMode" class="cancel-button" @click="cancelEdit">취소</button>
       </div>
     </div>
   </div>
+  <DeleteModule
+      v-if="isDeleteModalOpen"
+      modalTitle="캠페인 템플릿을 삭제하시겠습니까?"
+      @confirm="deleteCampaignTemplate"
+      @cancel="cancelDelete"
+    />
+    <ConfirmModule
+      v-if="isConfirmModalOpen"
+      modalTitle="성공적으로 수정되었습니다."
+      @confirm="successEdit"
+      @cancel="closeModal"
+    />
 </template>
 
 <script setup>
 import { ref, onMounted, defineEmits, defineProps } from 'vue';
 import axios from 'axios';
+import DeleteModule from '../modules/DeleteModule.vue';
+import ConfirmModule from '../modules/ConfirmModule.vue';
 
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ'; 
 
 const closeModal = () => {
-isOpen.value = false;
-emit('close');
+  isOpen.value = false;
+  emit('close');
 };
 
 const props = defineProps({
@@ -63,6 +78,8 @@ const emit = defineEmits(['close']);
 
 const isOpen = ref(true);
 const isEditMode = ref(false);
+const isDeleteModalOpen = ref(false);
+const isConfirmModalOpen = ref(false);
 
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -101,19 +118,24 @@ console.log('템플릿 수정 모드');
   isEditMode.value = true;
 };
 
+const cancelEdit = () => {
+  isEditMode.value = false;
+};
+
 const saveChanges = async () => {
   const payload = {
         campaignTemplateTitle: campaignTemplate.value.campaign_template_title,
         campaignTemplateContents: campaignTemplate.value.campaign_template_contents,
-        adminName: campaignTemplate.value.admin_name,
+        adminName: campaignTemplate.value.admin_name, 
     };
     console.log("요청한 수정 정보: ", payload);
   try {
-    const response = await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
+      await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
       headers: {
         Authorization: token,
       }
     });
+    isConfirmModalOpen.value = true;
     isEditMode.value = false;
     fetchCampaignTemplate();
   } catch (error) {
@@ -121,11 +143,35 @@ const saveChanges = async () => {
   }
 };
 
-const handleDelete = () => {
-console.log('템플릿 삭제 요청');
-// 삭제 로직 구현
+const handleDelete = async () => {
+  isDeleteModalOpen.value = true;
 };
 
+const deleteCampaignTemplate = async () => {
+  console.log('템플릿 삭제 요청');
+ try {
+  await axios.patch(`http://localhost:5000/campaign-template/delete/${props.campaignTemplateCode}`,{
+    headers: {
+      Authorization: token,
+    }
+  });
+  fetchCampaignTemplate();
+  isDeleteModalOpen.value = false;
+  closeModal();
+ } catch (error) {
+  console.error("캠페인 템플릿 삭제 실패:",error);
+ }
+};
+
+const cancelDelete = () => {
+  isDeleteModalOpen.value = false;
+    return;
+  };
+
+  const successEdit = () => {
+    isConfirmModalOpen.value = false;
+    return;
+  };
 
 </script>
 
@@ -241,6 +287,7 @@ padding: 20px;
 border-top: 1px solid #eee;
 }
 
+.delete-button,
 .cancel-button,
 .submit-button {
 padding: 8px 30px;
@@ -249,6 +296,8 @@ font-size: 14px;
 cursor: pointer;
 }
 
+.delete-button,
+.cancel-button,
 .submit-button {
 background-color: #005950;
 border: none;
