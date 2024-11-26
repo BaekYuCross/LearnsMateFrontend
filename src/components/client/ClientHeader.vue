@@ -43,7 +43,7 @@ const handleLogout = async () => {
 
     // 로그아웃 요청
     await axios.post('http://localhost:5000/client/logout', {
-      loginHistoryCode: clientInfo.login_history_code,
+      loginHistoryCode: clientInfo.loginHistoryCode,
     });
 
     // localStorage 클리어
