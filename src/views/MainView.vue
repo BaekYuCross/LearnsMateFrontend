@@ -175,7 +175,7 @@ const sales = ref({
   flex-direction: column;
   height: 70vh;
   background: #f8f9fa;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: 'Pretendard-Light';
   color: #333;
   padding-top: 70px;
   padding-left: 20px;
@@ -198,13 +198,7 @@ const sales = ref({
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   flex: 1;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* 카드 헤더 */
@@ -246,7 +240,6 @@ const sales = ref({
   font-size: 14px;
   font-weight: bold;
   text-decoration: none;
-  transition: color 0.3s ease;
 }
 
 .more-link:hover {
@@ -307,32 +300,4 @@ const sales = ref({
   color: #333;
 }
 
-/* 애니메이션 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card {
-  animation: fadeIn 0.6s ease-in-out;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .top-section,
-  .center-section,
-  .bottom-section {
-    flex-direction: column;
-  }
-
-  .card {
-    margin-bottom: 20px;
-  }
-}
 </style>
