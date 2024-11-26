@@ -74,6 +74,7 @@ const goToLearnsBuddy = (path) => {
 
 const Logout = async () => {
   await loginState.logout();
+  alert('로그아웃되었습니다.');
   router.push('/login');
 };
 
