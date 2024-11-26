@@ -44,8 +44,23 @@ watch(route, () => {
 </script>
 
 <style>
-/* 초기 상태에서 AppHeader 숨김 */
 div[style*="display: none"] {
   display: none !important;
+}
+
+.v-application {
+  font-family: 'Pretendard-Regular', sans-serif !important;
+}
+
+@font-face {
+  font-family:'Pretendard-Regular';
+  src: url('assets/fonts/Pretendard-Regular.otf') format('truetype');
+  font-weight: 400;
+}
+
+@font-face {
+  font-family:'Pretendard-Light';
+  src: url('assets/fonts/Pretendard-Light.otf') format('truetype');
+  font-weight: 400;
 }
 </style>

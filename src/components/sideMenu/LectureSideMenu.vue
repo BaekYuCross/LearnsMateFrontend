@@ -37,8 +37,8 @@
         {
         name: '강의',
         submenus: [
-            { name: '결제 내역', path: '/lecture' },
-            { name: '전체 강의', path: '/lectures' },
+            { name: '전체 강의', path: '/lecture' },
+            { name: '결제 내역', path: '/payment' },
         ],
         },     
     ]);
@@ -73,7 +73,7 @@
 
     .menu-title {
         color: #ffffff;
-        font-family: "Malgun Gothic";
+        font-family:'Pretendard-Regular';
         font-size: 15px;
         font-weight: bold;
         padding: 5px 0;
@@ -96,7 +96,7 @@
     .submenu-item {
         color: #ffffff;
         cursor: pointer;
-        font-family: "Malgun Gothic";
+        font-family:'Pretendard-Regular';
         font-size: 13px;
         padding: 5px 0px;
         text-align: left;

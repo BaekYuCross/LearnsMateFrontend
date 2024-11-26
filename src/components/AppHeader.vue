@@ -72,6 +72,7 @@ const goToLearnsBuddy = (path) => {
   
   <style scoped>
   .header-container {
+    font-family:'Pretendard-Regular';
     width: 100%;
     height: 50px;
     background-color: #ffffff;
@@ -111,9 +112,9 @@ const goToLearnsBuddy = (path) => {
   }
   
   .menu-item {
+    font-family:'Pretendard-Regular';
     color: #000000;
     cursor: pointer;
-    font-family: "Malgun Gothic";
     font-size: 16px;
     white-space: nowrap;
     padding-left: 40px;

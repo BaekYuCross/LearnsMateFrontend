@@ -38,7 +38,6 @@
         name: 'VOC',
         submenus: [
             { name: 'VOC', path: '/voc' },
-            { name: 'VOC AI분석 & 통계', path: '/voc-analysis' },
         ],
         },     
     ]);
@@ -51,8 +50,8 @@
 </script>
 
 <style scoped>
-
     .side-menu-container {
+        font-family:'Pretendard-Regular';
         width: 160px;
         height: 100%;
         background-color: #005950;
@@ -73,7 +72,7 @@
 
     .menu-title {
         color: #ffffff;
-        font-family: "Malgun Gothic";
+        font-family:'Pretendard-Regular';
         font-size: 15px;
         font-weight: bold;
         padding: 5px 0;
@@ -96,7 +95,7 @@
     .submenu-item {
         color: #ffffff;
         cursor: pointer;
-        font-family: "Malgun Gothic";
+        font-family:'Pretendard-Regular';
         font-size: 13px;
         padding: 5px 0px;
         text-align: left;
