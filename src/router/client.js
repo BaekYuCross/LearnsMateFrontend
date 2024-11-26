@@ -8,7 +8,7 @@ const checkLoginAndTime = async () => {
    
     const loginTime = new Date(clientInfo.loginTime);
     const now = new Date();
-    const diffHours = (now - loginTime) / (100000000000000);
+    const diffHours = (now - loginTime) / (1000000000000000000);
    
     if (diffHours >= 6) {
         try {
