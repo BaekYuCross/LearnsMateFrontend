@@ -13,7 +13,7 @@
 </template>
 <script setup>
 import { useLoginState } from '@/stores/loginState';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
@@ -56,6 +56,12 @@ const loginUser = async () => {
     alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
   }
 };
+
+// 앱 로드 시 로그인 상태 확인
+onMounted(async () => {
+  await loginState.fetchLoginState(); // 쿠키 기반 인증 정보 확인
+});
+
 </script>
 
   
