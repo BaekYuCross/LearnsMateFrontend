@@ -179,11 +179,11 @@
               </span>
             </div>
             <div class="lecture-detail-item">
-              <span class="label">총 학생 수:</span>
+              <span class="label">총 학생 수</span>
               <span class="value">{{ selectedLecture.purchase_count }}</span>
             </div>
             <div class="lecture-detail-item">
-              <span class="label">구매 전환율:</span>
+              <span class="label">구매 전환율</span>
               <span class="value">{{ selectedLecture.purchase_conversion_rate }}%</span>
             </div>
             <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
@@ -270,7 +270,9 @@ import axios from 'axios'
 import { saveAs } from 'file-saver'
 import '@/assets/css/lecture/LectureView.css'
 import Chart from 'chart.js/auto'
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 const isMonthlyModalOpen = ref(false);
@@ -647,7 +649,10 @@ const closeMonthlyModal = () => {
   isMonthlyModalOpen.value = false;
 };
 
-onMounted(() => {
+onMounted(async () => {
   fetchLectureList();
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); 
+  }
 });
 </script>

@@ -123,9 +123,7 @@
   height: 570px;
   flex: 0.3;
   padding: 20px;
-  display: flex;
-  overflow-x: auto;
-  flex-direction: column;
+  overflow-y: auto;
 }
 
 .lecture-detail-header {
@@ -146,28 +144,25 @@
 .lecture-detail-content {
   display: flex;
   flex-direction: column;
-  padding-right: 10px;
+  gap: 10px;
 }
 
 .lecture-detail-item {
   display: flex;
-  flex-direction: column;
-  align-items: self-start;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
   font-size: 11px;
-  color: #444;
-  border-bottom: 1px dashed #ddd;
-  padding: 5px 0;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eaeaea;
 }
 
 .lecture-detail-item .label {
   font-weight: bold;
-  color: #555;
+  color: #666;
 }
 
 .lecture-detail-item .value {
-  text-align: right;
-  color: #666;
+  color: #333;
 }
 
 .close-button {

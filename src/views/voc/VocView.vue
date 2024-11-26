@@ -107,13 +107,13 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">답변 상태</span>
-              <span class="value" :class="getStatusClass(selectedVOC.voc_answer_status)">
+              <span class="value_voc_answer_status" :class="getStatusClass(selectedVOC.voc_answer_status)">
                 {{ selectedVOC.voc_answer_status ? '답변완료' : '미답변' }}
               </span>
             </div>
             <div class="voc-detail-item">
               <span class="label">만족도</span>
-              <span class="value" :class="getSatisfactionClass(selectedVOC.voc_answer_satisfaction)">
+              <span class="value_satisfaction" :class="getSatisfactionClass(selectedVOC.voc_answer_satisfaction)">
                 {{ selectedVOC.voc_answer_satisfaction || '-' }}
               </span>
             </div>
