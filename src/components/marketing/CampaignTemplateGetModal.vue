@@ -155,9 +155,9 @@ const deleteCampaignTemplate = async () => {
       Authorization: token,
     }
   });
-  fetchCampaignTemplate();
+  await fetchCampaignTemplate();
   isDeleteModalOpen.value = false;
-  closeModal();
+  window.location.href = '/marketing/campaign-template'; 
  } catch (error) {
   console.error("캠페인 템플릿 삭제 실패:",error);
  }
