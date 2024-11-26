@@ -15,8 +15,8 @@
             >
           </div>
           <div class="input-group">
-            <label>담당자</label>
-            <span>{{ adminName }}</span>
+            <label>담당자</label> 
+            <span>{{ loginState.adminName }}</span>
           </div>
           <div class="input-group content-group">
             <label>템플릿 내용</label>
@@ -42,16 +42,13 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
-import { jwtDecode } from 'jwt-decode'; 
+import { ref, defineEmits, onMounted } from 'vue'; 
 import axios from 'axios';
 import RegisterModule from '../modules/RegisterModule.vue';
+import { useLoginState } from '@/stores/loginState';
 const emit = defineEmits(['confirm', 'cancel']);
-const cancleModal = ref(false);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ'; 
-const adminName = jwtDecode(token).name;
-const adminCode = jwtDecode(token).sub;
 
+const loginState = useLoginState();
 
 const isOpen = ref(true);
 const isRegisterModalOpen = ref(false);
@@ -59,7 +56,7 @@ const isRegisterModalOpen = ref(false);
 const formData = ref({
   campaignTemplateTitle: '',
   campaignTemplateContents: '',
-  adminCode: adminCode,
+  adminCode: loginState.adminCode,
 });
 
 const   handleModalClose = () => {
@@ -81,7 +78,8 @@ const handleSubmit = async () => {
 
 const registerCampaignTemplate = async () => {
   try {
-    const response = await axios.post('http://localhost:5000/campaign-template/register', formData.value,{
+    await axios.post('http://localhost:5000/campaign-template/register', formData.value,{
+      withCredentials: true,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,6 +94,11 @@ const registerCampaignTemplate = async () => {
   closeModal();
 };
 
+onMounted(async () => {
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); // 로그인 상태 확인
+  }
+});
 </script>
 
 <style scoped>
