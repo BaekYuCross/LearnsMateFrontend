@@ -22,7 +22,7 @@
       <div class="icon-section">
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon"  @click="Logout">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
         <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
@@ -33,9 +33,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
 const router = useRouter();
 const route = useRoute();
+
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
@@ -68,6 +71,12 @@ const navigateTo = (path) => {
 const goToLearnsBuddy = (path) => {
   router.push('/client-main');
 };
+
+const Logout = async () => {
+  await loginState.logout();
+  router.push('/login');
+};
+
 </script>
   
   <style scoped>
