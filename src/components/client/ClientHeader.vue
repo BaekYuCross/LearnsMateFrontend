@@ -19,7 +19,7 @@
 
     <div class="clientheader-user-menu">
       <router-link to="/client-mylecture" class="clientheader-user-link">내 강의</router-link>
-      <router-link to="#" class="clientheader-user-link">로그아웃</router-link>
+      <a href="#" class="clientheader-user-link" @click.prevent="handleLogout">로그아웃</a>
       <div class="clientheader-user-icon">
         <img src="@/assets/icons/person.svg" alt="유저 아이콘"  @click="goToLogin"/>
       </div>
@@ -29,8 +29,34 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
+import axios from '@/plugins/axios';
 
 const router = useRouter();
+
+const handleLogout = async () => {
+  try {
+    const clientInfo = JSON.parse(localStorage.getItem('clientInfo'));
+    if (!clientInfo) {
+      router.push('/client-login');
+      return;
+    }
+
+    // 로그아웃 요청
+    await axios.post('http://localhost:5000/client/logout', {
+      loginHistoryCode: clientInfo.login_history_code,
+    });
+
+    // localStorage 클리어
+    localStorage.removeItem('clientInfo');
+    localStorage.removeItem('isAuthenticated');
+    
+    // 로그인 페이지로 이동
+    router.push('/client-login');
+  } catch (error) {
+    console.error('로그아웃 실패:', error);
+    alert('로그아웃 처리 중 오류가 발생했습니다.');
+  }
+};
 
 const goToLogin = (path) => {
   router.push('/client-login');
