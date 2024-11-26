@@ -7,7 +7,7 @@
           <div class="reserved-header-container">
             <div class="reserved-count">
               예비 {{ memberTypeText }} 블랙리스트 수 
-              <span class="reserved-count-number">{{ totalCount }}</span>명
+              <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
             </div>
           </div>
 
@@ -172,6 +172,10 @@ watch(
   }
 );
 
+const formatCurrency = (value) => {
+  return value.toLocaleString(); 
+};
+
 const resetData = () => {
   currentPage.value = 1;
   selectedReserved.value = null;
@@ -193,8 +197,6 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
 
 const groupedReports = computed(() => {
   const grouped = {};
@@ -218,12 +220,10 @@ const groupedReports = computed(() => {
 const fetchReservedList = async () => {
   try {
     const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved`, {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     
@@ -244,20 +244,16 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
-      lastFilterData.value,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,lastFilterData.value, {
+      withCredentials: true,  
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     reservedList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -298,12 +294,8 @@ const showDetail = async (blacklist) => {
   } else {
     selectedReserved.value = blacklist;
     try {
-      const response = await axios.get(
-        `http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, 
-        {
-          headers: {
-            Authorization: token,
-          },
+      const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, {
+          withCredentials: true
         }
       );
       console.log('Detail response:', response.data);
@@ -340,11 +332,9 @@ const closeConfirmModal = () => {
 const confirmRegister = async () => {
   try {
     await axios.post(
-      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,
-      { blackReason: blacklistReason.value },
-      {
+      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,{ blackReason: blacklistReason.value }, {
+        withCredentials: true,
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }

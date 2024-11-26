@@ -58,7 +58,6 @@
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     padding: 20px;
-    text-align: center;
     position: relative;
   }
   
@@ -73,22 +72,28 @@
   }
   
   .modal-title {
-    margin-top: 20px;
+    margin-top: 10px;
+    margin-bottom: 30px;
     font-size: 23px;
     color: #193325;
+    text-align: center;
   }
   
   .modal-content {
-    margin: 20px 0;
+    margin: 20px auto; 
+    width: 90%; 
   }
   
   .modal-textarea {
-    width: 90%;
+    width: 100%;
     height: 100px;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     resize: vertical;
+    margin: 0 auto;
+    display: block; 
+    outline: none;
   }
   
   .modal-actions {
