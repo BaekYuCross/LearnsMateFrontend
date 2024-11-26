@@ -11,26 +11,20 @@
           <input 
             type="text" 
             v-if="isEditMode"
-            v-model="campaignTemplate.campaignTemplateTitle"
+            v-model="campaignTemplate.campaign_template_title"
             placeholder="템플릿 제목을 입력하세요."
           >
           <span v-else class="detail-content content-multiline">{{ campaignTemplate.campaign_template_title }}</span>
         </div>
         <div class="input-group">
           <label>담당자</label>
-          <input 
-            type="text"
-            v-if="isEditMode" 
-            v-model="campaignTemplate.adminName"
-            placeholder="나중에 로그인한 직원 이름이 들어가용 ^^"
-          >
-          <span v-else class="detail-content content-multiline">{{ campaignTemplate.admin_name }}</span>
+          <span class="detail-content content-multiline">{{ campaignTemplate.admin_name }}</span>
         </div>
         <div class="input-group content-group">
           <label>템플릿 내용</label>
           <textarea
               v-if="isEditMode"
-              v-model="campaign.campaign_contents"
+              v-model="campaignTemplate.campaign_template_contents"
               class="detail-content-textarea"
               placeholder="캠페인 내용을 입력하세요"
               rows="10"
@@ -39,7 +33,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="submit-button" @click="handleEdit">수정</button>
+        <button v-if="!isEditMode" class="submit-button" @click="handleEdit">수정</button>
+        <button v-if="isEditMode" class="submit-button" @click="saveChanges">저장</button>
         <button calss="delete-button" @click="hnadleDelete">삭제</button>
       </div>
     </div>
@@ -67,6 +62,7 @@ campaignTemplateCode: {
 const emit = defineEmits(['close']);
 
 const isOpen = ref(true);
+const isEditMode = ref(false);
 
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -79,9 +75,9 @@ const camelToSnake = (obj) => {
 };
 
 const campaignTemplate = ref({
-campaignTemplateTitle: '',
-campaignTemplateContents: '',
-adminName: '',
+  campaign_template_title: '',
+  campaign_template_contents: '',
+  admin_name: '',
 });
 console.log("부모에서 넘어온 템플릿코드: ",props.campaignTemplateCode);
 const fetchCampaignTemplate = async () => {
@@ -100,9 +96,29 @@ try {
 
 onMounted(fetchCampaignTemplate);
 
-const handleEdit = () => {
-console.log('템플릿 수정 요청');
-// 수정 로직 구현
+const handleEdit = async () => {
+console.log('템플릿 수정 모드');
+  isEditMode.value = true;
+};
+
+const saveChanges = async () => {
+  const payload = {
+        campaignTemplateTitle: campaignTemplate.value.campaign_template_title,
+        campaignTemplateContents: campaignTemplate.value.campaign_template_contents,
+        adminName: campaignTemplate.value.admin_name,
+    };
+    console.log("요청한 수정 정보: ", payload);
+  try {
+    const response = await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
+      headers: {
+        Authorization: token,
+      }
+    });
+    isEditMode.value = false;
+    fetchCampaignTemplate();
+  } catch (error) {
+    console.error('캠페인 템플릿 수정 실패:', error);
+  }
 };
 
 const handleDelete = () => {
