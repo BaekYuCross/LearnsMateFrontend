@@ -77,9 +77,7 @@
   import CampaignTemplateFilter from '@/components/marketing/CampaignTemplateFilter.vue';
   import CampaignTemplateGetModal from '@/components/marketing/CampaignTemplateGetModal.vue';
   import CampaignTemplateRegisterModal from '@/components/marketing/campaignTemplateRegisterModal.vue';
-  
-  const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ'; 
-  
+
   const campaignTemplates = ref([]);
 
   const isFiltered = ref(false);
@@ -89,9 +87,7 @@
     try {
       const response = await axios.get('http://localhost:5000/campaign-template/list',{
       method: 'GET',
-      headers: {
-        Authorization: token,
-      }
+      withCredentials: true,
     });
       campaignTemplates.value = response.data;
       console.log(campaignTemplates.value);
@@ -163,8 +159,8 @@
         'http://localhost:5000/campaign-template/filter',
         camelToSnake(preparedFilters),
         {
+          withCredentials: true,
           headers: {
-            Authorization: token,
             'Content-Type': 'application/json',
           },
           params: {
