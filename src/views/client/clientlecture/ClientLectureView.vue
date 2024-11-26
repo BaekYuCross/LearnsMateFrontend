@@ -126,7 +126,7 @@ import Android from '@/assets/icons/Android.svg';
 import Full from '@/assets/icons/Full.svg';
 import { ref, computed } from "vue";
 import InactivityModal from '@/components/client/InactivityModal.vue';
-import { useActivityMonitor } from '@/components/client/useActivityMonitor';
+import { useActivityMonitor } from "@/composables/useActivityMonitor";
 
 const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1/12);
 
