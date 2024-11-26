@@ -101,7 +101,6 @@
   'rgba(201, 203, 207, 0.7)'   // 회색
 ];
   
-  const token = 'Bearer yourTokenHere'; // 실제 토큰으로 교체 필요
   const createChart = (data) => {
   if (chart) {
     chart.destroy();
@@ -175,15 +174,11 @@ const fetchCategoryRatio = async (useFilter = false) => {
         endDate: `${filter.value.endYear}-${filter.value.endMonth.toString().padStart(2, '0')}-31T23:59:59`
       };
       response = await axios.post('http://localhost:5000/member/category-ratio/filter', filterData, {
-        headers: {
-          Authorization: token
-        }
+        withCredentials: true, 
       });
     } else {
       response = await axios.get('http://localhost:5000/member/category-ratio', {
-        headers: {
-          Authorization: token
-        }
+        withCredentials: true, 
       });
     }
     createChart(response.data);

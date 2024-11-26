@@ -308,16 +308,15 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ1Mjc4MywiZXhwIjoxNzc1NjUyNzgzfQ.xLHlCXMO-7yPd_Gd1xb0sQy1SSU9O9buW0dx8zbWSIOQRAw6mTGc9p8_tJerr3tjIlI23Rd0_u6XPs-5prRhlg';
+
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize,
-      },
-      headers: {
-        Authorization: token,
       },
     });
 
@@ -334,20 +333,16 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/student',
-      lastFilterData.value,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize,
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
+      withCredentials: true, 
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -364,14 +359,10 @@ const showDetail = async (student) => {
     studentDetail.value = null;
   } else {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/member/student/${student.memberCode}`,
-        {
-          headers: { 
-            Authorization: token 
-          }
-        }
-      );
+      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
+        withCredentials: true,   
+      });
+
       selectedStudent.value = student;
       studentDetail.value = response.data;
       console.log("상세 정보:", response.data);
@@ -410,16 +401,12 @@ const handleFileUpload = async (event) => {
   formData.append('file', file);
 
   try {
-    await axios.post(
-      'http://localhost:5000/member/excel/upload/student',
-      formData,
-      {
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'multipart/form-data'
-        }
+    await axios.post('http://localhost:5000/member/excel/upload/student',formData, {
+      withCredentials: true,  
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
-    );
+    });
     
     // 업로드 성공 후 목록 새로고침
     await fetchStudents();
@@ -446,8 +433,8 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/student',
       responseType: 'blob',
+      withCredentials: true,
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };
@@ -521,19 +508,18 @@ const displayedPages = computed(() => {
 
 const getVocCategory = (categoryCode) => {
   const categories = {
-    1: '강의 관련',
-    2: '결제 관련',
-    3: '시스템 관련',
-    4: '기타'
-    // 실제 카테고리 코드에 맞게 수정해주세요
+    1: '결제 및 환불',
+    2: '계정 및 로그인',
+    3: '프로모션 및 쿠폰',
+    4: '시스템 기술적 문제',
+    5: '기타 건의사항',
   };
-  return categories[categoryCode] || '기타';
+  return categories[categoryCode];
 };
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
   
-  // 배열의 값이 [2024, 12, 1, 1, 1] 이런 형태라고 가정
   const [year, month, day, hour, minute] = dateArray;
   
   // 월과 일이 한자리수일 경우 앞에 0을 붙임

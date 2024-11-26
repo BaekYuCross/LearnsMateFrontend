@@ -155,9 +155,6 @@ const memberTypeText = computed(() => ({
 }[memberType.value]));
 const filterType = computed(() => memberType.value);
 
-
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ5NzkyOCwiZXhwIjoxNzc1Njk3OTI4fQ.iJX2dHA_lMbKIpHlX9xcFKrVUoB8Gr_cW1xMCcCdetS3T6rBAY2YHlJH3uarkP6NAXX-zbkSd7vAXkEQIYRG6A';
-
 watch(
   () => route.path,
   (newPath) => {
@@ -207,12 +204,10 @@ const groupedReports = computed(() => {
 const fetchBlacklists = async () => {
   try {
     const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}`, {
+      withCredentials: true,
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     console.log(response.data);
@@ -234,14 +229,13 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData,
-      {
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData, {
+        withCredentials: true,
         params: {
           page: currentPage.value - 1,
           size: pageSize
         },
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
@@ -261,8 +255,8 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: `http://localhost:5000/blacklist/excel/download/${memberType.value}`,
       responseType: 'blob',
+      withCredentials: true,
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };
@@ -322,14 +316,13 @@ const changePage = async (newPage) => {
   
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, 
-      {
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, {
+        withCredentials: true,
         params: {
           page: currentPage.value - 1,
           size: pageSize
         },
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
@@ -380,12 +373,13 @@ const showDetail = async (blacklist) => {
     selectedBlacklist.value = blacklist;
     try {
       const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/${blacklist.blackCode}`, {
+        withCredentials: true,
         headers: {
           Authorization: token,
         },
       });
       reportDetails.value = response.data;
-      console.log("상세내용ㅇ,ㅡㄴ", reportDetails.value);
+      console.log("상세내용은 ", reportDetails.value);
     } catch (error) {
       console.error('Failed to load report details:', error);
       reportDetails.value = [];
