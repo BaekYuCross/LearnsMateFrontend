@@ -75,11 +75,13 @@ const handleLogin = async () => {
       memberPassword: password.value
     });
 
-    localStorage.setItem('clientInfo', JSON.stringify(response.data));
-    localStorage.setItem('isAuthenticated', 'true');
+    const loginData = {
+      ...response.data,
+      loginTime: new Date().toISOString()
+    };
 
-    console.log('로그인 성공:', response.data);
-    console.log('로그인 성공:', JSON.stringify(response.data));
+    localStorage.setItem('clientInfo', JSON.stringify(loginData));
+    localStorage.setItem('isAuthenticated', 'true');
     
     router.push("/client-main");
   } catch (error) {
