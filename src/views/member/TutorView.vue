@@ -11,7 +11,7 @@
       <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
         <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-header-container">
-            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="tutor-button-group">
               <button class="tutor-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
@@ -142,6 +142,10 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const tutorDetail = ref(null);
+
+const formatCurrency = (value) => {
+  return value.toLocaleString();
+};
 
 // 전체 강사 목록
 const fetchTutors = async () => {
@@ -308,11 +312,7 @@ const showDetail = async (tutor) => {
   } else {
     selectedTutor.value = tutor;
     try {
-      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
     } catch (error) {
       console.error('Failed to load tutor detail:', error);

@@ -11,7 +11,7 @@
       <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
         <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
           <div class="blacklist-header-container">
-            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="blacklist-button-group">
               <button class="blacklist-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
@@ -45,7 +45,7 @@
                 <td>{{ blacklist.memberCode }}</td>
                 <td>{{ blacklist.memberName }}</td>
                 <td>{{ blacklist.memberEmail }}</td>
-                <td>{{ blacklist.blackReason }}</td>
+                <td :title="blacklist.blackReason">{{ blacklist.blackReason }}</td>
                 <td>{{ blacklist.createdAt }}</td>
                 <td>{{ blacklist.adminName }}</td>
               </tr>
@@ -162,6 +162,10 @@ watch(
     resetData();
   }
 );
+
+const formatCurrency = (value) => {
+  return value.toLocaleString(); 
+};
 
 const resetData = () => {
   currentPage.value = 1;
@@ -374,9 +378,6 @@ const showDetail = async (blacklist) => {
     try {
       const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/${blacklist.blackCode}`, {
         withCredentials: true,
-        headers: {
-          Authorization: token,
-        },
       });
       reportDetails.value = response.data;
       console.log("상세내용은 ", reportDetails.value);

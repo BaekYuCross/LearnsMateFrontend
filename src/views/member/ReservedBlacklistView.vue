@@ -7,7 +7,7 @@
           <div class="reserved-header-container">
             <div class="reserved-count">
               예비 {{ memberTypeText }} 블랙리스트 수 
-              <span class="reserved-count-number">{{ totalCount }}</span>명
+              <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
             </div>
           </div>
 
@@ -171,6 +171,10 @@ watch(
     resetData();
   }
 );
+
+const formatCurrency = (value) => {
+  return value.toLocaleString(); 
+};
 
 const resetData = () => {
   currentPage.value = 1;

@@ -11,7 +11,7 @@
       <div class="content-section" :class="{ 'with-detail': selectedStudent }">
         <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-header-container">
-            <div class="count">전체 학생 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
               
               <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
@@ -281,11 +281,10 @@
         </div>
       </div>
     </div>
-  <!-- 여기에 모달 컴포넌트 추가 -->
-  <CategoryRatioModal 
-      :is-open="showCategoryModal" 
-      @close="showCategoryModal = false" 
-    />
+    <CategoryRatioModal 
+        :is-open="showCategoryModal" 
+        @close="showCategoryModal = false" 
+      />
   </div>  
 </template>
 
@@ -307,7 +306,10 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ1Mjc4MywiZXhwIjoxNzc1NjUyNzgzfQ.xLHlCXMO-7yPd_Gd1xb0sQy1SSU9O9buW0dx8zbWSIOQRAw6mTGc9p8_tJerr3tjIlI23Rd0_u6XPs-5prRhlg';
+
+const formatCurrency = (value) => {
+  return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
+};
 
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
