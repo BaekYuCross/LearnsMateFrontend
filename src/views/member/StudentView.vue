@@ -13,7 +13,23 @@
           <div class="student-header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
-              
+              <div class="column-selector">
+                <button @click="toggleDropdown" class="dropdown-button">
+                  필요 컬럼 선택 ▼
+                </button>
+                <div v-show="isDropdownOpen" class="dropdown-menu">
+                  <div v-for="(label, key) in columns" :key="key" class="dropdown-item">
+                    <input 
+                      type="checkbox"   
+                      :value="key" 
+                      v-model="selectedColumns" 
+                      @change="updateSelectedColumns" 
+                      :id="key"
+                    />
+                    <label :for="key">{{ label }}</label>
+                  </div>
+                </div>
+              </div>
               <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
               <button class="excel-button" @click="$refs.fileInput.click()">
                 <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
@@ -31,16 +47,16 @@
             <thead>
               <tr>
                 <th>No</th>
-                <th>학생 코드</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>연락처</th>
-                <th>주소</th>
-                <th>나이</th>
-                <th>생년월일</th>
-                <th>계정상태</th>
-                <th>생성일</th>
-                <th>휴면상태</th>
+                <th v-if="selectedColumns.includes('memberCode')">학생 코드</th>
+                <th v-if="selectedColumns.includes('memberName')">이름</th>
+                <th v-if="selectedColumns.includes('memberEmail')">이메일</th>
+                <th v-if="selectedColumns.includes('memberPhone')">연락처</th>
+                <th v-if="selectedColumns.includes('memberAddress')">주소</th>
+                <th v-if="selectedColumns.includes('memberAge')">나이</th>
+                <th v-if="selectedColumns.includes('memberBirth')">생년월일</th>
+                <th v-if="selectedColumns.includes('memberFlag')">계정상태</th>
+                <th v-if="selectedColumns.includes('createdAt')">생성일</th>
+                <th v-if="selectedColumns.includes('memberDormantFlag')">휴면상태</th>
               </tr>
             </thead>
             <tbody>
@@ -52,16 +68,16 @@
                 :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
               >
                 <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ student.memberCode }}</td>
-                <td>{{ student.memberName }}</td>
-                <td>{{ student.memberEmail }}</td>
-                <td>{{ student.memberPhone }}</td>
-                <td>{{ student.memberAddress }}</td>
-                <td>{{ student.memberAge }}</td>
-                <td>{{ student.memberBirth }}</td>
-                <td>{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
-                <td>{{ student.createdAt }}</td>
-                <td>{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
+                <td v-if="selectedColumns.includes('memberCode')">{{ student.memberCode }}</td>
+                <td v-if="selectedColumns.includes('memberName')">{{ student.memberName }}</td>
+                <td v-if="selectedColumns.includes('memberEmail')">{{ student.memberEmail }}</td>
+                <td v-if="selectedColumns.includes('memberPhone')">{{ student.memberPhone }}</td>
+                <td v-if="selectedColumns.includes('memberAddress')">{{ student.memberAddress }}</td>
+                <td v-if="selectedColumns.includes('memberAge')">{{ student.memberAge }}</td>
+                <td v-if="selectedColumns.includes('memberBirth')">{{ student.memberBirth }}</td>
+                <td v-if="selectedColumns.includes('memberFlag')">{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
+                <td v-if="selectedColumns.includes('createdAt')">{{ student.createdAt }}</td>
+                <td v-if="selectedColumns.includes('memberDormantFlag')">{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
               </tr>
             </tbody>
           </table>
@@ -306,7 +322,29 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
+const isDropdownOpen = ref(false);
+const columns = ref({
+  memberCode: "학생 코드",
+  memberName: "이름",
+  memberEmail: "이메일",
+  memberPhone: "연락처",
+  memberAddress: "주소",
+  memberAge: "나이",
+  memberBirth: "생년월일",
+  memberFlag: "계정상태",
+  createdAt: "생성일",
+  memberDormantFlag: "휴면상태"
+});
+const selectedColumns = ref(Object.keys(columns.value));
 
+// 함수 추가
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
 const formatCurrency = (value) => {
   return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
 };
@@ -438,14 +476,13 @@ const handleExcelDownload = async() => {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json'
+      },
+      data: {
+        selectedColumns: selectedColumns.value,  // 선택된 컬럼 정보 추가
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {})
       }
     };
 
-    if (isFiltered.value && lastFilterData.value) {
-      config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
-    }
-    
     const response = await axios(config);
     
     // 에러 응답 체크
