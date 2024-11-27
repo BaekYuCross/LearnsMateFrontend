@@ -146,29 +146,21 @@
               @click="changePage(currentPage - 1)" 
               :disabled="currentPage === 1"
             >◀</button>
-            <button 
-              class="page-button" 
-              :class="{ active: currentPage === 1 }" 
-              @click="changePage(1)"
-            >1</button>
-            <span v-if="startPage > 2">...</span>
+            
             <template v-for="page in displayedPages" :key="page">
+              <span v-if="page === '...'" class="page-dots">...</span>
               <button 
-                v-if="page !== 1 && page !== totalPages" 
+                v-else
                 class="page-button" 
                 :class="{ active: currentPage === page }" 
                 @click="changePage(page)"
-              >{{ page }}</button>
+              >
+                {{ page }}
+              </button>
             </template>
-            <span v-if="endPage < totalPages - 1">...</span>
+            
             <button 
-              v-if="totalPages > 1" 
-              class="page-button" 
-              :class="{ active: currentPage === totalPages }" 
-              @click="changePage(totalPages)"
-            >{{ totalPages }}</button>
-            <button 
-              class="page-button next-button" 
+              class="page-button next-button"
               @click="changePage(currentPage + 1)" 
               :disabled="currentPage === totalPages"
             >▶</button>
@@ -270,40 +262,49 @@
   const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
   const currentPage = ref(1);
-const pageSize = 50;
+  const pageSize = ref(15); 
 
 // 페이지네이션된 사용자 목록 계산
 const paginatedTargetUsers = computed(() => {
   if (!campaign.value.members) return [];
-  const start = (currentPage.value - 1) * pageSize;
-  return campaign.value.members.slice(start, start + pageSize);
+  const start = (currentPage.value - 1) * pageSize.value;
+  return campaign.value.members.slice(start, start + pageSize.value);
 });
 
 // 전체 페이지 수 계산
 const totalPages = computed(() => {
   if (!campaign.value.members) return 1;
-  return Math.ceil(campaign.value.members.length / pageSize);
+  return Math.ceil(campaign.value.members.length / pageSize.value);
 });
+
 
 // 표시할 페이지 번호 계산
 const displayedPages = computed(() => {
-  let start = Math.max(currentPage.value - 2, 2);
-  let end = Math.min(start + 4, totalPages.value - 1);
+  const pages = [];
+  pages.push(1);
   
-  if (end === totalPages.value - 1) {
-    start = Math.max(end - 4, 2);
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
   }
   
-  if (start === 2) {
-    end = Math.min(6, totalPages.value - 1);
-  }
-  
-  let pages = [];
-  for (let i = start; i <= end; i++) {
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
     pages.push(i);
   }
+  
+  if (totalPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  
+  if (totalPages.value > 1) {
+    pages.push(totalPages.value);
+  }
+  
   return pages;
 });
+
+
 
 const startPage = computed(() => {
   return displayedPages.value[0];
@@ -314,9 +315,9 @@ const endPage = computed(() => {
 });
 
 // 페이지 변경 함수
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
+const changePage = (newPage) => {
+  if (newPage > 0 && newPage <= totalPages.value) {
+    currentPage.value = newPage;
   }
 };
   const fetchTemplate = async () => {
