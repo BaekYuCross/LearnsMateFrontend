@@ -73,6 +73,7 @@
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import axios from 'axios';
+  import { saveAs } from 'file-saver';
   import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
   import CampaignTemplateFilter from '@/components/marketing/CampaignTemplateFilter.vue';
   import CampaignTemplateGetModal from '@/components/marketing/CampaignTemplateGetModal.vue';
