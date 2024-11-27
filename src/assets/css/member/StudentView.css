@@ -97,18 +97,69 @@ th {
   min-width: 100px;
   text-align: left;
 }
+.student-board-container {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 570px;
+  flex: 1;
+  overflow-x: auto;
+  transition: flex 0.5s ease;
+}
 
-/* 각 열의 너비 지정 */
-th:nth-child(1), td:nth-child(1) { width: 100px; }
-th:nth-child(2), td:nth-child(2) { width: 100px; }
-th:nth-child(3), td:nth-child(3) { width: 150px; }
-th:nth-child(4), td:nth-child(4) { width: 120px; }
-th:nth-child(5), td:nth-child(5) { width: 200px; }
-th:nth-child(6), td:nth-child(6) { width: 80px; }
-th:nth-child(7), td:nth-child(7) { width: 100px; }
-th:nth-child(8), td:nth-child(8) { width: 100px; }
-th:nth-child(9), td:nth-child(9) { width: 100px; }
-th:nth-child(10), td:nth-child(10) { width: 100px; }
+.student-board-header {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1.2fr 1fr 1.5fr 0.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+  padding: 7px 14px;
+  background-color: #f9f9f9;
+  font-size: 12px;
+  font-weight: bold;
+  color: #595656;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.student-board-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100% - 35px);
+}
+
+.student-board-row {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr 1.2fr 1fr 1.5fr 0.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+  padding: 7px 14px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 11px;
+  color: #333333;
+  text-align: center;
+  align-items: center;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.student-board-row:hover {
+  background-color: #f4f4f4;
+}
+
+.student-board-row.selected {
+  background-color: #e2e8f0;
+}
+
+.student-board-header > div,
+.student-board-row > div {
+  padding: 0 5px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .pagination {
   position: sticky;
@@ -225,7 +276,7 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
  
  .progress {
   height: 100%;
-  background: #00bfa5;  /* 이미지의 초록색과 비슷한 색상 */
+  background: #00bfa5;  
   transition: width 0.3s ease;
  }
  
