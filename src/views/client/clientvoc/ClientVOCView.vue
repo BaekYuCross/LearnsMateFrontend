@@ -209,9 +209,11 @@ const handleSubmit = (data) => {
 }
 
 .clientvoc-text {
+  font-family:Inter;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  
 }
 
 .clientvoc-header h2 {
@@ -294,6 +296,7 @@ const handleSubmit = (data) => {
 }
 
 .clientvoc-footer {
+  font-family:Inter;
   text-align: center;
   margin-top: 40px;
 }

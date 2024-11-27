@@ -128,6 +128,7 @@ const goToLearnsMate = () => {
 }
 
 .clientmain-sub-title {
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   margin: 30px 0;
 }
 
