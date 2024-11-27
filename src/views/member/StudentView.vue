@@ -56,7 +56,7 @@
                 <th v-if="selectedColumns.includes('memberBirth')">생년월일</th>
                 <th v-if="selectedColumns.includes('memberFlag')">계정상태</th>
                 <th v-if="selectedColumns.includes('createdAt')">생성일</th>
-                <th v-if="selectedColumns.includes('memberDormantFlag')">휴면상태</th>
+                <th v-if="selectedColumns.includes('memberDormantStatus')">휴면상태</th>
               </tr>
             </thead>
             <tbody>
@@ -77,7 +77,7 @@
                 <td v-if="selectedColumns.includes('memberBirth')">{{ student.memberBirth }}</td>
                 <td v-if="selectedColumns.includes('memberFlag')">{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
                 <td v-if="selectedColumns.includes('createdAt')">{{ student.createdAt }}</td>
-                <td v-if="selectedColumns.includes('memberDormantFlag')">{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
+                <td v-if="selectedColumns.includes('memberDormantStatus')">{{ student.memberDormantStatus === true ? '휴면' : '활성' }}</td>
               </tr>
             </tbody>
           </table>
@@ -333,7 +333,7 @@ const columns = ref({
   memberBirth: "생년월일",
   memberFlag: "계정상태",
   createdAt: "생성일",
-  memberDormantFlag: "휴면상태"
+  memberDormantStatus: "휴면상태"
 });
 const selectedColumns = ref(Object.keys(columns.value));
 
