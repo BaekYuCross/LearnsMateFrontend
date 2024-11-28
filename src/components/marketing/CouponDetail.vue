@@ -184,13 +184,14 @@ const saveCoupon = async () => {
 const deleteCoupon = async () => {
   try {
     const response = await axios.patch(`http://localhost:5000/coupon/admin/delete/${props.selectedCoupon.coupon_code}`,
-      {
+      {},{
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
         }
       }
     );
+    window.location.href = '/marketing/coupons'
     console.log("삭제 성공", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
