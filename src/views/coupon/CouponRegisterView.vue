@@ -309,6 +309,20 @@ const showRegisterModal = () => {
   isRegisterModalOpen.value = true;
 };
 
+const cancelRegister = () => {
+  isRegisterModalOpen.value = false;
+  isCancelModalOpen.value = false;
+};
+
+const confirmCancel = () => {
+    isCancelModalOpen.value = false; 
+    window.location.href = '/marketing/register-coupon'; 
+};
+
+const showCancelModal = () => {
+  isCancelModalOpen.value = true;
+};
+
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) currentPage.value = page;
 };
