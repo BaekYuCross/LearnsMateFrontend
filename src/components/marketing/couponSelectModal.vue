@@ -13,7 +13,15 @@
                 <div class="coupon-count">전체 쿠폰 <span class="coupon-length">{{ coupons.length }}</span>개</div>
                 <div class="board-container">
                     <div class="board-header">
-                    <div class="board-header-select">선택</div>
+                      <div class="board-header-select">
+                        <input
+                          type="checkbox"
+                          :checked="allSelected"
+                          @change="selectAll"
+                          class="select-all-checkbox"
+                        />
+                      </div>
+
                     <div class="board-header-name">쿠폰 이름</div>
                     <div class="board-header-contents">쿠폰 내용</div>
                     <div class="board-header-discount-rate">쿠폰 할인율</div>
@@ -138,6 +146,18 @@ const applyFilters = async (filters) => {
     console.log('Filtered Coupons:', coupons.value);
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
+  }
+};
+
+const allSelected = computed(() => {
+  return coupons.value.length > 0 && selectedCoupons.value.length === coupons.value.length;
+});
+
+const selectAll = () => {
+  if (allSelected.value) {
+    selectedCoupons.value = [];
+  } else {
+    selectedCoupons.value = [...coupons.value];
   }
 };
 
@@ -296,7 +316,18 @@ const applyFilters = async (filters) => {
       display: flex;
       align-items: center;
       justify-content: center;
-}
+    }
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: 15px;
+      height: 15px;
+      accent-color: #005950;
+    }
+    .board-header-select {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     
     .board-body {
       display: flex;

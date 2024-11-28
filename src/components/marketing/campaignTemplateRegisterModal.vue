@@ -46,7 +46,10 @@ import { ref, defineEmits, onMounted } from 'vue';
 import axios from 'axios';
 import RegisterModule from '../modules/RegisterModule.vue';
 import { useLoginState } from '@/stores/loginState';
+import { useRouter } from 'vue-router';
 const emit = defineEmits(['confirm', 'cancel']);
+
+const router = useRouter();
 
 const loginState = useLoginState();
 
@@ -68,6 +71,8 @@ const   handleModalClose = () => {
 
 const closeModal = () => {
   isOpen.value = false;
+  emit('cancel');
+  
 };
 
 const handleSubmit = async () => {
