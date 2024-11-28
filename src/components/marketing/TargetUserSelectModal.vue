@@ -411,6 +411,14 @@ onMounted(() => {
     align-items: center;
   }
 
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: #005950; 
+  }
+
   .target-user-count {
     font-size: 17px;
     font-weight: bold;
