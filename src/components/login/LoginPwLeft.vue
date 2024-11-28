@@ -133,7 +133,9 @@ const handleSubmit = async () => {
       });
       message.value = '비밀번호가 성공적으로 변경되었습니다.';
       messageClass.value = 'success';
-      resetForm(); // 폼 초기화
+      
+      resetForm();
+    
     } catch (error) {
       message.value = error.response?.data?.message || '비밀번호 변경 실패.';
       messageClass.value = 'error';
