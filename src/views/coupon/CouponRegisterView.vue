@@ -138,9 +138,15 @@
     </div>
   </div>
 
-  <RegisterModule v-if="isRegisterModalOpen" modalTitle="쿠폰을 등록하시겠습니까?" @confirm="registerCoupon"
+  <RegisterModule 
+    v-if="isRegisterModalOpen" 
+    modalTitle="쿠폰을 등록하시겠습니까?" 
+    @confirm="registerCoupon"
     @cancel="cancelRegister" />
-  <CancelModule v-if="isCancelModalOpen" modalTitle="쿠폰 등록을 취소하시겠습니까?" @confirm="confirmCancel"
+  <CancelModule 
+    v-if="isCancelModalOpen" 
+    modalTitle="쿠폰 등록을 취소하시겠습니까?" 
+    @confirm="confirmCancel"
     @cancel="cancelRegister" />
 </template>
 
@@ -206,11 +212,9 @@ const formatDateWithTime = {
 const selectedLectureIds = ref([]);
 
 const registerCoupon = async () => {
+
   try {
-
-    // couponData의 날짜 필드를 직접 수정
     formatDateWithTime.applyCouponDates(couponData.value);
-
 
     const requestData = {
       couponName: couponData.value.couponName,
@@ -222,27 +226,14 @@ const registerCoupon = async () => {
       lectureCode: couponData.value.selectedLectures.map(lecture => lecture.lecture_code), // lecture_code 배열로 전송
     };
 
-
-    console.log(requestData.data);
-  // 날짜 필드와 빈 문자열 처리
-  // Object.keys(couponData).forEach(key => {
-  //   if (couponData[key] === '') {
-  //     couponData[key] = null;
-  //   } else if (key.includes('date') && couponData[key]) {
-  //     couponData[key] = new Date(couponData[key]).toISOString();
-  //   }
-  // });
-console.log(couponData.value.couponStartDate, couponData.value.couponExpireDate); 
-
-console.log(couponData.value);
-
-
     const response = await axios.post('http://localhost:5000/coupon/admin/register', requestData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json'
       }
     });
+    isRegisterModalOpen.value = false;
+    window.location.href = '/marketing/register-coupon'
 
     console.log('쿠폰 등록 성공', response.data);
     
@@ -316,6 +307,20 @@ const showRegisterModal = () => {
     return;
   }
   isRegisterModalOpen.value = true;
+};
+
+const cancelRegister = () => {
+  isRegisterModalOpen.value = false;
+  isCancelModalOpen.value = false;
+};
+
+const confirmCancel = () => {
+    isCancelModalOpen.value = false; 
+    window.location.href = '/marketing/register-coupon'; 
+};
+
+const showCancelModal = () => {
+  isCancelModalOpen.value = true;
 };
 
 const changePage = (page) => {
