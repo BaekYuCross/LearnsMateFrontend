@@ -1,101 +1,166 @@
 <template>
-    <div class="login-left">
-      <h1>| 비밀번호 재설정</h1>
-      <!-- @submit.prevent로 재로딩 방지 -->
-      <form class="login-form" @submit.prevent="handleSubmit">
-        <input id="id" type="text" placeholder="사번 ID" class="login-input" />
-        
-        <div class="input-group">
-          <label for="email" class="input-label">이메일</label>
-          <div class="email-wrapper">
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              placeholder="E-mail 입력"
-              class="login-input email-input"
-            />
-            <!-- 인증 버튼 -->
-            <button type="button" class="auth-button" @click="sendAuthCode">인증</button>
-          </div>
-        </div>
-  
-        <div class="input-group">
-          <label for="auth-code" class="input-label">인증번호</label>
+  <div
+    class="login-left"
+    :style="{ paddingTop: isAuthVerified ? '6%' : '10%' }"
+  >
+    <h1>| 비밀번호 재설정</h1>
+    <!-- @submit.prevent로 재로딩 방지 -->
+    <form class="login-form" @submit.prevent="handleSubmit">
+      <input id="adminCode"  v-model.trim="adminCode" type="adminCode" placeholder="사번 ID" class="login-input" />
+      
+      <div class="input-group">
+        <label for="email" class="input-label">이메일</label>
+        <div class="email-wrapper">
           <input
-            id="auth-code"
-            v-model="authCodeInput"
-            type="text"
-            placeholder="인증번호 입력"
-            class="login-input"
+            id="email"
+            v-model.trim="email"
+            type="email"
+            placeholder="E-mail 입력"
+            class="login-input email-input"
           />
+          <!-- 인증 버튼 -->
+          <button type="button" class="auth-button" @click="sendAuthCode">인증</button>
         </div>
-  
-        <!-- 다음 버튼 -->
-        <button type="submit" class="login-button">다음</button>
-        <!-- 메시지 출력 -->
-        <p v-if="message" :class="messageClass">{{ message }}</p>
-        <!-- 로그인하기 버튼 -->
-        <button type="button" class="login-pw" @click="$emit('show-login')">로그인하기</button>
-      </form>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  
-  // 상태 관리
-  const email = ref(''); // 이메일 입력값
-  const authCodeInput = ref(''); // 사용자 입력 인증번호
-  const authCode = ref(''); // 서버로부터 받은 인증번호
-  const message = ref(''); // 사용자에게 표시할 메시지
-  const messageClass = ref(''); // 메시지 스타일 클래스
-  
-  // 이메일 인증번호 발송
-  const sendAuthCode = () => {
-    if (!validateEmail(email.value)) {
-      message.value = '이메일 형식이 올바르지 않습니다.';
+      </div>
+
+      <div class="input-group">
+        <label for="auth-code" class="input-label">인증번호</label>
+        <input
+          id="auth-code"
+          v-model="authCodeInput"
+          type="text"
+          placeholder="인증번호 입력"
+          class="login-input"
+        />
+      </div>
+
+      <!-- 새 비밀번호 입력창 (인증 성공 시 표시) -->
+      <div class="input-group" v-if="isAuthVerified">
+        <label for="new-password" class="input-label">새 비밀번호</label>
+        <input
+          id="new-password"
+          v-model="newPassword"
+          type="password"
+          placeholder="새 비밀번호 입력"
+          class="login-input"
+        />
+      </div>
+
+      <!-- 다음 버튼 (인증 성공 시 완료 버튼으로 변경) -->
+      <button type="submit" class="login-button">
+        {{ isAuthVerified ? '완료' : '다음' }}
+      </button>
+      <!-- 메시지 출력 -->
+      <p v-if="message" :class="messageClass">{{ message }}</p>
+      <!-- 로그인하기 버튼 -->
+      <button type="button" class="login-pw" @click="$emit('show-login')">로그인하기</button>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import axios from 'axios';
+
+// 상태 관리
+const email = ref(''); // 이메일 입력값
+const authCodeInput = ref(''); // 사용자 입력 인증번호
+const authCode = ref(''); // 서버로부터 받은 인증번호
+const message = ref(''); // 사용자에게 표시할 메시지
+const messageClass = ref(''); // 메시지 스타일 클래스
+const isAuthVerified = ref(false); // 인증 여부
+const newPassword = ref(''); // 새 비밀번호 입력값
+const adminCode = ref(''); // 사번 ID
+
+// 이메일 인증번호 발송
+const sendAuthCode = async () => {
+  if (!validateEmail(email.value)) {
+    message.value = '이메일 형식이 올바르지 않습니다.';
+    messageClass.value = 'error';
+    return;
+  }
+
+  if (!adminCode.value) {
+    message.value = '사번 ID를 입력해주세요.';
+    messageClass.value = 'error';
+    return;
+  }
+
+  try {
+    const response = await axios.post('http://localhost:5000/admin/verification-email/password', {
+      email: email.value,
+      adminCode: adminCode.value, 
+    });
+    console.log("넘어와라!!!!!!!!!!:", response);
+    authCode.value = response.data.verificationCode; // 서버에서 인증번호 받아오기
+    message.value = '인증번호가 이메일로 발송되었습니다.';
+    messageClass.value = 'success';
+    console.log('Generated Auth Code:', authCode.value);
+  } catch (error) {
+    message.value = error.response?.data?.message || '이메일 인증 실패.';
+    messageClass.value = 'error';
+  }
+};
+
+// 폼 제출 처리
+const handleSubmit = async () => {
+  if (!isAuthVerified.value) {
+    // 인증번호 검증 단계
+    try {
+      await axios.post('http://localhost:5000/admin/verification-email/confirmation', {
+        email: email.value,
+        code: authCodeInput.value,
+        adminCode: adminCode.value,
+      });
+      isAuthVerified.value = true; // 인증 성공
+      message.value = '인증이 완료되었습니다. 새 비밀번호를 입력해주세요.';
+      messageClass.value = 'success';
+    } catch (error) {
+      message.value = error.response?.data?.message || '인증번호가 틀렸습니다.';
+      messageClass.value = 'error';
+    }
+  } else {
+    // 비밀번호 변경 완료 단계
+    if (newPassword.value.length < 6) {
+      message.value = '비밀번호는 최소 6자리 이상이어야 합니다.';
       messageClass.value = 'error';
       return;
     }
-    // 서버로 인증번호 요청 (예시로 랜덤 코드 생성)
-    authCode.value = generateAuthCode(); // 인증번호 생성
-    message.value = '인증번호가 이메일로 발송되었습니다.';
-    messageClass.value = 'success';
-    console.log('Generated Auth Code:', authCode.value); // 디버그용
-  };
-  
-  // 폼 제출 처리
-  const handleSubmit = () => {
-    if (authCodeInput.value === authCode.value) {
+
+    try {
+      console.log("Email Before Submit:", email.value);
+      console.log("New Password Before Submit:", newPassword.value);
+      await axios.post('http://localhost:5000/admin/password', {
+        userEmail: email.value,
+        userPassword: newPassword.value,
+      });
       message.value = '비밀번호가 성공적으로 변경되었습니다.';
       messageClass.value = 'success';
-      resetForm();
-    } else {
-      message.value = '인증번호가 틀렸습니다.';
+      resetForm(); // 폼 초기화
+    } catch (error) {
+      message.value = error.response?.data?.message || '비밀번호 변경 실패.';
       messageClass.value = 'error';
     }
-  };
-  
-  // 이메일 형식 검증
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-  
-  // 인증번호 생성 (랜덤 6자리 숫자)
-  const generateAuthCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-  
-  // 폼 초기화
-  const resetForm = () => {
-    email.value = '';
-    authCodeInput.value = '';
-    authCode.value = '';
-  };
-  </script>
-  
+  }
+};
+
+// 이메일 형식 검증
+const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// 폼 초기화
+const resetForm = () => {
+  email.value = '';
+  authCodeInput.value = '';
+  authCode.value = '';
+  newPassword.value = '';
+  adminCode.value = '';
+  isAuthVerified.value = false;
+};
+</script>
+
 
 <style scoped>
 
@@ -120,7 +185,6 @@
   border-top: 8px solid #145f58;
   width: 50%;
   padding: 40px 60px;
-  padding-top: 10%;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
