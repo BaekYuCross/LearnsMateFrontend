@@ -235,8 +235,7 @@ const endPage = computed(() => {
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   
-  currentPage.value = newPage;
-  selectedUsers.value = []; 
+  currentPage.value = newPage; 
   
   if (isFiltered.value && lastFilterData.value) {
     await handleSearch(lastFilterData.value);
