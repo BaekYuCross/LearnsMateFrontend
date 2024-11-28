@@ -9,20 +9,37 @@
       <div class="campaign-actions">
       <div class="campaign-count">등록된 캠페인 <span class="campaign-length">{{ campaigns.length }}</span>개</div>
       <div class="campaign-button-group">
+        <div class="campaign-column-selector">
+            <button @click="toggleDropdown" class="campaign-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="campaign-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="campaign-dropdown-item">
+                <input 
+                  type="checkbox" 
+                  :value="key" 
+                  v-model="selectedColumns" 
+                  @change="updateSelectedColumns" 
+                  id="key"
+                />
+                <label :for="key">{{ label }}</label>
+              </div>
+            </div>
+          </div>
         <button class="campaign-register-button" @click="navigateTo()">캠페인 등록</button>
         <button class="campaign-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
     </div>
     </div>
       <div class="board-container">
         <div class="board-header">
-          <div class="board-header-number">캠페인 번호</div>
-          <div class="board-header-title">캠페인 제목</div>
-          <div class="board-header-contents">캠페인 내용</div>
-          <div class="board-header-type">발송 타입</div>
-          <div class="board-header-send">발송 날짜</div>
-          <div class="board-header-created">생성일</div>
-          <div class="board-header-updated">수정일</div>
-          <div class="board-header-admin">담당자</div>
+          <div v-if="selectedColumns.includes('campaignCode')" class="board-header-number">캠페인 코드</div>
+          <div v-if="selectedColumns.includes('campaignTitle')" class="board-header-title">캠페인 제목</div>
+          <div v-if="selectedColumns.includes('campaignContents')" class="board-header-contents">캠페인 내용</div>
+          <div v-if="selectedColumns.includes('campaignType')" class="board-header-type">발송 타입</div>
+          <div v-if="selectedColumns.includes('campaignSendDate')" class="board-header-send">발송 날짜</div>
+          <div v-if="selectedColumns.includes('createdAt')" class="board-header-created">생성일</div>
+          <div v-if="selectedColumns.includes('updatedAt')" class="board-header-updated">수정일</div>
+          <div v-if="selectedColumns.includes('adminName')" class="board-header-admin">담당자</div>
         </div>
         <div class="board-body">
           <div
@@ -31,23 +48,23 @@
     :key="campaign.campaign_code"
     @click="getCampaign(campaign.campaign_code)"
   >
-    <div class="board-row-number">{{ campaign.campaign_code }}</div>
-    <div class="board-row-title" :title="campaign.campaign_title">
+    <div v-if="selectedColumns.includes('campaignCode')" class="board-row-number">{{ campaign.campaign_code }}</div>
+    <div v-if="selectedColumns.includes('campaignTitle')" class="board-row-title" :title="campaign.campaign_title">
       {{ campaign.campaign_title }}
     </div>
-    <div class="board-row-contents" :title="campaign.campaign_contents">
+    <div v-if="selectedColumns.includes('campaignContents')" class="board-row-contents" :title="campaign.campaign_contents">
       {{ campaign.campaign_contents }}
     </div>
-    <div class="board-row-type">{{ campaign.campaign_type }}</div>
-    <div class="board-row-send">
+    <div v-if="selectedColumns.includes('campaignType')" class="board-row-type">{{ campaign.campaign_type }}</div>
+    <div v-if="selectedColumns.includes('campaignSendDate')" class="board-row-send">
       {{ campaign.campaign_type === 'INSTANT' 
           ? formatDateFromArray(campaign.campaign_send_date) 
           : formatSendDateFromArray(campaign.campaign_send_date) 
       }}
     </div>
-    <div class="board-row-created">{{ formatDateFromArray(campaign.created_at) }}</div>
-    <div class="board-row-updated">{{ formatDateFromArray(campaign.updated_at) }}</div>
-    <div class="board-row-admin">{{ campaign.admin_name }}</div>
+    <div v-if="selectedColumns.includes('createdAt')" class="board-row-created">{{ formatDateFromArray(campaign.created_at) }}</div>
+    <div v-if="selectedColumns.includes('updatedAt')" class="board-row-updated">{{ formatDateFromArray(campaign.updated_at) }}</div>
+    <div v-if="selectedColumns.includes('adminName')" class="board-row-admin">{{ campaign.admin_name }}</div>
   </div>
         </div>
         <!-- 페이지네이션 버튼 -->
@@ -87,6 +104,21 @@
 
   const isFiltered = ref(false);
   const lastFilterData = ref(null);
+  const isDropdownOpen = ref(false);
+
+  const columns = ref({
+    campaignCode: "캠페인 코드",
+    campaignTitle: "캠페인 제목",
+    campaignContents: "캠페인 내용",
+    campaignType: "발송 타입",
+    campaignSendDate: "발송 날짜",
+    createdAt: "생성일",
+    updatedAt: "수정일",
+    adminName: "담당자",
+
+  });
+
+  const selectedColumns = ref(Object.keys(columns.value));
 
   const fetchCampaigns = async () => {
     try {
@@ -192,6 +224,13 @@ const formatSendDateFromArray = (dateArray) => {
  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
 };
 
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
 
 const navigateTo = () => {
     router.push({ 
@@ -206,15 +245,11 @@ const handleExcelDownload = async() => {
       withCredentials: true,
       url: 'http://localhost:5000/campaign/excel/download/campaigns',
       responseType: 'blob',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      data: {
+        selectedColumns: camelToSnake(selectedColumns.value),
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {}),
+      },
     };
-
-    if (isFiltered.value && lastFilterData.value) {
-      config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
-    }
     
     const response = await axios(config);
     
@@ -283,6 +318,49 @@ onMounted(async() => {
     .campaign-button-group {
       display: flex;
       gap: 10px;
+    }
+
+    .campaign-column-selector {
+      position: relative;
+      display: inline-block;
+    }
+
+    .campaign-dropdown-button {
+      background-color: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 3px 5px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 0.5px solid #000000;
+      cursor: pointer;
+    }
+
+    .campaign-dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      z-index: 100;
+      width: 100px;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 4px;
+    }
+
+    .campaign-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .campaign-dropdown-item label {
+      font-size: 12px;
+      color: #333;
+      cursor: pointer;
     }
 
     .campaign-register-button, .campaign-excel-button {
