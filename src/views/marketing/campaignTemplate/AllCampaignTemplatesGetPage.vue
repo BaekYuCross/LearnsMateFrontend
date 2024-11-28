@@ -9,18 +9,35 @@
         <div class="campaigntemplate-actions">
           <div class="campaigntemplate-count">전체 템플릿 <span class="campaigntemplate-length">{{ campaignTemplates.length }}</span>개</div>
           <div class="campaigntemplate-button-group">
+            <div class="campaigntemplate-column-selector">
+            <button @click="toggleDropdown" class="campaigntemplate-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="campaigntemplate-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="campaigntemplate-dropdown-item">
+                <input 
+                  type="checkbox" 
+                  :value="key" 
+                  v-model="selectedColumns" 
+                  @change="updateSelectedColumns" 
+                  id="key"
+                />
+                <label :for="key">{{ label }}</label>
+              </div>
+            </div>
+          </div>
             <button class="campaigntemplate-register-button" @click="clickRegister">템플릿 등록</button>
             <button class="campaigntemplate-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
           </div>
         </div>
         <div class="board-container">
           <div class="board-header">
-            <div class="board-header-number">템플릿 번호</div>
-            <div class="board-header-title">템플릿 제목</div>
-            <div class="board-header-contents">템플릿 내용</div>
-            <div class="board-header-created">생성일</div>
-            <div class="board-header-updated">수정일</div>
-            <div class="board-header-admin">담당자</div>
+            <div  v-if="selectedColumns.includes('campaignTemplateCode')" class="board-header-number">템플릿 코드</div>
+            <div  v-if="selectedColumns.includes('campaignTemplateTitle')" class="board-header-title">템플릿 제목</div>
+            <div  v-if="selectedColumns.includes('campaignTemplateContents')" class="board-header-contents">템플릿 내용</div>
+            <div  v-if="selectedColumns.includes('createdAt')" class="board-header-created">생성일</div>
+            <div  v-if="selectedColumns.includes('updatedAt')" class="board-header-updated">수정일</div>
+            <div  v-if="selectedColumns.includes('adminName')" class="board-header-admin">담당자</div>
           </div>
           <div class="board-body">
             <div
@@ -29,12 +46,12 @@
               :key="campaignTemplate.campaign_template_code"
               @click="showCampaignTemplateModal(campaignTemplate.campaign_template_code)"
             >
-              <div class="board-row-number">{{ campaignTemplate.campaign_template_code }}</div>
-              <div class="board-row-title">{{ campaignTemplate.campaign_template_title }}</div>
-              <div class="board-row-contents">{{ campaignTemplate.campaign_template_contents }}</div>
-              <div class="board-row-created">{{ formatDateFromArray(campaignTemplate.created_at) }}</div>
-              <div class="board-row-updated">{{ formatDateFromArray(campaignTemplate.updated_at) }}</div>
-              <div class="board-row-admin">{{ campaignTemplate.admin_name }}</div>
+              <div  v-if="selectedColumns.includes('campaignTemplateCode')" class="board-row-number">{{ campaignTemplate.campaign_template_code }}</div>
+              <div  v-if="selectedColumns.includes('campaignTemplateTitle')" class="board-row-title">{{ campaignTemplate.campaign_template_title }}</div>
+              <div  v-if="selectedColumns.includes('campaignTemplateContents')" class="board-row-contents">{{ campaignTemplate.campaign_template_contents }}</div>
+              <div  v-if="selectedColumns.includes('createdAt')" class="board-row-created">{{ formatDateFromArray(campaignTemplate.created_at) }}</div>
+              <div  v-if="selectedColumns.includes('updatedAt')" class="board-row-updated">{{ formatDateFromArray(campaignTemplate.updated_at) }}</div>
+              <div  v-if="selectedColumns.includes('adminName')" class="board-row-admin">{{ campaignTemplate.admin_name }}</div>
             </div>
           </div>
           <!-- 페이지네이션 버튼 -->
@@ -83,6 +100,19 @@
 
   const isFiltered = ref(false);
   const lastFilterData = ref(null);
+
+  const isDropdownOpen = ref(false);
+
+  const columns = ref({
+    campaignTemplateCode: "템플릿 코드",
+    campaignTemplateTitle: "템플릿 제목",
+    campaignTemplateContents: "템플릿 내용",
+    createdAt: "생성일",
+    updatedAt: "수정일",
+    adminName: "담당자",
+  });
+
+  const selectedColumns = ref(Object.keys(columns.value));
   
   const fetchCampaignTemplates = async () => {
     try {
@@ -130,6 +160,15 @@
     const [year, month, day, hours, minutes, seconds] = dateArray;
     return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
+
+  const toggleDropdown = () => {
+    isDropdownOpen.value = !isDropdownOpen.value;
+  };
+
+  const updateSelectedColumns = () => {
+    console.log("현재 선택된 컬럼:", selectedColumns.value);
+  };
+
   
   const clickRegister = () => {
     showRegisterModal.value = true;
@@ -142,16 +181,12 @@
         withCredentials: true,
         url: 'http://localhost:5000/campaign-template/excel/download/campaign-templates',
         responseType: 'blob',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        data: {
+          selectedColumns: camelToSnake(selectedColumns.value),
+          ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {}),
+        },
       };
 
-      if (isFiltered.value && lastFilterData.value) {
-        config.data = lastFilterData.value;
-        console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
-      }
-      
       const response = await axios(config);
       
       // 에러 응답 체크
@@ -276,6 +311,49 @@
     display: flex;
     gap: 10px;
   }
+
+  .campaigntemplate-column-selector {
+      position: relative;
+      display: inline-block;
+    }
+
+  .campaigntemplate-dropdown-button {
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 3px 5px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 0.5px solid #000000;
+    cursor: pointer;
+  }
+
+  .campaigntemplate-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 100;
+    width: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 4px;
+  }
+
+  .campaigntemplate-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .campaigntemplate-dropdown-item label {
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+  }
   
   .campaigntemplate-register-button, .campaigntemplate-excel-button {
     background: #005950;
@@ -324,6 +402,13 @@
   
   .board-row:hover {
     background-color: #f4f4f4;
+  }
+
+  .board-row-title,
+  .board-row-contents {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .pagination {
