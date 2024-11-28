@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div
+    class="login-left"
+    :style="{ paddingTop: isAuthVerified ? '6%' : '10%' }"
+  >
     <h1>| 비밀번호 재설정</h1>
     <!-- @submit.prevent로 재로딩 방지 -->
     <form class="login-form" @submit.prevent="handleSubmit">
@@ -133,9 +136,7 @@ const handleSubmit = async () => {
       });
       message.value = '비밀번호가 성공적으로 변경되었습니다.';
       messageClass.value = 'success';
-      
-      resetForm();
-    
+      resetForm(); // 폼 초기화
     } catch (error) {
       message.value = error.response?.data?.message || '비밀번호 변경 실패.';
       messageClass.value = 'error';
