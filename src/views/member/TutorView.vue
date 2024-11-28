@@ -11,63 +11,97 @@
       <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
         <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-header-container">
-            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="tutor-button-group">
+              <div class="column-selector">
+                <button @click="toggleDropdown" class="tutor-dropdown-button">
+                  필요 컬럼 선택 ▼
+                </button>
+                <div v-show="isDropdownOpen" class="tutor-dropdown-menu">
+                  <div v-for="(label, key) in columns" :key="key" class="tutor-dropdown-item">
+                    <input 
+                      type="checkbox"
+                      :value="key" 
+                      v-model="selectedColumns" 
+                      @change="updateSelectedColumns" 
+                      :id="key"
+                    />
+                    <label :for="key">{{ label }}</label>
+                  </div>
+                </div>
+              </div>
               <button class="tutor-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
             </div>
           </div>
             
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>강사 코드</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>연락처</th>
-                <th>주소</th>
-                <th>나이</th>
-                <th>생년월일</th>
-                <th>계정상태</th>
-                <th>생성일</th>
-                <th>휴면상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
+          <div class="tutor-board-container">
+            <div class="tutor-board-header">
+              <div v-if="selectedColumns.includes('memberCode')" class="tutor-board-header-code">강사 코드</div>
+              <div v-if="selectedColumns.includes('memberName')" class="tutor-board-header-name">이름</div>
+              <div v-if="selectedColumns.includes('memberEmail')" class="tutor-board-header-email">이메일</div>
+              <div v-if="selectedColumns.includes('memberPhone')" class="tutor-board-header-phone">연락처</div>
+              <div v-if="selectedColumns.includes('memberAddress')" class="tutor-board-header-address">주소</div>
+              <div v-if="selectedColumns.includes('memberAge')" class="tutor-board-header-age">나이</div>
+              <div v-if="selectedColumns.includes('memberBirth')" class="tutor-board-header-birth">생년월일</div>
+              <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-header-flag">계정상태</div>
+              <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-header-created">생성일</div>
+              <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-header-dormant">휴면상태</div>
+            </div>
+
+            <div class="tutor-board-body">
+              <div 
+                class="tutor-board-row" 
                 v-for="(tutor, index) in tutors" 
                 :key="tutor.memberCode"
                 @click="showDetail(tutor)"
-                class="cursor-pointer hover:bg-gray-50"
-                :class="{ 'tutor-selected': selectedTutor?.memberCode === tutor.memberCode }"
+                :class="{ 'selected': selectedTutor?.memberCode === tutor.memberCode }"
               >
-                <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ tutor.memberCode }}</td>
-                <td>{{ tutor.memberName }}</td>
-                <td>{{ tutor.memberEmail }}</td>
-                <td>{{ tutor.memberPhone }}</td>
-                <td>{{ tutor.memberAddress }}</td>
-                <td>{{ tutor.memberAge }}</td>
-                <td>{{ tutor.memberBirth }}</td>
-                <td>{{ tutor.memberFlag === true ? '활성' : '비활성' }}</td>
-                <td>{{ tutor.createdAt }}</td>
-                <td>{{ tutor.memberDormantFlag === true ? '휴면' : '활성' }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <div v-if="selectedColumns.includes('memberCode')" class="tutor-board-row-code">
+                  {{ tutor.memberCode }}
+                </div>
+                <div v-if="selectedColumns.includes('memberName')" class="tutor-board-row-name">
+                  {{ tutor.memberName }}
+                </div>
+                <div v-if="selectedColumns.includes('memberEmail')" class="tutor-board-row-email">
+                  {{ tutor.memberEmail }}
+                </div>
+                <div v-if="selectedColumns.includes('memberPhone')" class="tutor-board-row-phone">
+                  {{ tutor.memberPhone }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAddress')" class="tutor-board-row-address">
+                  {{ tutor.memberAddress }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAge')" class="tutor-board-row-age">
+                  {{ tutor.memberAge }}
+                </div>
+                <div v-if="selectedColumns.includes('memberBirth')" class="tutor-board-row-birth">
+                  {{ tutor.memberBirth }}
+                </div>
+                <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-row-flag">
+                  {{ tutor.memberFlag === true ? '활성' : '비활성' }}
+                </div>
+                <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-row-created">
+                  {{ tutor.createdAt }}
+                </div>
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant">
+                  {{ tutor.memberDormantStatus === true ? '휴면' : '활성' }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="tutor-pagination">
-            <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
-            <button class="page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
+            <button class="tutor-page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
+            <button class="tutor-page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
             <span v-if="startPage > 2">...</span>
             <template v-for="page in displayedPages" :key="page">
-              <button v-if="page !== 1 && page !== totalPages" class="page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
+              <button v-if="page !== 1 && page !== totalPages" class="tutor-page-button" :class="{ active: currentPage === page }" @click="changePage(page)">{{ page }}</button>
             </template>
             <span v-if="endPage < totalPages - 1">...</span>
-            <button v-if="totalPages > 1" class="page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
-            <button class="page-button next-button" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
+            <button v-if="totalPages > 1" class="tutor-page-button" :class="{ active: currentPage === totalPages }" @click="changePage(totalPages)">{{ totalPages }}</button>
+            <button class="tutor-page-button next-button" @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">▶</button>
           </div>
         </div>
 
@@ -142,18 +176,41 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const tutorDetail = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
+const isDropdownOpen = ref(false);
+const columns = ref({
+  memberCode: "강사 코드",
+  memberName: "이름",
+  memberEmail: "이메일",
+  memberPhone: "연락처",
+  memberAddress: "주소",
+  memberAge: "나이",
+  memberBirth: "생년월일",
+  memberFlag: "계정상태",
+  createdAt: "생성일",
+  memberDormantStatus: "휴면상태"
+});
+const selectedColumns = ref(Object.keys(columns.value));
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
+
+const formatCurrency = (value) => {
+  return value.toLocaleString();
+};
 
 // 전체 강사 목록
 const fetchTutors = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/tutors', {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     
@@ -172,19 +229,16 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
 
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor', lastFilterData.value, 
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/tutor', lastFilterData.value, {
+      withCredentials: true, 
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     tutors.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -200,16 +254,14 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/tutor',
       responseType: 'blob',
+      withCredentials: true, 
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
-      }
+      },
+      data: {
+        selectedColumns: selectedColumns.value,  // 선택된 컬럼 정보 추가
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {})}
     };
-
-    if (isFiltered.value && lastFilterData.value) {
-      config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
-    }
     
     const response = await axios(config);
     
@@ -253,27 +305,22 @@ const handleReset = () => {
   fetchTutors();
 };
 
-// 페이지 변경
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/tutor',
-      camelToSnake(lastFilterData.value),
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/tutor',lastFilterData.value, {
+      withCredentials: true,   
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     tutors.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -319,11 +366,7 @@ const showDetail = async (tutor) => {
   } else {
     selectedTutor.value = tutor;
     try {
-      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`, {
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
     } catch (error) {
       console.error('Failed to load tutor detail:', error);

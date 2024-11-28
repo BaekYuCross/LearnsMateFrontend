@@ -10,7 +10,7 @@
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
           </button>
-          <button class="voc-ai-button">
+          <button class="voc-ai-button" @click="openAiModal">
             <img src="@/assets/icons/ai.svg" alt="AI 요약 보고서">
             AI 요약 보고서
           </button>
@@ -154,6 +154,12 @@
         </div>
       </div>
     </div>
+    <voc-ai-modal
+      v-if="isAiModalOpen"
+      :summary-data="aiData"
+      @close="closeAiModal"
+    />
+
     <VOCRegisterModule
       :isModalOpen="isRegisterModalOpen"
       :modalTitle="'VOC 답변 등록'"
@@ -179,10 +185,14 @@ import VOCFilter from '@/components/voc/VOCFilter.vue'
 import axios from 'axios'
 import { saveAs } from 'file-saver'
 import '@/assets/css/voc/VOCView.css'
-import VOCRegisterModule from '@/components/modules/VOCRegisterModule.vue';
-import VOCEditModule from '@/components/modules/VOCEditModule.vue'
-import { jwtDecode } from 'jwt-decode';
+import VocAiModal from "@/components/voc/VocAiModal.vue";
+import VOCRegisterModule from '@/components/voc/VOCRegisterModule.vue';
+import VOCEditModule from '@/components/voc/VOCEditModule.vue'
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 const isRegisterModalOpen = ref(false);
 const isEditingAnswer = ref(false);
 const editAnswerContent = ref('');
@@ -196,20 +206,21 @@ const totalPages = ref(1)
 const pageSize = 50
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
+const isAiModalOpen = ref(false);
+const aiData = ref([]);
+const isLoading = ref(false);
 
 const fetchVOCList = async (filters = {}) => {
   try {
-    const response = await axios.get('http://localhost:5000/voc/list', {
-      headers: {
-        Authorization: token,
-      },
-      params: {
-        ...filters,
-        page: currentPage.value - 1,
-        size: pageSize
+    const response = await axios.get('http://localhost:5000/voc/list',
+      {
+        params: {
+          ...filters,
+          page: currentPage.value - 1,
+          size: pageSize,
+        }
       }
-    });
+    );
     
     vocList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -242,114 +253,86 @@ const hideSingleVoc = () => {
 const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
+    currentPage.value = 1;
+
     const processedData = {
       ...filterData,
       vocAnswerStatus: filterData.vocAnswerStatus === "true" ? true :
                       filterData.vocAnswerStatus === "false" ? false : null,
-      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null
+      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null,
     };
-    
-    console.log('원본 필터 데이터:', filterData);
-    console.log('처리된 필터 데이터:', processedData);
+
     lastFilterData.value = processedData;
-    console.log('저장된 필터 데이터:', lastFilterData.value);
 
     const response = await axios.post(
-      `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-      camelToSnake(processedData),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
+      `http://localhost:5000/voc/filter?page=0&size=${pageSize}`,
+      camelToSnake(processedData)
     );
 
     vocList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
-    console.error('Failed to filter voc:', error);
+    console.error('필터링 중 오류 발생:', error);
   }
 };
 
-const handleReset = () => {
-  fetchVOCList();
-  currentPage.value = 1;
-  selectedVOC.value = null;
+const handleReset = async () => {
+  try {
+    isFiltered.value = false;
+    lastFilterData.value = null;
+    currentPage.value = 1;
+
+    await fetchVOCList();
+    selectedVOC.value = null;
+  } catch (error) {
+    console.error('리셋 중 오류 발생:', error);
+  }
 };
 
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
-  
-  currentPage.value = newPage;
-  
-  if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-      camelToSnake(lastFilterData.value),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
 
-    vocList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-  } else {
-    await fetchVOCList();
+  try {
+    currentPage.value = newPage;
+
+    if (isFiltered.value && lastFilterData.value) {
+      const response = await axios.post(
+        `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+        camelToSnake(lastFilterData.value)
+      );
+
+      vocList.value = response.data.content;
+      totalCount.value = response.data.totalElements;
+      totalPages.value = response.data.totalPages;
+    } else {
+      await fetchVOCList();
+    }
+  } catch (error) {
+    console.error('페이지 변경 중 오류 발생:', error);
   }
 };
 
 const handleExcelDownload = async () => {
   try {
-    const config = {
-      method: 'POST',
-      url: 'http://localhost:5000/voc/excel/download',
-      responseType: 'blob',
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      'http://localhost:5000/voc/excel/download',
+      isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
+      {
+        responseType: 'blob',
       }
-    };
+    );
 
-    if (isFiltered.value && lastFilterData.value) {
-      const snakeCaseData = camelToSnake(lastFilterData.value);
-      console.log('Request data before conversion:', lastFilterData.value);
-      console.log('Request data after snake case:', snakeCaseData);
-      config.data = snakeCaseData;
-    }
-
-    const response = await axios(config);
-    
-    if (response.data instanceof Blob) {
-      const isJson = response.data.type === 'application/json';
-      if (isJson) {
-        const textData = await response.data.text();
-        console.error('Server error:', textData);
-        throw new Error(textData);
-      }
-    }
-    
-    const blob = new Blob([response.data], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-    
+
     saveAs(blob, 'voc_data.xlsx');
   } catch (error) {
-    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
-    if (error.response) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        console.error('상세 에러:', reader.result);
-      };
-      reader.readAsText(error.response.data);
-    }
+    console.error('엑셀 다운로드 중 오류 발생:', error);
   }
 };
+
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
@@ -386,9 +369,7 @@ const showVOCDetail = async (voc) => {
     closeVOCDetail();
   } else {
     try {
-      const response = await axios.get(`http://localhost:5000/voc/${voc.voc_code}`, {
-        headers: { Authorization: token },
-      });
+      const response = await axios.get(`http://localhost:5000/voc/${voc.voc_code}`);
       selectedVOC.value = response.data;
       showSingleVoc();
       console.log('Selected VOC:', selectedVOC.value);
@@ -436,30 +417,21 @@ const confirmAction = () => {
 
 const submitRegisterAnswer = async () => {
   try {
-    const tokenWithoutBearer = token.replace('Bearer ', '');
-    const decodedToken = jwtDecode(tokenWithoutBearer);
-    const adminCode = decodedToken.sub;
-
-    if (!adminCode) {
-      throw new Error('adminCode를 추출할 수 없습니다.');
-    }
-
     const response = await axios.post(
       `http://localhost:5000/voc-answer/register`,
       {
         voc_answer_content: editAnswerContent.value,
-        admin_code: adminCode,
+        admin_code: loginState.adminCode,
         voc_code: selectedVOC.value.voc_code,
-      },
-      {
-        headers: {
-          Authorization: token,
-        },
       }
     );
-
-    selectedVOC.value.voc_answer_code = response.data.vocAnswerCode;
-    selectedVOC.value.voc_answer_content = response.data.vocAnswerContent;
+    const vocResponse = await axios.get(`http://localhost:5000/voc/${selectedVOC.value.voc_code}`);
+    const updatedVOC = vocResponse.data;
+    selectedVOC.value = updatedVOC;
+    const vocIndex = vocList.value.findIndex(voc => voc.voc_code === updatedVOC.voc_code);
+    if (vocIndex !== -1) {
+      vocList.value[vocIndex] = updatedVOC;
+    }
 
     closeRegisterModal();
     isEditingAnswer.value = false;
@@ -476,12 +448,7 @@ const submitEditAnswer = async () => {
     const vocAnswerCode = selectedVOC.value.voc_answer_code;
     const response = await axios.patch(
       `http://localhost:5000/voc-answer/edit/${vocAnswerCode}`,
-      { voc_answer_content: editAnswerContent.value },
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
+      { voc_answer_content: editAnswerContent.value }
     );
     selectedVOC.value.voc_answer_content = editAnswerContent.value;
     isEditingAnswer.value = false;
@@ -493,8 +460,37 @@ const submitEditAnswer = async () => {
   }
 };
 
-onMounted(() => {
+const openAiModal = async () => {
+  isAiModalOpen.value = true;
+  isLoading.value = true;
+  document.body.style.overflow = 'hidden';
+
+  try {
+    const response = await axios.get('http://localhost:5000/voc/ai/current-week');
+    aiData.value = response.data || [];
+    if (aiData.value.length === 0) {
+      alert('현재 주차에 대한 AI 요약 데이터가 없습니다.');
+    }
+  } catch (error) {
+    console.error('AI 요약 데이터 로드 실패:', error);
+    alert('AI 요약 데이터를 로드하는 중 문제가 발생했습니다.');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const closeAiModal = () => {
+  isAiModalOpen.value = false;
+  aiData.value = [];
+
+  document.body.style.overflow = '';
+};
+
+onMounted(async () => {
   fetchVOCList()
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); 
+  }
 })
 
 const displayedPages = computed(() => {

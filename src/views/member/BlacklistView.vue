@@ -11,7 +11,7 @@
       <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
         <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
           <div class="blacklist-header-container">
-            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="blacklist-button-group">
               <button class="blacklist-excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
@@ -45,7 +45,7 @@
                 <td>{{ blacklist.memberCode }}</td>
                 <td>{{ blacklist.memberName }}</td>
                 <td>{{ blacklist.memberEmail }}</td>
-                <td>{{ blacklist.blackReason }}</td>
+                <td :title="blacklist.blackReason">{{ blacklist.blackReason }}</td>
                 <td>{{ blacklist.createdAt }}</td>
                 <td>{{ blacklist.adminName }}</td>
               </tr>
@@ -155,9 +155,6 @@ const memberTypeText = computed(() => ({
 }[memberType.value]));
 const filterType = computed(() => memberType.value);
 
-
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ5NzkyOCwiZXhwIjoxNzc1Njk3OTI4fQ.iJX2dHA_lMbKIpHlX9xcFKrVUoB8Gr_cW1xMCcCdetS3T6rBAY2YHlJH3uarkP6NAXX-zbkSd7vAXkEQIYRG6A';
-
 watch(
   () => route.path,
   (newPath) => {
@@ -165,6 +162,10 @@ watch(
     resetData();
   }
 );
+
+const formatCurrency = (value) => {
+  return value.toLocaleString(); 
+};
 
 const resetData = () => {
   currentPage.value = 1;
@@ -207,12 +208,10 @@ const groupedReports = computed(() => {
 const fetchBlacklists = async () => {
   try {
     const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}`, {
+      withCredentials: true,
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     console.log(response.data);
@@ -234,14 +233,13 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData,
-      {
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, filterData, {
+        withCredentials: true,
         params: {
           page: currentPage.value - 1,
           size: pageSize
         },
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
@@ -261,8 +259,8 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: `http://localhost:5000/blacklist/excel/download/${memberType.value}`,
       responseType: 'blob',
+      withCredentials: true,
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };
@@ -322,14 +320,13 @@ const changePage = async (newPage) => {
   
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, 
-      {
+      `http://localhost:5000/blacklist/filter/${memberType.value}`, lastFilterData.value, {
+        withCredentials: true,
         params: {
           page: currentPage.value - 1,
           size: pageSize
         },
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
@@ -380,12 +377,10 @@ const showDetail = async (blacklist) => {
     selectedBlacklist.value = blacklist;
     try {
       const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/${blacklist.blackCode}`, {
-        headers: {
-          Authorization: token,
-        },
+        withCredentials: true,
       });
       reportDetails.value = response.data;
-      console.log("상세내용ㅇ,ㅡㄴ", reportDetails.value);
+      console.log("상세내용은 ", reportDetails.value);
     } catch (error) {
       console.error('Failed to load report details:', error);
       reportDetails.value = [];

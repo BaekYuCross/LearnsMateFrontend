@@ -90,19 +90,21 @@
 
   const fetchCampaigns = async () => {
     try {
-      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-      const response = await axios.get('http://localhost:5000/campaign/campaigns',{
-      method: 'GET',
-      headers: {
-        Authorization: token,
-        }
+      const response = await axios.get('http://localhost:5000/campaign/campaigns', {
+        method: 'GET',
+        withCredentials: true,
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+        },
       });
-      campaigns.value = response.data;
-      console.log(campaigns.value);
+      campaigns.value = response.data.content; // content 배열로 설정
+      console.log('캠페인 데이터:', campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
   };
+
 
   const currentPage = ref(1);
   const pageSize = 15;
@@ -141,33 +143,33 @@
   };
 
 
-const handleSearch = async (preparedFilters) => {
-  isFiltered.value = true;
-  lastFilterData.value = preparedFilters;
-  try {
-    console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-    const response = await axios.post(
-      'http://localhost:5000/campaign/filter',
-      camelToSnake(preparedFilters),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-        params: {
-          page: currentPage.value - 1, // 0-based pagination
-          size: pageSize,
-        },
-      }
-    );
-    campaigns.value = response.data.content; // API의 응답 구조에 따라 조정
-    console.log('Filtered campaigns:', campaigns.value);
-    totalPages.value = response.data.totalPages; 
-  } catch (error) {
-    console.error('Error while fetching filtered campaigns:', error);
-  }
-};
+  const handleSearch = async (preparedFilters) => {
+    isFiltered.value = true;
+    lastFilterData.value = preparedFilters;
+    try {
+      console.log("필터 데이터:", preparedFilters);
+      const response = await axios.post(
+        'http://localhost:5000/campaign/filter',
+        camelToSnake(preparedFilters),
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize,
+          },
+        }
+      );
+      campaigns.value = response.data.content; // content 배열로 설정
+      console.log('필터된 캠페인 데이터:', campaigns.value);
+      totalPages.value = response.data.totalPages;
+    } catch (error) {
+      console.error('Error while fetching filtered campaigns:', error);
+    }
+  };
+
 
 const handleReset = async () => {
   isFiltered.value = false;
@@ -199,13 +201,12 @@ const navigateTo = () => {
 
 const handleExcelDownload = async() => {
   try{
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const config = {
       method: 'POST',
+      withCredentials: true,
       url: 'http://localhost:5000/campaign/excel/download/campaigns',
       responseType: 'blob',
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
       }
     };

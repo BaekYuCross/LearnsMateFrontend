@@ -271,6 +271,8 @@ import { saveAs } from 'file-saver'
 import '@/assets/css/lecture/LectureView.css'
 import Chart from 'chart.js/auto'
 
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 const isMonthlyModalOpen = ref(false);
 const isSingleView = ref(false)
 const selectedLecture = ref(null)
@@ -303,8 +305,6 @@ const columns = ref({
 });
 const selectedColumns = ref(Object.keys(columns.value));
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
-
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(camelToSnake);
@@ -325,9 +325,6 @@ const statsFilter = ref({
 const fetchLectureList = async (filters = {}) => {
   try {
     const response = await axios.get('http://localhost:5000/lecture/list', {
-      headers: {
-        Authorization: token,
-      },
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -358,17 +355,7 @@ const handleSearch = async (filterData) => {
     isFiltered.value = true;
     lastFilterData.value = filterData;
     const response = await axios.post(
-      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-      camelToSnake(filterData),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    console.log("Filter Response Data:", response.data);
+      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`, camelToSnake(filterData));
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -392,16 +379,7 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
 
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-      camelToSnake(lastFilterData.value),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,camelToSnake(lastFilterData.value));
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -426,10 +404,6 @@ const handleExcelDownload = async () => {
       method: 'POST',
       url: 'http://localhost:5000/lecture/excel/download',
       responseType: 'blob',
-      headers: {
-        Authorization: token,
-        'Content-Type': 'application/json',
-      },
       data: {
         selectedColumns: camelToSnake(selectedColumns.value),
         ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {}),
@@ -573,7 +547,7 @@ const createStatsCharts = (data) => {
       labels: ['총 학생 수', '총 클릭 수'],
       datasets: [{
         label: '전체',
-        data: [safeData.totalStudentCount, safeData.totalLectureClickCount], // 8777, 141579
+        data: [safeData.totalStudentCount, safeData.totalLectureClickCount],
         backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)'],
         borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)'],
         borderWidth: 1
@@ -591,7 +565,6 @@ const createStatsCharts = (data) => {
     }
   });
 
-  // 현재 강의 통계 차트
   if (lectureChart) lectureChart.destroy();
   const lectureCtx = lectureStatsChart.value.getContext('2d');
   lectureChart = new Chart(lectureCtx, {
@@ -600,7 +573,7 @@ const createStatsCharts = (data) => {
       labels: ['구매 학생 수', '클릭 수'],
       datasets: [{
         label: selectedLecture.value.lecture_title,
-        data: [safeData.studentCount, safeData.lectureClickCount], // 22, 362
+        data: [safeData.studentCount, safeData.lectureClickCount],
         backgroundColor: ['rgba(255, 206, 86, 0.2)', 'rgba(153, 102, 255, 0.2)'],
         borderColor: ['rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
         borderWidth: 1
@@ -621,17 +594,8 @@ const createStatsCharts = (data) => {
 
 const fetchLectureStats = async () => {
   try {
-    const response = await axios.post(
-      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
-      camelToSnake(statsFilter.value),
-      {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json'
-        }
-      }
-    )
-    console.log(response.data);
+    const response = await axios.post(`http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,camelToSnake(statsFilter.value))
+    
     if (response.data) {
       createStatsCharts(response.data)
     } else {

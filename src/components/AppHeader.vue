@@ -1,7 +1,7 @@
 <template>
   <header class="header-container">
     <nav class="nav-container">
-      <div class="logo-section">
+      <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
       </div>
 
@@ -20,22 +20,29 @@
       </div>
 
       <div class="icon-section">
+        <div class="user-info">
+  [{{ loginState.adminTeam }}] 
+  <span class="highlight">{{ loginState.adminName }}</span> 님, 반갑습니다.
+</div>
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon"  @click="Logout">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
-        <img src="@/assets/icons/settings.svg" alt="설정" class="icon">
+        <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
     </nav>
   </header>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
 const router = useRouter();
 const route = useRoute();
+
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
@@ -64,10 +71,33 @@ const currentGroup = computed(() => {
 const navigateTo = (path) => {
   router.push(path);
 };
+
+const goToLearnsBuddy = (path) => {
+  router.push('/client-main');
+};
+
+const Main = (path) => {
+  router.push('/');
+};
+
+const Logout = async () => {
+  await loginState.logout();
+  alert('로그아웃되었습니다.');
+  router.push('/login');
+};
+
+onMounted(async () => {
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); 
+  }
+});
+
+
 </script>
   
   <style scoped>
   .header-container {
+    font-family:'Pretendard-Regular';
     width: 100%;
     height: 50px;
     background-color: #ffffff;
@@ -86,6 +116,7 @@ const navigateTo = (path) => {
   }
   
   .logo-section h1 {
+    cursor: pointer;
     color: #000000;
     font-size: 20px;
     font-weight: bold;
@@ -107,9 +138,9 @@ const navigateTo = (path) => {
   }
   
   .menu-item {
+    font-family:'Pretendard-Regular';
     color: #000000;
     cursor: pointer;
-    font-family: "Malgun Gothic";
     font-size: 16px;
     white-space: nowrap;
     padding-left: 40px;
@@ -135,6 +166,17 @@ const navigateTo = (path) => {
     gap: 15px;
     align-items: center;
   }
+
+  .user-info {
+    padding-top: 5px;
+    font-size: 13.5px;
+    font-weight: bold;
+   color: #000000; 
+}
+
+.highlight {
+  color: #005950; 
+}
   
   .icon {
     width: 24px;

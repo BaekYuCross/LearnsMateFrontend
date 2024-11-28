@@ -91,8 +91,6 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
   if (Array.isArray(obj)) return obj.map(camelToSnake);
@@ -110,9 +108,7 @@ const fetchUsers = async () => {
         page: currentPage.value - 1,
         size: pageSize
       },
-      headers: {
-        Authorization: token,
-      }
+      withCredentials: true,
     });
     users.value = camelToSnake(response.data.content);
     totalCount.value = response.data.totalElements;
@@ -144,8 +140,8 @@ const selectAll = async (event) => {
               page: 0,
               size: totalCount.value // 전체 데이터를 한 번에 가져오기 위해 size를 totalCount로 설정
             },
+            withCredentials: true,
             headers: {
-              Authorization: token,
               'Content-Type': 'application/json',
             },
           }
@@ -157,9 +153,7 @@ const selectAll = async (event) => {
             page: 0,
             size: totalCount.value
           },
-          headers: {
-            Authorization: token,
-          }
+          withCredentials: true,
         });
       }
       selectedUsers.value = camelToSnake(response.data.content);
@@ -186,8 +180,8 @@ const handleSearch = async (filterData) => {
           page: currentPage.value - 1,
           size: pageSize
         },
+        withCredentials: true,
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
@@ -260,11 +254,6 @@ const saveSelection = () => {
   emit('submit', selectedUsers.value);
 };
 
-const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
-  const [year, month, day] = dateArray;
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-};
 
 onMounted(() => {
   fetchUsers();
@@ -420,6 +409,14 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  input[type="checkbox"] {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    accent-color: #005950; 
   }
 
   .target-user-count {

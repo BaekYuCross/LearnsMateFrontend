@@ -13,7 +13,15 @@
                 <div class="coupon-count">전체 쿠폰 <span class="coupon-length">{{ coupons.length }}</span>개</div>
                 <div class="board-container">
                     <div class="board-header">
-                    <div class="board-header-select">선택</div>
+                      <div class="board-header-select">
+                        <input
+                          type="checkbox"
+                          :checked="allSelected"
+                          @change="selectAll"
+                          class="select-all-checkbox"
+                        />
+                      </div>
+
                     <div class="board-header-name">쿠폰 이름</div>
                     <div class="board-header-contents">쿠폰 내용</div>
                     <div class="board-header-discount-rate">쿠폰 할인율</div>
@@ -81,15 +89,6 @@
 
   const coupons = ref([]);
   const selectedCoupons = ref([]);
-
-  
-  const clickCancel = () => {
-    cancleModal.value = true;
-  };
-  
-  const handleModalClose = () => {
-    cancleModal.value = false;
-  };
   
   const closeModal = () => {
     isOpen.value = false;
@@ -98,12 +97,9 @@
 
   const fetchCoupons = async () => {
     try {
-      const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
       const response = await axios.get('http://localhost:5000/coupon/admin-coupons',{
         method: 'GET',
-        headers: {
-          Authorization: token,
-          }
+        withCredentials: true,
         });
         coupons.value = response.data;
         console.log(coupons.value);
@@ -138,21 +134,30 @@ const changePage = (page) => {
 
 const applyFilters = async (filters) => {
   try {
-    const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
     const response = await axios.post(
-      'http://localhost:5000/coupon/filters', // 필터링 API 엔드포인트
+      'http://localhost:5000/coupon/filters',
       filters,
       {
-        headers: {
-          Authorization: token,
-        },
+        withCredentials: true,
       }
     );
-    coupons.value = response.data; // 필터링된 쿠폰 데이터를 업데이트
-    currentPage.value = 1; // 필터링 후 첫 페이지로 이동
+    coupons.value = response.data;
+    currentPage.value = 1; 
     console.log('Filtered Coupons:', coupons.value);
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
+  }
+};
+
+const allSelected = computed(() => {
+  return coupons.value.length > 0 && selectedCoupons.value.length === coupons.value.length;
+});
+
+const selectAll = () => {
+  if (allSelected.value) {
+    selectedCoupons.value = [];
+  } else {
+    selectedCoupons.value = [...coupons.value];
   }
 };
 
@@ -311,7 +316,18 @@ const applyFilters = async (filters) => {
       display: flex;
       align-items: center;
       justify-content: center;
-}
+    }
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: 15px;
+      height: 15px;
+      accent-color: #005950;
+    }
+    .board-header-select {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     
     .board-body {
       display: flex;

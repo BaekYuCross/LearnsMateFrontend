@@ -19,7 +19,7 @@
         <div class="campaign-filter-item">
             <span class="campaign-filter-label">제목</span>
             <input 
-                v-model="filters.title"
+                v-model="filters.campaignTemplateTitle"
                 type="text" 
                 placeholder="캠페인 제목을 입력하세요"
                 class="campaign-filter-input"
@@ -29,13 +29,13 @@
             <span class="campaign-filter-label">게시일</span>
             <div class="campaign-date-range-container">
               <input 
-                v-model="filters.startPostDate"
+                v-model="filters.campaignTemplateStartPostDate"
                 type="date" 
                 class="campaign-filter-input date-input"
               />
               <span class="campaign-date-separator">~</span>
               <input 
-                v-model="filters.endPostDate"
+                v-model="filters.campaignTemplateEndPostDate"
                 type="date" 
                 class="campaign-filter-input date-input"
               />
@@ -50,18 +50,32 @@
   import { ref } from 'vue'
   
   const filters = ref({
-    title: '',
-    startPostDate: '',
-    endPostDate: '',
-    type: '',
-    status: '',
+    campaignTemplateTitle: '',
+    campaignTemplateStartPostDate: '',
+    campaignTemplateEndPostDate: '',
   })
   
   const emit = defineEmits(['search', 'reset'])
+
+  const convertToLocalDateTime = (date, isEndDate = false) => {
+    if (!date) return null; 
+    const timeString = isEndDate ? 'T23:59:59' : 'T00:00:00';
+    return `${date}${timeString}`; 
+  };
+
+  const prepareFilters = (filters) => {
+    return {
+      ...filters,
+      campaignTemplateStartPostDate: convertToLocalDateTime(filters.campaignTemplateStartPostDate), // 시작 날짜 변환
+      campaignTemplateEndPostDate: convertToLocalDateTime(filters.campaignTemplateEndPostDate, true), // 종료 날짜 변환
+    };
+  };
   
   const search = () => {
-    emit('search', filters.value)
-  }
+    const preparedFilters = prepareFilters(filters.value);
+    console.log(preparedFilters); 
+    emit('search', preparedFilters); 
+  };
   
   const reset = () => {
     Object.keys(filters.value).forEach(key => {

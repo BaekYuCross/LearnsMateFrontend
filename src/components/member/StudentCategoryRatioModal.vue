@@ -100,70 +100,82 @@
   'rgba(255, 159, 64, 0.7)',   // 주황색
   'rgba(201, 203, 207, 0.7)'   // 회색
 ];
+
+const translateCategory = (category) => {
+  const categoryMap = {
+    'BACKEND': '백엔드',
+    'FRONTEND': '프론트엔드',
+    'DEVOPS': '데브옵스',
+    'DATABASE': '데이터베이스',
+    'WEB_DEVELOPMENT': '웹 개발',
+    'MOBILE_APP_DEVELOPMENT': '앱 개발',
+    'FULL_STACK': '풀스택'
+  };
+  return categoryMap[category] || category;
+};
   
-  const token = 'Bearer yourTokenHere'; // 실제 토큰으로 교체 필요
-  const createChart = (data) => {
+const createChart = (data) => {
   if (chart) {
     chart.destroy();
   }
 
   const ctx = chartCanvas.value.getContext('2d');
-  const labels = data.map(item => item.category);
+  const labels = data.map(item => translateCategory(item.category));
   const counts = data.map(item => item.count);
   const percentages = data.map(item => item.percentage);
   
-  totalCount.value = counts.reduce((acc, curr) => acc + curr, 0);  // .value 추가
+  totalCount.value = counts.reduce((acc, curr) => acc + curr, 0);
 
   chart = new Chart(ctx, {
-  type: 'doughnut',
-  data: {
-    labels: labels,
-    datasets: [{
-      data: percentages,
-      backgroundColor: colors,
-      borderWidth: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      title: {
-        display: false
-      },
-      legend: {
-        position: 'bottom',  // 범례 위치를 아래로 변경
-        labels: {
-          boxWidth: 15,
-          padding: 15,
-          font: {
-            size: 12
-          }
+    type: 'doughnut',
+    data: {
+      labels: labels, 
+      datasets: [{
+        data: percentages,
+        backgroundColor: colors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: false
         },
-        maxWidth: 250
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            const dataIndex = context.dataIndex;
-            const label = labels[dataIndex];
-            const count = counts[dataIndex];
-            const percentage = percentages[dataIndex];
-            return `${label}: ${count.toLocaleString()}명 (${percentage.toFixed(1)}%)`;
+        legend: {
+          position: 'bottom',
+          labels: {
+            boxWidth: 15,
+            padding: 15,
+            font: {
+              size: 12
+            }
+          },
+          maxWidth: 250
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const dataIndex = context.dataIndex;
+              const label = labels[dataIndex]; 
+              const count = counts[dataIndex];
+              const percentage = percentages[dataIndex];
+              return `${label}: ${count.toLocaleString()}명 (${percentage.toFixed(1)}%)`;
+            }
           }
         }
-      }
-    },
-    layout: {
-      padding: {
-        top: 50,
-        right: 20,
-        bottom: 30,  // 아래 여백 조금 더 추가
-        left: 20
+      },
+      layout: {
+        padding: {
+          top: 50,
+          right: 20,
+          bottom: 30,
+          left: 20
+        }
       }
     }
-  }
-});
+  });
 };
 
 const fetchCategoryRatio = async (useFilter = false) => {
@@ -175,15 +187,11 @@ const fetchCategoryRatio = async (useFilter = false) => {
         endDate: `${filter.value.endYear}-${filter.value.endMonth.toString().padStart(2, '0')}-31T23:59:59`
       };
       response = await axios.post('http://localhost:5000/member/category-ratio/filter', filterData, {
-        headers: {
-          Authorization: token
-        }
+        withCredentials: true, 
       });
     } else {
       response = await axios.get('http://localhost:5000/member/category-ratio', {
-        headers: {
-          Authorization: token
-        }
+        withCredentials: true, 
       });
     }
     createChart(response.data);

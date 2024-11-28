@@ -90,7 +90,7 @@
             </div>
           </div>
           <div class="campaign-get-coupon-list">
-              <div v-for="coupon in campaign.coupons" :key="coupon.coupon_code" class="campaign-get-coupon-item">
+              <div v-for="coupon in attachedCoupons" :key="coupon.coupon_code" class="campaign-get-coupon-item">
                 <span class="coupon-name">{{ coupon.coupon_name }}</span>
                 <button class="remove-item-btn" @click="removeCoupon(coupon)" v-if="isEditMode">×</button>
             </div>
@@ -127,7 +127,7 @@
             <div>휴면상태</div>
             <div>삭제</div>
           </div>
-          <div v-for="user in paginatedTargetUsers" :key="user.member_code" class="target-user-item">
+          <div v-for="user in targetUsers" :key="user.member_code" class="target-user-item">
             <div>{{ user.member_code }}</div>
             <div>{{ user.member_name }}</div>
             <div>{{ user.member_email }}</div>
@@ -146,31 +146,23 @@
               @click="changePage(currentPage - 1)" 
               :disabled="currentPage === 1"
             >◀</button>
-            <button 
-              class="page-button" 
-              :class="{ active: currentPage === 1 }" 
-              @click="changePage(1)"
-            >1</button>
-            <span v-if="startPage > 2">...</span>
+            
             <template v-for="page in displayedPages" :key="page">
+              <span v-if="page === '...'" class="page-dots">...</span>
               <button 
-                v-if="page !== 1 && page !== totalPages" 
+                v-else
                 class="page-button" 
                 :class="{ active: currentPage === page }" 
                 @click="changePage(page)"
-              >{{ page }}</button>
+              >
+                {{ page }}
+              </button>
             </template>
-            <span v-if="endPage < totalPages - 1">...</span>
+            
             <button 
-              v-if="totalPages > 1" 
-              class="page-button" 
-              :class="{ active: currentPage === totalPages }" 
-              @click="changePage(totalPages)"
-            >{{ totalPages }}</button>
-            <button 
-              class="page-button next-button" 
+              class="page-button next-button"
               @click="changePage(currentPage + 1)" 
-              :disabled="currentPage === totalPages"
+              :disabled="currentPage === totalMemberPages"
             >▶</button>
           </div>
         </div>
@@ -235,317 +227,296 @@
   
   
   <script setup>
-  import { ref, computed, watch  } from 'vue';
-  import axios from 'axios';
-  import { useRoute, useRouter } from 'vue-router';
-  import { jwtDecode } from 'jwt-decode'; 
-  import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-  import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
-  import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
-  import CancelModule from '@/components/modules/CancelModule.vue';
-  
-  const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjI2MTY5MywiZXhwIjoxNzc1NDYxNjkzfQ.sfY4-uvhksfHdeuFUY216KJbfjkK8jeBWAVBzFttMYpn_zC4ao2FB9DZt6xEleAGh7VsteoloNjAPCWbzxD6xg';
-  const userCode = jwtDecode(token).sub;
-  const userName = jwtDecode(token).name;
-  
-  const route = useRoute();
-  const router = useRouter();
-  
-  const campaign = ref({});
-  const isEditMode = ref(false);
-  
-  const showCouponSelectModal = ref(false);
-  const showTargetUserSelectModal = ref(false);
-  const isCancelModalOpen = ref(false);
-  
-  const campaignType = ref('RESERVATION'); 
-  const selectedDate = ref('');
-  const selectedTime = ref('');
-  
-  const attachedCouponMap = ref(new Map());
-  const targetUserMap = ref(new Map());
-  
-  const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
-  const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
+  import { ref, computed, watch } from 'vue';
+import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
+import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
+import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
+import CancelModule from '@/components/modules/CancelModule.vue';
+import { useLoginState } from '@/stores/loginState';
 
-  const currentPage = ref(1);
-const pageSize = 50;
+const loginState = useLoginState();
+const userCode = loginState.adminCode;
+const userName = loginState.adminName;
 
-// 페이지네이션된 사용자 목록 계산
-const paginatedTargetUsers = computed(() => {
-  if (!campaign.value.members) return [];
-  const start = (currentPage.value - 1) * pageSize;
-  return campaign.value.members.slice(start, start + pageSize);
-});
+const route = useRoute();
+const router = useRouter();
 
-// 전체 페이지 수 계산
-const totalPages = computed(() => {
-  if (!campaign.value.members) return 1;
-  return Math.ceil(campaign.value.members.length / pageSize);
-});
+// 기본 상태 관리
+const campaign = ref({});
+const isEditMode = ref(false);
+const showCouponSelectModal = ref(false);
+const showTargetUserSelectModal = ref(false);
+const isCancelModalOpen = ref(false);
 
-// 표시할 페이지 번호 계산
+// 캠페인 타입 및 날짜 관리
+const campaignType = ref('RESERVATION');
+const selectedDate = ref('');
+const selectedTime = ref('');
+
+// 데이터 관리
+const attachedCouponMap = ref(new Map());
+const targetUserMap = ref(new Map());
+const targetUsers = ref([]);
+const attachedCoupons = ref([]);
+
+// 페이지네이션 관련
+const currentPage = ref(1);
+const pageSize = ref(15);
+const totalCount = ref(0);
+const totalMemberPages = ref(1);  
+
+// 계산된 속성들
 const displayedPages = computed(() => {
-  let start = Math.max(currentPage.value - 2, 2);
-  let end = Math.min(start + 4, totalPages.value - 1);
+  const pages = [];
+  pages.push(1);
   
-  if (end === totalPages.value - 1) {
-    start = Math.max(end - 4, 2);
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
   }
   
-  if (start === 2) {
-    end = Math.min(6, totalPages.value - 1);
-  }
-  
-  let pages = [];
-  for (let i = start; i <= end; i++) {
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalMemberPages.value - 1, currentPage.value + 2); 
+       i++) {
     pages.push(i);
   }
+  
+  if (totalMemberPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  
+  if (totalMemberPages.value > 1) {
+    pages.push(totalMemberPages.value);
+  }
+  
   return pages;
 });
 
-const startPage = computed(() => {
-  return displayedPages.value[0];
-});
-
-const endPage = computed(() => {
-  return displayedPages.value[displayedPages.value.length - 1];
-});
-
-// 페이지 변경 함수
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
-  const fetchTemplate = async () => {
-    const campaignCode = route.query.campaignCode;
-    try {
-        const response = await axios.get(`http://localhost:5000/campaign/${campaignCode}`, {
-            headers: { Authorization: token },
-        });
-        campaign.value = response.data;
-
-        campaignType.value = campaign.value.campaign_type; 
-
-        if (campaignType.value === 'RESERVATION' && Array.isArray(campaign.value.campaign_send_date)) {
-            const formattedDateTime = formatSendDateFromArray(campaign.value.campaign_send_date);
-            const [date, time] = formattedDateTime.split(' ');
-            selectedDate.value = date; 
-            selectedTime.value = time; 
-        } else {
-            selectedDate.value = '';
-            selectedTime.value = '';
-        }
-
-        attachedCouponMap.value.clear();
-        if (campaign.value.coupons) {
-            campaign.value.coupons.forEach((coupon) => {
-                attachedCouponMap.value.set(coupon.coupon_code, coupon);
-            });
-        }
-        targetUserMap.value.clear();
-        if (campaign.value.members) {
-            campaign.value.members.forEach((member) => {
-                targetUserMap.value.set(member.member_code, member);
-            });
-        }
-    } catch (error) {
-        console.error('캠페인 데이터 로드 실패:', error);
-    }
-};
-
-const toggleEditMode = () => {
-    if (campaignType.value === 'RESERVATION' && Array.isArray(campaign.value.campaign_send_date)) {
-        const formattedDateTime = formatSendDateFromArray(campaign.value.campaign_send_date);
-        const [date, time] = formattedDateTime.split(' ');
-        selectedDate.value = date; // "YYYY-MM-DD"
-        selectedTime.value = time; // "HH:MM"
-    }
-    isEditMode.value = true;
-};
-
 const isPastSendDate = computed(() => {
-  if (!campaign.value.campaign_send_date || campaign.value.campaign_send_date.length < 5) {
-    return false; 
+  if (!campaign.value.campaign_send_date || !Array.isArray(campaign.value.campaign_send_date)) {
+    return false;
   }
   const [year, month, day, hour, minute] = campaign.value.campaign_send_date;
-  const sendDate = new Date(year, month - 1, day, hour, minute); 
-  return sendDate < new Date(); 
+  const sendDate = new Date(year, month - 1, day, hour, minute);
+  return sendDate < new Date();
 });
 
+const fetchTemplate = async () => {
+  const campaignCode = route.query.campaignCode;
+  try {
+    const response = await axios.get(`http://localhost:5000/campaign/${campaignCode}`, {
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize.value,
+      },
+      withCredentials: true,
+    });
 
-  
-  const saveChanges = async () => {
-    if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
-        alert('예약 발송 날짜와 시간을 설정하세요.');
-        return;
-    }
-
-    const payload = {
-        campaign_code: campaign.value.campaign_code,
-        campaign_title: campaign.value.campaign_title,
-        campaign_contents: campaign.value.campaign_contents,
-        campaign_type: campaignType.value, 
-        campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
-        coupons: attachedCoupons.value,
-        members: targetUsers.value,
-        admin_code: userCode,
-        created_at: campaign.value.created_at,
-        updated_at: new Date().toISOString(),
+    // 기본 캠페인 정보 설정
+    campaign.value = {
+      campaign_code: response.data.campaign_code,
+      campaign_title: response.data.campaign_title,
+      campaign_contents: response.data.campaign_contents,
+      campaign_type: response.data.campaign_type,
+      campaign_send_date: response.data.campaign_send_date,
+      created_at: response.data.created_at,
+      updated_at: response.data.updated_at,
     };
 
-      try {
-          await axios.patch('http://localhost:5000/campaign/edit', payload, {
-              headers: {
-                  Authorization: token,
-                  'Content-Type': 'application/json',
-              },
-          });
-          isEditMode.value = false;
-          fetchTemplate(); 
-      } catch (error) {
-          console.error('캠페인 수정 실패:', error);
-          alert('발송 날짜/시간을 입력해주세요');
-      }
-  };
+    campaignType.value = response.data.campaign_type;
 
-  
-  const cancelEditMode = () => {
-    if (confirm('수정을 취소하시겠습니까? 변경 사항이 저장되지 않습니다.')) {
-      isEditMode.value = false;
-      fetchTemplate(); 
-    }
-  };
-  const confirmCancelCampaign = async () => {
-    isCancelModalOpen.value = true;
-  };
-
-  const backCampaign =  () => {
-    router.push({ 
-            path: '/marketing', 
-        });
-  };
-  
-  const cancelCampaign = async () => {
-    const campaignCode = route.query.campaignCode;
-    try {
-      await axios.delete(`http://localhost:5000/campaign/delete/${campaignCode}`, {
-              headers: {
-                  Authorization: token,
-              },
-          });
-          window.location.href = '/marketing';
-    } catch (error) {
-      console.error('캠페인 삭제 실패:', error);
-          alert('삭제에 실패했습니다.');
+    // 날짜 처리 수정 - 배열에서 날짜로 변환
+    if (Array.isArray(response.data.campaign_send_date)) {
+      const [year, month, day, hours, minutes] = response.data.campaign_send_date;
+      selectedDate.value = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      selectedTime.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
-  };
-  
-  const clickCouponSelect = () => {
-    showCouponSelectModal.value = true;
-  };
-  
-  const handleCouponModalClose = () => {
-    showCouponSelectModal.value = false;
-  };
-  
-  const handleCouponSubmit = (coupons) => {
-    coupons.forEach((coupon) => {
-      attachedCouponMap.value.set(coupon.coupon_code, coupon);
-    });
-    campaign.value.coupons = Array.from(attachedCouponMap.value.values());
-    showCouponSelectModal.value = false;
-  };
-  
-  const removeCoupon = (coupon) => {
-    attachedCouponMap.value.delete(coupon.coupon_code);
-    campaign.value.coupons = Array.from(attachedCouponMap.value.values());
-  };
-  
-  const clearAllCoupons = () => {
-    if (confirm('선택한 모든 쿠폰을 삭제하시겠습니까?')) {
-      attachedCouponMap.value.clear();
-      campaign.value.coupons = [];
-    }
-  };
-  
-  const clickTargetUserSelect = () => {
-    showTargetUserSelectModal.value = true;
-  };
-  
-  const handleTargetUserModalClose = () => {
-    showTargetUserSelectModal.value = false;
-  };
-  
-  const handleTargetUserSubmit = (users) => {
-    users.forEach((user) => {
-      targetUserMap.value.set(user.member_code, user);
-    });
-    campaign.value.members = Array.from(targetUserMap.value.values());
-    showTargetUserSelectModal.value = false;
-  };
-
-  const confirmCancel = () => {
-    isCancelModalOpen.value = false; 
-    cancelCampaign();
-  };
-
-  const cancelRegister = () => {
-    isCancelModalOpen.value = false;
-    return;
-  };
-
-  const removeUser = (user) => {
-    targetUserMap.value.delete(user.member_code);
-    campaign.value.members = Array.from(targetUserMap.value.values());
-  };
-
-  
-  const clearAllUsers = () => {
-    if (confirm('선택한 모든 사용자를 삭제하시겠습니까?')) {
-      targetUserMap.value.clear();
-      campaign.value.members = [];
-    }
-  };
-
-  const formatDateTimeFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 6) return '';
-    const [year, month, day, hours, minutes, seconds] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
-  
-  const formatSendDateFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
-    const [year, month, day, hours, minutes] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-  };
-  
-  const formatDateFromArray = (dateArray) => {
-    if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
-    const [year, month, day] = dateArray;
-    return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-  };
-
-  watch(() => campaign.value, (newCampaign) => {
-    attachedCouponMap.value.clear();
-    targetUserMap.value.clear();
+    // 멤버와 쿠폰 데이터 설정
+    targetUsers.value = response.data.members.content;
+    totalCount.value = response.data.members.totalElements;
+    totalMemberPages.value = response.data.members.totalPages;
+    attachedCoupons.value = response.data.coupons.content;
     
-    if (newCampaign.coupons) {
-      newCampaign.coupons.forEach((coupon) => {
+    // Map 초기화 및 설정
+    attachedCouponMap.value.clear();
+    if (response.data.coupons?.content) {
+      response.data.coupons.content.forEach((coupon) => {
         attachedCouponMap.value.set(coupon.coupon_code, coupon);
       });
+      attachedCoupons.value = Array.from(attachedCouponMap.value.values());
     }
-    
-    if (newCampaign.members) {
-      newCampaign.members.forEach((member) => {
-        targetUserMap.value.set(member.member_code, member);
-      });
-    }
-  }, { deep: true });
-  
-  fetchTemplate();
+    targetUserMap.value.clear();
+
+    response.data.coupons.content.forEach((coupon) => {
+      attachedCouponMap.value.set(coupon.coupon_code, coupon);
+    });
+
+    response.data.members.content.forEach((member) => {
+      targetUserMap.value.set(member.member_code, member);
+    });
+    console.log('서버에서 받은 쿠폰 데이터:', response.data.coupons);
+    console.log('현재 저장된 쿠폰들:', attachedCoupons.value);
+
+  } catch (error) {
+    console.error('캠페인 데이터 로드 실패:', error);
+  }
+};
+
+// 이벤트 핸들러
+const toggleEditMode = () => {
+  if (campaignType.value === 'RESERVATION' && campaign.value.campaignSendDate) {
+    const date = new Date(campaign.value.campaignSendDate);
+    selectedDate.value = date.toISOString().split('T')[0];
+    selectedTime.value = date.toTimeString().slice(0, 5);
+  }
+  isEditMode.value = true;
+};
+
+const saveChanges = async () => {
+  if (campaignType.value === 'RESERVATION' && (!selectedDate.value || !selectedTime.value)) {
+    alert('예약 발송 날짜와 시간을 설정하세요.');
+    return;
+  }
+
+  const payload = {
+    campaign_code: campaign.value.campaign_code,
+    campaign_title: campaign.value.campaign_title,
+    campaign_contents: campaign.value.campaign_contents,
+    campaign_type: campaignType.value,
+    campaign_send_date: campaignType.value === 'RESERVATION' ? 
+      `${selectedDate.value}T${selectedTime.value}` : null,
+    coupons: Array.from(attachedCouponMap.value.values()),
+    members: targetUsers.value,
+    admin_code: userCode,
+    created_at: campaign.value.created_at,
+    updated_at: new Date().toISOString(),
+  };
+
+
+  try {
+    await axios.patch('http://localhost:5000/campaign/edit', payload, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    isEditMode.value = false;
+    await fetchTemplate();
+  } catch (error) {
+    console.error('캠페인 수정 실패:', error);
+    alert('발송 날짜/시간을 입력해주세요');
+  }
+};
+
+const changePage = async (newPage) => {
+  if (newPage > 0 && newPage <= totalMemberPages.value) {
+    currentPage.value = newPage;
+    await fetchTemplate();
+  }
+};
+
+const cancelEditMode = () => {
+  if (confirm('수정을 취소하시겠습니까? 변경 사항이 저장되지 않습니다.')) {
+    isEditMode.value = false;
+    fetchTemplate();
+  }
+};
+
+const handleCouponSubmit = (coupons) => {
+  console.log('선택된 쿠폰들:', coupons);
+  coupons.forEach((coupon) => {
+    attachedCouponMap.value.set(coupon.coupon_code, coupon);
+  });
+  attachedCoupons.value = Array.from(attachedCouponMap.value.values());
+  console.log('저장된 쿠폰들:', attachedCoupons.value);
+  showCouponSelectModal.value = false;
+};
+
+const handleTargetUserSubmit = (users) => {
+  users.forEach((user) => {
+    targetUserMap.value.set(user.memberCode, user);
+  });
+  targetUsers.value = Array.from(targetUserMap.value.values());
+  showTargetUserSelectModal.value = false;
+};
+
+// 사용자 및 쿠폰 관리 함수들
+const removeCoupon = (coupon) => {
+  attachedCouponMap.value.delete(coupon.couponCode);
+  attachedCoupons.value = Array.from(attachedCouponMap.value.values());
+};
+
+const removeUser = (user) => {
+  targetUserMap.value.delete(user.memberCode);
+  targetUsers.value = Array.from(targetUserMap.value.values());
+};
+
+const clearAllCoupons = () => {
+  if (confirm('선택한 모든 쿠폰을 삭제하시겠습니까?')) {
+    attachedCouponMap.value.clear();
+    attachedCoupons.value = [];
+  }
+};
+
+const clearAllUsers = () => {
+  if (confirm('선택한 모든 사용자를 삭제하시겠습니까?')) {
+    targetUserMap.value.clear();
+    targetUsers.value = [];
+  }
+};
+
+const clickCouponSelect = () => {
+  showCouponSelectModal.value = true;
+};
+
+const handleCouponModalClose = () => {
+  showCouponSelectModal.value = false;
+};
+
+const clickTargetUserSelect = () => {
+  showTargetUserSelectModal.value = true;
+};
+
+const handleTargetUserModalClose = () => {
+  showTargetUserSelectModal.value = false;
+};
+
+const confirmCancelCampaign = () => {
+  isCancelModalOpen.value = true;
+};
+
+const confirmCancel = () => {
+  isCancelModalOpen.value = false;
+  cancelCampaign();
+};
+
+const cancelRegister = () => {
+  isCancelModalOpen.value = false;
+};
+
+const backCampaign = () => {
+  router.push({
+    path: '/marketing',
+  });
+};
+
+const cancelCampaign = async () => {
+  const campaignCode = route.query.campaignCode;
+  try {
+    await axios.delete(`http://localhost:5000/campaign/delete/${campaignCode}`, {
+      withCredentials: true,
+    });
+    window.location.href = '/marketing';
+  } catch (error) {
+    console.error('캠페인 삭제 실패:', error);
+    alert('삭제에 실패했습니다.');
+  }
+};
+
+// 초기 데이터 로드
+fetchTemplate();
   </script>
   
 

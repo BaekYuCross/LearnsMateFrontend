@@ -11,9 +11,25 @@
       <div class="content-section" :class="{ 'with-detail': selectedStudent }">
         <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-header-container">
-            <div class="count">전체 학생 수 <span class="count-number">{{ totalCount }}</span>명</div>
+            <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
-              
+              <div class="column-selector">
+                <button @click="toggleDropdown" class="dropdown-button">
+                  필요 컬럼 선택 ▼
+                </button>
+                <div v-show="isDropdownOpen" class="dropdown-menu">
+                  <div v-for="(label, key) in columns" :key="key" class="dropdown-item">
+                    <input 
+                      type="checkbox"   
+                      :value="key" 
+                      v-model="selectedColumns" 
+                      @change="updateSelectedColumns" 
+                      :id="key"
+                    />
+                    <label :for="key">{{ label }}</label>
+                  </div>
+                </div>
+              </div>
               <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
               <button class="excel-button" @click="$refs.fileInput.click()">
                 <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
@@ -27,44 +43,61 @@
             </div>
           </div>
             
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>학생 코드</th>
-                <th>이름</th>
-                <th>이메일</th>
-                <th>연락처</th>
-                <th>주소</th>
-                <th>나이</th>
-                <th>생년월일</th>
-                <th>계정상태</th>
-                <th>생성일</th>
-                <th>휴면상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
+          <div class="student-board-container">
+            <div class="student-board-header">
+              <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
+              <div v-if="selectedColumns.includes('memberName')" class="student-board-header-name">이름</div>
+              <div v-if="selectedColumns.includes('memberEmail')" class="student-board-header-email">이메일</div>
+              <div v-if="selectedColumns.includes('memberPhone')" class="student-board-header-phone">연락처</div>
+              <div v-if="selectedColumns.includes('memberAddress')" class="student-board-header-address">주소</div>
+              <div v-if="selectedColumns.includes('memberAge')" class="student-board-header-age">나이</div>
+              <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
+              <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
+              <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
+              <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
+            </div>
+
+            <div class="student-board-body">
+              <div 
+                class="student-board-row" 
                 v-for="(student, index) in students" 
                 :key="student.memberCode"
                 @click="showDetail(student)"
-                class="cursor-pointer hover:bg-gray-50"
                 :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
               >
-                <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ student.memberCode }}</td>
-                <td>{{ student.memberName }}</td>
-                <td>{{ student.memberEmail }}</td>
-                <td>{{ student.memberPhone }}</td>
-                <td>{{ student.memberAddress }}</td>
-                <td>{{ student.memberAge }}</td>
-                <td>{{ student.memberBirth }}</td>
-                <td>{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
-                <td>{{ student.createdAt }}</td>
-                <td>{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <div v-if="selectedColumns.includes('memberCode')" class="student-board-row-code">
+                  {{ student.memberCode }}
+                </div>
+                <div v-if="selectedColumns.includes('memberName')" class="student-board-row-name">
+                  {{ student.memberName }}
+                </div>
+                <div v-if="selectedColumns.includes('memberEmail')" class="student-board-row-email">
+                  {{ student.memberEmail }}
+                </div>
+                <div v-if="selectedColumns.includes('memberPhone')" class="student-board-row-phone">
+                  {{ student.memberPhone }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAddress')" class="student-board-row-address">
+                  {{ student.memberAddress }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAge')" class="student-board-row-age">
+                  {{ student.memberAge }}
+                </div>
+                <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
+                  {{ student.memberBirth }}
+                </div>
+                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag">
+                  {{ student.memberFlag === true ? '활성' : '비활성' }}
+                </div>
+                <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
+                  {{ student.createdAt }}
+                </div>
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant">
+                  {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="pagination">
             <button 
@@ -281,11 +314,10 @@
         </div>
       </div>
     </div>
-  <!-- 여기에 모달 컴포넌트 추가 -->
-  <CategoryRatioModal 
-      :is-open="showCategoryModal" 
-      @close="showCategoryModal = false" 
-    />
+    <CategoryRatioModal 
+        :is-open="showCategoryModal" 
+        @close="showCategoryModal = false" 
+      />
   </div>  
 </template>
 
@@ -307,17 +339,41 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjQ1Mjc4MywiZXhwIjoxNzc1NjUyNzgzfQ.xLHlCXMO-7yPd_Gd1xb0sQy1SSU9O9buW0dx8zbWSIOQRAw6mTGc9p8_tJerr3tjIlI23Rd0_u6XPs-5prRhlg';
+const isDropdownOpen = ref(false);
+const columns = ref({
+  memberCode: "학생 코드",
+  memberName: "이름",
+  memberEmail: "이메일",
+  memberPhone: "연락처",
+  memberAddress: "주소",
+  memberAge: "나이",
+  memberBirth: "생년월일",
+  memberFlag: "계정상태",
+  createdAt: "생성일",
+  memberDormantStatus: "휴면상태"
+});
+const selectedColumns = ref(Object.keys(columns.value));
+
+// 함수 추가
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const updateSelectedColumns = () => {
+  console.log("현재 선택된 컬럼:", selectedColumns.value);
+};
+const formatCurrency = (value) => {
+  return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
+};
+
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize,
-      },
-      headers: {
-        Authorization: token,
       },
     });
 
@@ -334,20 +390,16 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post(
-      'http://localhost:5000/member/filter/student',
-      lastFilterData.value,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize,
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
+      withCredentials: true, 
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     students.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -364,14 +416,10 @@ const showDetail = async (student) => {
     studentDetail.value = null;
   } else {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/member/student/${student.memberCode}`,
-        {
-          headers: { 
-            Authorization: token 
-          }
-        }
-      );
+      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
+        withCredentials: true,   
+      });
+
       selectedStudent.value = student;
       studentDetail.value = response.data;
       console.log("상세 정보:", response.data);
@@ -410,16 +458,12 @@ const handleFileUpload = async (event) => {
   formData.append('file', file);
 
   try {
-    await axios.post(
-      'http://localhost:5000/member/excel/upload/student',
-      formData,
-      {
-        headers: {
-          'Authorization': token,
-          'Content-Type': 'multipart/form-data'
-        }
+    await axios.post('http://localhost:5000/member/excel/upload/student',formData, {
+      withCredentials: true,  
+      headers: {
+        'Content-Type': 'multipart/form-data'
       }
-    );
+    });
     
     // 업로드 성공 후 목록 새로고침
     await fetchStudents();
@@ -446,17 +490,16 @@ const handleExcelDownload = async() => {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/student',
       responseType: 'blob',
+      withCredentials: true,
       headers: {
-        'Authorization': token,
         'Content-Type': 'application/json'
+      },
+      data: {
+        selectedColumns: selectedColumns.value,
+        ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {})
       }
     };
 
-    if (isFiltered.value && lastFilterData.value) {
-      config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
-    }
-    
     const response = await axios(config);
     
     // 에러 응답 체크
@@ -521,19 +564,18 @@ const displayedPages = computed(() => {
 
 const getVocCategory = (categoryCode) => {
   const categories = {
-    1: '강의 관련',
-    2: '결제 관련',
-    3: '시스템 관련',
-    4: '기타'
-    // 실제 카테고리 코드에 맞게 수정해주세요
+    1: '결제 및 환불',
+    2: '계정 및 로그인',
+    3: '프로모션 및 쿠폰',
+    4: '시스템 기술적 문제',
+    5: '기타 건의사항',
   };
-  return categories[categoryCode] || '기타';
+  return categories[categoryCode];
 };
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
   
-  // 배열의 값이 [2024, 12, 1, 1, 1] 이런 형태라고 가정
   const [year, month, day, hour, minute] = dateArray;
   
   // 월과 일이 한자리수일 경우 앞에 0을 붙임

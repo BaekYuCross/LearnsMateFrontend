@@ -2,18 +2,12 @@
   <div class="reserved-layout-container">
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
-      <BlacklistFilter 
-        :type="filterType"
-        @search="handleSearch" 
-        @reset="handleReset"
-      />
-
       <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
         <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
           <div class="reserved-header-container">
             <div class="reserved-count">
               예비 {{ memberTypeText }} 블랙리스트 수 
-              <span class="reserved-count-number">{{ totalCount }}</span>명
+              <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
             </div>
           </div>
 
@@ -116,8 +110,29 @@
                 </div>
               </div>
             </div>
+            <!-- 블랙리스트 등록 버튼 -->
+            <button 
+              v-if="selectedReserved" 
+              @click="openReasonModal" 
+              class="register-button mt-4"
+            >
+              블랙리스트 등록
+            </button>
 
-            <button @click="registerBlacklist" class="reserved-insert">등록하기</button>
+            <!-- 사유 입력 모달 -->
+            <BlackReason
+              :is-open="isReasonModalOpen"
+              @cancel="closeReasonModal"
+              @confirm="handleReasonConfirm"
+            />
+
+            <!-- 모달 컴포넌트 사용 -->
+            <RegisterModule
+              v-if="isConfirmModalOpen"
+              :modalTitle="modalTitle"
+              @confirm="confirmRegister"
+              @cancel="closeConfirmModal"
+            />
           </div>
         </div>
       </div>
@@ -128,18 +143,27 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import BlacklistFilter from '@/components/member/BlacklistFilter.vue';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
+import RegisterModule from '@/components/modules/RegisterModule.vue';
+import BlackReason from '@/components/member/BlackReason.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
 import axios from '@/plugins/axios';
 
-  const route = useRoute();
-  const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
-  const memberTypeText = computed(() => ({
+const route = useRoute();
+const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
+const memberTypeText = computed(() => ({
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
+
 const filterType = computed(() => memberType.value);
+
+// 모달 관련 상태
+const isModalOpen = ref(false);
+const modalTitle = ref('블랙리스트를 등록하시겠습니까?');
+const blacklistReason = ref('');
+const isReasonModalOpen = ref(false);
+const isConfirmModalOpen = ref(false);
 watch(
   () => route.path,
   (newPath) => {
@@ -147,6 +171,10 @@ watch(
     resetData();
   }
 );
+
+const formatCurrency = (value) => {
+  return value.toLocaleString(); 
+};
 
 const resetData = () => {
   currentPage.value = 1;
@@ -170,9 +198,6 @@ const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
 
-
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6WyJST0xFX0FETUlOIl0sImlhdCI6MTczMjMzNDYzNSwiZXhwIjoxNzc1NTM0NjM1fQ.mGz_-KbPzd7aO5FDq9ij_odcIJo2V2fmgOQgb2-qB87WXfieAiNPtFuNUwe42QHBJtt_Zo4EgtL1vKU32OP6CQ';
-// 댓글별로 그룹화된 신고 내역
 const groupedReports = computed(() => {
   const grouped = {};
   
@@ -195,12 +220,10 @@ const groupedReports = computed(() => {
 const fetchReservedList = async () => {
   try {
     const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved`, {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize
-      },
-      headers: {
-        Authorization: token,
       },
     });
     
@@ -215,63 +238,22 @@ const fetchReservedList = async () => {
   }
 };
 
-const handleSearch = async (filterData) => {
-  try {
-    isFiltered.value = true;
-    lastFilterData.value = filterData;
-    currentPage.value = 1;
-
-    const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
-      filterData,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-    reservedList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-    selectedReserved.value = null;
-  } catch (error) {
-    console.error('Failed to filter reserved list:', error);
-  }
-};
-
-const handleReset = () => {
-  isFiltered.value = false;
-  lastFilterData.value = null;
-  currentPage.value = 1;
-  selectedReserved.value = null;
-  fetchReservedList();
-};
-
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      `http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,
-      lastFilterData.value,
-      {
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await axios.post(`http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,lastFilterData.value, {
+      withCredentials: true,  
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
     reservedList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -312,12 +294,8 @@ const showDetail = async (blacklist) => {
   } else {
     selectedReserved.value = blacklist;
     try {
-      const response = await axios.get(
-        `http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, 
-        {
-          headers: {
-            Authorization: token,
-          },
+      const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, {
+          withCredentials: true
         }
       );
       console.log('Detail response:', response.data);
@@ -329,31 +307,46 @@ const showDetail = async (blacklist) => {
   }
 };
 
-const registerBlacklist = async () => {
-  if (!selectedReserved.value) return;
-  
+// 사유 입력 모달 열기
+const openReasonModal = () => {
+  isReasonModalOpen.value = true;
+};
+
+// 사유 입력 모달 닫기
+const closeReasonModal = () => {
+  isReasonModalOpen.value = false;
+};
+
+// 사유 입력 후 확인
+const handleReasonConfirm = (reason) => {
+  blacklistReason.value = reason;
+  isReasonModalOpen.value = false;
+  isConfirmModalOpen.value = true;
+};
+// 최종 확인 모달 닫기
+const closeConfirmModal = () => {
+  isConfirmModalOpen.value = false;
+  blacklistReason.value = '';
+};
+
+const confirmRegister = async () => {
   try {
     await axios.post(
-      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,  // membercode를 URL에 포함
-       "신고 누적으로 인한 블랙리스트 등록",  // RequestSaveBlacklistVO에 맞는 형식
-      {
+      `http://localhost:5000/blacklist/${selectedReserved.value.memberCode}`,{ blackReason: blacklistReason.value }, {
+        withCredentials: true,
         headers: {
-          Authorization: token,
           'Content-Type': 'application/json',
         },
       }
     );
-    
+    alert('블랙리스트 등록이 완료되었습니다.');
+    closeConfirmModal();
     await fetchReservedList();
     selectedReserved.value = null;
   } catch (error) {
     console.error('Failed to register blacklist:', error);
+    alert('블랙리스트 등록에 실패했습니다.');
   }
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  return new Date(dateString).toLocaleString();
 };
 
 onMounted(() => {
