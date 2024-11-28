@@ -271,13 +271,17 @@ const deleteCoupon = async () => {
 }
 
 .coupon-buttons {
+    display: flex;
+    justify-content: right;
     position: relative;
     margin-top: 20px;
     text-align: right;
 }
 
 .coupon-edit-button,
-.coupon-delete-button {
+.coupon-delete-button,
+.coupon-save-button,
+.coupon-cancel-button {
     background-color: #005950;
     color: #ffffff;
     border: none;
@@ -287,7 +291,9 @@ const deleteCoupon = async () => {
 }
 
 .coupon-edit-button:hover,
-.coupon-delete-button:hover {
+.coupon-delete-button:hover,
+.coupon-save-button:hover,
+.coupon-cancel-button:hover {
   cursor: pointer;
   background-color: #004c42;
 }
