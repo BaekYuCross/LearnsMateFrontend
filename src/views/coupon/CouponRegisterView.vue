@@ -182,23 +182,23 @@ const formatDateWithTime = {
   // 시작일: 해당 날짜의 00:00:00
   startDate: (date) => {
     if (!date) return null;
-    return `${date}T00:00:00`; // ISO 8601 형식으로 변환
+    return `${date}T00:00:00`;
   },
 
   // 만료일: 해당 날짜의 23:59:59
   endDate: (date) => {
     if (!date) return null;
-    return `${date}T23:59:59`; // ISO 8601 형식으로 변환
+    return `${date}T23:59:59`;
   },
 
-  // 여러 날짜를 한번에 포맷팅 (쿠폰 등록용)
-  formatCouponDates: (startDate, endDate) => {
-    return {
-      startDate: formatDateWithTime.startDate(startDate),
-      endDate: formatDateWithTime.endDate(endDate),
-      createdAt: new Date().toISOString(), // 현재 시간
-      updatedAt: new Date().toISOString()  // 현재 시간
-    };
+  // 여러 날짜를 쿠폰 데이터에 직접 업데이트
+  applyCouponDates: (couponData) => {
+    if (couponData.couponStartDate) {
+      couponData.couponStartDate = formatDateWithTime.startDate(couponData.couponStartDate);
+    }
+    if (couponData.couponExpireDate) {
+      couponData.couponExpireDate = formatDateWithTime.endDate(couponData.couponExpireDate);
+    }
   }
 };
 
@@ -207,12 +207,18 @@ const selectedLectureIds = ref([]);
 
 const registerCoupon = async () => {
   try {
+
+    // couponData의 날짜 필드를 직접 수정
+    formatDateWithTime.applyCouponDates(couponData.value);
+
+
     const requestData = {
       couponName: couponData.value.couponName,
       couponCategoryName: couponData.value.couponCategoryName,
       couponContents: couponData.value.couponContents,
       couponDiscountRate: Number(couponData.value.couponDiscountRate),
-      ...formatDateWithTime.formatCouponDates(couponData.value.couponStartDate, couponData.value.couponExpireDate),
+      couponStartDate: couponData.value.couponStartDate, // 변환된 값
+      couponExpireDate: couponData.value.couponExpireDate, // 변환된 값
       lectureCode: couponData.value.selectedLectures.map(lecture => lecture.lecture_code), // lecture_code 배열로 전송
     };
 
@@ -226,7 +232,6 @@ const registerCoupon = async () => {
   //     couponData[key] = new Date(couponData[key]).toISOString();
   //   }
   // });
-console.log(formatDateWithTime.formatCouponDates(couponData.value.couponStartDate, couponData.value.couponExpireDate));
 console.log(couponData.value.couponStartDate, couponData.value.couponExpireDate); 
 
 console.log(couponData.value);
