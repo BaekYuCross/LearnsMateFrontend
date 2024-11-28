@@ -106,41 +106,31 @@ const coupon = ref([]);
 const selectedCoupon = ref(null);
 const currentPage = ref(1);
 const pageSize = 15;
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDUwMDMiLCJlbWFpbCI6IjY5NDA5MEBnbWFpbC5jb20iLCJuYW1lIjoi7J207ISc7ZiEIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE3MzIxNTEzNzYsImV4cCI6MTc3NTM1MTM3Nn0.09oguvlZSs2ZX3WuZtjt8cATCF7uxYv1Jv7bphGSJd_UZqN97cHG0RRU_5CFGVNONJLRf-x-QtBpIEAi2R2ZgQ';
-// 전체 페이지 계산
-// const totalPages = computed(() => Math.ceil(coupon.length / pageSize));
+
 const totalPages = computed(() => {
   if (Array.isArray(coupon.value)) {
     return Math.ceil(coupon.value.length / pageSize);
   }
-  return 1; // 기본값 1로 반환
+  return 1;
 });
 
-// 페이지별로 보여줄 쿠폰 계산
-// const paginatedCoupons = computed(() =>
-//   coupon.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-// );
 const paginatedCoupons = computed(() => {
   if (Array.isArray(coupon.value)) {
     return coupon.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
   }
-  return []; // 배열이 아닌 경우 빈 배열 반환
+  return [];
 });
 
-
-// 페이지 변경
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
   }
 };
 
-// 선택된 쿠폰 설정
 const selectCoupon = (couponData) => {
   selectedCoupon.value = couponData;
 };
 
-// 선택 해제
 const deselectCoupon = () => {
   selectedCoupon.value = null;
 };
@@ -151,7 +141,11 @@ const registerCoupon = () => {
 
 const fetchCoupons = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/coupon/coupons'); // API 호출
+    const response = await axios.get('http://localhost:5000/coupon/coupons',
+      {
+        withCredentials: true
+      }
+    );
     console.log('Fetched data:', response.data); // 응답 데이터 확인
 
     // 응답 데이터가 배열인지 확인하고 처리
@@ -171,8 +165,8 @@ const applyFilters = async (filters) => {
   try {
     const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
     {
+      withCredentials: true,
       headers: {
-        Authorization: token,
         'Content-Type': 'application/json',
       }
     }
@@ -200,9 +194,8 @@ const camelToSnake = (obj) => {
   }, {});
 };
 
-// 컴포넌트가 로드될 때 데이터 가져오기
 onMounted(() => {
-  fetchCoupons(); // 처음 로드 시 쿠폰 데이터를 가져옴
+  fetchCoupons();
 });
 
 const formatDate = (isoDate) => {
