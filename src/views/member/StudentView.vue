@@ -261,9 +261,9 @@
               <div class="voc-list">
                 <!-- 미답변 문의 -->
                 <div class="unanswered">
-                  <h5>미답변 문의 ({{ studentDetail.unansweredvocbyMemberList?.length || 0 }})</h5>
+                  <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})</h5>
                   <div class="voc-grid">
-                    <div v-for="voc in studentDetail.unansweredvocbyMemberList" 
+                    <div v-for="voc in studentDetail.unansweredVocbyMemberList" 
                         :key="voc.vocCode" 
                         class="voc-item">
                       <div class="voc-detail">
