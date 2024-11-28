@@ -322,6 +322,21 @@
     text-align: center;
   }
   
+
+  .board-row-title,
+    .board-row-contents {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .board-row-title {
+      max-width: 100%;
+    }
+
+    .board-row-contents {
+      max-width: 100%;
+    }
   .board-row:hover {
     background-color: #f4f4f4;
   }
