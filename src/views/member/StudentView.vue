@@ -43,44 +43,61 @@
             </div>
           </div>
             
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th v-if="selectedColumns.includes('memberCode')">학생 코드</th>
-                <th v-if="selectedColumns.includes('memberName')">이름</th>
-                <th v-if="selectedColumns.includes('memberEmail')">이메일</th>
-                <th v-if="selectedColumns.includes('memberPhone')">연락처</th>
-                <th v-if="selectedColumns.includes('memberAddress')">주소</th>
-                <th v-if="selectedColumns.includes('memberAge')">나이</th>
-                <th v-if="selectedColumns.includes('memberBirth')">생년월일</th>
-                <th v-if="selectedColumns.includes('memberFlag')">계정상태</th>
-                <th v-if="selectedColumns.includes('createdAt')">생성일</th>
-                <th v-if="selectedColumns.includes('memberDormantFlag')">휴면상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
+          <div class="student-board-container">
+            <div class="student-board-header">
+              <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
+              <div v-if="selectedColumns.includes('memberName')" class="student-board-header-name">이름</div>
+              <div v-if="selectedColumns.includes('memberEmail')" class="student-board-header-email">이메일</div>
+              <div v-if="selectedColumns.includes('memberPhone')" class="student-board-header-phone">연락처</div>
+              <div v-if="selectedColumns.includes('memberAddress')" class="student-board-header-address">주소</div>
+              <div v-if="selectedColumns.includes('memberAge')" class="student-board-header-age">나이</div>
+              <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
+              <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
+              <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
+              <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
+            </div>
+
+            <div class="student-board-body">
+              <div 
+                class="student-board-row" 
                 v-for="(student, index) in students" 
                 :key="student.memberCode"
                 @click="showDetail(student)"
-                class="cursor-pointer hover:bg-gray-50"
                 :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
               >
-                <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td v-if="selectedColumns.includes('memberCode')">{{ student.memberCode }}</td>
-                <td v-if="selectedColumns.includes('memberName')">{{ student.memberName }}</td>
-                <td v-if="selectedColumns.includes('memberEmail')">{{ student.memberEmail }}</td>
-                <td v-if="selectedColumns.includes('memberPhone')">{{ student.memberPhone }}</td>
-                <td v-if="selectedColumns.includes('memberAddress')">{{ student.memberAddress }}</td>
-                <td v-if="selectedColumns.includes('memberAge')">{{ student.memberAge }}</td>
-                <td v-if="selectedColumns.includes('memberBirth')">{{ student.memberBirth }}</td>
-                <td v-if="selectedColumns.includes('memberFlag')">{{ student.memberFlag === true ? '활성' : '비활성' }}</td>
-                <td v-if="selectedColumns.includes('createdAt')">{{ student.createdAt }}</td>
-                <td v-if="selectedColumns.includes('memberDormantFlag')">{{ student.memberDormantFlag === true ? '휴면' : '활성' }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <div v-if="selectedColumns.includes('memberCode')" class="student-board-row-code">
+                  {{ student.memberCode }}
+                </div>
+                <div v-if="selectedColumns.includes('memberName')" class="student-board-row-name">
+                  {{ student.memberName }}
+                </div>
+                <div v-if="selectedColumns.includes('memberEmail')" class="student-board-row-email">
+                  {{ student.memberEmail }}
+                </div>
+                <div v-if="selectedColumns.includes('memberPhone')" class="student-board-row-phone">
+                  {{ student.memberPhone }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAddress')" class="student-board-row-address">
+                  {{ student.memberAddress }}
+                </div>
+                <div v-if="selectedColumns.includes('memberAge')" class="student-board-row-age">
+                  {{ student.memberAge }}
+                </div>
+                <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
+                  {{ student.memberBirth }}
+                </div>
+                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag">
+                  {{ student.memberFlag === true ? '활성' : '비활성' }}
+                </div>
+                <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
+                  {{ student.createdAt }}
+                </div>
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant">
+                  {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="pagination">
             <button 
@@ -333,7 +350,7 @@ const columns = ref({
   memberBirth: "생년월일",
   memberFlag: "계정상태",
   createdAt: "생성일",
-  memberDormantFlag: "휴면상태"
+  memberDormantStatus: "휴면상태"
 });
 const selectedColumns = ref(Object.keys(columns.value));
 
@@ -478,7 +495,7 @@ const handleExcelDownload = async() => {
         'Content-Type': 'application/json'
       },
       data: {
-        selectedColumns: selectedColumns.value,  // 선택된 컬럼 정보 추가
+        selectedColumns: selectedColumns.value,
         ...(isFiltered.value && lastFilterData.value ? lastFilterData.value : {})
       }
     };

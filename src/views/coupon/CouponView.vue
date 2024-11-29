@@ -12,7 +12,7 @@
             등록된 쿠폰 <span class="coupon-length">{{ coupon.length }}</span>개
           </div>
           <div class="coupon-count-right">
-            <button class="coupon-register-button">쿠폰 등록</button>
+            <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
           </div>
         </div>
         <!-- 조회 데이터 테이블 -->
@@ -95,10 +95,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponFilter from '@/components/marketing/CouponFilter.vue';
 import CouponDetail from '@/components/marketing/CouponDetail.vue';
+const router = useRouter();
 
 const coupon = ref([]);
 const selectedCoupon = ref(null);
@@ -141,6 +143,10 @@ const selectCoupon = (couponData) => {
 // 선택 해제
 const deselectCoupon = () => {
   selectedCoupon.value = null;
+};
+
+const registerCoupon = () => {
+  router.push({ name: 'Register-Coupon' });
 };
 
 const fetchCoupons = async () => {

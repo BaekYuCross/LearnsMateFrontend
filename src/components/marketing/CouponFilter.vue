@@ -98,13 +98,13 @@
             <span class="coupon-filter-label">쿠폰 만료일</span>
             <div class="coupon-date-range-container">
               <input 
-                v-model="filters.start_expire_date"
+                v-model="filters.start_coupon_expire_date"
                 type="date" 
                 class="coupon-filter-input date-input"
               />
               <span class="coupon-date-separator">~</span>
               <input 
-                v-model="filters.end_expire_date"
+                v-model="filters.end_coupon_expire_date"
                 type="date"
                 class="coupon-filter-input date-input"
               />
@@ -165,8 +165,8 @@
     max_discount_rate: '',
     start_coupon_start_date: '',
     end_coupon_start_date:'',
-    start_expire_date: '',
-    end_expire_date: '',
+    start_coupon_expire_date: '',
+    end_coupon_expire_date: '',
     start_created_at: '',
     end_created_at: '',
     admin_name: '',
@@ -176,7 +176,18 @@
   const emit = defineEmits(['search', 'reset'])
   
   const search = () => {
-    emit('search', filters.value)
+    const formattedFilters = { ...filters.value };
+
+  // 날짜 필드와 빈 문자열 처리
+  Object.keys(formattedFilters).forEach(key => {
+    if (formattedFilters[key] === '') {
+      formattedFilters[key] = null;
+    } else if (key.includes('date') && formattedFilters[key]) {
+      formattedFilters[key] = new Date(formattedFilters[key]).toISOString();
+    }
+  });
+
+  emit('search', formattedFilters);
   }
   
   const reset = () => {
