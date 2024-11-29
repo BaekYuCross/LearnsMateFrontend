@@ -98,13 +98,13 @@
   >
               </td>
               <td>{{ lecture.lecture_code }}</td>
-              <td>{{ lecture.lecture_title }}</td>
-              <td>{{ lecture.category_name }}</td>
-              <td>{{ lecture.lecture_level }}</td>
+              <td class="target-lecture-lecture-title">{{ lecture.lecture_title }}</td>
+              <td>{{ getCategoryDisplayName(lecture.lecture_category_name) }}</td>
+              <td>{{ getLevelDisplayName(lecture.lecture_level) }}</td>
               <td>{{ lecture.tutor_name }}</td>
               <td>{{ lecture.tutor_code }}</td>
               <td>{{ formatDate(lecture.created_at) }}</td>
-              <td>{{ lecture.lecture_price }}</td>
+              <td>{{ lecture.lecture_price.toLocaleString("ko-KR") + '원' || '0원' }}</td>
             </tr>
           </tbody>
         </table>
@@ -156,8 +156,6 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
-const userCode = jwtDecode(token).sub;
-const userName = jwtDecode(token).name;
 
 import RegisterModule from '@/components/modules/RegisterModule.vue';
 import CancelModule from '@/components/modules/CancelModule.vue';
@@ -181,8 +179,6 @@ const couponData = ref({
   couponExpireDate: '',
   selectedLectures: []
 })
-
-
 
 const formatDateWithTime = {
   // 시작일: 해당 날짜의 00:00:00
@@ -271,6 +267,32 @@ const fetchLectures = async () => {
 onMounted(() => {
   fetchLectures();
 });
+
+const categoryMapping = {
+  BACKEND: '백엔드',
+  FRONTEND: '프론트엔드',
+  DEVOPS: '데브옵스',
+  DATABASE: '데이터베이스',
+  WEB_DEVELOPMENT: '웹 개발',
+  MOBILE_APP_DEVELOPMENT: '모바일 앱 개발',
+  FULL_STACK: '풀스택',
+};
+
+const getCategoryDisplayName = (categoryName) => {
+  return categoryMapping[categoryName] || categoryName; // 매핑이 없으면 원래 값 반환
+};
+
+const levelMapping = {
+  BEGINNER: '초급',
+  INTERMEDIATE: '중급',
+  ADVANCED: '고급'
+};
+
+const getLevelDisplayName = (lectureLevel) => {
+  return levelMapping[lectureLevel] || lectureLevel;
+}
+
+console.log(lectures.value);
 
 const isRegisterModalOpen = ref(false);
 const isCancelModalOpen = ref(false);
@@ -464,6 +486,13 @@ const endPage = computed(() => {
   width: 70%;
 }
 
+.coupon-target-lecture-table-body td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+}
+
 .coupon-target-lecture-table {
   border-collapse: collapse;
   width: 100%;
@@ -484,6 +513,11 @@ const endPage = computed(() => {
   color: #333333;
   text-align: center;
   background-color: #ffffff;
+}
+
+.coupon-target-lecture-table td.target-lecture-lecture-title {
+  text-align: left;
+  padding-left: 10px;
 }
 
 .coupon-target-lecture-table th,
