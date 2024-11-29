@@ -123,9 +123,7 @@
   height: 570px;
   flex: 0.3;
   padding: 20px;
-  display: flex;
-  overflow-x: auto;
-  flex-direction: column;
+  overflow-y: auto;
 }
 
 .lecture-detail-header {
@@ -146,28 +144,61 @@
 .lecture-detail-content {
   display: flex;
   flex-direction: column;
-  padding-right: 10px;
+  gap: 10px;
 }
 
 .lecture-detail-item {
   display: flex;
-  flex-direction: column;
-  align-items: self-start;
-  gap: 5px;
-  font-size: 11px;
-  color: #444;
-  border-bottom: 1px dashed #ddd;
-  padding: 5px 0;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eaeaea;
 }
 
 .lecture-detail-item .label {
   font-weight: bold;
-  color: #555;
+  color: #666;
 }
 
 .lecture-detail-item .value {
+  color: #333;
+}
+
+.lecture-detail-item ul {
+  list-style-type: none;
+  max-width: 200px;
+  padding: 0;
+  margin: 0;
   text-align: right;
-  color: #666;
+}
+
+.lecture-detail-item ul li {
+  text-align: right;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+.ellipsis {
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 200px; /* 원하는 너비로 설정 */
+  vertical-align: middle;
+}
+
+.ellipsis:hover {
+  overflow: visible;
+  white-space: normal;
+  position: relative;
+  background: #fff;
+  z-index: 10;
+  border: 1px solid #ccc;
+  padding: 5px;
+  max-width: 150px;
 }
 
 .close-button {

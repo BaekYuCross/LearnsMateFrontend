@@ -7,6 +7,7 @@ export const useLoginState = defineStore('loginState', {
     adminName: '',     // 관리자 이름
     adminTeam: '',     // 관리자 부서
     adminCode: '',     // 관리자 코드
+    exp: '',
   }),
   actions: {
     async fetchLoginState() {
@@ -18,17 +19,20 @@ export const useLoginState = defineStore('loginState', {
         this.adminName = response.data.name;
         this.adminTeam = response.data.adminDepartment; 
         this.adminCode = response.data.code; 
+        this.exp = response.data.exp;
+        console.log("토큰 만료시간:", this.exp);
       } catch (error) {
         console.error('로그인 상태를 확인할 수 없습니다:', error);
         this.isLoggedIn = false;
         this.adminName = '';
         this.adminTeam = '';
         this.adminCode = '';
+        this.exp = '';
       }
     },
     async logout() {
       try {
-        await axios.post('http://localhost:5000/admin/logout', {}, { withCredentials: true });
+        await axios.post('http://localhost:5000/auth/logout', {}, { withCredentials: true });
         this.isLoggedIn = false;
         this.adminName = '';
         this.adminTeam = '';
@@ -40,4 +44,3 @@ export const useLoginState = defineStore('loginState', {
     },
   },
 });
-
