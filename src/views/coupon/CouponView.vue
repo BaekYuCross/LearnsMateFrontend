@@ -116,6 +116,8 @@ const pageSize = 15;
 
 const totalPages = ref(1);
 
+const isFiltered = ref(false);
+const currentFilters = ref(null);
 
 // displayedPages computed 속성 추가
 const displayedPages = computed(() => {
@@ -167,7 +169,13 @@ const fetchCoupons = async () => {
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
-  await fetchCoupons();
+  if (isFiltered.value && currentFilters.value) {
+    // 필터링된 상태면 필터링된 데이터 조회
+    await applyFilters(currentFilters.value);
+  } else {
+    // 필터링되지 않은 상태면 일반 조회
+    await fetchCoupons();
+  }
 };
 const paginatedCoupons = computed(() => {
   if (Array.isArray(coupon.value)) {
@@ -190,6 +198,8 @@ const registerCoupon = () => {
 
 const applyFilters = async (filters) => {
   try {
+    isFiltered.value = true;  // 필터링 상태 설정
+    currentFilters.value = filters;  // 현재 필터 값 저장
     const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
     {
       withCredentials: true,
@@ -230,8 +240,10 @@ const applyFilters = async (filters) => {
 };
 
 const resetFilters = () => {
-  fetchCoupons();
+  isFiltered.value = false;  // 필터링 상태 해제
+  currentFilters.value = null;  // 현재 필터 값 초기화
   currentPage.value = 1;
+  fetchCoupons();
 }
 
 const camelToSnake = (obj) => {
