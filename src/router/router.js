@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import LectureRouter from './lecture'
 import MemberRouter from './member'
 import LoginRouter from './login'
 import MarketingRouter from './marketing'
 import ClientRouter from './client'
+import VOCRouter from './voc'
 
 
 const routes = [
@@ -11,22 +13,14 @@ const routes = [
     name: 'Main',
     component: () => import('../views/MainView.vue')
   },
-  {
-    path: '/lecture',
-    name: 'Lecture',
-    component: () => import('../views/lecture/LectureView.vue')
-  },
 
   ...MemberRouter,
   ...LoginRouter,
   ...MarketingRouter,
   ...ClientRouter,
+  ...LectureRouter,
+  ...VOCRouter,
 
-  {
-    path: '/voc',
-    name: 'VOC',
-    component: () => import('../views/voc/VocView.vue')
-  },
   {
     path: '/',
     redirect: '/main'

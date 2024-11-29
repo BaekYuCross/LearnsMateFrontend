@@ -75,126 +75,113 @@
   const chartCanvas = ref(null);
   const monthlyData = ref([]);
   let chart = null;
-
-  // 연도와 월 옵션 설정
   const currentYear = new Date().getFullYear();
   const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i));
   const months = ref(Array.from({length: 12}, (_, i) => i + 1));
-
-  // 필터 상태
   const filter = ref({
     startYear: currentYear - 1,
     startMonth: 1,
     endYear: currentYear,
     endMonth: 12
   });
-  
-  const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDIwMDUiLCJlbWFpbCI6ImNobzk3NTlAZ21haWwuY29tIiwibmFtZSI6IuyhsOygnO2biCIsInJvbGVzIjpbIlJPTEVfQURNSU4iXSwiaWF0IjoxNzMyMjYxNDczLCJleHAiOjE3NzU0NjE0NzN9.YXyZssRjHVLhiSRkx4zqRXJAciK60GxbmdQQ66uutW2M_R9nlGqnq6ilE2PJRlhbOyCEhlVPAKNP4Xze4I20BA';
-  
+
   const createChart = () => {
     if (chart) {
-      chart.destroy();
+        chart.destroy();
     }
-  
+
     const ctx = chartCanvas.value.getContext('2d');
     chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: monthlyData.value.map(item => item.date),
-        datasets: [{
-          label: '강의 수',
-          data: monthlyData.value.map(item => item.lectureCount),
-          backgroundColor: 'rgba(75, 192, 192, 0.05)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-          pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-            align: 'end',
-            labels: {
-              boxWidth: 10,
-              padding: 10,
-              font: {
-                size: 12
-              }
-            }
-          },
-          title: {
-            display: true,
-            text: '월별 강의 등록 현황',
-            position: 'top',
-            align: 'center',
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            padding: {
-              bottom: 20
-            }
-          }
+        type: 'line',
+        data: {
+            labels: monthlyData.value.map(item => item.date),
+            datasets: [{
+                label: '강의 수',
+                data: monthlyData.value.map(item => item.lectureCount),
+                backgroundColor: 'rgba(75, 192, 192, 0.05)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-              font: {
-                size: 12
-              }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        boxWidth: 10,
+                        padding: 10,
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: '월별 강의 등록 현황',
+                    position: 'top',
+                    align: 'center',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        bottom: 20
+                    }
+                }
             },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.1)'
-            }
-          },
-          x: {
-            ticks: {
-              maxRotation: 45,
-              minRotation: 45,
-              font: {
-                size: 12
-              },
-              padding: 10
+            scales: {
+                y: {
+                    beginAtZero: false, // 0부터 시작하지 않도록 설정
+                    min: 10, // Y축의 최소값 설정
+                    ticks: {
+                        stepSize: 10, // Grid 간격 설정
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45,
+                        font: {
+                            size: 12
+                        },
+                        padding: 10
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
             },
-            grid: {
-              display: false
+            interaction: {
+                intersect: false,
+                mode: 'index'
             }
-          }
-        },
-        interaction: {
-          intersect: false,
-          mode: 'index'
-        },
-      }
+        }
     });
-  };
+};
   
   const fetchMonthlyData = async (useFilter = false) => {
     try {
       let response;
       if (useFilter) {
-        response = await axios.post('http://localhost:5000/lecture/monthly-counts/filter', filter.value, {
-          headers: {
-            Authorization: token
-          }
-        });
+        response = await axios.post('http://localhost:5000/lecture/monthly-counts/filter', filter.value);
       } else {
-        response = await axios.get('http://localhost:5000/lecture/monthly-counts', {
-          headers: {
-            Authorization: token
-          }
-        });
+        response = await axios.get('http://localhost:5000/lecture/monthly-counts');
       }
       monthlyData.value = response.data;
       await createChart();

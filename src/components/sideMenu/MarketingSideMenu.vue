@@ -12,14 +12,14 @@
 
             <div class="submenu-list">
                 <div
-                v-for="submenu in menu.submenus"
-                :key="submenu.path"
-                class="submenu-item"
-                :class="{ active: currentRoute === submenu.path }"
-                @click="navigateTo(submenu.path)"
-                >
-                {{ submenu.name }}
-                </div>
+                    v-for="submenu in menu.submenus"
+                    :key="submenu.path"
+                    class="submenu-item"
+                    :class="{ active: isSubmenuActive(submenu.path) }"
+                    @click="navigateTo(submenu.path)"
+                    >
+                    {{ submenu.name }}
+                    </div>
             </div>
             </div>
         </div>
@@ -59,6 +59,17 @@
     // });
 
     const currentRoute = computed(() => route.path);
+
+    const isSubmenuActive = (submenuPath) => {
+        if (submenuPath === '/marketing') {
+            // 캠페인 경로 또는 캠페인 등록 경로일 경우 캠페인 메뉴를 활성화
+            return route.path === '/marketing' || route.path === '/marketing/register-campaign';
+        }
+        return route.path === submenuPath;
+    };
+
+
+
 
 
     const navigateTo = (path) => {
