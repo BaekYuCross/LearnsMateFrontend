@@ -13,6 +13,7 @@
           </div>
           <div class="coupon-count-right">
             <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
+            <button class="coupon-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드</button>
           </div>
         </div>
         <!-- 조회 데이터 테이블 -->
@@ -101,6 +102,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { saveAs } from 'file-saver';
 import axios from 'axios';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
 import CouponFilter from '@/components/marketing/CouponFilter.vue';
@@ -116,6 +118,8 @@ const pageSize = 15;
 
 const totalPages = ref(1);
 
+const isFiltered = ref(false);
+const currentFilters = ref(null);
 
 // displayedPages computed 속성 추가
 const displayedPages = computed(() => {
@@ -167,7 +171,13 @@ const fetchCoupons = async () => {
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
-  await fetchCoupons();
+  if (isFiltered.value && currentFilters.value) {
+    // 필터링된 상태면 필터링된 데이터 조회
+    await applyFilters(currentFilters.value);
+  } else {
+    // 필터링되지 않은 상태면 일반 조회
+    await fetchCoupons();
+  }
 };
 const paginatedCoupons = computed(() => {
   if (Array.isArray(coupon.value)) {
@@ -190,6 +200,9 @@ const registerCoupon = () => {
 
 const applyFilters = async (filters) => {
   try {
+    console.log('Applying filters:', filters); // 필터 적용 시 데이터 확인
+    isFiltered.value = true;  // 필터링 상태 설정
+    currentFilters.value = filters;  // 현재 필터 값 저장
     const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
     {
       withCredentials: true,
@@ -230,8 +243,10 @@ const applyFilters = async (filters) => {
 };
 
 const resetFilters = () => {
-  fetchCoupons();
+  isFiltered.value = false;  // 필터링 상태 해제
+  currentFilters.value = null;  // 현재 필터 값 초기화
   currentPage.value = 1;
+  fetchCoupons();
 }
 
 const camelToSnake = (obj) => {
@@ -257,6 +272,89 @@ const formatDate = (isoDate) => {
     day: '2-digit',
   });
 };
+
+// 기존 imports 아래에 추가
+const columns = {
+  couponCode: "쿠폰 번호",
+  couponName: "쿠폰 이름",
+  couponContents: "쿠폰 내용",
+  couponDiscountRate: "쿠폰 할인율",
+  couponCategoryName: "쿠폰 종류",
+  activeState: "상태",
+  couponStartDate: "시작일",
+  couponExpireDate: "만료일",
+  createdAt: "생성일",
+  updatedAt: "수정일",
+  adminName: "직원",
+  tutorName: "강사"
+};
+
+const handleExcelDownload = async() => {
+  try{
+
+    console.log('Current filters:', currentFilters.value); // 현재 필터 상태 확인
+    const filterData = isFiltered.value && currentFilters.value ? {
+      couponName: currentFilters.value.coupon_name || null,
+      couponContents: currentFilters.value.coupon_contents || null,
+      activeState: currentFilters.value.active_state || null,
+      startExpireDate: currentFilters.value.start_expire_date || null,
+      endExpireDate: currentFilters.value.end_expire_date || null,
+      startCreatedAt: currentFilters.value.start_created_at || null,
+      endCreatedAt: currentFilters.value.end_created_at || null,
+      minDiscountRate: currentFilters.value.min_discount_rate || null,
+      maxDiscountRate: currentFilters.value.max_discount_rate || null,
+      startCouponStartDate: currentFilters.value.start_coupon_start_date || null,
+      endCouponStartDate: currentFilters.value.end_coupon_start_date || null,
+      couponCategoryName: currentFilters.value.coupon_category_name || null,
+      adminName: currentFilters.value.admin_name || null,
+      tutorName: currentFilters.value.tutor_name || null,
+      selectedColumns: Object.keys(columns)
+    } : null;
+
+    console.log('Sending filter data for excel:', filterData); // 디버깅용
+
+    const config = {
+      method: 'POST',
+      withCredentials: true,
+      url: 'http://localhost:5000/coupon/excel/download',
+      responseType: 'blob',
+      data: filterData,
+        headers: {
+        'Content-Type': 'application/json'
+      },
+    };
+    
+    const response = await axios(config);
+    
+    // 에러 응답 체크
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+    
+    // 파일 다운로드
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+    const now = new Date();
+    const fileName = `coupon_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
+  }
+}
 
 </script>
 
@@ -380,7 +478,8 @@ const formatDate = (isoDate) => {
   background-color: #cc0000;
 }
 
-.coupon-register-button {
+.coupon-register-button,
+.coupon-excel-button {
   background-color: #005950;
     color: #ffffff;
     border: none;
@@ -389,7 +488,8 @@ const formatDate = (isoDate) => {
     padding: 5px 10px;
 }
 
-.coupon-register-button:hover {
+.coupon-register-button:hover,
+.coupon-excel-button:hover {
   cursor: pointer;
   background-color: #004c42;
 }
