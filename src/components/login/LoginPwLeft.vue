@@ -131,8 +131,8 @@ const handleSubmit = async () => {
       console.log("Email Before Submit:", email.value);
       console.log("New Password Before Submit:", newPassword.value);
       await axios.post('http://localhost:5000/admin/password', {
-        userEmail: email.value,
-        userPassword: newPassword.value,
+        adminEmail: email.value,
+        adminPassword: newPassword.value,
       });
       message.value = '비밀번호가 성공적으로 변경되었습니다.';
       messageClass.value = 'success';
