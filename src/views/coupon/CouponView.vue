@@ -9,7 +9,7 @@
         <!-- 전체 쿠폰 개수 -->
         <div class="coupon-table-top">
           <div class="coupon-count">
-            등록된 쿠폰 <span class="coupon-length">{{ totalCount.toLocaleString("ko-KR") }}</span>개
+            등록된 쿠폰 <span class="coupon-length">{{ (totalCount || 0).toLocaleString("ko-KR") }}</span>개
           </div>
           <div class="coupon-count-right">
             <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
@@ -195,15 +195,37 @@ const applyFilters = async (filters) => {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      params: {  // 페이지네이션 파라미터 추가
+          page: currentPage.value - 1,
+          size: pageSize,
+        }
     }
     );
-    console.log(filters);
-    coupon.value = response.data;
-    totalCount.value = response.data.totalElements;
+    // response.data가 페이징 처리된 데이터인지 확인하고 적절히 처리
+    if (response.data && response.data.content) {
+      coupon.value = response.data.content;
+      totalCount.value = response.data.totalElements || 0;
+      totalPages.value = response.data.totalPages || 1;
+    } else {
+      // 페이징 처리되지 않은 데이터인 경우
+      coupon.value = response.data;
+      totalCount.value = response.data.length || 0;
+      totalPages.value = Math.ceil((response.data.length || 0) / pageSize);
+    }
+    
     currentPage.value = 1;
+    
+    console.log('Filtered data:', response.data);
+    console.log('Total count:', totalCount.value);
+    console.log('Total pages:', totalPages.value);
+    
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
+    // 에러 발생 시 기본값 설정
+    coupon.value = [];
+    totalCount.value = 0;
+    totalPages.value = 1;
   }
 };
 
