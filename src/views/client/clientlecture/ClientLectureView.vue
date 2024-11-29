@@ -128,7 +128,7 @@ import { ref, computed } from "vue";
 import InactivityModal from '@/components/client/InactivityModal.vue';
 import { useActivityMonitor } from "@/composables/useActivityMonitor";
 
-const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(1/12);
+const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 
 const router = useRouter();
 

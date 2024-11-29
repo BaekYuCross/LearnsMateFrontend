@@ -140,7 +140,7 @@
             </div>
             <div class="lecture-detail-item">
               <span class="label">강의 제목</span>
-              <span class="value">{{ selectedLecture.lecture_title }}</span>
+              <span class="value ellipsis" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">카테고리</span>
@@ -179,24 +179,20 @@
               </span>
             </div>
             <div class="lecture-detail-item">
-              <span class="label">총 학생 수:</span>
+              <span class="label">총 학생 수</span>
               <span class="value">{{ selectedLecture.purchase_count }}</span>
             </div>
-            <div class="lecture-detail-item">
-              <span class="label">구매 전환율:</span>
-              <span class="value">{{ selectedLecture.purchase_conversion_rate }}%</span>
-            </div>
             <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
-              강의 비디오 목록
-              <span>
-                <li v-for="(title, index) in selectedLecture.formatted_video_titles" :key="index">
-                  {{ title }}
+              <span>강의 비디오 목록</span>
+              <ul>
+                <li v-for="(video, index) in selectedLecture.lecture_videos" :key="index" class="ellipsis">
+                  {{ video.videoTitle }}
                 </li>
-              </span>
+              </ul>
             </div>
             <div class="lecture-stats-section">
               <div class="lecture-stats-header">
-                <h3 class="lecture-stats-title">클릭수 및 구매 통계</h3>
+                <h3 class="lecture-stats-title">구매 전환율 필터링</h3>
                 <div class="lecture-stats-filter">
                   <div class="lecture-stats-period">
                     <span class="lecture-stats-label">조회 기간</span>
@@ -237,13 +233,19 @@
 
               <div class="lecture-stats-charts">
                 <div class="lecture-stats-chart">
-                  <h4 class="lecture-stats-chart-title">전체 통계</h4>
+                  <h4 class="lecture-stats-chart-title">전체 강의 전환율</h4>
                   <div class="lecture-stats-chart-wrapper">
-                    <canvas ref="totalStatsChart"></canvas>
+                    <canvas ref="overallStatsChart"></canvas>
                   </div>
                 </div>
                 <div class="lecture-stats-chart">
-                  <h4 class="lecture-stats-chart-title">현재 강의 통계</h4>
+                  <h4 class="lecture-stats-chart-title">카테고리별 전환율</h4>
+                  <div class="lecture-stats-chart-wrapper">
+                    <canvas ref="categoryStatsChart"></canvas>
+                  </div>
+                </div>
+                <div class="lecture-stats-chart">
+                  <h4 class="lecture-stats-chart-title">현재 강의 전환율</h4>
                   <div class="lecture-stats-chart-wrapper">
                     <canvas ref="lectureStatsChart"></canvas>
                   </div>
@@ -270,7 +272,9 @@ import axios from 'axios'
 import { saveAs } from 'file-saver'
 import '@/assets/css/lecture/LectureView.css'
 import Chart from 'chart.js/auto'
+import { useLoginState } from '@/stores/loginState';
 
+const loginState = useLoginState(); 
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 const isMonthlyModalOpen = ref(false);
@@ -283,10 +287,12 @@ const totalPages = ref(1)
 const pageSize = 50
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
-const totalStatsChart = ref(null)
+const overallStatsChart = ref(null);
+const categoryStatsChart = ref(null);
 const lectureStatsChart = ref(null)
-let totalChart = null
-let lectureChart = null
+let overallChart = null;
+let categoryChart = null;
+let lectureChart = null;
 const currentYear = new Date().getFullYear()
 const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i))
 const months = ref(Array.from({length: 12}, (_, i) => i + 1))
@@ -477,15 +483,18 @@ const closeLectureDetail = () => {
 
 const createStatsCharts = (data) => {
   const safeData = {
-    totalStudentCount: data.total_student_count || 0,
-    totalLectureClickCount: data.total_lecture_click_count || 0,
+    totalClicks: data.total_lecture_click_count || 0,
+    totalPurchases: data.total_student_count || 0,
     totalConversionRate: data.total_conversion_rate || 0,
-    studentCount: data.student_count || 0,
-    lectureClickCount: data.lecture_click_count || 0,
-    conversionRate: data.conversion_rate || 0
-  };
 
-  console.log("Safe data for charts:", safeData);
+    categoryClicks: data.category_click_count || 0,
+    categoryPurchases: data.category_purchase_count || 0,
+    categoryConversionRate: data.category_conversion_rate || 0,
+
+    lectureClicks: data.lecture_click_count || 0,
+    lecturePurchases: data.student_count || 0,
+    lectureConversionRate: data.conversion_rate || 0,
+  };
 
   const chartOptions = {
     responsive: true,
@@ -501,17 +510,16 @@ const createStatsCharts = (data) => {
           size: 11
         },
         padding: {
-          top: 5,
-          bottom: 5
-        }
+          bottom: 10
+        },
       }
     },
     layout: {
       padding: {
-        left: 5,
-        right: 5,
-        top: 5,
-        bottom: 5
+        left: 10,
+        right: 10,
+        top: 10,
+        bottom: 10
       }
     },
     scales: {
@@ -539,72 +547,98 @@ const createStatsCharts = (data) => {
     }
   };
 
-  if (totalChart) totalChart.destroy();
-  const totalCtx = totalStatsChart.value.getContext('2d');
-  totalChart = new Chart(totalCtx, {
-    type: 'bar',
+  if (overallChart) overallChart.destroy();
+  const overallCtx = overallStatsChart.value.getContext("2d");
+  overallChart = new Chart(overallCtx, {
+    type: "bar",
     data: {
-      labels: ['총 학생 수', '총 클릭 수'],
-      datasets: [{
-        label: '전체',
-        data: [safeData.totalStudentCount, safeData.totalLectureClickCount],
-        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(54, 162, 235, 0.2)'],
-        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)'],
-        borderWidth: 1
-      }]
+      labels: ["클릭 수", "구매 수"],
+      datasets: [
+        {
+          label: "전체 강의",
+          data: [safeData.totalClicks, safeData.totalPurchases],
+          backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)"],
+          borderColor: ["rgba(75, 192, 192, 1)", "rgba(54, 162, 235, 1)"],
+          borderWidth: 1,
+        },
+      ],
     },
     options: {
       ...chartOptions,
       plugins: {
         ...chartOptions.plugins,
-        title: {
-          ...chartOptions.plugins.title,
-          text: `전체 전환율: ${safeData.totalConversionRate.toFixed(2)}%`
-        }
-      }
-    }
+        title: { ...chartOptions.plugins.title, text: `전체 전환율: ${safeData.totalConversionRate.toFixed(2)}%` },
+      },
+    },
+  });
+
+  if (categoryChart) categoryChart.destroy();
+  const categoryCtx = categoryStatsChart.value.getContext("2d");
+  categoryChart = new Chart(categoryCtx, {
+    type: "bar",
+    data: {
+      labels: ["클릭 수", "구매 수"],
+      datasets: [
+        {
+          label: "카테고리",
+          data: [safeData.categoryClicks, safeData.categoryPurchases],
+          backgroundColor: ["rgba(255, 159, 64, 0.2)", "rgba(153, 102, 255, 0.2)"],
+          borderColor: ["rgba(255, 159, 64, 1)", "rgba(153, 102, 255, 1)"],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      ...chartOptions,
+      plugins: {
+        ...chartOptions.plugins,
+        title: { ...chartOptions.plugins.title, text: `카테고리 전환율: ${safeData.categoryConversionRate.toFixed(2)}%` },
+      },
+    },
   });
 
   if (lectureChart) lectureChart.destroy();
-  const lectureCtx = lectureStatsChart.value.getContext('2d');
+  const lectureCtx = lectureStatsChart.value.getContext("2d");
   lectureChart = new Chart(lectureCtx, {
-    type: 'bar',
+    type: "bar",
     data: {
-      labels: ['구매 학생 수', '클릭 수'],
-      datasets: [{
-        label: selectedLecture.value.lecture_title,
-        data: [safeData.studentCount, safeData.lectureClickCount],
-        backgroundColor: ['rgba(255, 206, 86, 0.2)', 'rgba(153, 102, 255, 0.2)'],
-        borderColor: ['rgba(255, 206, 86, 1)', 'rgba(153, 102, 255, 1)'],
-        borderWidth: 1
-      }]
+      labels: ["클릭 수", "구매 수"],
+      datasets: [
+        {
+          label: "현재 강의",
+          data: [safeData.lectureClicks, safeData.lecturePurchases],
+          backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(255, 99, 132, 0.2)"],
+          borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
+          borderWidth: 1,
+        },
+      ],
     },
     options: {
       ...chartOptions,
       plugins: {
         ...chartOptions.plugins,
-        title: {
-          ...chartOptions.plugins.title,
-          text: `강의 전환율: ${safeData.conversionRate.toFixed(2)}%`
-        }
-      }
-    }
+        title: { ...chartOptions.plugins.title, text: `강의 전환율: ${safeData.lectureConversionRate.toFixed(2)}%` },
+      },
+    },
   });
 };
 
 const fetchLectureStats = async () => {
   try {
-    const response = await axios.post(`http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,camelToSnake(statsFilter.value))
-    
+    const response = await axios.post(
+      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
+      camelToSnake(statsFilter.value)
+    );
+
     if (response.data) {
-      createStatsCharts(response.data)
+      createStatsCharts(response.data);
     } else {
-      console.error('No data received from stats API')
+      console.error('No data received from stats API');
     }
   } catch (error) {
-    console.error('Failed to fetch lecture stats:', error)
+    console.error('Failed to fetch lecture stats:', error);
   }
-}
+};
 
 const resetStatsFilter = () => {
   statsFilter.value = {
@@ -647,7 +681,10 @@ const closeMonthlyModal = () => {
   isMonthlyModalOpen.value = false;
 };
 
-onMounted(() => {
+onMounted(async () => {
   fetchLectureList();
+  if (!loginState.isLoggedIn) {
+    await loginState.fetchLoginState(); 
+  }
 });
 </script>
