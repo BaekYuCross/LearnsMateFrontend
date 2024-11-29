@@ -28,7 +28,7 @@ export const useLoginState = defineStore('loginState', {
     },
     async logout() {
       try {
-        await axios.post('http://localhost:5000/admin/logout', {}, { withCredentials: true });
+        await axios.post('http://localhost:5000/auth/logout', {}, { withCredentials: true });
         this.isLoggedIn = false;
         this.adminName = '';
         this.adminTeam = '';
@@ -40,4 +40,3 @@ export const useLoginState = defineStore('loginState', {
     },
   },
 });
-
