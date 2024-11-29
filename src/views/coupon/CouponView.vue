@@ -350,6 +350,13 @@ const formatDate = (isoDate) => {
   padding: 0px 10px;
 }
 
+.coupon-table-row td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+}
+
 /* 쿠폰 번호 */
 .coupon-table th:nth-child(1),
 .coupon-table td:nth-child(1) {
