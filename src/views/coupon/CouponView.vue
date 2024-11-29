@@ -9,7 +9,7 @@
         <!-- 전체 쿠폰 개수 -->
         <div class="coupon-table-top">
           <div class="coupon-count">
-            등록된 쿠폰 <span class="coupon-length">{{ coupon.length.toLocaleString("ko-KR") }}</span>개
+            등록된 쿠폰 <span class="coupon-length">{{ (totalCount || 0).toLocaleString("ko-KR") }}</span>개
           </div>
           <div class="coupon-count-right">
             <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
@@ -37,7 +37,7 @@
             <tbody>
               <tr
                 class="coupon-table-row"
-                v-for="(coupon, index) in paginatedCoupons || []"
+                v-for="(coupon, index) in coupon || []"
                 :key="coupon.coupon_code"
                 @click="selectCoupon(coupon)"
               >
@@ -57,33 +57,38 @@
             </tbody>
           </table>
         </div>
+        
         <!-- 페이지네이션 -->
         <div class="pagination">
-          <button
-            class="page-button prev-button"
-            @click="changePage(currentPage - 1)"
-            :disabled="currentPage === 1"
-          >
-            ◀이전
-          </button>
-          <span v-for="page in totalPages" :key="page" class="page-number">
-            <button
-              class="page-button"
-              :class="{ active: currentPage === page }"
-              @click="changePage(page)"
-            >
-              {{ page }}
-            </button>
-          </span>
-          <button
-            class="page-button next-button"
-            @click="changePage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-          >
-            다음▶
-          </button>
-        </div>
-      </div>
+  <button 
+    class="page-button prev-button" 
+    @click="changePage(currentPage - 1)" 
+    :disabled="currentPage === 1"
+  >
+    ◀
+  </button>
+  
+  <template v-for="page in displayedPages" :key="page">
+    <span v-if="page === '...'" class="page-dots">...</span>
+    <button 
+      v-else
+      class="page-button" 
+      :class="{ active: currentPage === page }" 
+      @click="changePage(page)"
+    >
+      {{ page }}
+    </button>
+  </template>
+  
+  <button 
+    class="page-button next-button" 
+    @click="changePage(currentPage + 1)" 
+    :disabled="currentPage === totalPages"
+  >
+    ▶
+  </button>
+</div>
+</div>
       <!-- 쿠폰 단건 조회 -->
       <div class="coupon-detail-container" v-if="selectedCoupon">
         <CouponDetail :selectedCoupon="selectedCoupon"
@@ -102,30 +107,74 @@ import CouponFilter from '@/components/marketing/CouponFilter.vue';
 import CouponDetail from '@/components/marketing/CouponDetail.vue';
 const router = useRouter();
 
+const totalCount = ref(0);
+
 const coupon = ref([]);
 const selectedCoupon = ref(null);
 const currentPage = ref(1);
 const pageSize = 15;
 
-const totalPages = computed(() => {
-  if (Array.isArray(coupon.value)) {
-    return Math.ceil(coupon.value.length / pageSize);
+const totalPages = ref(1);
+
+
+// displayedPages computed 속성 추가
+const displayedPages = computed(() => {
+  const pages = [];
+  pages.push(1);
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
   }
-  return 1;
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
+    pages.push(i);
+  }
+  if (totalPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  if (totalPages.value > 1) {
+    pages.push(totalPages.value);
+  }
+  return pages;
 });
 
+// fetchCoupons 함수 수정
+const fetchCoupons = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/coupon/coupons2',
+      {
+        withCredentials: true,
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+        },
+      });
+    
+    coupon.value = response.data.content;
+    totalPages.value = response.data.totalPages;
+    totalCount.value = response.data.totalElements;
+    
+    console.log(response.data.content);
+    console.log(coupon.value);
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    coupon.value = []; 
+    totalCount.value = 0;
+  }
+};
+
+// changePage 함수 수정
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  currentPage.value = newPage;
+  await fetchCoupons();
+};
 const paginatedCoupons = computed(() => {
   if (Array.isArray(coupon.value)) {
     return coupon.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
   }
   return [];
 });
-
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) {
-    currentPage.value = page;
-  }
-};
 
 const selectCoupon = (couponData) => {
   selectedCoupon.value = couponData;
@@ -139,28 +188,6 @@ const registerCoupon = () => {
   router.push({ name: 'Register-Coupon' });
 };
 
-const fetchCoupons = async () => {
-  try {
-    const response = await axios.get('http://localhost:5000/coupon/coupons',
-      {
-        withCredentials: true
-      }
-    );
-    console.log('Fetched data:', response.data); // 응답 데이터 확인
-
-    // 응답 데이터가 배열인지 확인하고 처리
-    if (Array.isArray(response.data)) {
-      coupon.value = response.data; // 응답 데이터가 배열일 경우 그대로 사용
-    } else {
-      console.error('Error: Unexpected API response format');
-      coupon.value = []; // 배열이 아닌 경우 빈 배열로 초기화
-    }
-  } catch (error) {
-    console.error('Error fetching coupons:', error);
-    coupon.value = []; // 오류 발생 시 빈 배열로 초기화
-  }
-};
-
 const applyFilters = async (filters) => {
   try {
     const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
@@ -168,14 +195,37 @@ const applyFilters = async (filters) => {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      params: {  // 페이지네이션 파라미터 추가
+          page: currentPage.value - 1,
+          size: pageSize,
+        }
     }
     );
-    console.log(filters);
-    coupon.value = response.data;
+    // response.data가 페이징 처리된 데이터인지 확인하고 적절히 처리
+    if (response.data && response.data.content) {
+      coupon.value = response.data.content;
+      totalCount.value = response.data.totalElements || 0;
+      totalPages.value = response.data.totalPages || 1;
+    } else {
+      // 페이징 처리되지 않은 데이터인 경우
+      coupon.value = response.data;
+      totalCount.value = response.data.length || 0;
+      totalPages.value = Math.ceil((response.data.length || 0) / pageSize);
+    }
+    
     currentPage.value = 1;
+    
+    console.log('Filtered data:', response.data);
+    console.log('Total count:', totalCount.value);
+    console.log('Total pages:', totalPages.value);
+    
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
+    // 에러 발생 시 기본값 설정
+    coupon.value = [];
+    totalCount.value = 0;
+    totalPages.value = 1;
   }
 };
 
