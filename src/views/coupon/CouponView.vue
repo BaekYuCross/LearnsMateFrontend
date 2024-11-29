@@ -9,7 +9,7 @@
         <!-- 전체 쿠폰 개수 -->
         <div class="coupon-table-top">
           <div class="coupon-count">
-            등록된 쿠폰 <span class="coupon-length">{{ coupon.length }}</span>개
+            등록된 쿠폰 <span class="coupon-length">{{ coupon.length.toLocaleString("ko-KR") }}</span>개
           </div>
           <div class="coupon-count-right">
             <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
@@ -232,6 +232,10 @@ const formatDate = (isoDate) => {
   color: #333;
 }
 
+.coupon-length {
+  color: #005950;
+}
+
 .coupon-table {
   width: 100%;
   min-width: 1200px;
@@ -344,6 +348,13 @@ const formatDate = (isoDate) => {
   display: flex;
   justify-content:space-between;
   padding: 0px 10px;
+}
+
+.coupon-table-row td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
 }
 
 /* 쿠폰 번호 */

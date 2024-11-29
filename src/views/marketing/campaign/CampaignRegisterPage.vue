@@ -91,8 +91,8 @@
             <div class="campaign-header">
               <span class="campaign-attach-span">쿠폰 첨부</span>
               <div class="attach-buttons">
-                <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
-                <button class="excel-download-btn"  @click="triggerFileUpload">
+                <input type="file" ref="couponFile" @change="handleCouponFileChange" accept=".xlsx, .xls" hidden />
+                <button class="excel-download-btn"  @click="triggerFileUpload('coupon')">
                   <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
                   엑셀 업로드
                 </button>
@@ -115,8 +115,8 @@
         <div class="campaign-header">
           <span class="campaign-select-span">타겟 유저</span>
           <div class="target-buttons">
-            <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
-            <button class="excel-download-btn" @click="triggerFileUpload">
+            <input type="file" ref="targetUserFile" @change="handleTargetUserFileChange" accept=".xlsx, .xls" hidden />
+            <button class="excel-download-btn" @click="triggerFileUpload('targetUser')">
               <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
               엑셀 업로드
             </button>
@@ -261,7 +261,8 @@ const targetUserMap = ref(new Map());
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
-const excelFile = ref(null);
+const couponFile = ref(null);
+const targetUserFile = ref(null);
 
 const currentPage = ref(1);
 const pageSize = 50;
@@ -422,13 +423,15 @@ const handleDateChange = () => {
   }
 };
 
-const triggerFileUpload = () => {
-  if (excelFile.value) {
-    excelFile.value.click();
+const triggerFileUpload = (type) => {
+  if (type === 'coupon' && couponFile.value) {
+    couponFile.value.click();
+  } else if (type === 'targetUser' && targetUserFile.value) {
+    targetUserFile.value.click();
   }
 };
 
-const handleFileChange = async (event) => {
+const handleTargetUserFileChange = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
   formData.append("file", file);
@@ -444,6 +447,29 @@ const handleFileChange = async (event) => {
       console.log("파일 업로드 성공:", response.data);
       camelToSnake(response.data).forEach((user) => {
         targetUserMap.value.set(user.member_code, user);
+      });
+    } catch (error) {
+      console.error("파일 업로드 실패:", error.message);
+    }
+  }
+};
+
+const handleCouponFileChange = async (event) => {
+  const file = event.target.files[0];
+  const formData = new FormData();
+  formData.append("file", file);
+  if (file) {
+    try {
+      const response = await axios.post("http://localhost:5000/member/coupon/excel/upload/target-coupon", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("파일 업로드 성공:", response.data);
+      camelToSnake(response.data).forEach((user) => {
+        attachedCouponMap.value.set(coupon.coupon_code, coupon);
       });
     } catch (error) {
       console.error("파일 업로드 실패:", error.message);

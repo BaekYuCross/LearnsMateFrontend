@@ -144,6 +144,30 @@ const formatDate = (isoDate) => {
   });
 };
 
+const formatDateWithTime = {
+  // 시작일: 해당 날짜의 00:00:00
+  startDate: (date) => {
+    if (!date) return null;
+    return `${date}T00:00:00`;
+  },
+
+  // 만료일: 해당 날짜의 23:59:59
+  endDate: (date) => {
+    if (!date) return null;
+    return `${date}T23:59:59`;
+  },
+
+  // 여러 날짜를 쿠폰 데이터에 직접 업데이트
+  applyCouponDates: (editCouponData) => {
+    if (editCouponData.coupon_start_date) {
+      editCouponData.coupon_start_date = formatDateWithTime.startDate(editCouponData.coupon_start_date);
+    }
+    if (editCouponData.coupon_expire_date) {
+      editCouponData.coupon_expire_date = formatDateWithTime.endDate(editCouponData.coupon_expire_date);
+    }
+  }
+};
+
 // 수정 모드 활성화
 const enableEditMode = () => {
   isEditMode.value = true;
@@ -159,6 +183,9 @@ const cancelEdit = () => {
 // 수정 데이터 저장
 const saveCoupon = async () => {
   try {
+
+    formatDateWithTime.applyCouponDates(editCouponData.value);
+    
     // 저장 로직 (예: API 호출)
     const requestData = { ...editCouponData.value };
     const response = await axios.patch(`http://localhost:5000/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
@@ -184,13 +211,14 @@ const saveCoupon = async () => {
 const deleteCoupon = async () => {
   try {
     const response = await axios.patch(`http://localhost:5000/coupon/admin/delete/${props.selectedCoupon.coupon_code}`,
-      {
+      {},{
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
         }
       }
     );
+    window.location.href = '/marketing/coupons'
     console.log("삭제 성공", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
@@ -271,13 +299,17 @@ const deleteCoupon = async () => {
 }
 
 .coupon-buttons {
+    display: flex;
+    justify-content: right;
     position: relative;
     margin-top: 20px;
     text-align: right;
 }
 
 .coupon-edit-button,
-.coupon-delete-button {
+.coupon-delete-button,
+.coupon-save-button,
+.coupon-cancel-button {
     background-color: #005950;
     color: #ffffff;
     border: none;
@@ -287,7 +319,9 @@ const deleteCoupon = async () => {
 }
 
 .coupon-edit-button:hover,
-.coupon-delete-button:hover {
+.coupon-delete-button:hover,
+.coupon-save-button:hover,
+.coupon-cancel-button:hover {
   cursor: pointer;
   background-color: #004c42;
 }
