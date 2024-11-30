@@ -35,7 +35,7 @@
           class="clientlogin-google-login"
           @click="handleGoogleLogin"
         >
-          <img src="@/assets/icons/google.svg" alt="구글" />
+          <img src="@/assets/icons/Google.svg" alt="구글" />
           구글 로그인
         </button>
       </div>
