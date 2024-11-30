@@ -213,15 +213,17 @@ gap: 10px;
 }
 
 .tutor-excel-button {
-  display: flex;
-  align-items: center;
   background: #005950;
-  padding: 2px 5px;
+  padding: 3px 5px;
   margin-bottom: 3px;
   border: none;
   color: #ffffff;
   cursor: pointer;
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
 }
 
 .tutor-excel-button img {
