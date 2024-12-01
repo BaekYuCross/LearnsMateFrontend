@@ -199,8 +199,8 @@ const reset = () => {
   }
   
   .section-title {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: bold;
   }
 
 .filter-container {
@@ -214,7 +214,9 @@ const reset = () => {
 }
 
 .filter-row.gray {
-  background-color: #f8f9fa;
+  background-color: #EFEFEF;
+  border-top: #D9D9D9;
+  border-bottom: #D9D9D9;
 }
 
 .filter-row.white {
@@ -230,18 +232,24 @@ const reset = () => {
 
 .filter-label {
   width: 5rem;
-  min-width: 5rem; /* 라벨 너비 고정 */
-  font-size: 13px;
+  min-width: 5rem;
+  font-size: 11px;
   font-weight: 500;
+  text-align: end;
+  padding-right: 10px;
 }
 
 .filter-input {
   flex: 1;
   padding: 5px 5px;
-  font-size: 13px;
+  font-size: 11px;
   border: 1px solid #e2e8f0;
-  min-width: 0; /* 입력창이 너무 작아지지 않도록 */
-  width: 100%; /* 입력창 너비 제한 */
+  min-width: 0;
+  width: 100%;
+
+  &:focus{
+    outline: none;
+  }
 }
 
 /* 날짜 입력 필드용 스타일 */
@@ -259,7 +267,7 @@ const reset = () => {
 .date-separator {
   color: #64748b;
   padding: 0 4px;  /* 0.25rem 대신 4px로 통일 */
-  font-size: 12px;
+
 }
   
   .button-group {
