@@ -7,7 +7,7 @@
         @search="handleSearch" 
         @reset="handleReset"
       />
-      <div class="student-header-container">
+          <div class="student-header-container" >
             <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
               <div class="column-selector">
@@ -39,9 +39,8 @@
               </button>
             </div>
           </div>
-
-      <div class="content-section" :class="{ 'with-detail': selectedStudent }">
-        <div class="table-container" :class="{ 'shrink': selectedStudent }">
+          <div class="content-section" :class="{ 'with-detail': selectedStudent }">
+            <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-board-container">
             <div class="student-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
@@ -589,5 +588,12 @@ const formatDate = (dateArray) => {
 // 초기 로드
 onMounted(() => {
   fetchStudents();
+  const header = document.querySelector('.student-header-container');
+  const section = document.querySelector('.content-section');
+  
+  if (header && section) {
+    header.style.marginBottom = '0';
+    section.style.marginTop = '0';
+  }
 });
 </script>

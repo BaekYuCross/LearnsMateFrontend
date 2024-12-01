@@ -3,7 +3,6 @@
   min-height: 100vh;
 }
 
-
 .side-menu {
   left: 0;
   top: 0;
@@ -11,6 +10,7 @@
   background-color: #006D5C;
   z-index: 100;
 }
+
 
 .main-content {
   flex: 1;
@@ -23,7 +23,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  width: 100%;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  margin-bottom: 10px !important; /* 강제 적용 */
 }
 
 .content-section {
@@ -42,9 +44,7 @@
   overflow-x: auto;
 }
 
-.table-container.shrink {
-  flex: 0 0 50%;
-}
+
 
 .detail-container {
   flex: 1; 

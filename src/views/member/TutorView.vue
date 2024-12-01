@@ -7,10 +7,7 @@
         @search="handleSearch" 
         @reset="handleReset"
       />
-
-      <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
-        <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
-          <div class="tutor-header-container">
+      <div class="tutor-header-container">
             <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="tutor-button-group">
               <div class="column-selector">
@@ -35,7 +32,9 @@
               </button>
             </div>
           </div>
-            
+
+      <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
+        <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-board-container">
             <div class="tutor-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="tutor-board-header-code">강사 코드</div>

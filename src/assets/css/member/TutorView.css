@@ -19,20 +19,17 @@
 }
 
 .tutor-header-container {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 10px 10px 10px 20px;
-width: 100%;
-white-space: nowrap; /* 줄바꿈 방지 */
-background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 
 .tutor-content-section {
   display: flex;
   gap: 20px;
-  margin-top: 20px;
+
 }
 
 .tutor-table-container {
