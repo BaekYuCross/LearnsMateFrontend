@@ -111,8 +111,8 @@ const reset = () => {
   }
   
   .section-title {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: bold;
   }
 
 .filter-container {
@@ -126,7 +126,9 @@ const reset = () => {
 }
 
 .filter-row.gray {
-  background-color: #f8f9fa;
+  background-color: #EFEFEF;
+  border-top: #D9D9D9;
+  border-bottom: #D9D9D9;
 }
 
 .filter-row.white {
@@ -142,9 +144,11 @@ const reset = () => {
 
 .filter-label {
   width: 5rem;
-  min-width: 5rem; /* 라벨 너비 고정 */
-  font-size: 13px;
+  min-width: 5rem;
+  font-size: 11px;
   font-weight: 500;
+  text-align: end;
+  padding-right: 10px;
 }
 
 .filter-input {
