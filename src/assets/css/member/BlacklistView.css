@@ -84,6 +84,15 @@
 .table-container.shrink {
   flex: 0 0 50%;
 }
+/* 초기화 스타일 추가 */
+table, th, td {
+  font-size: inherit;
+  margin: 0;
+  font-size: 13px;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
+}
 
 table {
   width: 100%;
@@ -96,7 +105,6 @@ th, td {
   text-align: center;
   border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
-  font-size: 11px;
 }
 
 .table-container th,
@@ -108,11 +116,18 @@ th, td {
   white-space: nowrap;
   overflow: hidden; 
   text-overflow: ellipsis; 
-  font-size: 11px;
 }
 
 th {
-  font-size: 13px;
+  padding: 7px 14px;
+  background-color: #f9f9f9;
+  font-weight: bold;
+  color: #595656;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  font-size: 12px;
 }
 
 th:nth-child(1), td:nth-child(1) { width: 100px; }
@@ -196,6 +211,8 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
 
 .report-title {
   margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
   margin-bottom: 15px;
   font-size: 16px;
   font-weight: bold;
@@ -254,7 +271,7 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
 }
 
 .hover\:bg-gray-50:hover {
-  background-color: #f9fafb;
+  background-color: #f4f4f4;
 }
 
 .report-group {
