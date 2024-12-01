@@ -50,12 +50,15 @@ overflow-x: auto;
 }
 
 .tutor-detail-container {
-flex: 0 0 40%; /* 50%에서 40%로 변경 */
-opacity: 1;
-background: white;
-padding: 20px;
-border-radius: 8px;
-box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex: 1; 
+  width: 100%; 
+  max-height: calc(100vh - 40px); 
+  overflow-y: auto;
+  background: white;
+  padding: 20px; 
+  border-radius: 8px; 
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+  box-sizing: border-box;
 }
 
 table {
