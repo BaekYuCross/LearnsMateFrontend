@@ -326,7 +326,7 @@ const fetchCategoryRatio = async (useFilter = false) => {
   }
   
   .lecture-filter-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -395,16 +395,16 @@ const fetchCategoryRatio = async (useFilter = false) => {
   position: relative;
   width: 100%;
   height: 500px;
-  padding: 20px;
+  padding: 10px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
   
   .search-img, .reset-img {
-    width: 12px;
+    width: 14px;
     height: 12px;
-    margin-right: 4px;
+    
   }
   
   .close-button {
