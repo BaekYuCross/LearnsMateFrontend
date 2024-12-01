@@ -138,10 +138,6 @@
         <div v-if="selectedStudent && studentDetail" class="detail-container">
           <div class="detail-content">
             <h3>상세 정보</h3>
-            
-            <!-- 기본 정보 -->
-            <div class="info-section">
-              <h4>기본 정보</h4>
               <div class="info-grid">
                 <div class="info-row">
                   <span class="label">이름</span>
@@ -164,7 +160,7 @@
                   <span>{{ studentDetail.memberDto.memberAddress }}</span>
                 </div>
               </div>
-            </div>
+
 
             <!-- 수강 진행 현황 -->
             <div class="course-section">
