@@ -356,7 +356,7 @@ color: #333;
 .tutor-dropdown-button {
   background-color: #ffffff;
   color: #000000;
-  border: 0.5px solid #000000;
+  border: 0.5px solid #d5d5d5;
   padding: 3px 5px;
   font-size: 12px;
   border-radius: 4px;
@@ -377,6 +377,12 @@ color: #333;
   /* overflow-y: auto; */
   border-radius: 4px;
 }
+
+.tutor-dropdown-menu input[type="checkbox"] {
+  outline: none;
+  accent-color: #005950; 
+}
+
 
 .tutor-dropdown-item {
   display: flex;
