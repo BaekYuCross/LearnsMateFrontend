@@ -86,13 +86,18 @@
                 <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
                   {{ student.memberBirth }}
                 </div>
-                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag">
+                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
+    backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
+    color: student.memberFlag ? '#166534' : '#991b1b'
+  }">
                   {{ student.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
                   {{ student.createdAt }}
                 </div>
-                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant">
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
+    backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+    color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
                   {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
                 </div>
               </div>
