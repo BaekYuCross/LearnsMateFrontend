@@ -4,7 +4,7 @@
     <div class="lecture-content-container" :class="{ 'single-view': isSingleView }">
       <LectureFilter @search="handleSearch" @reset="handleReset" />
       <div class="lecture-actions">
-        <div class="lecture-count">등록된 강의 <span class="lecture-length">{{ totalCount }}</span>개</div>
+        <div class="lecture-count">등록된 강의 <span class="lecture-length">{{ formatNumber(totalCount) }}</span>개</div>
         <div class="lecture-button-group">
           <div class="lecture-column-selector">
             <button @click="toggleDropdown" class="lecture-dropdown-button">
@@ -64,10 +64,10 @@
                 {{ lecture.lecture_title.slice(0, 20) }}...
               </div>
               <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-row-category">
-                {{ lecture.lecture_category_name.slice(0, 10) }}
+                {{ getMappedCategory(lecture.lecture_category_name) }}
               </div>
               <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-row-level">
-                {{ lecture.lecture_level }}
+                {{ getMappedLevel(lecture.lecture_level) }}
               </div>
               <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-row-tutor">
                 {{ lecture.tutor_name }}
@@ -76,7 +76,7 @@
                 {{ lecture.tutor_code }}
               </div>
               <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-row-date">
-                {{ formatDateFromArray(lecture.created_at).slice(0, 10) }}
+                {{ formatDateFromString(lecture.created_at).slice(0, 10) }}
               </div>
               <div v-if="selectedColumns.includes('price')" class="lecture-board-row-price">
                 {{ formatPrice(lecture.lecture_price) }}
@@ -144,11 +144,11 @@
             </div>
             <div class="lecture-detail-item">
               <span class="label">카테고리</span>
-              <span class="value">{{ selectedLecture.lecture_category_name }}</span>
+              <span class="value">{{ getMappedCategory(selectedLecture.lecture_category_name) }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">난이도</span>
-              <span class="value">{{ selectedLecture.lecture_level }}</span>
+              <span class="value">{{ getMappedLevel(selectedLecture.lecture_level) }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">강사명</span>
@@ -309,7 +309,31 @@ const columns = ref({
   lectureConfirmStatus: "승인 상태",
   lectureStatus: "강의 상태",
 });
+const levelMapping = {
+  BEGINNER: '입문',
+  INTERMEDIATE: '중급',
+  ADVANCED: '고급',
+};
+
+const categoryMapping = {
+  BACKEND: '백엔드',
+  FRONTEND: '프론트엔드',
+  DEVOPS: '데브옵스',
+  DATABASE: '데이터베이스',
+  WEB_DEVELOPMENT: '웹 개발',
+  MOBILE_APP_DEVELOPMENT: '모바일 앱 개발',
+  FULL_STACK: '풀스택',
+};
+
 const selectedColumns = ref(Object.keys(columns.value));
+
+const getMappedLevel = (level) => {
+  return levelMapping[level] || '알 수 없음';
+};
+
+const getMappedCategory = (category) => {
+  return categoryMapping[category] || '알 수 없음'; // 맵핑되지 않은 값은 '알 수 없음'으로 처리
+};
 
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -337,14 +361,13 @@ const fetchLectureList = async (filters = {}) => {
         size: pageSize
       }
     });
-    console.log(response.data);
     
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
 
   } catch (error) {
-    console.error('강의 목록을 불러오는데 실패했습니다:', error);
+    console.error('lecture-list get fail:', error);
   }
 };
 
@@ -428,6 +451,19 @@ const handleExcelDownload = async () => {
   }
 };
 
+const formatDateFromString = (dateString) => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  if (isNaN(date)) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
 
@@ -438,6 +474,11 @@ const formatDateFromArray = (dateArray) => {
   }
 
   return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
+
+const formatNumber = (number) => {
+  if (!number) return '0';
+  return number.toLocaleString('ko-KR');
 };
 
 const formatPrice = (price) => {
