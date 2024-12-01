@@ -18,20 +18,18 @@
   padding: 20px;
   min-height: 100vh;
 }
-
 .student-header-container {
+  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
-  white-space: nowrap; /* 줄바꿈 방지 */
-  margin-bottom: 10px !important; /* 강제 적용 */
+  padding-bottom: 10px;
 }
 
 .content-section {
-  width: 100%; 
   display: flex;
   gap: 20px;
+  margin-top: 10px; /* 헤더와 테이블 간의 여백 추가 */
 }
 
 .table-container {
@@ -40,15 +38,13 @@
   flex: 1;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
-
 
 
 .detail-container {
   flex: 1; 
-  width: 100%; 
+  min-height: 100vh; 
   max-height: calc(100vh - 40px); 
   overflow-y: auto;
   background: white;
@@ -120,7 +116,7 @@ th {
 
 .student-board-header {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr 0.6fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr 0.07fr;
+  grid-template-columns:  0.6fr 0.4fr 0.9fr 0.6fr 1.0fr 0.6fr 0.7fr 0.6fr 0.6fr 0.5fr 0.07fr;
   padding: 7px 14px;
   background-color: #f9f9f9;
   font-size: 12px;
@@ -128,9 +124,7 @@ th {
   color: #595656;
   text-align: center;
   border-bottom: 1px solid #eaeaea;
-  position: sticky;
   top: 0;
-  z-index: 1;
 }
 
 .student-board-body {
@@ -142,7 +136,7 @@ th {
 
 .student-board-row {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr 0.6fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr;
+  grid-template-columns:  0.6fr 0.4fr 0.9fr 0.5fr 1.0fr 0.6fr 0.7fr 0.5fr 0.6fr 0.5fr 0.07fr;
   padding: 7px 14px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
@@ -236,6 +230,7 @@ th {
   align-items: center;
   gap: 10px;
 }
+
 
 .excel-button {
   background: #005950;
@@ -339,15 +334,15 @@ th {
 }
 
 .recommended-item {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 15px;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #eee;
-  transition: transform 0.2s ease;
+
 }
 
 .recommended-item:hover {
-  transform: translateX(5px);
   cursor: pointer;
 }
 
@@ -415,6 +410,40 @@ th {
 .lecture-info .info-item span:last-child {
   font-size: 13px;
   color: #333;
+}
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ 
+}
+
+.recommended-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-toggle-button {
+  background-color: white;
+  color: #005950;
+  border: none;
+  margin-left: 460px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.recommended-toggle-button {
+  background-color: white;
+  color: #005950;
+  border: none;
+  margin-left: 470px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
  /* VOC 섹션 */
