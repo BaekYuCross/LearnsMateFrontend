@@ -7,10 +7,7 @@
         @search="handleSearch" 
         @reset="handleReset"
       />
-
-      <div class="content-section" :class="{ 'with-detail': selectedStudent }">
-        <div class="table-container" :class="{ 'shrink': selectedStudent }">
-          <div class="student-header-container">
+      <div class="student-header-container">
             <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
               <div class="column-selector">
@@ -42,7 +39,9 @@
               </button>
             </div>
           </div>
-            
+
+      <div class="content-section" :class="{ 'with-detail': selectedStudent }">
+        <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-board-container">
             <div class="student-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
