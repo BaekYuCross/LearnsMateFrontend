@@ -353,8 +353,12 @@ color: #333;
 }
 
 .tutor-column-selector {
-  position: relative;
-  display: inline-block;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
 }
 
 .tutor-dropdown-button {
@@ -369,16 +373,13 @@ color: #333;
 
 .tutor-dropdown-menu {
   position: absolute;
-  top: 100%;
-  left: 0;
   background-color: white;
   border: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 10px;
-  z-index: 100;
+  margin-top: 240px;
+  z-index: 10;
   width: 100px;
-  /* max-height: 200px; */
-  /* overflow-y: auto; */
   border-radius: 4px;
 }
 
