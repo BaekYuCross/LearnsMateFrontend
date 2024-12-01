@@ -138,12 +138,47 @@ th {
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
   color: #333333;
-  text-align: center;
+  justify-content: center;
   align-items: center;
   background-color: #ffffff;
   cursor: pointer;
 }
 
+.student-board-header-flag{
+  margin-right: 30px;
+}
+
+.student-board-header-age{
+  margin-left: 5px;
+}
+
+.student-board-row-birth{
+  margin-left: 15px;
+}
+
+.student-board-header-created{
+  margin-right: 28px;
+}
+.student-board-header-dormant{
+  margin-right: 15px;
+}
+
+.student-board-row-age{
+  margin-left: 15px;
+}
+
+.student-board-row-flag{ 
+  margin-left: 25px;
+  border-radius: 12px;
+  width: 50px;
+  height: 15px;
+}
+.student-board-row-dormant{
+  margin-left: 33px;
+  border-radius: 12px;
+  width: 50px;
+  height: 15px;
+}
 .student-board-row:hover {
   background-color: #f4f4f4;
 }
