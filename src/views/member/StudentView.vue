@@ -88,8 +88,7 @@
                 </div>
                 <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
     backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
-    color: student.memberFlag ? '#166534' : '#991b1b'
-  }">
+    color: student.memberFlag ? '#166534' : '#991b1b', }">
                   {{ student.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
