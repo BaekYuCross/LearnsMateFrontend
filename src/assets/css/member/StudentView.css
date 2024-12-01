@@ -95,6 +95,13 @@ th {
   gap: 20px;
 }
 
+.info-row {
+  display: flex; /* 가로로 배치 */
+  align-items: left; /* 세로 정렬 */
+  gap: 3px; /* 이름과 값 사이에 간격 추가 */
+  margin-bottom: 3px; /* 각 행 간 간격 추가 */
+}
+
 .label {
   color: #64748b;
   min-width: 100px;
@@ -517,23 +524,6 @@ th {
   padding-right: 10px;
  }
  
- /* 스크롤바 스타일 */
- .detail-container::-webkit-scrollbar {
-  width: 6px;
- }
- 
- .detail-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
- }
- 
- .detail-container::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
- }
- 
- .detail-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
- }
  
  .column-selector {
   cursor: pointer;
