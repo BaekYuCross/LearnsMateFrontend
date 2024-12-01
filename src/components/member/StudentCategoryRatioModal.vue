@@ -423,7 +423,6 @@ const fetchCategoryRatio = async (useFilter = false) => {
   
   .total-count {
   position: absolute;
-  top: 20px;
   left: 10px;
   font-size: 17px;
   font-weight: bold;
