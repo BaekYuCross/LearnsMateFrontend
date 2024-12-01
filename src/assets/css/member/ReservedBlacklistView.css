@@ -14,11 +14,11 @@
 .reserved-main-content {
   flex: 1;
   margin-left: 160px;
-  padding: 20px;
-  min-height: 100vh;
+  padding: 20px 20px 0px 20px;
+  max-height: calc(100vh - 40px); 
   max-width: calc(1920px - 160px - 40px);
   overflow-x: hidden;
-  margin-top: 40px;
+  margin-top: 55px;
 }
 
 .reserved-content-section {
@@ -41,10 +41,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 10px 10px 20px;
-  width: 100%;
-  white-space: nowrap;
-  background-color: #f8f9fa;
+  margin-bottom: 10px;
 }
 
 .reserved-count {
@@ -308,6 +305,7 @@ th:nth-child(4), td:nth-child(4) { width: 100px; }
 }
 
 textarea {
+  font-family: Inter;
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
