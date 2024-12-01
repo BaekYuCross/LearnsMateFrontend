@@ -55,7 +55,9 @@
   max-height: calc(100vh - 40px); 
   overflow-y: auto;
   background: white;
-  padding: 20px; 
+  padding-right: 10px; 
+  padding-left: 20px;
+  padding-top: 20px;
   border-radius: 8px; 
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
   box-sizing: border-box;
@@ -281,8 +283,11 @@ th {
 
 /* 상세 정보 섹션 스타일 */
 .info-section, .course-section, .voc-section, .coupon-section {
-  border-bottom: 1px solid #eee;
+  border-top: 1px solid #e2e8f0;
   padding: 20px 0;
+  margin-top: 20px;
+  padding-top: 20px;
+
  }
  
  .info-section h4, .course-section h4, .voc-section h4, .coupon-section h4 {
@@ -290,6 +295,7 @@ th {
   color: #333;
   margin-bottom: 15px;
   font-weight: bold;
+  
  }
  
  /* 강의 진행 현황 */
@@ -336,7 +342,6 @@ th {
  
 /* 추천 강의 섹션 스타일 */
 .recommended-section {
-  border-bottom: 1px solid #eee;
   padding: 20px 0;
 }
 
