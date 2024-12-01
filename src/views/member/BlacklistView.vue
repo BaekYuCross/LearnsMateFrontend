@@ -8,9 +8,7 @@
         @reset="handleReset"
       />
 
-      <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
-        <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
-          <div class="blacklist-header-container">
+      <div class="blacklist-header-container">
             <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="blacklist-button-group">
               <button class="blacklist-excel-button" @click="handleExcelDownload">
@@ -18,6 +16,9 @@
               </button>
             </div>
           </div>
+
+      <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
+        <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
 
           <table>
             <thead>

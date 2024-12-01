@@ -2,15 +2,14 @@
   <div class="reserved-layout-container">
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
-      <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
-        <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
-          <div class="reserved-header-container">
+      <div class="reserved-header-container">
             <div class="reserved-count">
               예비 {{ memberTypeText }} 블랙리스트 수 
               <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
             </div>
           </div>
-
+      <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
+        <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
           <table>
             <thead>
               <tr>
