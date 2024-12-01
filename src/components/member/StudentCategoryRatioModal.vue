@@ -408,7 +408,9 @@ const fetchCategoryRatio = async (useFilter = false) => {
   }
   
   .close-button {
-    font-size: 24px;
+    font-size: 27px;
+    margin-bottom: 10px;
+    margin-right: 5px;
     background: none;
     border: none;
     cursor: pointer;
