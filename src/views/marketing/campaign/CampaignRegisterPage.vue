@@ -456,11 +456,11 @@ const handleTargetUserFileChange = async (event) => {
 
 const handleCouponFileChange = async (event) => {
   const file = event.target.files[0];
-  const formData = new FormData();
+  const formData = new FormData(); 
   formData.append("file", file);
   if (file) {
     try {
-      const response = await axios.post("http://localhost:5000/member/coupon/excel/upload/target-coupon", formData, {
+      const response = await axios.post("http://localhost:5000/coupon/excel/upload/target-coupon", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -468,7 +468,7 @@ const handleCouponFileChange = async (event) => {
       });
 
       console.log("파일 업로드 성공:", response.data);
-      camelToSnake(response.data).forEach((user) => {
+      camelToSnake(response.data).forEach((coupon) => {
         attachedCouponMap.value.set(coupon.coupon_code, coupon);
       });
     } catch (error) {
@@ -530,7 +530,7 @@ const showCancelModal = () => {
 
 const confirmRegister = async () => {
   try {
-    await registerCampaign(); 
+    registerCampaign(); 
     isRegisterModalOpen.value = false;
     window.location.href = '/marketing'; 
   } catch (error) {
