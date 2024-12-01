@@ -52,7 +52,6 @@ overflow-x: auto;
 .tutor-detail-container {
 flex: 0 0 40%; /* 50%에서 40%로 변경 */
 opacity: 1;
-transform: translateX(0);
 background: white;
 padding: 20px;
 border-radius: 8px;
