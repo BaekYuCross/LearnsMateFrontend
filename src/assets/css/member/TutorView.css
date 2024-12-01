@@ -39,7 +39,7 @@ flex: 1;
 background: white;
 border-radius: 8px;
 box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-overflow-x: auto;
+
 }
 
 .tutor-table-container.shrink {
@@ -48,11 +48,13 @@ overflow-x: auto;
 
 .tutor-detail-container {
   flex: 1; 
-  width: 100%; 
+  min-height: 100vh;
   max-height: calc(100vh - 40px); 
   overflow-y: auto;
   background: white;
-  padding: 20px; 
+  padding-right: 10px; 
+  padding-left: 20px;
+  padding-top: 20px;
   border-radius: 8px; 
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
   box-sizing: border-box;
@@ -92,11 +94,13 @@ display: flex;
 gap: 20px;
 }
 
+
 .tutor-label {
 color: #64748b;
 min-width: 100px; /* 레이블 너비 통일 */
 text-align: left;
 }
+
 .tutor-board-container {
   background-color: #ffffff;
   border-radius: 4px;
@@ -111,7 +115,7 @@ text-align: left;
 
 .tutor-board-header {
   display: grid;
-  grid-template-columns: 0.8fr 1fr 1.2fr 1fr 1.5fr 0.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+  grid-template-columns:  0.7fr 0.3fr 0.9fr 0.7fr 1.0fr 0.6fr 0.7fr 0.6fr 0.5fr 0.5fr 0.07fr;
   padding: 7px 14px;
   background-color: #f9f9f9;
   font-size: 12px;
@@ -119,9 +123,8 @@ text-align: left;
   color: #595656;
   text-align: center;
   border-bottom: 1px solid #eaeaea;
-  position: sticky;
   top: 0;
-  z-index: 1;
+
 }
 
 .tutor-board-body {
@@ -133,7 +136,7 @@ text-align: left;
 
 .tutor-board-row {
   display: grid;
-  grid-template-columns: 0.8fr 1fr 1.2fr 1fr 1.5fr 0.5fr 0.8fr 0.8fr 0.8fr 0.8fr;
+  grid-template-columns: 0.7fr 0.3fr 0.9fr 0.7fr 1.0fr 0.6fr 0.7fr 0.6fr 0.5fr 0.5fr 0.03fr;
   padding: 7px 14px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
@@ -142,28 +145,6 @@ text-align: left;
   align-items: center;
   background-color: #ffffff;
   cursor: pointer;
-}
-.tutor-board-header-flag{
-  margin-right: 30px;
-}
-
-.tutor-board-header-age{
-  margin-left: 5px;
-}
-
-.tutor-board-row-birth{
-  margin-left: 15px;
-}
-
-.tutor-board-header-created{
-  margin-right: 28px;
-}
-.tutor-board-header-dormant{
-  margin-right: 15px;
-}
-
-.tutor-board-row-age{
-  margin-left: 15px;
 }
 
 .tutor-board-row-flag{ 
@@ -306,9 +287,10 @@ flex: 0 0 50%;
 }
 
 .lecture-section {
-margin-top: 20px;
 border-top: 1px solid #e2e8f0;
-padding-top: 20px;
+  padding: 20px 0;
+  margin-top: 20px;
+  padding-top: 20px;
 }
 
 .lecture-title {
@@ -349,13 +331,41 @@ color: #666;
 color: #333;
 }
 
-.tutor-column-selector {
+.column-selector {
+  position: relative; /* 드롭다운 메뉴의 위치를 버튼 기준으로 설정 */
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   gap: 5px;
   border-radius: 5px;
+  display: flex;
+
+}
+
+.tutor-dropdown-menu {
+  position: absolute; /* 부모 요소인 column-selector 기준으로 위치 */
+  top: 100%; /* 버튼 바로 아래에 위치 */
+  left: 0; /* 버튼의 왼쪽과 맞춤 */
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  width: 100px;
+  border-radius: 4px;
+  z-index: 10; /* 다른 요소 위에 표시 */
+}
+
+.tutor-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.tutor-dropdown-item input[type="checkbox"] {
+  outline: none;
+  accent-color: #005950;
 }
 
 .tutor-dropdown-button {
@@ -367,24 +377,6 @@ color: #333;
   border-radius: 4px;
   cursor: pointer;
 }
-
-.tutor-dropdown-menu {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  margin-top: 240px;
-  z-index: 10;
-  width: 100px;
-  border-radius: 4px;
-}
-
-.tutor-dropdown-menu input[type="checkbox"] {
-  outline: none;
-  accent-color: #005950; 
-}
-
 
 .tutor-dropdown-item {
   display: flex;
