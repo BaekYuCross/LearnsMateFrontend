@@ -300,10 +300,10 @@ const registerCoupon = async () => {
     isRegisterModalOpen.value = false;
     window.location.href = '/marketing/register-coupon'
 
-    console.log('쿠폰 등록 성공', response.data);
+    console.log('coupon register success', response.data);
     
   } catch (error) {
-    console.error('쿠폰 등록 실패:', error.message);
+    console.error('coupon register fail:', error.message);
   }
 };
 

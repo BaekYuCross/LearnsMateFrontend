@@ -468,9 +468,6 @@ const openAiModal = async () => {
   try {
     const response = await axios.get('http://localhost:5000/voc/ai/current-week');
     aiData.value = response.data || [];
-    if (aiData.value.length === 0) {
-      alert('현재 주차에 대한 AI 요약 데이터가 없습니다.');
-    }
   } catch (error) {
     console.error('AI 요약 데이터 로드 실패:', error);
     alert('AI 요약 데이터를 로드하는 중 문제가 발생했습니다.');

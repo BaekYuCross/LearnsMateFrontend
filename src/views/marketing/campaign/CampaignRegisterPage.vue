@@ -466,12 +466,12 @@ const handleTargetUserFileChange = async (event) => {
         },
       });
 
-      console.log("파일 업로드 성공:", response.data);
+      console.log("file upload success :", response.data);
       camelToSnake(response.data).forEach((user) => {
         targetUserMap.value.set(user.member_code, user);
       });
     } catch (error) {
-      console.error("파일 업로드 실패:", error.message);
+      console.error("file upload fail:", error.message);
     }
   }
 };
@@ -489,12 +489,12 @@ const handleCouponFileChange = async (event) => {
         },
       });
 
-      console.log("파일 업로드 성공:", response.data);
+      console.log("file upload success :", response.data);
       camelToSnake(response.data).forEach((coupon) => {
         attachedCouponMap.value.set(coupon.coupon_code, coupon);
       });
     } catch (error) {
-      console.error("파일 업로드 실패:", error.message);
+      console.error("file upload fail :", error.message);
     }
   }
 };

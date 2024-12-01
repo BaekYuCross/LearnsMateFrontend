@@ -197,13 +197,13 @@ const saveCoupon = async () => {
       },
     }
   );
-    console.log("수정 성공", response.data);
+    console.log("edit success", response.data);
 
     // 성공 시 화면 데이터 갱신
     Object.assign(props.selectedCoupon, editCouponData.value);
     isEditMode.value = false;
   } catch (error) {
-    console.error("수정 실패", error.message);
+    console.error("edit fail", error.message);
   }
 };
 
@@ -219,10 +219,10 @@ const deleteCoupon = async () => {
       }
     );
     window.location.href = '/marketing/coupons'
-    console.log("삭제 성공", response.data);
+    console.log("delete success", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
-    console.error("삭제 실패", error.message);
+    console.error("delete fail", error.message);
     alert("쿠폰 삭제에 실패했습니다.");
   }
 };

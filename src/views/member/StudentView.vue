@@ -360,7 +360,7 @@ const toggleDropdown = () => {
 };
 
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected column :", selectedColumns.value);
 };
 const formatCurrency = (value) => {
   return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
@@ -422,8 +422,6 @@ const showDetail = async (student) => {
 
       selectedStudent.value = student;
       studentDetail.value = response.data;
-      console.log("상세 정보:", response.data);
-      console.log("상세 정보:", studentDetail.value);
     } catch (error) {
       console.error('Failed to load student details:', error);
     }

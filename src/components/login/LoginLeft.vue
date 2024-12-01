@@ -44,7 +44,7 @@ const loginUser = async () => {
       }
     );
 
-    console.log('로그인 성공:', response);
+    console.log('login success :', response);
 
     // 로그인 상태 확인 (쿠키 기반)
     await loginState.fetchLoginState();

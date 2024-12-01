@@ -131,7 +131,7 @@
         },
       });
       campaigns.value = response.data.content; // content 배열로 설정
-      console.log('캠페인 데이터:', campaigns.value);
+      console.log('campaign data:', campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
@@ -179,7 +179,7 @@
     isFiltered.value = true;
     lastFilterData.value = preparedFilters;
     try {
-      console.log("필터 데이터:", preparedFilters);
+      console.log("filter data:", preparedFilters);
       const response = await axios.post(
         'http://localhost:5000/campaign/filter',
         camelToSnake(preparedFilters),
@@ -195,7 +195,7 @@
         }
       );
       campaigns.value = response.data.content; // content 배열로 설정
-      console.log('필터된 캠페인 데이터:', campaigns.value);
+      console.log('filtered campaign data:', campaigns.value);
       totalPages.value = response.data.totalPages;
     } catch (error) {
       console.error('Error while fetching filtered campaigns:', error);
@@ -229,7 +229,7 @@ const toggleDropdown = () => {
 };
 
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected columns:", selectedColumns.value);
 };
 
 const navigateTo = () => {

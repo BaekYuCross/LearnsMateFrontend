@@ -267,7 +267,7 @@ const handleExcelDownload = async() => {
 
     if (isFiltered.value && lastFilterData.value) {
       config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+      console.log('excel download request data :', lastFilterData.value);
     }
 
     const response = await axios(config);
@@ -380,7 +380,7 @@ const showDetail = async (blacklist) => {
         withCredentials: true,
       });
       reportDetails.value = response.data;
-      console.log("상세내용은 ", reportDetails.value);
+      console.log("report details : ", reportDetails.value);
     } catch (error) {
       console.error('Failed to load report details:', error);
       reportDetails.value = [];

@@ -6,7 +6,7 @@ permissions:
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [ opened, reopened, synchronize ]
   push:
     branches:
       - "main"
@@ -48,8 +48,8 @@ jobs:
         mkdir -p deploy
         cp -r dist deploy/
         cp package.json deploy/
-        cp Procfile deploy/
-        cp server.js deploy/
+        cp server.js deploy/ 
+        cp Procfile deploy/Procfile
         cd deploy && zip -r deploy.zip .
 
     - name: Beanstalk Deploy
