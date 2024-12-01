@@ -166,7 +166,7 @@
   };
 
   const updateSelectedColumns = () => {
-    console.log("현재 선택된 컬럼:", selectedColumns.value);
+    console.log("current selected columns :", selectedColumns.value);
   };
 
   
@@ -240,7 +240,7 @@
     isFiltered.value = true;
     lastFilterData.value = preparedFilters;
     try {
-      console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
+      console.log("filters data: ",preparedFilters);
       const response = await axios.post(
         'http://localhost:5000/campaign-template/filter',
         camelToSnake(preparedFilters),

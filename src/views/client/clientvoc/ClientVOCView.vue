@@ -171,7 +171,7 @@ const goToMyVOC = () => {
   router.push("/client-myvoc");
 };
 const handleSubmit = (data) => {
-  console.log("제출된 데이터:", data);
+  console.log("data:", data);
 };
 
 </script>

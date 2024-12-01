@@ -98,12 +98,12 @@ const handleLogin = async () => {
 
 // 카카오 로그인 처리
 const handleKakaoLogin = () => {
-  console.log("카카오 로그인");
+  console.log("kakao login");
 };
 
 // 구글 로그인 처리
 const handleGoogleLogin = () => {
-  console.log("구글 로그인");
+  console.log("google login");
 };
 </script>
 

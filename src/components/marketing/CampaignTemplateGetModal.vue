@@ -94,23 +94,22 @@ const campaignTemplate = ref({
   campaign_template_contents: '',
   admin_name: '',
 });
-console.log("부모에서 넘어온 템플릿코드: ",props.campaignTemplateCode);
+console.log("template Code : ",props.campaignTemplateCode);
 const fetchCampaignTemplate = async () => {
 try {
   const response = await axios.get(`http://localhost:5000/campaign-template/${props.campaignTemplateCode}`, {
     withCredentials: true,
   });
   campaignTemplate.value = response.data;
-  console.log('캠페인 템플릿 조회 성공:', response.data);
+  console.log('template read success :', response.data);
 } catch (error) {
-  console.error('캠페인 템플릿 조회 실패:', error);
+  console.error('template read fail :', error);
 }
 };
 
 onMounted(fetchCampaignTemplate);
 
 const handleEdit = async () => {
-console.log('템플릿 수정 모드');
   isEditMode.value = true;
 };
 
@@ -124,7 +123,6 @@ const saveChanges = async () => {
         campaignTemplateContents: campaignTemplate.value.campaign_template_contents,
         adminName: campaignTemplate.value.admin_name, 
     };
-    console.log("요청한 수정 정보: ", payload);
   try {
       await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
         withCredentials: true,
@@ -133,7 +131,7 @@ const saveChanges = async () => {
     isEditMode.value = false;
     fetchCampaignTemplate();
   } catch (error) {
-    console.error('캠페인 템플릿 수정 실패:', error);
+    console.error('edit fail :', error);
   }
 };
 
@@ -142,7 +140,6 @@ const handleDelete = async () => {
 };
 
 const deleteCampaignTemplate = async () => {
-  console.log('템플릿 삭제 요청');
  try {
   await axios.patch(`http://localhost:5000/campaign-template/delete/${props.campaignTemplateCode}`,{
     withCredentials: true,
@@ -151,7 +148,7 @@ const deleteCampaignTemplate = async () => {
   isDeleteModalOpen.value = false;
   window.location.href = '/marketing/campaign-template'; 
  } catch (error) {
-  console.error("캠페인 템플릿 삭제 실패:",error);
+  console.error("delete fail :",error);
  }
 };
 

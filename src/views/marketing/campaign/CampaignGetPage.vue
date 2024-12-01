@@ -356,11 +356,9 @@ const fetchTemplate = async () => {
     response.data.members.content.forEach((member) => {
       targetUserMap.value.set(member.member_code, member);
     });
-    console.log('서버에서 받은 쿠폰 데이터:', response.data.coupons);
-    console.log('현재 저장된 쿠폰들:', attachedCoupons.value);
 
   } catch (error) {
-    console.error('캠페인 데이터 로드 실패:', error);
+    console.error('campaign data load fail:', error);
   }
 };
 
@@ -425,12 +423,12 @@ const cancelEditMode = () => {
 };
 
 const handleCouponSubmit = (coupons) => {
-  console.log('선택된 쿠폰들:', coupons);
+  console.log('selected coupons :', coupons);
   coupons.forEach((coupon) => {
     attachedCouponMap.value.set(coupon.coupon_code, coupon);
   });
   attachedCoupons.value = Array.from(attachedCouponMap.value.values());
-  console.log('저장된 쿠폰들:', attachedCoupons.value);
+  console.log('attached coupons :', attachedCoupons.value);
   showCouponSelectModal.value = false;
 };
 

@@ -274,7 +274,6 @@ const visiblePages = computed(() => {
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
-    console.log(`현재 페이지: ${page}`);
     // 여기서 서버 요청으로 해당 페이지 데이터를 가져오면 됨
   }
 };
