@@ -268,7 +268,7 @@ const reset = () => {
   }
   
   .search-button {
-    padding: 2px 6px 3px 3px;        
+    padding: 4px 5px 5px 4px;     
     background-color: #005950;
     border: 1px solid #005950;
     border-radius: 4px;
