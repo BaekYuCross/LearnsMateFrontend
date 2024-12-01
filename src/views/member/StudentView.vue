@@ -37,7 +37,7 @@
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
-              <button class="excel-button" @click="showCategoryModal = true">
+              <button class="excel-button" @click="showCategoryModal = true" style="font-size: 13.5px;">
                 카테고리 비율
               </button>
             </div>
