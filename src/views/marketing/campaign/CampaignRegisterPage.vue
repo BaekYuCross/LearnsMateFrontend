@@ -50,6 +50,23 @@
               <div class="campaign-detail-row">
                 <span class="detail-title">담당자</span>
                 <span class="detail-content">{{ userName }}</span>
+                <span class="detail-title">발송 수단</span>
+                <div class="detail-content send-method">
+                  <button
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'Email' }"
+                    @click="selectSendMethod('Email')"
+                  >
+                    Email
+                  </button>
+                  <button
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'SMS' }"
+                    @click="selectSendMethod('SMS')"
+                  >
+                    SMS
+                  </button>
+                </div>
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">발송 유형</span>
@@ -252,6 +269,7 @@ const campaignTitle = ref('');
 const campaignContents = ref('');
 const isEditMode = ref(false);
 const campaignType = ref('INSTANT');
+const campaignMethod = ref('Email');
 const selectedDate = ref('');
 const selectedTime = ref('');
 
@@ -400,6 +418,10 @@ const selectSendType = (type) => {
   }
 };
 
+const selectSendMethod = (method) => {
+  campaignMethod.value = method;
+};
+
 const minDate = computed(() => {
   const today = new Date();
   return today.toISOString().split('T')[0];
@@ -504,6 +526,7 @@ const registerCampaign = async () => {
     campaign_title: campaignTitle.value,
     campaign_contents: campaignContents.value,
     campaign_type: campaignType.value,
+    campaign_method: campaignMethod.value,
     campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
     coupon_list: attachedCoupons.value,
     student_list: formattedStudentList,
@@ -682,7 +705,13 @@ fetchTemplates();
    align-items: center;
 }
 
-.send-type-btn {
+.send-method {
+   display: flex;
+   gap: 10px;
+   align-items: center;
+}
+
+.send-type-btn, .send-method-btn {
    padding: 5px 10px;
    background-color: #f0f0f0;
    border: 1px solid #ddd;
@@ -691,7 +720,7 @@ fetchTemplates();
    cursor: pointer;
 }
 
-.send-type-btn.active {
+.send-type-btn.active, .send-method-btn.active {
    color: #FFFFFF;
    background-color: #005950;
 }
