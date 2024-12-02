@@ -315,8 +315,12 @@
   }
 
   .campaigntemplate-column-selector {
-      position: relative;
-      display: inline-block;
+    cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
     }
 
   .campaigntemplate-dropdown-button {
@@ -331,23 +335,26 @@
 
   .campaigntemplate-dropdown-menu {
     position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    z-index: 100;
-    width: 100px;
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 4px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-top: 160px;
+  z-index: 10;
+  width: 100px;
+  border-radius: 4px;
   }
+
+  .campaigntemplate-dropdown-menu input[type="checkbox"] {
+  outline: none;
+  accent-color: #005950; 
+}
 
   .campaigntemplate-dropdown-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
   }
 
   .campaigntemplate-dropdown-item label {
