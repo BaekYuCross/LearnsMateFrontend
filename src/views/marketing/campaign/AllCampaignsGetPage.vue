@@ -304,6 +304,9 @@ onMounted(async() => {
 
     .campaign-actions {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
     
     .campaign-count {
@@ -327,11 +330,10 @@ onMounted(async() => {
     .campaign-dropdown-button {
       background-color: #ffffff;
       color: #000000;
-      border: none;
-      padding: 3px 5px;
-      font-size: 12px;
+      border: 1px solid #000000;
+      padding: 5px 10px;
+      font-size: 13px;
       border-radius: 4px;
-      border: 0.5px solid #000000;
       cursor: pointer;
     }
 
@@ -364,8 +366,7 @@ onMounted(async() => {
 
     .campaign-register-button, .campaign-excel-button {
       background: #005950;
-      padding: 3px 5px;
-      margin-bottom: 3px;
+      padding: 5px 10px;
       border: none;
       color: #ffffff;
       cursor: pointer;
