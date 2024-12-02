@@ -44,23 +44,43 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from "vue"
+import axios from '@/plugins/axios';
 
 // Emits 정의
 const emit = defineEmits(["close", "submit"]);
 
 const showNotification = ref(false);
-
-
 const selectedCategory = ref("");
 const inquiryContent = ref("");
+const categoryCodeMap = {
+      "결제 및 환불": 1,
+      "강의 자료 요청": 2,
+      "강사 피드백": 3,
+      "기술적 문제": 4,
+      "기타 건의사항": 5
+    };
 
-const handleSubmit = () => {
+
+const handleSubmit = async() => {
   if (!selectedCategory.value || !inquiryContent.value) {
     alert("모든 필드를 작성해 주세요.");
     return;
   }
 
+  // console.log(localStorage.getItem('clientInfo'));
+  // console.log(JSON.parse(localStorage.getItem('clientInfo')).memberCode);
+
+  const response = await axios.post('http://localhost:5000/voc', {
+      vocContent: inquiryContent.value,
+      vocCategoryCode: categoryCodeMap[selectedCategory.value],
+      // vocAnswerStatus: false,  
+      // vocAnswerSatisfaction: null,
+      // createdAt: new Date(), 
+      memberCode: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
+    }, {
+      withCredentials: true
+    });
 
   showNotification.value = true;
 
@@ -77,7 +97,8 @@ const handleSubmit = () => {
   }, 2000);
 };
 </script>
-<style lang="scss" scoped>
+
+<style scoped>
 .clientvocmodal-overlay {
   position: fixed;
   top: 0;

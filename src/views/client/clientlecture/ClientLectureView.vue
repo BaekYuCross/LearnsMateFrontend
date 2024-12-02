@@ -280,7 +280,7 @@ const changePage = (page) => {
 
 </script>
 
-<style lang="scss">
+<style>
 .clientlecture-app-container {
   background-color: #ffffff;
   height: 100vh;
