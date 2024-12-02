@@ -423,29 +423,27 @@ th {
   justify-content: space-between;
   align-items: center;
 }
-
+.recommended-toggle-button,
 .course-toggle-button {
-  background-color: white;
-  color: #005950;
+  background: none;
   border: none;
-  margin-left: 460px;
-  padding: 5px 10px;
-  font-size: 14px;
-  border-radius: 4px;
+  font-size: 16px; /* 화살표 크기 */
+  color: #005950;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 10px; /* 화살표와 텍스트 간 간격 */
+  position: relative; /* 위치 고정 */
 }
 
-.recommended-toggle-button {
-  background-color: white;
-  color: #005950;
-  border: none;
-  margin-left: 470px;
-  padding: 5px 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  cursor: pointer;
+/* 화살표를 텍스트와 일치하도록 정렬 */
+.recommended-toggle-button span,
+.course-toggle-button span {
+  line-height: 1; /* 세로 정렬 */
+  vertical-align: middle;
+  display: inline-block;
 }
-
  /* VOC 섹션 */
  .voc-list {
   display: flex;
