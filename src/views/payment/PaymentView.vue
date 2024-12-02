@@ -80,13 +80,13 @@
                     {{ payment.tutor_code }}
                     </div>
                     <div v-if="selectedColumns.includes('tutorName')" class="payment-board-row-tutor">
-                    {{ payment.tutor_name }}
+                    {{ maskName(payment.tutor_name) }}
                     </div>
                     <div v-if="selectedColumns.includes('studentCode')" class="payment-board-row-studentcode">
                     {{ payment.student_code }}
                     </div>
                     <div v-if="selectedColumns.includes('studentName')" class="payment-board-row-student">
-                    {{ payment.student_name }}
+                    {{ maskName(payment.student_name) }}
                     </div>
                     <div v-if="selectedColumns.includes('lecturePrice')" class="payment-board-row-lectureprice">
                     {{ formatPrice(payment.lecture_price) }}
@@ -481,6 +481,13 @@ const closeRevenueModal = () => {
   const endPage = computed(() => {
     return displayedPages.value[displayedPages.value.length - 1];
   });
+
+  const maskName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
+};
   
   onMounted(async () => {
     fetchPaymentList();
