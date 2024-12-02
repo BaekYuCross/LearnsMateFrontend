@@ -87,7 +87,7 @@
           <h3>미답변 VOC</h3>
           <ul>
             <li v-for="(unansweredVOC, index) in unansweredVOCs" :key="index">
-              <div class="voc-section">
+              <div class="main-voc-section">
                 <p class="voc-contents">[{{ unansweredVOC.voc_category_name }}] - {{ unansweredVOC.voc_content }}</p>
                 <button class="detail-button" @click="goToUnansweredVOCPage(unansweredVOC.voc_code)">자세히</button>
               </div>
@@ -583,7 +583,7 @@ onMounted(async () => {
   font-size: 12px;
   color: #999;
 }
-.voc-section {
+.main-voc-section {
   display: flex;
   align-items: center;
   justify-content: space-between; 
