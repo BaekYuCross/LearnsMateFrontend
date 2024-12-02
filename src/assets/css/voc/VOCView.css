@@ -83,6 +83,32 @@
   z-index: 1;
 }
 
+.voc-board-header div {
+  cursor: pointer;
+  position: relative;
+}
+
+.voc-board-header div.sort-asc::after {
+  content: '▲';
+  font-size: 12px;
+  position: absolute;
+  right: 10px;
+  color: #005950;
+}
+
+.voc-board-header div.sort-desc::after {
+  content: '▼';
+  font-size: 12px;
+  position: absolute;
+  right: 10px;
+  color: #005950;
+}
+
+.voc-board-header div:hover {
+  background-color: #f1f1f1;
+}
+
+
 .voc-board-body {
   display: flex;
   flex-direction: column;
