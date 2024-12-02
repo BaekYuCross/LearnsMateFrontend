@@ -50,6 +50,7 @@
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    
   }
   
   .modal-container {
@@ -59,15 +60,18 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     padding: 20px;
     position: relative;
+    border-top: 9px solid #B5CFCC; /* 위 테두리 */
+    border-bottom: 9px solid #B5CFCC; /* 아래 테두리 */
+
   }
   
   .modal-close {
     position: absolute;
-    top: 15px;
-    right: 10px;
+    top: 10px;
+    right: 20px;
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 30px;
     cursor: pointer;
   }
   

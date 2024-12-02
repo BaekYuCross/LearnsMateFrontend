@@ -2,7 +2,7 @@
     <div v-if="isOpen" class="lecture-modal-overlay">
       <div class="lecture-modal-container">
         <div class="lecture-modal-header">
-          <h2>강의 카테고리 비율</h2>
+          <h2> 강의 카테고리 비율</h2>
           <button class="close-button" @click="closeModal">×</button>
         </div>
         <div class="lecture-modal-content">
@@ -53,7 +53,7 @@
           </div>
           <div class="lecture-chart-container">
             <div class="total-count">
-                전체 인원: {{ totalCount.toLocaleString() }}명
+                전체 인원: <span style="color:#005950 ;">{{ totalCount.toLocaleString() }}</span>명
             </div>
             <canvas ref="chartCanvas"></canvas>
           </div>
@@ -92,13 +92,13 @@
   });
   
   const colors = [
-  'rgba(75, 192, 192, 0.7)',   // 청록색
-  'rgba(255, 99, 132, 0.7)',   // 분홍색
-  'rgba(255, 205, 86, 0.7)',   // 노란색
-  'rgba(54, 162, 235, 0.7)',   // 파란색
-  'rgba(153, 102, 255, 0.7)',  // 보라색
-  'rgba(255, 159, 64, 0.7)',   // 주황색
-  'rgba(201, 203, 207, 0.7)'   // 회색
+  'rgba(75, 192, 192, 0.7)',   // 청록색 (기준 색)
+  'rgba(120, 200, 180, 0.7)',  // 부드러운 민트색
+  'rgba(100, 180, 210, 0.7)',  // 밝은 하늘색
+  'rgba(85, 210, 180, 0.7)',   // 연한 초록색
+  'rgba(200, 225, 180, 0.7)',  // 부드러운 라임색
+  'rgba(150, 180, 225, 0.7)',  // 연한 청록-보라색
+  'rgba(200, 190, 220, 0.7)'   // 청록빛이 섞인 연보라색
 ];
 
 const translateCategory = (category) => {
@@ -126,57 +126,76 @@ const createChart = (data) => {
   
   totalCount.value = counts.reduce((acc, curr) => acc + curr, 0);
 
-  chart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: labels, 
-      datasets: [{
-        data: percentages,
-        backgroundColor: colors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: {
-          display: false
-        },
-        legend: {
-          position: 'bottom',
-          labels: {
-            boxWidth: 15,
-            padding: 15,
-            font: {
-              size: 12
-            }
-          },
-          maxWidth: 250
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const dataIndex = context.dataIndex;
-              const label = labels[dataIndex]; 
-              const count = counts[dataIndex];
-              const percentage = percentages[dataIndex];
-              return `${label}: ${count.toLocaleString()}명 (${percentage.toFixed(1)}%)`;
-            }
+chart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: labels,
+    datasets: [{
+      data: percentages,
+      backgroundColor: colors,
+      borderWidth: 1
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          boxWidth: 25,
+          padding: 25,
+          font: {
+            size: 13
           }
         }
       },
-      layout: {
-        padding: {
-          top: 50,
-          right: 20,
-          bottom: 30,
-          left: 20
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const dataIndex = context.dataIndex;
+            const label = labels[dataIndex];
+            const percentage = percentages[dataIndex];
+            return `${label}: ${percentage.toFixed(1)}%`;
+          }
         }
       }
     }
-  });
-};
+  },
+  plugins: [
+    {
+      id: 'percentageLabels',
+      beforeDraw: (chart) => {
+        const { width } = chart;
+        const { datasets } = chart.data;
+        const ctx = chart.ctx;
+        const total = datasets[0].data.reduce((acc, value) => acc + value, 0);
+
+        ctx.save();
+        chart.data.labels.forEach((label, index) => {
+          const meta = chart.getDatasetMeta(0);
+          const arc = meta.data[index];
+          const { x, y } = arc.tooltipPosition();
+
+          const percentage = ((datasets[0].data[index] / total) * 100).toFixed(1) + '%';
+          const displayText = `${label}\n${percentage}`; // 카테고리명과 퍼센트 표시
+
+ctx.fillStyle = 'black';
+ctx.font = 'bold 13px Arial';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+
+const lines = displayText.split('\n'); // 텍스트 줄바꿈 처리
+lines.forEach((line, i) => {
+  ctx.fillText(line, x, y + i * 15); // 각 줄에 대한 위치 조정
+});
+});
+ctx.restore();
+      }
+    }
+  ]
+});
+}
 
 const fetchCategoryRatio = async (useFilter = false) => {
   try {
@@ -249,15 +268,18 @@ const fetchCategoryRatio = async (useFilter = false) => {
   }
   
   .lecture-modal-container {
-    background-color: white;
-    border-radius: 12px;
-    padding: 10px;
-    width: 90%;
-    max-width: 1000px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+  background-color: white;
+  border-radius: 12px;
+  padding: 10px;
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-top: 9px solid #B5CFCC; /* 위 테두리 */
+  border-bottom: 9px solid #B5CFCC; /* 아래 테두리 */
+}
+
   
   .lecture-modal-header {
     display: flex;
@@ -269,6 +291,7 @@ const fetchCategoryRatio = async (useFilter = false) => {
   
   .lecture-modal-header h2 {
     font-size: 16px;
+    padding-left: 9px;
     font-weight: bold;
     color: #333;
   }
@@ -303,7 +326,7 @@ const fetchCategoryRatio = async (useFilter = false) => {
   }
   
   .lecture-filter-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -372,20 +395,22 @@ const fetchCategoryRatio = async (useFilter = false) => {
   position: relative;
   width: 100%;
   height: 500px;
-  padding: 20px;
+  padding: 10px;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
   
   .search-img, .reset-img {
-    width: 12px;
+    width: 14px;
     height: 12px;
-    margin-right: 4px;
+    
   }
   
   .close-button {
-    font-size: 24px;
+    font-size: 27px;
+    margin-bottom: 10px;
+    margin-right: 5px;
     background: none;
     border: none;
     cursor: pointer;
@@ -398,9 +423,8 @@ const fetchCategoryRatio = async (useFilter = false) => {
   
   .total-count {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  font-size: 14px;
+  left: 10px;
+  font-size: 17px;
   font-weight: bold;
   color: #333;
 }
