@@ -82,6 +82,32 @@
   z-index: 1;
 }
 
+.lecture-board-header div {
+  cursor: pointer;
+  position: relative;
+}
+
+.lecture-board-header div.sort-asc::after {
+  content: '▲';
+  font-size: 12px;
+  position: absolute;
+  right: 10px;
+  color: #005950;
+}
+
+.lecture-board-header div.sort-desc::after {
+  content: '▼';
+  font-size: 12px;
+  position: absolute;
+  right: 10px;
+  color: #005950;
+}
+
+.lecture-board-header div:hover {
+  background-color: #f1f1f1;
+}
+
+
 .lecture-board-body {
   display: flex;
   flex-direction: column;
