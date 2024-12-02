@@ -196,7 +196,7 @@ const toggleDropdown = () => {
 };
 
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected column :", selectedColumns.value);
 };
 
 const formatCurrency = (value) => {

@@ -87,7 +87,8 @@
               <th>가격</th>
             </tr>
           </thead>
-          <tbody class="coupon-target-lecture-table-body" v-for="lecture in paginatedLectures"
+          <tbody class="coupon-target-lecture-table-body" 
+          v-for="(lecture, index) in lecture || []"
             :key="lecture.lecture_code">
             <tr>
               <td>
@@ -112,20 +113,34 @@
 
       <!-- 페이지네이션 -->
       <div class="pagination">
-        <button class="page-button prev-button" @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1">◀</button>
-        <button class="page-button" :class="{ active: currentPage === 1 }" @click="changePage(1)">1</button>
-        <span v-if="startPage > 2">...</span>
-        <template v-for="page in displayedPages" :key="page">
-          <button v-if="page !== 1 && page !== totalPages" class="page-button" :class="{ active: currentPage === page }"
-            @click="changePage(page)">{{ page }}</button>
-        </template>
-        <span v-if="endPage < totalPages - 1">...</span>
-        <button v-if="totalPages > 1" class="page-button" :class="{ active: currentPage === totalPages }"
-          @click="changePage(totalPages)">{{ totalPages }}</button>
-        <button class="page-button next-button" @click="changePage(currentPage + 1)"
-          :disabled="currentPage === totalPages">▶</button>
-      </div>
+  <button 
+    class="page-button prev-button" 
+    @click="changePage(currentPage - 1)" 
+    :disabled="currentPage === 1"
+  >
+    ◀
+  </button>
+  
+  <template v-for="page in displayedPages" :key="page">
+    <span v-if="page === '...'" class="page-dots">...</span>
+    <button 
+      v-else
+      class="page-button" 
+      :class="{ active: currentPage === page }" 
+      @click="changePage(page)"
+    >
+      {{ page }}
+    </button>
+  </template>
+  
+  <button 
+    class="page-button next-button" 
+    @click="changePage(currentPage + 1)" 
+    :disabled="currentPage === totalPages"
+  >
+    ▶
+  </button>
+</div>
 
       <div class="coupon-register-buttons">
         <button class="coupon-register-button" @click="showRegisterModal">
@@ -153,12 +168,66 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDEwMDEiLCJlbWFpbCI6ImRid3BkbXMxMTIyQG5hdmVyLmNvbSIsIm5hbWUiOiLsnKDsoJzsnYAiLCJyb2xlcyI6W10sImlhdCI6MTczMjA2MzM2OSwiZXhwIjoxNzc1MjYzMzY5fQ.bAHcsoQVi8dd-XFl0aWUE6srz68YbToSmhzPKHgYhkxETTWsoT2o5iGQ0r0LYVx2d3MqplgXGDVGxOqcXDAHEQ';
 
 import RegisterModule from '@/components/modules/RegisterModule.vue';
 import CancelModule from '@/components/modules/CancelModule.vue';
+
+const lecture = ref([]);
+
+const totalPages = ref(1); // 전체 페이지 수
+const currentPage = ref(1);
+const pageSize = 15; // 페이지당 항목 수
+
+// displayedPages computed 속성 추가
+const displayedPages = computed(() => {
+  const pages = [];
+  pages.push(1);
+  if (currentPage.value - 1 > 2) {
+    pages.push('...');
+  }
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
+    pages.push(i);
+  }
+  if (totalPages.value - currentPage.value > 2) {
+    pages.push('...');
+  }
+  if (totalPages.value > 1) {
+    pages.push(totalPages.value);
+  }
+  return pages;
+});
+
+// fetchLectures 함수 수정
+const fetchLectures = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/lecture/list', {
+      withCredentials: true,
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    lecture.value = response.data.content;
+    totalPages.value = response.data.totalPages;
+    
+  } catch (error) {
+    console.error('강의 데이터를 가져오는 중 오류 발생:', error.message);
+  }
+};
+
+// changePage 함수 수정
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  currentPage.value = newPage;
+  await fetchLectures();
+};
 
 const formatDate = (isoDate) => {
   if (!isoDate) return '-';
@@ -231,38 +300,21 @@ const registerCoupon = async () => {
     isRegisterModalOpen.value = false;
     window.location.href = '/marketing/register-coupon'
 
-    console.log('쿠폰 등록 성공', response.data);
+    console.log('coupon register success', response.data);
     
   } catch (error) {
-    console.error('쿠폰 등록 실패:', error.message);
+    console.error('coupon register fail:', error.message);
   }
 };
 
 const lectures = ref([]);
-const currentPage = ref(1);
-const pageSize = 50;
 
-const totalPages = computed(() => Math.ceil(lectures.value.length / pageSize));
 const paginatedLectures = computed(() => {
-  const start = (currentPage.value - 1) * pageSize;
-  return lectures.value.slice(start, start + pageSize);
-});
-
-const fetchLectures = async () => {
-  try {
-    const response = await axios.get('http://localhost:5000/lecture/all-lectures', {
-      method: 'GET',
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    lectures.value = response.data;
-    console.log(lectures.value);
-  } catch (error) {
-    console.error('강의 데이터를 가져오는 중 오류 발생:', error.message);
+  if (Array.isArray(lecture.value)) {
+    return lecture.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
   }
-};
+  return [];
+});
 
 onMounted(() => {
   fetchLectures();
@@ -344,38 +396,6 @@ const confirmCancel = () => {
 const showCancelModal = () => {
   isCancelModalOpen.value = true;
 };
-
-const changePage = (page) => {
-  if (page > 0 && page <= totalPages.value) currentPage.value = page;
-};
-
-const displayedPages = computed(() => {
-  let start = Math.max(currentPage.value - 2, 2);
-  let end = Math.min(start + 4, totalPages.value - 1);
-
-  if (end === totalPages.value - 1) {
-    start = Math.max(end - 4, 2);
-  }
-
-  if (start === 2) {
-    end = Math.min(6, totalPages.value - 1);
-  }
-
-  let pages = [];
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-  return pages;
-});
-
-const startPage = computed(() => {
-  return displayedPages.value[0];
-});
-
-const endPage = computed(() => {
-  return displayedPages.value[displayedPages.value.length - 1];
-});
-
 </script>
 
 <style scoped>

@@ -91,7 +91,6 @@ const sendAuthCode = async () => {
       email: email.value,
       adminCode: adminCode.value, 
     });
-    console.log("넘어와라!!!!!!!!!!:", response);
     authCode.value = response.data.verificationCode; // 서버에서 인증번호 받아오기
     message.value = '인증번호가 이메일로 발송되었습니다.';
     messageClass.value = 'success';

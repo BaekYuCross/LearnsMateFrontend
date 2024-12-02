@@ -65,8 +65,6 @@
       return;
     }
   
-    console.log("쿠폰 생성 데이터:", newCoupon.value);
-  
     newCoupon.value = {
       lecture: "",
       discount: "",
