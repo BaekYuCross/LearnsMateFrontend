@@ -63,7 +63,7 @@
     const isSubmenuActive = (submenuPath) => {
         if (submenuPath === '/marketing') {
             // 캠페인 경로 또는 캠페인 등록 경로일 경우 캠페인 메뉴를 활성화
-            return route.path === '/marketing' || route.path === '/marketing/register-campaign';
+            return route.path === '/marketing' || route.path === '/marketing/register-campaign' || route.path === '/marketing/campaign';
         }
         return route.path === submenuPath;
     };
