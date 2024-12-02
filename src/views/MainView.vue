@@ -18,24 +18,33 @@
           <a href="/student" class="more-link">+ 더보기</a>
         </div>
 
-        <!-- 할 일 섹션 -->
+        <!-- 전날 가입한 회원수 섹션 -->
         <div class="card">
-          <h3>할 일</h3>
-          <ul>
-            <li v-for="task in tasks" :key="task.name">{{ task.name }}</li>
-          </ul>
-          <a href="/tasks" class="more-link">+ 더보기</a>
+          <h3>전날 가입한 회원수</h3>
+          <div class="yesterday-stats">
+          <div class="stat-item">
+            <p class="yesterday-p">학생</p>
+            <p class="stat-value">
+              <span class="highlight">{{ yesterdayStudentCount }}</span>
+              /{{ totalStudentCount }}
+            </p>
+          </div>
+          <div class="stat-item">
+            <p class="yesterday-p">강사</p>
+            <p class="stat-value">
+              <span class="highlight">{{ yesterdayTutorCount }}</span>
+              /{{ totalTutorCount }}
+            </p>
+          </div>
+        </div>       
         </div>
 
         <!-- 전년도 동월 매출액 비교 섹션 -->
         <div class="card">
           <h3>전년 동월 대비 매출액</h3>
-          <ul>
-            <li v-for="notice in notices" :key="notice.title">
-              [{{ notice.type }}] {{ notice.title }}
-            </li>
-          </ul>
-          <a href="/announcements" class="more-link">+ 더보기</a>
+          <div class="stat">
+            <RevenueComparisonChart :revenueData="revenueData" />
+          </div>
         </div>
       </div>
 
@@ -97,7 +106,7 @@
           </ul>
         </div>
 
-        <!-- 신규 영업활동 -->
+        <!-- TOP3 강의 카테고리 -->
         <div class="card small">
           <h3>TOP3 강의 카테고리</h3>
           <div class="chart-stats">
@@ -105,13 +114,15 @@
           </div>
         </div>
 
-        <!-- 매출/견적 -->
+        <!-- 예비 블랙리스트 -->
         <div class="card small">
-          <h3>매출/견적</h3>
-          <div class="stats">
-            <div>견적: {{ sales.quotes }}</div>
-            <div>매출: {{ sales.revenue }}</div>
-          </div>
+          <h3>예비 블랙리스트</h3>
+          <ul>
+            <li v-for="(reserved, index) in reservedList" :key="index">
+              {{ reserved.member_name }} - 신고횟수: {{ reserved.report_count }}
+            </li>
+            <a href="/student/blacklist/reserved" class="more-link">+ 더보기</a>
+          </ul>
         </div>
       </div>
     </div>
@@ -123,28 +134,27 @@ import { ref, computed, onMounted  } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import CategoryBarChart from '@/components/main/CategoryBarChart.vue';
+import RevenueComparisonChart from '@/components/main/RevenueComparisonChart.vue';
 
 const router = useRouter();
 
 // 고객 데이터 타입 이름 등록일
 const members = ref([]);
 
-// 할 일 데이터
-const tasks = ref([
-  { name: '10시 정기 회의' },
-  { name: '미답변 VOC처리 및 고객 피드백 반영 사항 확인' },
-  { name: '[계약 유지] 백경석 - 최종 확인' },
-]);
+// 전날 가입한 회원 수 데이터
+const yesterdayStudentCount = ref(0);
+const totalStudentCount = ref(0);
+const yesterdayTutorCount = ref(0);
+const totalTutorCount = ref(0);
 
-// 공지사항 데이터
-const notices = ref([
-  { type: '필독', title: '쿠폰 등록 공지' },
-  { type: '필독', title: 'VOC 답변 매뉴얼 공지' },
-  { type: '마케팅부', title: '캠페인 템플릿 작성 요령' },
-]);
+// 전년 동월 매출 데이터
+const revenueData = ref([]);
 
 // 강의 데이터
 const lectures = ref([]);
+
+// 예비 블랙리스트 데이터
+const reservedList = ref([]);
 
 // 계약 데이터
 const latestLectureCode = ref('');
@@ -185,7 +195,7 @@ const fetchMembers = async () => {
     const response = await axios.get('http://localhost:5000/member/students', {
       params: {
         page: 0,
-        size: 3, 
+        size: 5, 
         sort: 'created_at,DESC', 
       },
       withCredentials: true,
@@ -198,8 +208,74 @@ const fetchMembers = async () => {
   }
 };
 
-// 전년 동월 대비 매출액 비교
+const fetchYesterdayStudentCount = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/member/count", {
+      params: { type: "student" },
+      withCredentials: true,
+    });
+    yesterdayStudentCount.value = response.data.yesterdayCount;
+    totalStudentCount.value = response.data.totalCount;
+  } catch (error) {
+    console.error("Failed to fetch student counts: ", error);
+  }
+};
 
+const fetchYesterdayTutorCount = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/member/count", {
+      params: { type: "tutor" },
+      withCredentials: true,
+    });
+    yesterdayTutorCount.value = response.data.yesterdayCount;
+    totalTutorCount.value = response.data.totalCount;
+  } catch (error) {
+    console.error("Failed to fetch tutor counts: ", error);
+  }
+};
+
+
+const fetchRevenueData = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/payments', {
+      params: { page: 0, size: 50 },
+      withCredentials: true,
+    });
+
+    const data = response.data.graphData; 
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1; // 현재 월 (1~12)
+    const previousMonth = currentMonth - 1 || 12; // 저번달 (12월 예외 처리)
+    const previousYear = previousMonth === 12 ? currentYear - 1 : currentYear;
+    console.log("전년 동월 대비 매출액:",data);
+
+    // 데이터 추출
+    revenueData.value = [
+      {
+        year: currentYear - 1,
+        month: currentMonth,
+        revenue: data[currentYear - 1]?.find((item) => item.month === currentMonth)?.totalRevenue || 0,
+      },
+      {
+        year: currentYear,
+        month: currentMonth,
+        revenue: data[currentYear]?.find((item) => item.month === currentMonth)?.totalRevenue || 0,
+      },
+      {
+        year: currentYear - 1,
+        month: previousMonth,
+        revenue: data[currentYear - 1]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
+      },
+      {
+        year: currentYear,
+        month: previousMonth,
+        revenue: data[currentYear]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
+      },
+    ];
+  } catch (error) {
+    console.error('매출 데이터를 불러오는데 실패했습니다:', error);
+  }
+};
 
 const fetchLectures = async () => {
   try { 
@@ -396,6 +472,25 @@ const fetchCategoryRatio = async () => {
   }
 };
 
+const fetchReservedList = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5000/blacklist/student/reserved`, {
+      withCredentials: true, 
+      params: {
+        page: 0,
+        size: 5,
+        sort: 'created_at,DESC',
+      },
+    });
+    
+    console.log('예비블랙리스트 데이터:', response.data);
+    
+    reservedList.value = response.data.content;
+  } catch (error) {
+    console.error('Failed to fetch reserved list:', error);
+  }
+};
+
 
 
 
@@ -411,6 +506,10 @@ onMounted(async () => {
       fetchUnansweredVOC(),
       fetchCampaigns(),
       fetchCategoryRatio(),
+      fetchRevenueData(),
+      fetchReservedList(),
+      fetchYesterdayStudentCount(),
+      fetchYesterdayTutorCount(),
     ]);
   } catch (error) {
     console.error('데이터 로딩 중 오류 발생:', error);
@@ -588,11 +687,42 @@ onMounted(async () => {
   gap: 10px;
 }
 
+
+
 .stats div {
   font-size: 14px;
   font-weight: bold;
   color: #333;
 }
+
+.yesterday-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 50px 30px;
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.yesterday-p {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.highlight {
+  color: #005950; 
+  font-size: 50px;
+}
+
 
 .loading-overlay {
   position: fixed;
