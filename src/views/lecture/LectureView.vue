@@ -170,7 +170,7 @@
                 {{ getMappedLevel(lecture.lecture_level) }}
               </div>
               <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-row-tutor">
-                {{ lecture.tutor_name }}
+                {{ maskTutorName(lecture.tutor_name) }}
               </div>
               <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-row-tutorcode">
                 {{ lecture.tutor_code }}
@@ -459,6 +459,13 @@ const sortLectureList = (columnKey) => {
       }
     });
   }
+};
+
+const maskTutorName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
 };
 
 const selectedColumns = ref(Object.keys(columns.value));
