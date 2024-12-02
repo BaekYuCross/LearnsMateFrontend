@@ -27,9 +27,9 @@
           <a href="/tasks" class="more-link">+ 더보기</a>
         </div>
 
-        <!-- 공지사항 섹션 -->
+        <!-- 전년도 동월 매출액 비교 섹션 -->
         <div class="card">
-          <h3>공지사항</h3>
+          <h3>전년 동월 대비 매출액</h3>
           <ul>
             <li v-for="notice in notices" :key="notice.title">
               [{{ notice.type }}] {{ notice.title }}
@@ -99,12 +99,9 @@
 
         <!-- 신규 영업활동 -->
         <div class="card small">
-          <h3>신규 영업활동</h3>
-          <div class="stats">
-            <div>강의: {{ activities.lectures }}</div>
-            <div>학생: {{ activities.students }}</div>
-            <div>강사: {{ activities.tutors }}</div>
-            <div>영업기회: {{ activities.opportunities }}</div>
+          <h3>TOP3 강의 카테고리</h3>
+          <div class="chart-stats">
+            <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
           </div>
         </div>
 
@@ -125,6 +122,7 @@
 import { ref, computed, onMounted  } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import CategoryBarChart from '@/components/main/CategoryBarChart.vue';
 
 const router = useRouter();
 
@@ -171,13 +169,8 @@ const unansweredVOCs = ref({});
 // 마케팅 데이터
 const marketing = ref({});
 
-// 활동 데이터
-const activities = ref({
-  lectures: 5,
-  students: 72,
-  tutors: 4,
-  opportunities: 16,
-});
+// TOP3강의카테고리 데이터
+const categories = ref([]); 
 
 // 매출 데이터
 const sales = ref({
@@ -204,6 +197,9 @@ const fetchMembers = async () => {
     console.error('Failed to fetch members:', error);
   }
 };
+
+// 전년 동월 대비 매출액 비교
+
 
 const fetchLectures = async () => {
   try { 
@@ -329,7 +325,7 @@ const fetchUnansweredVOC = async () => {
         method: 'GET',
         withCredentials: true,
       });
-      unansweredVOCs.value = response.data.slice(0, 3);
+      unansweredVOCs.value = response.data.slice(0, 5);
       console.log('미답변voc 데이터:', unansweredVOCs.value);
     } catch (error) {
       console.error('Failed to fetch vocs:', error);
@@ -349,7 +345,7 @@ const fetchCampaigns = async () => {
         withCredentials: true,
         params: {
           page: 0,
-          size: 3,
+          size: 5,
           sort: 'created_at,DESC'
         },
       });
@@ -367,6 +363,42 @@ const goToCampaignDetail = (campaignCode) => {
   });
 };
 
+const translateCategory = (category) => {
+  const categoryMap = {
+    BACKEND: '백엔드',
+    FRONTEND: '프론트엔드',
+    DEVOPS: '데브옵스',
+    DATABASE: '데이터베이스',
+    WEB_DEVELOPMENT: '웹 개발',
+    MOBILE_APP_DEVELOPMENT: '앱 개발',
+    FULL_STACK: '풀스택',
+  };
+  return categoryMap[category] || category; // 매핑되지 않은 경우 원래 이름 반환
+};
+
+const fetchCategoryRatio = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/member/category-ratio', {
+      withCredentials: true,
+    });
+
+    const sortedCategories = response.data.sort((a, b) => b.percentage - a.percentage);
+
+    // 데이터 가공
+    categories.value = sortedCategories.slice(0, 3).map((item) => ({
+      name: translateCategory(item.category), // 사용자 친화적인 이름으로 변환
+      ratio: item.percentage, // percentage를 ratio로 매핑
+    }));
+
+    console.log("TOP3 카테고리:", categories.value);
+  } catch (error) {
+    console.error('카테고리 비율 데이터를 불러오는데 실패했습니다:', error);
+  }
+};
+
+
+
+
 
 
 // OnMounted - 전체 로딩 관리
@@ -378,11 +410,12 @@ onMounted(async () => {
       fetchContract(),
       fetchUnansweredVOC(),
       fetchCampaigns(),
+      fetchCategoryRatio(),
     ]);
   } catch (error) {
     console.error('데이터 로딩 중 오류 발생:', error);
   } finally {
-    loading.value = false;  // 모든 데이터 로드 완료
+    loading.value = false; 
   }
 });
 
@@ -544,6 +577,14 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 10px;
+}
+
+.chart-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-right: 30px;
   gap: 10px;
 }
 
