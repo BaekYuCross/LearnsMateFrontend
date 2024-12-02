@@ -159,73 +159,73 @@
               </div>
 
 
-             <!-- 수강 진행 현황 -->
-  <div class="course-section">
-    <div class="course-header">
-      <h4>수강 진행 현황
-      <button class="course-toggle-button" @click="toggleCourseSection">
-        {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
-      </button></h4>
-    </div>
-    <div v-if="isCourseSectionVisible" class="course-list">
-      <div
-        v-for="lecture in studentDetail.lectureVideoProgressDtolist"
-        :key="lecture.lectureCode"
-        class="course-item"
-      >
-        <div class="course-title">{{ lecture.lectureTitle }}</div>
-        <div class="progress-bar">
-          <div
-            class="progress"
-            :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
-          ></div>
-        </div>
-        <div class="progress-text">
-          {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
-          ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
-        </div>
-      </div>
-    </div>
-  </div>
-<!-- 추천 강의 섹션 -->
-<div class="recommended-section">
-    <div class="recommended-header">
-      <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
-      <button class="recommended-toggle-button" @click="toggleRecommendedSection">
-        {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
-      </button></h4>
-    </div>
-    <div v-if="isRecommendedSectionVisible" class="recommended-list">
-      <div
-        v-for="lecture in studentDetail.recommendedLectureList"
-        :key="lecture.lectureCode"
-        class="recommended-item"
-      >
-        <div class="recommended-content">
-          <div class="lecture-header">
-            <span class="lecture-title">{{ lecture.lectureTitle }}</span>
-            <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
-              {{ lecture.lectureLevel }}
-            </span>
-          </div>
-          <div class="lecture-info">
-            <div class="info-item">
-              <span class="label">강의 가격</span>
-              <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
+            <!-- 수강 진행 현황 -->
+            <div class="course-section">
+              <div class="course-header">
+                <h4>수강 진행 현황 ({{ studentDetail?.lectureVideoProgressDtolist?.length || 0 }})
+                <button class="course-toggle-button" @click="toggleCourseSection">
+                  {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
+                </button></h4>
+              </div>
+              <div v-if="isCourseSectionVisible" class="course-list">
+                <div
+                  v-for="lecture in studentDetail.lectureVideoProgressDtolist"
+                  :key="lecture.lectureCode"
+                  class="course-item"
+                >
+                  <div class="course-title">{{ lecture.lectureTitle }}</div>
+                  <div class="progress-bar">
+                    <div
+                      class="progress"
+                      :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
+                    ></div>
+                  </div>
+                  <div class="progress-text">
+                    {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
+                    ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="info-item">
-              <span class="label">조회수</span>
-              <span>{{ lecture.lectureClickCount }}회</span>
+          <!-- 추천 강의 섹션 -->
+          <div class="recommended-section">
+              <div class="recommended-header">
+                <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
+                <button class="recommended-toggle-button" @click="toggleRecommendedSection">
+                  {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
+                </button></h4>
+              </div>
+              <div v-if="isRecommendedSectionVisible" class="recommended-list">
+                <div
+                  v-for="lecture in studentDetail.recommendedLectureList"
+                  :key="lecture.lectureCode"
+                  class="recommended-item"
+                >
+                  <div class="recommended-content">
+                    <div class="lecture-header">
+                      <span class="lecture-title">{{ lecture.lectureTitle }}</span>
+                      <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+                        {{ lecture.lectureLevel }}
+                      </span>
+                    </div>
+                    <div class="lecture-info">
+                      <div class="info-item">
+                        <span class="label">강의 가격</span>
+                        <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">조회수</span>
+                        <span>{{ lecture.lectureClickCount }}회</span>
+                      </div>
+                      <div class="info-item">
+                        <span class="label">등록일</span>
+                        <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="info-item">
-              <span class="label">등록일</span>
-              <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
             <!-- 쿠폰 정보 -->
             <div class="coupon-section">
               <h4>쿠폰 정보</h4>
@@ -448,6 +448,7 @@ const showDetail = async (student) => {
 
       selectedStudent.value = student;
       studentDetail.value = response.data;
+      console.log(studentDetail.value);
     } catch (error) {
       console.error('Failed to load student details:', error);
     }
