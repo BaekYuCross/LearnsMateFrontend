@@ -107,13 +107,13 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">답변 상태</span>
-              <span class="value" :class="getStatusClass(selectedVOC.voc_answer_status)">
+              <span class="value_voc_answer_status" :class="getStatusClass(selectedVOC.voc_answer_status)">
                 {{ selectedVOC.voc_answer_status ? '답변완료' : '미답변' }}
               </span>
             </div>
             <div class="voc-detail-item">
               <span class="label">만족도</span>
-              <span class="value" :class="getSatisfactionClass(selectedVOC.voc_answer_satisfaction)">
+              <span class="value_satisfaction" :class="getSatisfactionClass(selectedVOC.voc_answer_satisfaction)">
                 {{ selectedVOC.voc_answer_satisfaction || '-' }}
               </span>
             </div>
@@ -468,9 +468,6 @@ const openAiModal = async () => {
   try {
     const response = await axios.get('http://localhost:5000/voc/ai/current-week');
     aiData.value = response.data || [];
-    if (aiData.value.length === 0) {
-      alert('현재 주차에 대한 AI 요약 데이터가 없습니다.');
-    }
   } catch (error) {
     console.error('AI 요약 데이터 로드 실패:', error);
     alert('AI 요약 데이터를 로드하는 중 문제가 발생했습니다.');

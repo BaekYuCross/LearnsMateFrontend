@@ -72,7 +72,7 @@
           <button 
             class="page-button prev-button" 
             @click="changePage(currentPage - 1)" 
-            :disabled="currentPage === 1">◀이전</button>
+            :disabled="currentPage === 1">◀</button>
           <span v-for="page in totalPages" :key="page" class="page-number">
             <button 
               class="page-button" 
@@ -82,7 +82,7 @@
           <button 
             class="page-button next-button"
             @click="changePage(currentPage + 1)" 
-            :disabled="currentPage === totalPages">다음▶</button>
+            :disabled="currentPage === totalPages">▶</button>
         </div>
       </div>
     </div>
@@ -131,7 +131,7 @@
         },
       });
       campaigns.value = response.data.content; // content 배열로 설정
-      console.log('캠페인 데이터:', campaigns.value);
+      console.log('campaign data:', campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
@@ -179,7 +179,7 @@
     isFiltered.value = true;
     lastFilterData.value = preparedFilters;
     try {
-      console.log("필터 데이터:", preparedFilters);
+      console.log("filter data:", preparedFilters);
       const response = await axios.post(
         'http://localhost:5000/campaign/filter',
         camelToSnake(preparedFilters),
@@ -195,7 +195,7 @@
         }
       );
       campaigns.value = response.data.content; // content 배열로 설정
-      console.log('필터된 캠페인 데이터:', campaigns.value);
+      console.log('filtered campaign data:', campaigns.value);
       totalPages.value = response.data.totalPages;
     } catch (error) {
       console.error('Error while fetching filtered campaigns:', error);
@@ -229,7 +229,7 @@ const toggleDropdown = () => {
 };
 
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected columns:", selectedColumns.value);
 };
 
 const navigateTo = () => {
@@ -300,7 +300,6 @@ onMounted(async() => {
       display: block;
       flex-grow: 1;
       margin-left: 160px;
-      margin-top: 50px;
     }
 
     .campaign-actions {
@@ -371,12 +370,16 @@ onMounted(async() => {
 
     .campaign-register-button, .campaign-excel-button {
       background: #005950;
-      padding: 2px 5px;
+      padding: 3px 5px;
       margin-bottom: 3px;
       border: none;
       color: #ffffff;
       cursor: pointer;
       font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 5px;
     }
 
     .campaign-length {
@@ -391,12 +394,16 @@ onMounted(async() => {
     .board-header {
       display: grid;
       grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
-      padding: 10px 20px;
+      padding: 7px 14px;
       background-color: #f9f9f9;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
       color: #595656;
       text-align: center;
+      border-bottom: 1px solid #eaeaea;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
     
     .board-body {
@@ -407,12 +414,13 @@ onMounted(async() => {
     .board-row {
       display: grid;
       grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
-      padding: 10px 20px;
+      padding: 7px 14px;
       border-bottom: 1px solid #eaeaea;
       font-size: 11px;
       color: #333333;
       text-align: center;
-      cursor: pointer;
+      align-items: center;
+      background-color: #ffffff;
     }
     
     .board-row:hover {

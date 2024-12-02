@@ -50,6 +50,23 @@
               <div class="campaign-detail-row">
                 <span class="detail-title">담당자</span>
                 <span class="detail-content">{{ userName }}</span>
+                <span class="detail-title">발송 수단</span>
+                <div class="detail-content send-method">
+                  <button
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'Email' }"
+                    @click="selectSendMethod('Email')"
+                  >
+                    Email
+                  </button>
+                  <button
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'SMS' }"
+                    @click="selectSendMethod('SMS')"
+                  >
+                    SMS
+                  </button>
+                </div>
               </div>
               <div class="campaign-detail-row">
                 <span class="detail-title">발송 유형</span>
@@ -91,8 +108,8 @@
             <div class="campaign-header">
               <span class="campaign-attach-span">쿠폰 첨부</span>
               <div class="attach-buttons">
-                <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
-                <button class="excel-download-btn"  @click="triggerFileUpload">
+                <input type="file" ref="couponFile" @change="handleCouponFileChange" accept=".xlsx, .xls" hidden />
+                <button class="excel-download-btn"  @click="triggerFileUpload('coupon')">
                   <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
                   엑셀 업로드
                 </button>
@@ -115,8 +132,8 @@
         <div class="campaign-header">
           <span class="campaign-select-span">타겟 유저</span>
           <div class="target-buttons">
-            <input type="file" ref="excelFile" @change="handleFileChange" accept=".xlsx, .xls" hidden />
-            <button class="excel-download-btn" @click="triggerFileUpload">
+            <input type="file" ref="targetUserFile" @change="handleTargetUserFileChange" accept=".xlsx, .xls" hidden />
+            <button class="excel-download-btn" @click="triggerFileUpload('targetUser')">
               <img src="/src/assets/icons/upload.svg" alt="엑셀 업로드" />
               엑셀 업로드
             </button>
@@ -252,6 +269,7 @@ const campaignTitle = ref('');
 const campaignContents = ref('');
 const isEditMode = ref(false);
 const campaignType = ref('INSTANT');
+const campaignMethod = ref('Email');
 const selectedDate = ref('');
 const selectedTime = ref('');
 
@@ -261,7 +279,8 @@ const targetUserMap = ref(new Map());
 const attachedCoupons = computed(() => Array.from(attachedCouponMap.value.values()));
 const targetUsers = computed(() => Array.from(targetUserMap.value.values()));
 
-const excelFile = ref(null);
+const couponFile = ref(null);
+const targetUserFile = ref(null);
 
 const currentPage = ref(1);
 const pageSize = 50;
@@ -399,6 +418,10 @@ const selectSendType = (type) => {
   }
 };
 
+const selectSendMethod = (method) => {
+  campaignMethod.value = method;
+};
+
 const minDate = computed(() => {
   const today = new Date();
   return today.toISOString().split('T')[0];
@@ -422,13 +445,15 @@ const handleDateChange = () => {
   }
 };
 
-const triggerFileUpload = () => {
-  if (excelFile.value) {
-    excelFile.value.click();
+const triggerFileUpload = (type) => {
+  if (type === 'coupon' && couponFile.value) {
+    couponFile.value.click();
+  } else if (type === 'targetUser' && targetUserFile.value) {
+    targetUserFile.value.click();
   }
 };
 
-const handleFileChange = async (event) => {
+const handleTargetUserFileChange = async (event) => {
   const file = event.target.files[0];
   const formData = new FormData();
   formData.append("file", file);
@@ -441,12 +466,35 @@ const handleFileChange = async (event) => {
         },
       });
 
-      console.log("파일 업로드 성공:", response.data);
+      console.log("file upload success :", response.data);
       camelToSnake(response.data).forEach((user) => {
         targetUserMap.value.set(user.member_code, user);
       });
     } catch (error) {
-      console.error("파일 업로드 실패:", error.message);
+      console.error("file upload fail:", error.message);
+    }
+  }
+};
+
+const handleCouponFileChange = async (event) => {
+  const file = event.target.files[0];
+  const formData = new FormData(); 
+  formData.append("file", file);
+  if (file) {
+    try {
+      const response = await axios.post("http://localhost:5000/coupon/excel/upload/target-coupon", formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("file upload success :", response.data);
+      camelToSnake(response.data).forEach((coupon) => {
+        attachedCouponMap.value.set(coupon.coupon_code, coupon);
+      });
+    } catch (error) {
+      console.error("file upload fail :", error.message);
     }
   }
 };
@@ -478,6 +526,7 @@ const registerCampaign = async () => {
     campaign_title: campaignTitle.value,
     campaign_contents: campaignContents.value,
     campaign_type: campaignType.value,
+    campaign_method: campaignMethod.value,
     campaign_send_date: campaignType.value === 'RESERVATION' ? `${selectedDate.value}T${selectedTime.value}` : null,
     coupon_list: attachedCoupons.value,
     student_list: formattedStudentList,
@@ -504,7 +553,7 @@ const showCancelModal = () => {
 
 const confirmRegister = async () => {
   try {
-    await registerCampaign(); 
+    registerCampaign(); 
     isRegisterModalOpen.value = false;
     window.location.href = '/marketing'; 
   } catch (error) {
@@ -656,7 +705,13 @@ fetchTemplates();
    align-items: center;
 }
 
-.send-type-btn {
+.send-method {
+   display: flex;
+   gap: 10px;
+   align-items: center;
+}
+
+.send-type-btn, .send-method-btn {
    padding: 5px 10px;
    background-color: #f0f0f0;
    border: 1px solid #ddd;
@@ -665,7 +720,7 @@ fetchTemplates();
    cursor: pointer;
 }
 
-.send-type-btn.active {
+.send-type-btn.active, .send-method-btn.active {
    color: #FFFFFF;
    background-color: #005950;
 }

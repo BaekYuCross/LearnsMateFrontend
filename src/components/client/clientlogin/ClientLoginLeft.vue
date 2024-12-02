@@ -35,7 +35,7 @@
           class="clientlogin-google-login"
           @click="handleGoogleLogin"
         >
-          <img src="@/assets/icons/google.svg" alt="구글" />
+          <img src="@/assets/icons/Google.svg" alt="구글" />
           구글 로그인
         </button>
       </div>
@@ -98,12 +98,12 @@ const handleLogin = async () => {
 
 // 카카오 로그인 처리
 const handleKakaoLogin = () => {
-  console.log("카카오 로그인");
+  console.log("kakao login");
 };
 
 // 구글 로그인 처리
 const handleGoogleLogin = () => {
-  console.log("구글 로그인");
+  console.log("google login");
 };
 </script>
 

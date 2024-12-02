@@ -219,14 +219,14 @@ export default {
 .voc-ai-modal-summary-table td {
   border: 1px solid #ddd;
   padding: 10px;
-  word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
-  text-align: center; /* 텍스트를 가운데 정렬 */
+  word-wrap: break-word;
 }
 
 .voc-ai-modal-summary-table th {
   background-color: #f4f4f4;
   font-weight: bold;
   color: #333;
+  text-align: center;
 }
 
 .voc-ai-modal-summary-table tr:nth-child(even) {
@@ -239,9 +239,10 @@ export default {
 
 .voc-ai-modal-summary-table td {
   font-size: 12px;
-  overflow: hidden; /* 텍스트가 셀 내부를 넘지 않도록 제한 */
-  text-overflow: ellipsis; /* 텍스트가 길 경우 말줄임 표시 */
-  white-space: nowrap; /* 텍스트를 한 줄로 유지 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
 }
 
 </style>
