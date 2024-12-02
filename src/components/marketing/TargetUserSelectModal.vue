@@ -171,7 +171,7 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
     selectedUsers.value = []; // 검색 시 선택 초기화 추가
-    console.log("필터링 내용: ",lastFilterData.value);
+    console.log(lastFilterData.value);
     const response = await axios.post(
       'http://localhost:5000/member/filter/student',
       filterData,

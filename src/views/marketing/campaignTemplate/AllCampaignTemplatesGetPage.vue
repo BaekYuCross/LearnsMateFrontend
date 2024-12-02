@@ -59,7 +59,7 @@
             <button 
               class="page-button prev-button" 
               @click="changePage(currentPage - 1)" 
-              :disabled="currentPage === 1">◀이전</button>
+              :disabled="currentPage === 1">◀</button>
             <span v-for="page in totalPages" :key="page" class="page-number">
               <button 
                 class="page-button" 
@@ -69,7 +69,7 @@
             <button 
               class="page-button next-button"
               @click="changePage(currentPage + 1)" 
-              :disabled="currentPage === totalPages">다음▶</button>
+              :disabled="currentPage === totalPages">▶</button>
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@
   };
 
   const updateSelectedColumns = () => {
-    console.log("현재 선택된 컬럼:", selectedColumns.value);
+    console.log("current selected columns :", selectedColumns.value);
   };
 
   
@@ -240,7 +240,7 @@
     isFiltered.value = true;
     lastFilterData.value = preparedFilters;
     try {
-      console.log("부모컴포넌트로 넘어온 filters data: ",preparedFilters);
+      console.log("filters data: ",preparedFilters);
       const response = await axios.post(
         'http://localhost:5000/campaign-template/filter',
         camelToSnake(preparedFilters),
@@ -292,11 +292,13 @@
     display: block;
     flex-grow: 1;
     margin-left: 160px;
-    margin-top: 50px;
   }
   
   .campaigntemplate-actions {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
   }
   
   .campaigntemplate-count {
@@ -313,40 +315,46 @@
   }
 
   .campaigntemplate-column-selector {
-      position: relative;
-      display: inline-block;
+    cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
     }
 
   .campaigntemplate-dropdown-button {
     background-color: #ffffff;
     color: #000000;
-    border: none;
-    padding: 3px 5px;
-    font-size: 12px;
+    border: 1px solid #000000;
+    padding: 5px 10px;
+    font-size: 13px;
     border-radius: 4px;
-    border: 0.5px solid #000000;
     cursor: pointer;
   }
 
   .campaigntemplate-dropdown-menu {
     position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    z-index: 100;
-    width: 100px;
-    max-height: 200px;
-    overflow-y: auto;
-    border-radius: 4px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-top: 160px;
+  z-index: 10;
+  width: 100px;
+  border-radius: 4px;
   }
+
+  .campaigntemplate-dropdown-menu input[type="checkbox"] {
+  outline: none;
+  accent-color: #005950; 
+}
 
   .campaigntemplate-dropdown-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
   }
 
   .campaigntemplate-dropdown-item label {
@@ -357,12 +365,15 @@
   
   .campaigntemplate-register-button, .campaigntemplate-excel-button {
     background: #005950;
-    padding: 2px 5px;
-    margin-bottom: 3px;
+    padding: 5px 10px;
     border: none;
     color: #ffffff;
     cursor: pointer;
     font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
   }
   
   .campaigntemplate-length {
@@ -377,12 +388,16 @@
   .board-header {
     display: grid;
     grid-template-columns: 1fr 2fr 3fr 1fr 1fr 1fr;
-    padding: 10px 20px;
+    padding: 7px 14px;
     background-color: #f9f9f9;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
     color: #595656;
     text-align: center;
+    border-bottom: 1px solid #eaeaea;
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
   
   .board-body {
@@ -393,11 +408,13 @@
   .board-row {
     display: grid;
     grid-template-columns: 1fr 2fr 3fr 1fr 1fr 1fr;
-    padding: 10px 20px;
+    padding: 7px 14px;
     border-bottom: 1px solid #eaeaea;
     font-size: 11px;
     color: #333333;
     text-align: center;
+    align-items: center;
+    background-color: #ffffff;
   }
   
   .board-row:hover {

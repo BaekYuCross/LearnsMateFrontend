@@ -18,18 +18,23 @@
           </li>
         </ul>
       </div>
-      <span :class="{ 'timer': true, 'expired': remainingTime === '만료됨' }">
-      [{{ remainingTime }}]
-      </span>
-
+    
       <div class="icon-section">
+        <div class="user-info2">
+          <p class="logouttime">자동 로그아웃 시간 : </p>
+          <span :class="{ 'timer': true, 'expired': remainingTime === '만료됨' }">
+            {{ remainingTime }}
+          </span>
+          <!-- Vue 방식으로 수정 -->
+          <button id="extend-btn" @click="handleRefreshToken">연장</button>
+        </div>
         <div class="user-info">
-  [{{ loginState.adminTeam }}] 
-  <span class="highlight">{{ loginState.adminName }}</span> 님, 반갑습니다.
-</div>
+          [{{ loginState.adminTeam }}] 
+          <span class="highlight">{{ loginState.adminName }}</span> 님, 반갑습니다.
+        </div>
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon"  @click="Logout">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click="Logout">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
         <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
@@ -38,8 +43,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch} from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
 
 const loginState = useLoginState(); 
@@ -85,17 +91,31 @@ const calculateRemainingTime = () => {
 // 남은 시간을 표시할 ref
 const remainingTime = ref(calculateRemainingTime());
 
-
 const currentGroup = computed(() => {
   const currentPath = route.path;
   const matchedMenu = menus.value.find(menu => {
-      if (menu.includePaths) {
-          return menu.includePaths.some(path => currentPath.startsWith(path));
-      }
-      return currentPath.startsWith(menu.path);
+    if (menu.includePaths) {
+      return menu.includePaths.some(path => currentPath.startsWith(path));
+    }
+    return currentPath.startsWith(menu.path);
   });
   return matchedMenu ? matchedMenu.group : null;
 });
+
+
+
+// 버튼 클릭 시 토큰 갱신
+const handleRefreshToken = async () => {
+  await loginState.refreshToken();
+};
+
+
+// 로그아웃 처리
+const Logout = async () => {
+  await loginState.logout();
+  alert('로그아웃되었습니다.');
+  router.push('/login');
+};
 
 const navigateTo = (path) => {
   router.push(path);
@@ -109,12 +129,6 @@ const Main = (path) => {
   router.push('/');
 };
 
-const Logout = async () => {
-  await loginState.logout();
-  alert('로그아웃되었습니다.');
-  router.push('/login');
-};
-
 const startTimer = () => {
   if (timer.value) clearInterval(timer.value);
   remainingTime.value = calculateRemainingTime();
@@ -122,16 +136,18 @@ const startTimer = () => {
     remainingTime.value = calculateRemainingTime();
   }, 1000);
 };
+
 watch(() => loginState.exp, (newValue) => {
   if (newValue) {
     startTimer();
   }
-}, { immediate: true });  // immediate: true로 설정하여 즉시 실행
+}, { immediate: true });
 
 onMounted(async () => {
   if (!loginState.isLoggedIn) {
     await loginState.fetchLoginState(); 
   }
+  startTimer();
 });
 
 // 컴포넌트가 언마운트될 때 타이머 정리
@@ -140,14 +156,14 @@ onUnmounted(() => {
     clearInterval(timer.value);
   }
 });
-
 </script>
-  
+
   <style scoped>
   .timer {
-    font-family: monospace;
-    font-weight: bold;
-    color: #005950;
+    padding-top: 3.5px;
+  font-size: 13px;
+  margin-right: 9px;
+  color: #0f0f0f;
   }
 
   .expired {
@@ -230,6 +246,39 @@ onUnmounted(() => {
     font-size: 13.5px;
     font-weight: bold;
    color: #000000; 
+}
+
+.user-info2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  margin-right: 15px;
+    font-size: 16px;
+   color: #000000; 
+}
+.logouttime{
+  padding-top: 5px;
+  margin-right: 5px;
+    font-size: 13px;
+   color: #000000; 
+}
+
+
+#extend-btn {
+  padding: 5px 7px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #005950;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#extend-btn:hover {
+  background-color: #005950;
 }
 
 .highlight {

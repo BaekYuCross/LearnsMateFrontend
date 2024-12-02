@@ -33,6 +33,41 @@
             <div class="campaign-get-detail-row">
               <span class="detail-title">담당자</span>
               <span class="detail-content">{{ userName }}</span>
+              <span class="detail-title">발송 수단</span>
+                <div class="detail-content send-method">
+                  <button
+                    v-if="!isEditMode"
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'Email'}"
+                    disabled
+                  >
+                    Email
+                  </button>
+                  <button
+                  v-if="!isEditMode"
+                  class="send-method-btn"
+                  :class="{ active: campaignMethod === 'SMS'}"
+                  disabled
+                  >
+                    SMS
+                  </button>
+                  <button
+                    v-if="isEditMode"
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'Email' }"
+                    @click="selectSendMethod('Email')"
+                  >
+                    Email
+                  </button>
+                  <button
+                    v-if="isEditMode"
+                    class="send-method-btn"
+                    :class="{ active: campaignMethod === 'SMS' }"
+                    @click="selectSendMethod('SMS')"
+                  >
+                    SMS
+                  </button>
+                </div>
             </div>
             <div class="campaign-get-detail-row">
               <span class="detail-title">발송 유형</span>
@@ -251,7 +286,8 @@ const showTargetUserSelectModal = ref(false);
 const isCancelModalOpen = ref(false);
 
 // 캠페인 타입 및 날짜 관리
-const campaignType = ref('RESERVATION');
+const campaignType = ref('');
+const campaignMethod = ref('');
 const selectedDate = ref('');
 const selectedTime = ref('');
 
@@ -302,6 +338,11 @@ const isPastSendDate = computed(() => {
   return sendDate < new Date();
 });
 
+function formatToLocalDateTime(dateString) {
+  if (!dateString || dateString.includes('T')) return dateString; // 이미 변환된 경우
+  return `${dateString}T00:00:00`; // 시간 추가
+}
+
 const fetchTemplate = async () => {
   const campaignCode = route.query.campaignCode;
   try {
@@ -312,19 +353,21 @@ const fetchTemplate = async () => {
       },
       withCredentials: true,
     });
-
     // 기본 캠페인 정보 설정
     campaign.value = {
       campaign_code: response.data.campaign_code,
       campaign_title: response.data.campaign_title,
       campaign_contents: response.data.campaign_contents,
       campaign_type: response.data.campaign_type,
+      campaign_method:response.data.campaign_method,
+      campaign_send_flag:response.data.campaign_send_flag,
       campaign_send_date: response.data.campaign_send_date,
       created_at: response.data.created_at,
       updated_at: response.data.updated_at,
     };
 
     campaignType.value = response.data.campaign_type;
+    campaignMethod.value = response.data.campaign_method;
 
     // 날짜 처리 수정 - 배열에서 날짜로 변환
     if (Array.isArray(response.data.campaign_send_date)) {
@@ -334,7 +377,12 @@ const fetchTemplate = async () => {
     }
 
     // 멤버와 쿠폰 데이터 설정
-    targetUsers.value = response.data.members.content;
+    targetUsers.value = response.data.members.content.map(user => {
+      return {
+        ...user,
+        member_birth: formatToLocalDateTime(user.member_birth), // 생일 변환
+      };
+    });
     totalCount.value = response.data.members.totalElements;
     totalMemberPages.value = response.data.members.totalPages;
     attachedCoupons.value = response.data.coupons.content;
@@ -356,11 +404,8 @@ const fetchTemplate = async () => {
     response.data.members.content.forEach((member) => {
       targetUserMap.value.set(member.member_code, member);
     });
-    console.log('서버에서 받은 쿠폰 데이터:', response.data.coupons);
-    console.log('현재 저장된 쿠폰들:', attachedCoupons.value);
-
   } catch (error) {
-    console.error('캠페인 데이터 로드 실패:', error);
+    console.error('campaign data load fail:', error);
   }
 };
 
@@ -385,6 +430,8 @@ const saveChanges = async () => {
     campaign_title: campaign.value.campaign_title,
     campaign_contents: campaign.value.campaign_contents,
     campaign_type: campaignType.value,
+    campaign_method: campaignMethod.value,
+    campaign_send_flag: campaign.value.campaign_send_flag,
     campaign_send_date: campaignType.value === 'RESERVATION' ? 
       `${selectedDate.value}T${selectedTime.value}` : null,
     coupons: Array.from(attachedCouponMap.value.values()),
@@ -393,8 +440,6 @@ const saveChanges = async () => {
     created_at: campaign.value.created_at,
     updated_at: new Date().toISOString(),
   };
-
-
   try {
     await axios.patch('http://localhost:5000/campaign/edit', payload, {
       withCredentials: true,
@@ -425,33 +470,43 @@ const cancelEditMode = () => {
 };
 
 const handleCouponSubmit = (coupons) => {
-  console.log('선택된 쿠폰들:', coupons);
+  console.log('selected coupons :', coupons);
   coupons.forEach((coupon) => {
     attachedCouponMap.value.set(coupon.coupon_code, coupon);
   });
   attachedCoupons.value = Array.from(attachedCouponMap.value.values());
-  console.log('저장된 쿠폰들:', attachedCoupons.value);
+  console.log('attached coupons :', attachedCoupons.value);
   showCouponSelectModal.value = false;
 };
 
 const handleTargetUserSubmit = (users) => {
   users.forEach((user) => {
-    targetUserMap.value.set(user.memberCode, user);
+    const formattedUser = {
+      ...user,
+      member_birth: formatToLocalDateTime(user.member_birth), // 생일 변환
+    };
+    targetUserMap.value.set(user.member_code, formattedUser);
   });
+
+  // Map에서 모든 유저를 배열로 변환하여 저장
   targetUsers.value = Array.from(targetUserMap.value.values());
+
   showTargetUserSelectModal.value = false;
 };
 
+
+
 // 사용자 및 쿠폰 관리 함수들
 const removeCoupon = (coupon) => {
-  attachedCouponMap.value.delete(coupon.couponCode);
+  attachedCouponMap.value.delete(coupon.coupon_code);
   attachedCoupons.value = Array.from(attachedCouponMap.value.values());
 };
 
 const removeUser = (user) => {
-  targetUserMap.value.delete(user.memberCode);
+  targetUserMap.value.delete(user.member_code); // 기존 코드에서 memberCode를 사용했을 가능성 있음
   targetUsers.value = Array.from(targetUserMap.value.values());
 };
+
 
 const clearAllCoupons = () => {
   if (confirm('선택한 모든 쿠폰을 삭제하시겠습니까?')) {
@@ -465,6 +520,10 @@ const clearAllUsers = () => {
     targetUserMap.value.clear();
     targetUsers.value = [];
   }
+};
+
+const selectSendMethod = (method) => {
+  campaignMethod.value = method;
 };
 
 const clickCouponSelect = () => {
@@ -645,24 +704,30 @@ fetchTemplate();
   min-height: 171.6px;
 }
 
+.send-method {
+   display: flex;
+   gap: 10px;
+   align-items: center;
+}
+
+.send-type-btn, .send-method-btn {
+   padding: 5px 10px;
+   background-color: #f0f0f0;
+   border: 1px solid #ddd;
+   border-radius: 4px;
+   font-size: 10px;
+   cursor: pointer;
+}
+
+.send-type-btn.active, .send-method-btn.active {
+   color: #FFFFFF;
+   background-color: #005950;
+}
+
 .send-type {
   display: flex;
   gap: 10px;
   align-items: center;
-}
-
-.send-type-btn {
-  padding: 5px 10px;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.send-type-btn.active {
-  color: #ffffff;
-  background-color: #005950;
 }
 
 .date-input,

@@ -8,9 +8,7 @@
         @reset="handleReset"
       />
 
-      <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
-        <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
-          <div class="blacklist-header-container">
+      <div class="blacklist-header-container">
             <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="blacklist-button-group">
               <button class="blacklist-excel-button" @click="handleExcelDownload">
@@ -18,6 +16,9 @@
               </button>
             </div>
           </div>
+
+      <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
+        <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
 
           <table>
             <thead>
@@ -267,7 +268,7 @@ const handleExcelDownload = async() => {
 
     if (isFiltered.value && lastFilterData.value) {
       config.data = lastFilterData.value;
-      console.log('엑셀 다운로드 요청 데이터:', lastFilterData.value);
+      console.log('excel download request data :', lastFilterData.value);
     }
 
     const response = await axios(config);
@@ -380,7 +381,7 @@ const showDetail = async (blacklist) => {
         withCredentials: true,
       });
       reportDetails.value = response.data;
-      console.log("상세내용은 ", reportDetails.value);
+      console.log("report details : ", reportDetails.value);
     } catch (error) {
       console.error('Failed to load report details:', error);
       reportDetails.value = [];

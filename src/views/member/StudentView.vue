@@ -7,10 +7,7 @@
         @search="handleSearch" 
         @reset="handleReset"
       />
-
-      <div class="content-section" :class="{ 'with-detail': selectedStudent }">
-        <div class="table-container" :class="{ 'shrink': selectedStudent }">
-          <div class="student-header-container">
+          <div class="student-header-container" >
             <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
               <div class="column-selector">
@@ -37,12 +34,13 @@
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
-              <button class="excel-button" @click="showCategoryModal = true">
+              <button class="excel-button" @click="showCategoryModal = true" style="font-size: 13.5px;">
                 카테고리 비율
               </button>
             </div>
           </div>
-            
+          <div class="content-section" :class="{ 'with-detail': selectedStudent }">
+            <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-board-container">
             <div class="student-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
@@ -86,13 +84,17 @@
                 <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
                   {{ student.memberBirth }}
                 </div>
-                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag">
+                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
+    backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
+    color: student.memberFlag ? '#166534' : '#991b1b', }">
                   {{ student.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
                   {{ student.createdAt }}
                 </div>
-                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant">
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
+    backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+    color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
                   {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
                 </div>
               </div>
@@ -133,10 +135,6 @@
         <div v-if="selectedStudent && studentDetail" class="detail-container">
           <div class="detail-content">
             <h3>상세 정보</h3>
-            
-            <!-- 기본 정보 -->
-            <div class="info-section">
-              <h4>기본 정보</h4>
               <div class="info-grid">
                 <div class="info-row">
                   <span class="label">이름</span>
@@ -159,61 +157,75 @@
                   <span>{{ studentDetail.memberDto.memberAddress }}</span>
                 </div>
               </div>
-            </div>
 
-            <!-- 수강 진행 현황 -->
-            <div class="course-section">
-              <h4>수강 진행 현황</h4>
-              <div class="course-list">
-                <div v-for="lecture in studentDetail.lectureVideoProgressDtolist" 
-                     :key="lecture.lectureCode" 
-                     class="course-item">
-                     <h1></h1>
-                  <div class="course-title">{{ lecture.lectureTitle }}</div>
-                  <div class="progress-bar">
-                    <div class="progress" 
-                         :style="{width: `${(lecture.completedVideos/lecture.totalVideos) * 100}%`}">
-                    </div>
-                  </div>
-                  <div class="progress-text">
-                    {{lecture.completedVideos}}/{{lecture.totalVideos}} ({{Math.round((lecture.completedVideos/lecture.totalVideos) * 100)}}%)
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div class="recommended-section">
-              <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})</h4>
-              <div class="recommended-list">
-                <div v-for="lecture in studentDetail.recommendedLectureList" 
-                    :key="lecture.lectureCode" 
-                    class="recommended-item">
-                  <div class="recommended-content">
-                    <div class="lecture-header">
-                      <span class="lecture-title">{{ lecture.lectureTitle }}</span>
-                      <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
-                        {{ lecture.lectureLevel }}
-                      </span>
-                    </div>
-                    <div class="lecture-info">
-                      <div class="info-item">
-                        <span class="label">강의 가격</span>
-                        <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">조회수</span>
-                        <span>{{ lecture.lectureClickCount }}회</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">등록일</span>
-                        <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+             <!-- 수강 진행 현황 -->
+  <div class="course-section">
+    <div class="course-header">
+      <h4>수강 진행 현황
+      <button class="course-toggle-button" @click="toggleCourseSection">
+        {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
+      </button></h4>
+    </div>
+    <div v-if="isCourseSectionVisible" class="course-list">
+      <div
+        v-for="lecture in studentDetail.lectureVideoProgressDtolist"
+        :key="lecture.lectureCode"
+        class="course-item"
+      >
+        <div class="course-title">{{ lecture.lectureTitle }}</div>
+        <div class="progress-bar">
+          <div
+            class="progress"
+            :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
+          ></div>
+        </div>
+        <div class="progress-text">
+          {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
+          ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- 추천 강의 섹션 -->
+<div class="recommended-section">
+    <div class="recommended-header">
+      <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
+      <button class="recommended-toggle-button" @click="toggleRecommendedSection">
+        {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
+      </button></h4>
+    </div>
+    <div v-if="isRecommendedSectionVisible" class="recommended-list">
+      <div
+        v-for="lecture in studentDetail.recommendedLectureList"
+        :key="lecture.lectureCode"
+        class="recommended-item"
+      >
+        <div class="recommended-content">
+          <div class="lecture-header">
+            <span class="lecture-title">{{ lecture.lectureTitle }}</span>
+            <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+              {{ lecture.lectureLevel }}
+            </span>
+          </div>
+          <div class="lecture-info">
+            <div class="info-item">
+              <span class="label">강의 가격</span>
+              <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
             </div>
-
+            <div class="info-item">
+              <span class="label">조회수</span>
+              <span>{{ lecture.lectureClickCount }}회</span>
+            </div>
+            <div class="info-item">
+              <span class="label">등록일</span>
+              <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
             <!-- 쿠폰 정보 -->
             <div class="coupon-section">
               <h4>쿠폰 정보</h4>
@@ -261,9 +273,9 @@
               <div class="voc-list">
                 <!-- 미답변 문의 -->
                 <div class="unanswered">
-                  <h5>미답변 문의 ({{ studentDetail.unansweredvocbyMemberList?.length || 0 }})</h5>
+                  <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})</h5>
                   <div class="voc-grid">
-                    <div v-for="voc in studentDetail.unansweredvocbyMemberList" 
+                    <div v-for="voc in studentDetail.unansweredVocbyMemberList" 
                         :key="voc.vocCode" 
                         class="voc-item">
                       <div class="voc-detail">
@@ -359,11 +371,25 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
+// 토글 상태 관리
+const isCourseSectionVisible = ref(false);
+
+const toggleCourseSection = () => {
+  isCourseSectionVisible.value = !isCourseSectionVisible.value;
+};
+
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected column :", selectedColumns.value);
 };
 const formatCurrency = (value) => {
   return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
+};
+
+// 추천 강의 섹션 보이기/숨기기 상태 관리
+const isRecommendedSectionVisible = ref(false);
+
+const toggleRecommendedSection = () => {
+  isRecommendedSectionVisible.value = !isRecommendedSectionVisible.value;
 };
 
 // 학생 목록 가져오기 (일반 조회)
@@ -422,8 +448,6 @@ const showDetail = async (student) => {
 
       selectedStudent.value = student;
       studentDetail.value = response.data;
-      console.log("상세 정보:", response.data);
-      console.log("상세 정보:", studentDetail.value);
     } catch (error) {
       console.error('Failed to load student details:', error);
     }
@@ -590,5 +614,12 @@ const formatDate = (dateArray) => {
 // 초기 로드
 onMounted(() => {
   fetchStudents();
+  const header = document.querySelector('.student-header-container');
+  const section = document.querySelector('.content-section');
+  
+  if (header && section) {
+    header.style.marginBottom = '0';
+    section.style.marginTop = '0';
+  }
 });
 </script>

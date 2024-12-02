@@ -130,8 +130,8 @@
   }
   
   .campaign-section-title {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: bold;
   }
   
   .campaign-filter-container {
@@ -142,11 +142,12 @@
   .campaign-filter-row {
     display: flex;
     padding: 3px 10px;
-    gap: 16px;
   }
   
   .campaign-filter-row.gray {
-    background-color: #f8f9fa;
+    background-color: #EFEFEF;
+    border-top: #D9D9D9;
+    border-bottom: #D9D9D9;
   }
   
   .campaign-filter-row.white {
@@ -154,7 +155,8 @@
   }
   
   .campaign-filter-item {
-    flex: 0.2;
+    width: 25%;
+    padding-left: 8px;
     display: flex;
     align-items: center;
   }
@@ -166,15 +168,20 @@
 
   .campaign-filter-label {
     width: 5rem;
-    font-size: 13px;
+    min-width: 5rem;
+    font-size: 11px;
     font-weight: 500;
+    text-align: end;
+    padding-right: 10px;
   }
   
   .campaign-filter-input {
     flex: 1;
     padding: 5px 5px;
-    font-size: 13px;
+    font-size: 11px;
     border: 1px solid #e2e8f0;
+    min-width: 0;
+    width: 100%;
   }
 
   .campaign-date-range-container {

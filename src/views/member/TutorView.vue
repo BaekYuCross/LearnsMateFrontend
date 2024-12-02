@@ -7,10 +7,7 @@
         @search="handleSearch" 
         @reset="handleReset"
       />
-
-      <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
-        <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
-          <div class="tutor-header-container">
+      <div class="tutor-header-container">
             <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="tutor-button-group">
               <div class="column-selector">
@@ -35,7 +32,9 @@
               </button>
             </div>
           </div>
-            
+
+      <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
+        <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-board-container">
             <div class="tutor-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="tutor-board-header-code">강사 코드</div>
@@ -79,13 +78,18 @@
                 <div v-if="selectedColumns.includes('memberBirth')" class="tutor-board-row-birth">
                   {{ tutor.memberBirth }}
                 </div>
-                <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-row-flag">
+                <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-row-flag" :style="{
+    backgroundColor: tutor.memberFlag ? '#dcfce7' : '#fee2e2',
+    color: tutor.memberFlag ? '#166534' : '#991b1b'
+  }">
                   {{ tutor.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-row-created">
                   {{ tutor.createdAt }}
                 </div>
-                <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant">
+                <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant" :style="{
+    backgroundColor: tutor.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+    color: tutor.memberDormantStatus ? '#991b1b' : '#166534'}">
                   {{ tutor.memberDormantStatus === true ? '휴면' : '활성' }}
                 </div>
               </div>
@@ -196,7 +200,7 @@ const toggleDropdown = () => {
 };
 
 const updateSelectedColumns = () => {
-  console.log("현재 선택된 컬럼:", selectedColumns.value);
+  console.log("current selected column :", selectedColumns.value);
 };
 
 const formatCurrency = (value) => {

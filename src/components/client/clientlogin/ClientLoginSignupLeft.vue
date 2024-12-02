@@ -58,12 +58,12 @@ const setRole = (selectedRole) => {
 };
 
 const sendAuthCode = () => {
-  console.log('인증 코드 전송');
+  console.log('send Auth Code');
 };
 
 const handleSubmit = () => {
   try {
-      console.log('제출:', {
+      console.log('submit :', {
           role: role.value,
           userId: userId.value,
           password: password.value,

@@ -89,7 +89,7 @@ const birthdate = ref('');
 const topic = ref('');
 
 const handleSubmit = () => {
-  console.log('회원가입 성공:', {
+  console.log('success :', {
       zipcode: zipcode.value,
       address: address.value,
       gender: gender.value,

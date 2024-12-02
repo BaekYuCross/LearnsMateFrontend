@@ -5,7 +5,7 @@
         <PaymentFilter @search="handleSearch" @reset="handleReset" />
         <div class="payment-actions">
           <div class="payment-count">
-            총 결제 건수 <span class="payment-length">{{ totalElements }}</span>건
+            총 결제 건수 <span class="payment-length">{{ formatNumber(totalElements) }}</span>건
           </div>
           <div class="payment-button-group">
             <div class="payment-column-selector">
@@ -19,9 +19,9 @@
                     :value="key" 
                     v-model="selectedColumns" 
                     @change="updateSelectedColumns"
-                    :id="key"
+                    :id="'checkbox-' + key"
                   />
-                  <label :for="key">{{ label }}</label>
+                  <label :for="'checkbox-' + key">{{ label }}</label>
                 </div>
               </div>
             </div>
@@ -43,8 +43,8 @@
                 <div v-if="selectedColumns.includes('createdAt')" class="payment-board-header-date">결제일</div>
                 <div v-if="selectedColumns.includes('lectureCode')" class="payment-board-header-lecturecode">강의코드</div>
                 <div v-if="selectedColumns.includes('lectureTitle')" class="payment-board-header-title">강의명</div>
-                <div v-if="selectedColumns.includes('lectureCategory')" class="payment-board-header-category">강의 카테고리</div>
-                <div v-if="selectedColumns.includes('paymentCode')" class="payment-board-header-code">강사코드</div>
+                <div v-if="selectedColumns.includes('lectureCategoryName')" class="payment-board-header-category">강의 카테고리</div>
+                <div v-if="selectedColumns.includes('tutorCode')" class="payment-board-header-tutorcode">강사코드</div>
                 <div v-if="selectedColumns.includes('tutorName')" class="payment-board-header-tutor">강사명</div>
                 <div v-if="selectedColumns.includes('studentCode')" class="payment-board-header-studentcode">학생코드</div>
                 <div v-if="selectedColumns.includes('studentName')" class="payment-board-header-student">학생명</div>
@@ -73,8 +73,8 @@
                     <div v-if="selectedColumns.includes('lectureTitle')" class="payment-board-row-title">
                     {{ truncateText(payment.lecture_title, 20) }}
                     </div>
-                    <div v-if="selectedColumns.includes('lectureCategory')" class="payment-board-row-category">
-                    {{ translateCategory(payment.lecture_category) }}
+                    <div v-if="selectedColumns.includes('lectureCategoryName')" class="payment-board-row-category">
+                        {{ translateCategory(payment.lecture_category_name || payment.lecture_category) }}
                     </div>
                     <div v-if="selectedColumns.includes('tutorCode')" class="payment-board-row-tutorcode">
                     {{ payment.tutor_code }}
@@ -170,8 +170,8 @@
                 <span class="value">{{ selectedPayment.lecture_status ? '운영중' : '종료' }}</span>
               </div>
               <div class="payment-detail-item">
-                <span class="label">강의 카테고리</span>
-                <span class="value">{{ translateCategory(selectedPayment.lecture_category) }}</span>
+                  <span class="label">강의 카테고리</span>
+                  <span class="value">{{ translateCategory(selectedPayment.lecture_category_name || selectedPayment.lecture_category) }}</span>
               </div>
               <div class="payment-detail-item">
                 <span class="label">강의 난이도</span>
@@ -224,6 +224,7 @@ import axios from 'axios';
 import '@/assets/css/payment/PaymentView.css';
 import { useLoginState } from '@/stores/loginState';
 import PaymentRevenueModal from '@/components/payment/PaymentRevenueModal.vue';
+import { saveAs } from 'file-saver';
 
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['Content-Type'] = 'application/json';
@@ -245,7 +246,7 @@ const columns = ref({
     createdAt: "결제일",
     lectureCode: "강의코드",
     lectureTitle: "강의명",
-    lectureCategory: "강의 카테고리",
+    lectureCategoryName: "강의 카테고리",
     tutorCode: "강사코드",
     tutorName: "강사명",
     studentCode: "학생코드",
@@ -257,38 +258,55 @@ const columns = ref({
 
 const selectedColumns = ref(Object.keys(columns.value));
 
-const fetchPaymentList = async () => {
+const fetchPaymentList = async (filters = {}) => {
   try {
     const response = await axios.get(`http://localhost:5000/payments`, {
       params: {
+        ...filters,
         page: currentPage.value - 1,
         size: pageSize
       },
     });
 
-    paymentList.value = response.data.paymentData;
+    paymentList.value = response.data.paymentData.map(payment => ({
+      ...payment,
+      lecture_category_name: payment.lecture_category_name || payment.lecture_category
+    }));
     totalElements.value = response.data.totalElements;
     totalPages.value = Math.ceil(totalElements.value / pageSize);
   } catch (error) {
     console.error('Failed to fetch payments:', error);
   }
 };
-  
-  const handleSearch = async (filterData) => {
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+const handleSearch = async (filterData) => {
     try {
-      isFiltered.value = true;
-      lastFilterData.value = filterData;
-      const response = await axios.get('http://localhost:5000/payments/filter', {
-        params: filterData
-      });
-      
-      paymentList.value = response.data;
-      totalElements.value = response.data.length;
-      totalPages.value = Math.ceil(totalElements.value / pageSize);
+        isFiltered.value = true;
+        lastFilterData.value = filterData;
+        const response = await axios.post(
+            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`, 
+            camelToSnake(filterData)
+        );
+        
+        console.log(response);
+
+        paymentList.value = response.data.content;
+        totalElements.value = response.data.totalElements;
+        totalPages.value = response.data.totalPages;
     } catch (error) {
-      console.error('Failed to filter payments:', error);
+        console.error('Failed to filter payments:', error);
     }
-  };
+};
   
   const handleReset = () => {
     isFiltered.value = false;
@@ -297,6 +315,30 @@ const fetchPaymentList = async () => {
     selectedPayment.value = null;
     fetchPaymentList();
   };
+
+  const handleExcelDownload = async () => {
+  try {
+    const config = {
+      method: 'POST',
+      url: 'http://localhost:5000/payments/excel/download',
+      responseType: 'blob',
+      data: {
+        selected_columns: selectedColumns.value,
+        ...(isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {}),
+      },
+    };
+
+    const response = await axios(config);
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+
+    saveAs(blob, 'payment_data.xlsx');
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
+  }
+};
 
   const toggleDropdown = () => {
     isDropdownOpen.value = !isDropdownOpen.value;
@@ -338,6 +380,11 @@ const translateLevel = (level) => {
   return levelMap[level] || level;
 };
 
+const formatNumber = (number) => {
+  if (!number) return '0';
+  return number.toLocaleString('ko-KR');
+};
+
   const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
 
@@ -367,6 +414,7 @@ const showPaymentDetail = async (payment) => {
       
       if (response.data) {
         selectedPayment.value = response.data;
+        console.log(response.data);
       }
     } catch (error) {
       console.error('Failed to fetch payment details:', error);
@@ -388,13 +436,20 @@ const showPaymentDetail = async (payment) => {
   const changePage = async (newPage) => {
     if (newPage < 1 || newPage > totalPages.value) return;
     currentPage.value = newPage;
-  
+
     if (isFiltered.value && lastFilterData.value) {
-      await handleSearch(lastFilterData.value);
+        const response = await axios.post(
+            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+            camelToSnake(lastFilterData.value)
+        );
+
+        paymentList.value = response.data.content;
+        totalElements.value = response.data.totalElements;
+        totalPages.value = response.data.totalPages;
     } else {
-      await fetchPaymentList();
+        await fetchPaymentList();
     }
-  };
+};
 
 const openRevenueModal = () => {
   isRevenueModalOpen.value = true;
