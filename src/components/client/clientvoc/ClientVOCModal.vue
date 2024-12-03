@@ -68,13 +68,16 @@ const handleSubmit = async() => {
     return;
   }
 
+  // console.log(localStorage.getItem('clientInfo'));
+  // console.log(JSON.parse(localStorage.getItem('clientInfo')).memberCode);
+
   const response = await axios.post('http://localhost:5000/voc', {
       vocContent: inquiryContent.value,
       vocCategoryCode: categoryCodeMap[selectedCategory.value],
       // vocAnswerStatus: false,  
       // vocAnswerSatisfaction: null,
       // createdAt: new Date(), 
-      memberCode: localStorage.getItem('clientInfo').memberCode,
+      memberCode: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
     }, {
       withCredentials: true
     });

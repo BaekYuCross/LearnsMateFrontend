@@ -1,69 +1,77 @@
 <template>
-    <div class="clientmyvoc-container">
-      <ClientHeader />
-      <InactivityModal
-        v-if="showActivityModal"
-        :show="showActivityModal"
-        @continue="closeActivityModal"
-        @logout="activityLogout"
-      />
-      <div class="clientmyvoc-wrapper">
+  <div class="clientmyvoc-container">
+    <ClientHeader />
+    <InactivityModal
+      v-if="showActivityModal"
+      :show="showActivityModal"
+      @continue="closeActivityModal"
+      @logout="activityLogout"
+    />
+    <div class="clientmyvoc-wrapper">
+      <div v-for="voc in paginatedVOCs" :key="voc.vocCode">
         <!-- 질문(Q) -->
         <div class="clientmyvoc-block clientmyvoc-question-block">
           <h3 class="clientmyvoc-title">
             Q.
             <div class="clientmyvoc-line"></div>
           </h3>
-          <p class="clientmyvoc-text">
-            안녕하세요. 제가 얼마 전에 결제한 강의를 수강했는데, 생각보다 내용이 맞지 않아서 환불을 요청하고 싶습니다.
-            환불 절차가 어떻게 되는지 궁금한데, 어떤 단계를 거쳐야 하나요? 그리고 환불이 되기까지 얼마나 걸리는지도 알고 싶습니다.
-            혹시 환불 가능한 기간이나 조건이 있으면 알려주시면 감사하겠습니다.
-          </p>
+          <p class="clientmyvoc-text">{{ voc.vocContent }}</p>
+          <div class="clientmyvoc-metadata">
+            <span>카테고리: {{ voc.vocCategoryName }}</span>
+            <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+          </div>
         </div>
-        <!-- 답변(A) -->
-        <div class="clientmyvoc-block clientmyvoc-answer-block">
+
+        <!-- 답변(A) - 답변이 있는 경우에만 표시 -->
+        <div v-if="voc.vocAnswerContent" class="clientmyvoc-block clientmyvoc-answer-block">
           <h3 class="clientmyvoc-title">
             A.
             <div class="clientmyvoc-line"></div>
           </h3>
           <p class="clientmyvoc-text">
-            안녕하세요, 런즈버디 입니다. 😊 <br />
-            환불을 요청하시려면, 먼저 로그인 후 '내 강의' 페이지로 이동하여 환불을 원하시는 강의를 선택해 주세요.
-            강의 상세 페이지에서 '환불 요청' 버튼을 클릭하면 환불 신청이 접수됩니다. <br />
-            환불 정책에 따라 일부 조건이 적용될 수 있으며, 환불 처리 기간은 영업일 기준으로 약 3~5일 정도 소요됩니다.
-            자세한 환불 정책은 고객센터 페이지에서 확인하실 수 있습니다.
-            추가 문의 사항이 있으시면 언제든지 고객센터로 연락해 주세요! 감사합니다.
+            안녕하세요, 런즈버디입니다. 😊<br />
+            {{ voc.vocAnswerContent }}
           </p>
+          <div class="clientmyvoc-metadata">
+            <span>답변자: {{ voc.adminName }}</span>
+            <span>답변일: {{ formatDate(voc.vocAnswerCreatedAt) }}</span>
+            <span v-if="voc.vocAnswerSatisfaction">
+              만족도: {{ getSatisfactionEmoji(voc.vocAnswerSatisfaction) }}
+            </span>
+          </div>
         </div>
-        <!-- 피드백 -->
-        <div class="clientmyvoc-feedback">
+
+        <!-- 피드백 - 답변이 있고 만족도가 없는 경우에만 표시 -->
+        <div v-if="voc.vocAnswerContent && !voc.vocAnswerSatisfaction" class="clientmyvoc-feedback">
           <p class="clientmyvoc-feedback-question">답변이 도움 되셨나요?</p>
           <div class="clientmyvoc-feedback-options">
             <div
               class="clientmyvoc-feedback-item"
-              @click="sendFeedback('resolved')"
+              @click="sendFeedback(voc.vocCode, 'resolved')"
             >
               <span class="clientmyvoc-feedback-icon">😊</span>
-              <span>해결됨</span>
+              <span>만족</span>
             </div>
             <div
               class="clientmyvoc-feedback-item"
-              @click="sendFeedback('neutral')"
+              @click="sendFeedback(voc.vocCode, 'neutral')"
             >
               <span class="clientmyvoc-feedback-icon">😐</span>
-              <span>애매함</span>
+              <span>보통</span>
             </div>
             <div
               class="clientmyvoc-feedback-item"
-              @click="sendFeedback('not_resolved')"
+              @click="sendFeedback(voc.vocCode, 'not_resolved')"
             >
               <span class="clientmyvoc-feedback-icon">😞</span>
-              <span>해결안됨</span>
+              <span>불만족</span>
             </div>
           </div>
         </div>
-        <!-- 페이지네이션 -->
-       <div class="clientmyvoc-pagination">
+      </div>
+
+      <!-- 페이지네이션 -->
+      <div class="clientmyvoc-pagination">
         <button
           class="clientmyvoc-page-button prev-button"
           @click="changePage(currentPage - 1)"
@@ -93,24 +101,97 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import ClientHeader from "@/components/client/ClientHeader.vue";
-
 import InactivityModal from '@/components/client/InactivityModal.vue';
 import { useActivityMonitor } from "@/composables/useActivityMonitor";
+import axios from '@/plugins/axios';
 
 const { showActivityModal, closeActivityModal, activityLogout } = useActivityMonitor(30);
 
-const currentPage = ref(1); // 현재 페이지
-const totalPages = ref(155); // 총 페이지 수
-const maxVisiblePages = 5; // 한 번에 보여줄 페이지 버튼 수
+const currentPage = ref(1);
+const totalPages = ref(0);
+const maxVisiblePages = 5;
+const vocList = ref([]);
+const itemsPerPage = 1;
 
-// 피드백 이벤트 핸들러
-const sendFeedback = (status) => {
-  console.log("Feedback:", status); // 여기에서 서버로 데이터 전송 로직 추가 가능
+// 현재 페이지의 VOC 목록 계산
+const paginatedVOCs = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return vocList.value.slice(start, end);
+});
+
+const formatDate = (dateTime) => {
+  if (!dateTime || !Array.isArray(dateTime)) return '';
+  
+  const [year, month, day, hour, minute] = dateTime;
+  
+  // 월과 일이 한자리수일 경우 앞에 0을 붙임
+  const formattedMonth = String(month).padStart(2, '0');
+  const formattedDay = String(day).padStart(2, '0');
+  const formattedHour = String(hour).padStart(2, '0');
+  const formattedMinute = String(minute).padStart(2, '0');
+  
+  return `${year}년 ${formattedMonth}월 ${formattedDay}일 ${formattedHour}:${formattedMinute}`;
 };
 
-// 현재 페이지를 기준으로 동적으로 페이지 버튼 목록 계산
+
+const sendFeedback = async (vocCode, status) => {
+  try {
+    const satisfactionMap = {
+      'resolved': 2,
+      'neutral': 1,
+      'not_resolved': 0
+    };
+
+    await axios.post(
+      `http://localhost:5000/voc/client/${vocCode}/feedback`,
+      null, // body는 null
+      {
+        params: {  // params로 전송
+          satisfaction: satisfactionMap[status]
+        },
+        withCredentials: true
+      }
+    );
+
+    fetchUserVOCs();
+  } catch (error) {
+    console.error('피드백 전송 실패:', error);
+  }
+};
+
+const getSatisfactionEmoji = (satisfaction) => {
+  if (satisfaction === null) return '';
+  
+  switch(satisfaction) {
+    case "만족":
+      return "😊 만족";
+    case "보통":
+      return "😐 보통";
+    case "불만족":
+      return "😞 불만족";
+    default:
+      return satisfaction;
+  }
+};
+
+// VOC 목록 조회
+const fetchUserVOCs = async () => {
+  try {
+    const memberCode = JSON.parse(localStorage.getItem('clientInfo')).memberCode;
+    const response = await axios.get(`http://localhost:5000/voc/client/list/${memberCode}`, {
+      withCredentials: true
+    });
+    vocList.value = response.data;
+    totalPages.value = Math.ceil(vocList.value.length / itemsPerPage);
+  } catch (error) {
+    console.error('VOC 목록 조회 실패:', error);
+  }
+};
+
+// 페이지네이션 버튼 계산
 const visiblePages = computed(() => {
   const pages = [];
   const startPage = Math.max(1, currentPage.value - Math.floor(maxVisiblePages / 2));
@@ -123,19 +204,37 @@ const visiblePages = computed(() => {
   return pages;
 });
 
-// 페이지 변경 핸들러
+// 페이지 변경
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
-    // 여기서 서버 요청으로 해당 페이지 데이터를 가져오면 됨
   }
 };
+
+onMounted(() => {
+  fetchUserVOCs();
+});
 </script>
   
-  <style lang="scss">
+<style>
   .clientmyvoc-container {
-    background-color: #ffffff;
-    font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  height: 100vh;
+  overflow-y: auto;
+  }
+  
+  .clientmyvoc-container::-webkit-scrollba {
+    width: 6px;
+  }
+
+  .clientmyvoc-container::-webkit-scrollbar-thumb {
+    background-color: #7671f4;
+    border-radius: 10px;
+  }
+
+  .clientmyvoc-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 10px;
   }
   
   .clientmyvoc-wrapper {
@@ -143,18 +242,22 @@ const changePage = (page) => {
     max-width: 1160px;
     margin: 30px auto;
     padding: 20px;
-  }
+    min-height: calc(100vh - 100px);
+    position: relative;  
+    padding-bottom: 100px;  
+}
   
-  /* 공통 블록 스타일 */
   .clientmyvoc-block {
     background-color: #ffffff;
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 30px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    min-height: 200px;
+    display: flex; 
+    flex-direction: column;
   }
   
-  /* 질문(Q) 스타일링 */
   .clientmyvoc-question-block {
     border-left: 5px solid #7671f4;
   }
@@ -170,12 +273,12 @@ const changePage = (page) => {
   }
   
   .clientmyvoc-line {
-  margin-top: 6px;
-  width: 400px; /* 원하는 길이로 설정 */
-  height: 7px;
-  background-color: #7671f4;
-  margin-left: 10px;
-  border-radius: 60px;
+    margin-top: 6px;
+    width: 400px;
+    height: 7px;
+    background-color: #7671f4;
+    margin-left: 10px;
+    border-radius: 60px;
 }
 
   .clientmyvoc-text {
@@ -184,14 +287,13 @@ const changePage = (page) => {
     color: #818181;
     line-height: 1.6;
     font-weight: bold;
+    min-height: 100px; 
   }
   
-  /* 답변(A) 스타일링 */
   .clientmyvoc-answer-block {
     border-left: 5px solid #5a54cc;
   }
-  
-  /* 피드백 */
+
   .clientmyvoc-feedback {
     display: flex;
     flex-direction: column;
@@ -231,12 +333,16 @@ const changePage = (page) => {
     margin-bottom: 4px;
   }
   
-  /* 페이지네이션 */
   .clientmyvoc-pagination {
+    position: absolute; 
+    bottom: 50px; 
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 30px;
+    width: 100%;
+    margin: 0 auto;
   }
   
   .clientmyvoc-page-button {
@@ -258,5 +364,20 @@ const changePage = (page) => {
     margin: 0 10px;
     font-size: 14px;
   }
+
+  .clientmyvoc-metadata {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  padding-right: 20px;
+}
+
+.clientmyvoc-page-button.active {
+  color: #7671f4;
+  text-decoration: underline;
+}
   </style>
   
