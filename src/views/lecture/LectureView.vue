@@ -140,7 +140,7 @@
             </div>
             <div class="lecture-detail-item">
               <span class="label">강의 제목</span>
-              <span class="value ellipsis" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
+              <span class="value" style="width: 200px;" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">카테고리</span>
@@ -182,13 +182,19 @@
               <span class="label">총 학생 수</span>
               <span class="value">{{ selectedLecture.purchase_count }}</span>
             </div>
-            <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
-              <span>강의 비디오 목록</span>
-              <ul>
-                <li v-for="(video, index) in selectedLecture.lecture_videos" :key="index" class="ellipsis">
-                  {{ video.videoTitle }}
-                </li>
-              </ul>
+            <div class="lecture-toggle-header">
+            <span>
+            강의 비디오 목록
+            <button class="lecture-toggle-button" @click="toggleCourseSection">
+            {{ isCourseSectionVisible ? '&#9650;' : '&#9660;' }}
+             </button> </span>
+            </div>
+             <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
+              <div v-if="isCourseSectionVisible" class="lecture-recommended-list">
+                <div v-for="(video, index) in selectedLecture.lecture_videos" :key="index" class="lecture-recommended-item">
+                  {{ video.videoTitle || '비디오 제목 없음' }}
+                </div>
+              </div>
             </div>
             <div class="lecture-stats-section">
               <div class="lecture-stats-header">
@@ -333,6 +339,13 @@ const getMappedLevel = (level) => {
 
 const getMappedCategory = (category) => {
   return categoryMapping[category] || '알 수 없음'; // 맵핑되지 않은 값은 '알 수 없음'으로 처리
+};
+
+// 토글 상태 관리
+const isCourseSectionVisible = ref(false);
+
+const toggleCourseSection = () => {
+  isCourseSectionVisible.value = !isCourseSectionVisible.value;
 };
 
 const camelToSnake = (obj) => {
