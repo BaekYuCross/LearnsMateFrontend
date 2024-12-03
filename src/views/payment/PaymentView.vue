@@ -38,19 +38,139 @@
   
         <div class="payment-content-body">
           <div class="payment-board-container">
-              <div class="payment-board-header">
-                <div v-if="selectedColumns.includes('paymentCode')" class="payment-board-header-code">결제코드</div>
-                <div v-if="selectedColumns.includes('createdAt')" class="payment-board-header-date">결제일</div>
-                <div v-if="selectedColumns.includes('lectureCode')" class="payment-board-header-lecturecode">강의코드</div>
-                <div v-if="selectedColumns.includes('lectureTitle')" class="payment-board-header-title">강의명</div>
-                <div v-if="selectedColumns.includes('lectureCategoryName')" class="payment-board-header-category">강의 카테고리</div>
-                <div v-if="selectedColumns.includes('tutorCode')" class="payment-board-header-tutorcode">강사코드</div>
-                <div v-if="selectedColumns.includes('tutorName')" class="payment-board-header-tutor">강사명</div>
-                <div v-if="selectedColumns.includes('studentCode')" class="payment-board-header-studentcode">학생코드</div>
-                <div v-if="selectedColumns.includes('studentName')" class="payment-board-header-student">학생명</div>
-                <div v-if="selectedColumns.includes('lecturePrice')" class="payment-board-header-lectureprice">원가(원)</div>
-                <div v-if="selectedColumns.includes('couponIssuanceName')" class="payment-board-header-coupon">적용쿠폰</div>
-                <div v-if="selectedColumns.includes('paymentPrice')" class="payment-board-header-price">결제액(원)</div>
+            <div class="payment-board-header">
+              <div 
+                v-if="selectedColumns.includes('paymentCode')" 
+                class="payment-board-header-code"
+                @click="sortPaymentList('payment_code')"
+                :class="{
+                  'sort-asc': sortState.column === 'payment_code' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'payment_code' && sortState.order === 2
+                }"
+              >
+                결제코드
+              </div>
+              <div 
+                v-if="selectedColumns.includes('createdAt')" 
+                class="payment-board-header-date"
+                @click="sortPaymentList('created_at')"
+                :class="{
+                  'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'created_at' && sortState.order === 2
+                }"
+              >
+                결제일
+              </div>
+              <div 
+                v-if="selectedColumns.includes('lectureCode')" 
+                class="payment-board-header-lecturecode"
+                @click="sortPaymentList('lecture_code')"
+                :class="{
+                  'sort-asc': sortState.column === 'lecture_code' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'lecture_code' && sortState.order === 2
+                }"
+              >
+                강의코드
+              </div>
+              <div 
+                v-if="selectedColumns.includes('lectureTitle')" 
+                class="payment-board-header-title"
+                @click="sortPaymentList('lecture_title')"
+                :class="{
+                  'sort-asc': sortState.column === 'lecture_title' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'lecture_title' && sortState.order === 2
+                }"
+              >
+                강의명
+              </div>
+              <div 
+                v-if="selectedColumns.includes('lectureCategoryName')" 
+                class="payment-board-header-category"
+                @click="sortPaymentList('lecture_category_name')"
+                :class="{
+                  'sort-asc': sortState.column === 'lecture_category_name' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'lecture_category_name' && sortState.order === 2
+                }"
+              >
+                강의 카테고리
+              </div>
+              <div 
+                v-if="selectedColumns.includes('tutorCode')" 
+                class="payment-board-header-tutorcode"
+                @click="sortPaymentList('tutor_code')"
+                :class="{
+                  'sort-asc': sortState.column === 'tutor_code' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'tutor_code' && sortState.order === 2
+                }"
+              >
+                강사코드
+              </div>
+              <div 
+                v-if="selectedColumns.includes('tutorName')" 
+                class="payment-board-header-tutor"
+                @click="sortPaymentList('tutor_name')"
+                :class="{
+                  'sort-asc': sortState.column === 'tutor_name' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'tutor_name' && sortState.order === 2
+                }"
+              >
+                강사명
+              </div>
+              <div 
+                v-if="selectedColumns.includes('studentCode')" 
+                class="payment-board-header-studentcode"
+                @click="sortPaymentList('student_code')"
+                :class="{
+                  'sort-asc': sortState.column === 'student_code' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'student_code' && sortState.order === 2
+                }"
+              >
+                학생코드
+              </div>
+              <div 
+                v-if="selectedColumns.includes('studentName')" 
+                class="payment-board-header-student"
+                @click="sortPaymentList('student_name')"
+                :class="{
+                  'sort-asc': sortState.column === 'student_name' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'student_name' && sortState.order === 2
+                }"
+              >
+                학생명
+              </div>
+              <div 
+                v-if="selectedColumns.includes('lecturePrice')" 
+                class="payment-board-header-lectureprice"
+                @click="sortPaymentList('lecture_price')"
+                :class="{
+                  'sort-asc': sortState.column === 'lecture_price' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'lecture_price' && sortState.order === 2
+                }"
+              >
+                원가(원)
+              </div>
+              <div 
+                v-if="selectedColumns.includes('couponIssuanceName')" 
+                class="payment-board-header-coupon"
+                @click="sortPaymentList('coupon_issuance_name')"
+                :class="{
+                  'sort-asc': sortState.column === 'coupon_issuance_name' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'coupon_issuance_name' && sortState.order === 2
+                }"
+              >
+                적용쿠폰
+              </div>
+              <div 
+                v-if="selectedColumns.includes('paymentPrice')" 
+                class="payment-board-header-price"
+                @click="sortPaymentList('payment_price')"
+                :class="{
+                  'sort-asc': sortState.column === 'payment_price' && sortState.order === 1,
+                  'sort-desc': sortState.column === 'payment_price' && sortState.order === 2
+                }"
+              >
+                결제액(원)
+              </div>
             </div>
   
             <div class="payment-board-body">
@@ -80,13 +200,13 @@
                     {{ payment.tutor_code }}
                     </div>
                     <div v-if="selectedColumns.includes('tutorName')" class="payment-board-row-tutor">
-                    {{ payment.tutor_name }}
+                    {{ maskName(payment.tutor_name) }}
                     </div>
                     <div v-if="selectedColumns.includes('studentCode')" class="payment-board-row-studentcode">
                     {{ payment.student_code }}
                     </div>
                     <div v-if="selectedColumns.includes('studentName')" class="payment-board-row-student">
-                    {{ payment.student_name }}
+                    {{ maskName(payment.student_name) }}
                     </div>
                     <div v-if="selectedColumns.includes('lecturePrice')" class="payment-board-row-lectureprice">
                     {{ formatPrice(payment.lecture_price) }}
@@ -255,6 +375,35 @@ const columns = ref({
     couponIssuanceName: "적용쿠폰",
     paymentPrice: "결제액(원)"
 });
+
+const sortState = ref({
+  column: null,
+  order: 0,
+});
+
+const sortPaymentList = (columnKey) => {
+  if (sortState.value.column === columnKey) {
+    sortState.value.order = (sortState.value.order + 1) % 3;
+  } else {
+    sortState.value.column = columnKey;
+    sortState.value.order = 1;
+  }
+
+  if (sortState.value.order === 0) {
+    fetchPaymentList();
+  } else {
+    paymentList.value.sort((a, b) => {
+      const valueA = a[columnKey];
+      const valueB = b[columnKey];
+
+      if (sortState.value.order === 1) {
+        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      } else {
+        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+      }
+    });
+  }
+};
 
 const selectedColumns = ref(Object.keys(columns.value));
 
@@ -481,6 +630,13 @@ const closeRevenueModal = () => {
   const endPage = computed(() => {
     return displayedPages.value[displayedPages.value.length - 1];
   });
+
+const maskName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
+};
   
   onMounted(async () => {
     fetchPaymentList();

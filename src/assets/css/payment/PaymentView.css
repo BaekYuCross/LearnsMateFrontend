@@ -97,6 +97,32 @@
     top: 0;
     z-index: 1;
   }
+
+  .payment-board-header div {
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .payment-board-header div.sort-asc::after {
+    content: '▲';
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    color: #005950;
+  }
+  
+  .payment-board-header div.sort-desc::after {
+    content: '▼';
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    color: #005950;
+  }
+  
+  .payment-board-header div:hover {
+    background-color: #f1f1f1;
+  }
+  
   
   .payment-board-body {
     display: flex;
