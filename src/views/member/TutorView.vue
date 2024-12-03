@@ -109,9 +109,14 @@
           </div>
         </div>
 
+
+
         <div v-if="selectedTutor" class="tutor-detail-container">
+          <div class="tutor-detail-header">
+            <h3>강사 상세 정보</h3>
+            <button class="close-button" @click="closeTutorDetail">×</button>
+          </div>          
           <div class="tutor-detail-content">
-            <h3>상세 정보</h3>
             <div class="tutor-info-grid">
               <div class="tutor-info-item">
                 <span class="tutor-label">강사 코드</span>
@@ -377,6 +382,11 @@ const showDetail = async (tutor) => {
     }
   }
 };
+
+const closeTutorDetail = () =>{
+  selectedTutor.value = null;
+  tutorDetail.value = null;
+}
 
 onMounted(() => {
   fetchTutors();
