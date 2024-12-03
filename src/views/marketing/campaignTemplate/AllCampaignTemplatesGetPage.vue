@@ -326,9 +326,9 @@
   .campaigntemplate-dropdown-button {
     background-color: #ffffff;
     color: #000000;
-    border: 1px solid #000000;
-    padding: 5px 10px;
-    font-size: 13px;
+    border: 0.5px solid #d5d5d5;
+    padding: 3px 5px;
+    font-size: 12px;
     border-radius: 4px;
     cursor: pointer;
   }
@@ -365,7 +365,8 @@
   
   .campaigntemplate-register-button, .campaigntemplate-excel-button {
     background: #005950;
-    padding: 5px 10px;
+    padding: 3px 5px;
+    margin-bottom: 3px;
     border: none;
     color: #ffffff;
     cursor: pointer;
@@ -373,7 +374,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    border-radius: 5px;
+    border-radius: 3px;
   }
   
   .campaigntemplate-length {
