@@ -176,13 +176,26 @@ th:nth-child(4), td:nth-child(4) { width: 100px; }
   overflow-y: auto;
 }
 
+.reserved-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
 .reserved-detail-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  height: 100%;
-  overflow-y: auto;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
 }
 
 .reserved-info-grid {
