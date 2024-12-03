@@ -72,15 +72,15 @@
             <option value="false">비활성</option>
           </select>
         </div>
-        <div class="target-filter-item">
-          <div class="target-button-group">
-            <button @click="search" class="target-search-button">
-              <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-            </button>
-            <button @click="reset" class="reset-button">
-              <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
-            </button>
-          </div>
+      </div>
+      <div class="target-filter-row white">
+        <div class="target-button-group">
+          <button @click="search" class="target-search-button">
+            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+          </button>
+          <button @click="reset" class="reset-button">
+            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
+          </button>
         </div>
       </div>
     </div>
@@ -186,14 +186,9 @@ const reset = () => {
 
 .target-filter-item {
   width: 30%;
-  padding-left: px;
+  padding-left: 8px;
   display: flex;
   align-items: center;
-}
-
-.target-filter-item.partial {
-  flex: 1;
-  max-width: 300px;
 }
 
 .target-filter-label {
@@ -234,7 +229,7 @@ const reset = () => {
 .target-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 280px;
+  margin-left: 1100px;
 }
 
 .target-search-button {
