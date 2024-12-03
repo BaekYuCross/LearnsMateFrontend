@@ -169,7 +169,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 내용</span>
-              <span class="value">{{ selectedVOC.voc_content }}</span>
+              <span class="value" style="width: 200px;">{{ selectedVOC.voc_content }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">카테고리</span>
@@ -209,7 +209,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 답변</span>
-              <span v-if="!isEditingAnswer" class="value">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
+              <span v-if="!isEditingAnswer" class="value" style="width: 200px;">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
               <textarea
                 v-else
                 v-model="editAnswerContent"
