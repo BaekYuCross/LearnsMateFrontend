@@ -59,18 +59,31 @@
       <div class="coupon-target-lecture-container">
         <h2 class="coupon-target-lecture-header">타겟 강의</h2>
         <div class="coupon-target-lecture-filter">
-          <label>
-            강의명
-            <input type="text" placeholder="강의 제목을 입력하세요.">
-          </label>
-          <label>
-            강사명
-            <input type="text" placeholder="강사 이름을 입력하세요.">
-          </label>
-          <label>
-            강의 금액
-            <input type="number" placeholder="강의 금액을 입력하세요.">
-          </label>
+          <label>강의명</label>
+            <input 
+            type="text" 
+            placeholder="강의 제목을 입력하세요."
+            v-model="filters.lecture_title">
+          <label>강사명</label>
+            <input 
+            type="text" 
+            placeholder="강사 이름을 입력하세요."
+            v-model="filters.tutor_name">
+          <label>강의 금액</label>
+            <input 
+            type="number" 
+            placeholder="강의 금액을 입력하세요."
+            v-model="filters.min_price">
+            ~
+            <input 
+            type="number" 
+            placeholder="강의 금액을 입력하세요."
+            v-model="filters.max_price">
+          <button 
+          class="lecture-search-button"
+          @click="() => applyFilters(filters.value)">
+            조회
+          </button>
         </div>
 
         <table class="coupon-target-lecture-table">
@@ -178,6 +191,9 @@ const lecture = ref([]);
 const totalPages = ref(1); // 전체 페이지 수
 const currentPage = ref(1);
 const pageSize = 15; // 페이지당 항목 수
+const totalCount = ref(0);
+const isFiltered = ref(false);
+const currentFilters = ref(null);
 
 // displayedPages computed 속성 추가
 const displayedPages = computed(() => {
@@ -216,6 +232,7 @@ const fetchLectures = async () => {
     
     lecture.value = response.data.content;
     totalPages.value = response.data.totalPages;
+    totalCount.value = response.data.totalElements;
     
   } catch (error) {
     console.error('강의 데이터를 가져오는 중 오류 발생:', error.message);
@@ -226,7 +243,12 @@ const fetchLectures = async () => {
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
-  await fetchLectures();
+  console.log('Changed to page:', currentPage.value); // 디버깅용
+  if (isFiltered.value) {
+    await applyFilters(currentFilters.value, false);
+  } else {
+    await fetchLectures();
+  }
 };
 
 const formatDate = (isoDate) => {
@@ -273,6 +295,72 @@ const formatDateWithTime = {
   }
 };
 
+const filters = ref({
+  lecture_title: '',
+  tutor_name: '',
+  min_price: '',
+  max_price: ''
+})
+
+const applyFilters = async (filterData, resetPage = true) => {
+  try {
+    console.log('필터 적용 전:', filters.value);
+    
+    // 빈 문자열을 null로 변환
+    const formattedFilters = {
+      lecture_title: filters.value.lecture_title || null,
+      tutor_name: filters.value.tutor_name || null,
+      min_price: filters.value.min_price || null,
+      max_price: filters.value.max_price || null
+    };
+
+    console.log('필터 내용:', formattedFilters);
+
+    isFiltered.value = true;
+    currentFilters.value = formattedFilters;
+
+    // 페이지 초기화는 resetPage 파라미터에 따라 결정
+    if (resetPage) {
+      currentPage.value = 1;
+    }
+
+    const page = currentPage.value - 1;
+    console.log('Sending page:', page); // 디버깅용
+
+    const response = await axios.post('http://localhost:5000/lecture/coupon-register/filter', formattedFilters,
+    {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+      }
+    });
+
+    console.log("eawfweaf", response.data);
+    if (response.data) {
+      lecture.value = response.data.content;
+      totalCount.value = response.data.totalElements;
+      totalPages.value = response.data.totalPages;
+
+
+      console.log('페이지 정보:', {
+        현재페이지: currentPage.value,
+        전체페이지: totalPages.value,
+        전체항목수: totalCount.value,
+        현재데이터: response.data.content.length
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error fetching filtered coupons:', error);
+    lecture.value = [];
+    totalCount.value = 0;
+    totalPages.value = 1;
+  }
+};
 
 const selectedLectureIds = ref([]);
 
@@ -310,10 +398,7 @@ const registerCoupon = async () => {
 const lectures = ref([]);
 
 const paginatedLectures = computed(() => {
-  if (Array.isArray(lecture.value)) {
-    return lecture.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
-  }
-  return [];
+  return lecture.value; // 서버에서 이미 페이징된 데이터를 그대로 사용
 });
 
 onMounted(() => {
@@ -361,7 +446,7 @@ const toggleLecture = (lecture) => {
 
 const toggleAllLectures = (event) => {
   if (event.target.checked) {
-    selectedLectureIds.value = [...paginatedLectures.value];
+    selectedLectureIds.value = [...lecture.value]; 
   } else {
     selectedLectureIds.value = [];
   }
@@ -454,10 +539,11 @@ const showCancelModal = () => {
 .coupon-target-lecture-filter label {
   font-size: 12px;
   font-weight: bold;
+  margin-left: 20px;
 }
 
 .coupon-target-lecture-filter input {
-  margin-right: 20px;
+  margin-right: 10px;
   margin-left: 10px;
   padding: 5px 8px;
   border: 1px solid #ddd;
@@ -611,7 +697,8 @@ const showCancelModal = () => {
 }
 
 .coupon-register-button,
-.coupon-cancel-button {
+.coupon-cancel-button,
+.lecture-search-button {
   display: flex;
   gap: 5px;
   font-size: 15px;
@@ -620,12 +707,13 @@ const showCancelModal = () => {
   background-color: #005950;
   color: white;
   border: 1px solid #005950;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
 }
 
 .coupon-register-button:hover,
-.coupon-cancel-button:hover {
+.coupon-cancel-button:hover,
+.lecture-search-button:hover {
   background-color: #004c42;
 }
 
