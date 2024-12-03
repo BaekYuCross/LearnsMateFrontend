@@ -510,6 +510,7 @@ const closeRegisterModal = () => {
   isRegisterModalOpen.value = false;
 };
 
+
 const startEditingAnswer = () => {
     isEditingAnswer.value = true;
     editAnswerContent.value = selectedVOC.value?.voc_answer_content || '';
