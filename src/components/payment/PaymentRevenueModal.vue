@@ -326,6 +326,7 @@
   }
   
   .payment-year-input {
+    outline: none;
     width: 80px;
   }
   
@@ -379,6 +380,7 @@
     background: none;
     border: none;
     font-size: 30px;
+    margin-bottom: 10px;
     cursor: pointer;
     color: #999;
   }
