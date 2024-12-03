@@ -80,6 +80,7 @@
           </div>
         </div>
 
+        
         <div v-if="selectedBlacklist" class="blacklist-detail-container">
           <div class="blacklist-detail-header">
             <h3>블랙리스트 상세 정보</h3>
@@ -330,6 +331,11 @@ const handleReset = () => {
   currentPage.value = 1;
   selectedBlacklist.value = null;
   fetchBlacklists();
+};
+
+const closeBlacklistDetail = () => {
+  selectedBlacklist.value = null;
+  reportDetails.value = null;
 };
 
 // 페이지 변경
