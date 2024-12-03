@@ -103,6 +103,10 @@
   cursor: pointer;
 }
 
+.lecture-board-row.selected {
+  background-color: #E2E8F0;
+}
+
 .lecture-board-row:hover {
   background-color: #f4f4f4;
 }
