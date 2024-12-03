@@ -20,16 +20,106 @@
       <div class="voc-content-body">
         <div class="voc-board-container">
           <div class="voc-board-header">
-            <div class="voc-board-header-number">VOC 번호</div>
-            <div class="voc-board-header-content">VOC 내용</div>
-            <div class="voc-board-header-category">카테고리</div>
-            <div class="voc-board-header-type">고객 유형</div>
-            <div class="voc-board-header-name">고객명</div>
-            <div class="voc-board-header-code">고객 코드</div>
-            <div class="voc-board-header-manager">담당자</div>
-            <div class="voc-board-header-date">등록일</div>
-            <div class="voc-board-header-status">답변 상태</div>
-            <div class="voc-board-header-satisfaction">만족도</div>
+            <div 
+              class="voc-board-header-number"
+              @click="sortVOCList('voc_code')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_code' && sortState.order === 2
+              }"
+            >
+              VOC 번호
+            </div>
+            <div 
+              class="voc-board-header-content"
+              @click="sortVOCList('voc_content')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_content' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_content' && sortState.order === 2
+              }"
+            >
+              VOC 내용
+            </div>
+            <div 
+              class="voc-board-header-category"
+              @click="sortVOCList('voc_category_name')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_category_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_category_name' && sortState.order === 2
+              }"
+            >
+              카테고리
+            </div>
+            <div 
+              class="voc-board-header-type"
+              @click="sortVOCList('member_type')"
+              :class="{
+                'sort-asc': sortState.column === 'member_type' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_type' && sortState.order === 2
+              }"
+            >
+              고객 유형
+            </div>
+            <div 
+              class="voc-board-header-name"
+              @click="sortVOCList('member_name')"
+              :class="{
+                'sort-asc': sortState.column === 'member_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_name' && sortState.order === 2
+              }"
+            >
+              고객명
+            </div>
+            <div 
+              class="voc-board-header-code"
+              @click="sortVOCList('member_code')"
+              :class="{
+                'sort-asc': sortState.column === 'member_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_code' && sortState.order === 2
+              }"
+            >
+              고객 코드
+            </div>
+            <div 
+              class="voc-board-header-manager"
+              @click="sortVOCList('admin_name')"
+              :class="{
+                'sort-asc': sortState.column === 'admin_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'admin_name' && sortState.order === 2
+              }"
+            >
+              담당자
+            </div>
+            <div 
+              class="voc-board-header-date"
+              @click="sortVOCList('created_at')"
+              :class="{
+                'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
+                'sort-desc': sortState.column === 'created_at' && sortState.order === 2
+              }"
+            >
+              등록일
+            </div>
+            <div 
+              class="voc-board-header-status"
+              @click="sortVOCList('voc_answer_status')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_answer_status' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_answer_status' && sortState.order === 2
+              }"
+            >
+              답변 상태
+            </div>
+            <div 
+              class="voc-board-header-satisfaction"
+              @click="sortVOCList('voc_answer_satisfaction')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 2
+              }"
+            >
+              만족도
+            </div>
           </div>
 
           <div class="voc-board-body">
@@ -38,7 +128,7 @@
               <div class="voc-board-row-content">{{ voc.voc_content }}</div>
               <div class="voc-board-row-category">{{ voc.voc_category_name }}</div>
               <div class="voc-board-row-type">{{ voc.member_type }}</div>
-              <div class="voc-board-row-name">{{ voc.member_name }}</div>
+              <div class="voc-board-row-name">{{ maskName(voc.member_name) }}</div>
               <div class="voc-board-row-code">{{ voc.member_code }}</div>
               <div class="voc-board-row-manager">{{ voc.admin_name || '-' }}</div>
               <div class="voc-board-row-date">{{ formatDateFromArray(voc.created_at) }}</div>
@@ -512,4 +602,40 @@ const startPage = computed(() => {
 const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1]
 })
+
+const maskName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
+};
+
+const sortState = ref({
+  column: null,
+  order: 0,
+});
+
+const sortVOCList = (columnKey) => {
+  if (sortState.value.column === columnKey) {
+    sortState.value.order = (sortState.value.order + 1) % 3;
+  } else {
+    sortState.value.column = columnKey;
+    sortState.value.order = 1;
+  }
+
+  if (sortState.value.order === 0) {
+    fetchVOCList();
+  } else {
+    vocList.value.sort((a, b) => {
+      const valueA = a[columnKey];
+      const valueB = b[columnKey];
+
+      if (sortState.value.order === 1) {
+        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      } else {
+        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+      }
+    });
+  }
+};
 </script>
