@@ -40,7 +40,11 @@ export const useLoginState = defineStore('loginState', {
     },
 
 
-   
+    // 새 토큰 만료 시간 설정
+    setExp(newExp) {
+      this.exp = newExp;
+      console.log('새로운 토큰 만료시간:', this.exp);
+    },
 
     // 상태 초기화
     resetState() {
