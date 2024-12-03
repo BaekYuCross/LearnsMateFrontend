@@ -129,7 +129,7 @@ const calculateRemainingTime = () => {
   
   if (diffInSeconds <= 0) {
     clearInterval(timer.value);
-    Logout();
+    Logout(); 
     return '만료됨';
   }
   
