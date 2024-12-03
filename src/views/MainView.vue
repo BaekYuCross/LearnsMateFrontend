@@ -12,7 +12,7 @@
           <h3>고객</h3>
           <ul>
             <li v-for="member in formattedMembers" :key="member.memberCode">
-              [{{ member.memberType }}] {{ member.memberName }} | {{ member.createdAt }} | {{ member.memberEmail }}
+              [{{ member.memberType }}]&nbsp; {{ member.memberName }} &nbsp;| &nbsp;{{ member.createdAt }} &nbsp;|&nbsp; {{ member.memberEmail }}
             </li>
           </ul>
           <a href="/student" class="more-link">+ 더보기</a>
