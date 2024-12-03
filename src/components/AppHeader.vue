@@ -283,11 +283,12 @@ onUnmounted(() => {
   
   .icon-section {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
   }
 
   .user-info {
+    padding-right: 6px;
     padding-top: 5px;
     font-size: 13.5px;
     font-weight: bold;
