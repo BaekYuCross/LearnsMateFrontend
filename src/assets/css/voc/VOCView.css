@@ -130,6 +130,10 @@
   cursor: pointer;
 }
 
+.voc-board-row.selected {
+  background-color: #E2E8F0;
+}
+
 .voc-board-row:hover {
   background-color: #f4f4f4;
 }
