@@ -135,9 +135,9 @@
               </div>
         
               <!-- 강의 정보 -->
-              <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-section">
+              <div class="lecture-section">
                 <h4 class="lecture-title">강의 목록</h4>
-                <div class="lecture-list">
+                <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-list">
                   <div v-for="lecture in tutorDetail.tutorLectureDetailList" 
                       :key="lecture.lectureCode" 
                       class="lecture-item">
