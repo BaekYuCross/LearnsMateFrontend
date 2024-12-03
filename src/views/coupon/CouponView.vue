@@ -167,18 +167,18 @@ const fetchCoupons = async () => {
   }
 };
 
-// changePage 함수 수정
+// changePage 함수도 수정
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
   if (isFiltered.value && currentFilters.value) {
-    // 필터링된 상태면 필터링된 데이터 조회
-    await applyFilters(currentFilters.value);
+    // 페이지 리셋하지 않고 필터 적용
+    await applyFilters(currentFilters.value, false);
   } else {
-    // 필터링되지 않은 상태면 일반 조회
     await fetchCoupons();
   }
 };
+
 const paginatedCoupons = computed(() => {
   if (Array.isArray(coupon.value)) {
     return coupon.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
@@ -198,36 +198,40 @@ const registerCoupon = () => {
   router.push({ name: 'Register-Coupon' });
 };
 
-const applyFilters = async (filters) => {
+const applyFilters = async (filters, resetPage = true) => {
   try {
-    console.log('Applying filters:', filters); // 필터 적용 시 데이터 확인
-    isFiltered.value = true;  // 필터링 상태 설정
-    currentFilters.value = filters;  // 현재 필터 값 저장
-    const response = await axios.post('http://localhost:5000/coupon/filters', camelToSnake(filters),
+    console.log('필터 적용 전:', filters);
+    console.log('필터 적용 후:', filters);
+
+    isFiltered.value = true;
+    currentFilters.value = filters;
+
+    // 페이지 초기화는 resetPage 파라미터에 따라 결정
+    if (resetPage) {
+      currentPage.value = 1;
+    }
+
+    const response = await axios.post('http://localhost:5000/coupon/filters2', filters,
     {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
-      params: {  // 페이지네이션 파라미터 추가
+      params: {
           page: currentPage.value - 1,
           size: pageSize,
-        }
-    }
-    );
-    // response.data가 페이징 처리된 데이터인지 확인하고 적절히 처리
+      }
+    });
+
     if (response.data && response.data.content) {
       coupon.value = response.data.content;
       totalCount.value = response.data.totalElements || 0;
       totalPages.value = response.data.totalPages || 1;
     } else {
-      // 페이징 처리되지 않은 데이터인 경우
       coupon.value = response.data;
       totalCount.value = response.data.length || 0;
       totalPages.value = Math.ceil((response.data.length || 0) / pageSize);
     }
-    
-    currentPage.value = 1;
     
     console.log('Filtered data:', response.data);
     console.log('Total count:', totalCount.value);
@@ -235,7 +239,6 @@ const applyFilters = async (filters) => {
     
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
-    // 에러 발생 시 기본값 설정
     coupon.value = [];
     totalCount.value = 0;
     totalPages.value = 1;
