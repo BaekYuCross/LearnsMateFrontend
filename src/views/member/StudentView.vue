@@ -37,7 +37,7 @@
           </div>
 
 
-          <div class="content-section" :class="{ 'with-detail': selectedStudent }">
+          <div class="content-section">
             <div class="table-container" :class="{ 'shrink': selectedStudent }">
               <div class="student-board-container">
                 <div class="student-board-header">
