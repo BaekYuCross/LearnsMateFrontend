@@ -512,7 +512,7 @@ onMounted(() => {
 }
 
 .issue-coupon-board-row.selected {
-  background-color: #f4f4f4;
+  background-color: #E2E8F0;
 }
 
 .issue-coupon-board-row > div {
