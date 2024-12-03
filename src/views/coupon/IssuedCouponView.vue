@@ -1,417 +1,478 @@
 <template>
+  <div class="issue-coupon-container">
     <MarketingSideMenu />
-    <div class="issued-coupon-main-container"
-    @click="deselectCoupon">
+    <div class="issue-coupon-content-container" @click="deselectCoupon">
       <IssuedCouponFilter @search="applyFilters" @reset="resetFilters"/>
-      <div class="issued-coupon-content-container"
-      @click.stop>
-        <div class="issued-coupon-table-container" :class="{ 'shrink': selectedCoupon }">
-          <!-- 전체 쿠폰 개수 -->
-          <div class="issued-coupon-table-top">
-            <div class="issued-coupon-count">
-              등록된 쿠폰 <span class="issued-coupon-length">{{ issuedCoupon.length }}</span>개
-            </div>
-            <div class="issued-coupon-count-right">
-              <button class="issued-coupon-register-button">쿠폰 등록</button>
-            </div>
-          </div>
-          <!-- 조회 데이터 테이블 -->
-          <div class="issued-coupon-table-wrapper">
-            <table class="issued-coupon-table">
-              <thead class="issued-coupon-table-header">
-                <tr>
-                  <th>발급 쿠폰 번호</th>
-                  <th>쿠폰 이름</th>
-                  <th>쿠폰 내용</th>
-                  <th>쿠폰 종류</th>
-                  <th>고객 코드</th>
-                  <th>고객명</th>
-                  <th>사용 여부</th>
-                  <th>할인율</th>
-                  <th>시작일</th>
-                  <th>만료일</th>
-                  <th>발급일</th>
-                  <th>사용일</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  class="issued-coupon-table-row"
-                  v-for="(issuedCoupon, index) in paginatedCoupons || []"
-                  :key="issuedCoupon.coupon_issuance_code"
-                  @click="selectCoupon(issuedCoupon)"
-                >
-                  <td>{{ issuedCoupon.coupon_issuance_code }}</td>
-                  <td>{{ issuedCoupon.coupon_name }}</td>
-                  <td>{{ issuedCoupon.coupon_contents }}</td>
-                  <td>{{ issuedCoupon.coupon_category_name }}</td>
-                  <td>{{ issuedCoupon.student_code }}</td>
-                  <td>{{ issuedCoupon.student_name }}</td>
-                  <td>{{ issuedCoupon.coupon_use_status ? 'O' : 'X' }}</td>
-                  <td>{{ issuedCoupon.coupon_discount_rate }}</td>
-                  <td>{{ formatDate(issuedCoupon.coupon_start_date) }}</td>
-                  <td>{{ formatDate(issuedCoupon.coupon_expire_date) }}</td>
-                  <td>{{ formatDate(issuedCoupon.coupon_issue_date) }}</td>
-                  <td>{{ formatDate(issuedCoupon.coupon_use_date) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- 페이지네이션 -->
-          <div class="pagination">
-            <button
-              class="page-button prev-button"
-              @click="changePage(currentPage - 1)"
-              :disabled="currentPage === 1"
-            >
-              ◀이전
-            </button>
-            <span v-for="page in totalPages" :key="page" class="page-number">
-              <button
-                class="page-button"
-                :class="{ active: currentPage === page }"
-                @click="changePage(page)"
-              >
-                {{ page }}
-              </button>
-            </span>
-            <button
-              class="page-button next-button"
-              @click="changePage(currentPage + 1)"
-              :disabled="currentPage === totalPages"
-            >
-              다음▶
-            </button>
-          </div>
-        </div>
-        <!-- 쿠폰 단건 조회 -->
-        <div class="issued-coupon-detail-container" v-if="selectedCoupon">
-          <IssuedCouponDetail :selectedCoupon="selectedCoupon"
-          :token="token"/>
+      <div class="issue-coupon-actions">
+        <div class="issue-coupon-count">발행된 쿠폰 <span class="issue-coupon-length">{{ totalCount }}</span>개</div>
+        <div class="issue-coupon-button-group">
+          <button class="issue-coupon-excel-button" @click="handleExcelDownload">
+            <img src="@/assets/icons/download.svg" alt="다운로드">
+            엑셀 다운로드
+          </button>
         </div>
       </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import axios from 'axios';
-  import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
-  import IssuedCouponFilter from '@/components/marketing/IssuedCouponFilter.vue';
-  import IssuedCouponDetail from '@/components/marketing/IssuedCouponDetail.vue';
-  
-  const issuedCoupon = ref([]);
-  const selectedCoupon = ref(null);
-  const currentPage = ref(1);
-  const pageSize = 15;
-  const token = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMDIwMDUwMDMiLCJlbWFpbCI6IjY5NDA5MEBnbWFpbC5jb20iLCJuYW1lIjoi7J207ISc7ZiEIiwicm9sZXMiOlsiUk9MRV9BRE1JTiJdLCJpYXQiOjE3MzIxNTEzNzYsImV4cCI6MTc3NTM1MTM3Nn0.09oguvlZSs2ZX3WuZtjt8cATCF7uxYv1Jv7bphGSJd_UZqN97cHG0RRU_5CFGVNONJLRf-x-QtBpIEAi2R2ZgQ';
-  // 전체 페이지 계산
-  // const totalPages = computed(() => Math.ceil(coupon.length / pageSize));
-  const totalPages = computed(() => {
-    if (Array.isArray(issuedCoupon.value)) {
-      return Math.ceil(issuedCoupon.value.length / pageSize);
-    }
-    return 1; // 기본값 1로 반환
-  });
-  
-  // 페이지별로 보여줄 쿠폰 계산
-  // const paginatedCoupons = computed(() =>
-  //   coupon.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-  // );
-  const paginatedCoupons = computed(() => {
-    if (Array.isArray(issuedCoupon.value)) {
-      return issuedCoupon.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize);
-    }
-    return []; // 배열이 아닌 경우 빈 배열 반환
-  });
-  
-  
-  // 페이지 변경
-  const changePage = (page) => {
-    if (page > 0 && page <= totalPages.value) {
-      currentPage.value = page;
-    }
-  };
-  
-  // 선택된 쿠폰 설정
-  const selectCoupon = (couponData) => {
-    selectedCoupon.value = couponData;
-  };
-  
-  // 선택 해제
-  const deselectCoupon = () => {
-    selectedCoupon.value = null;
-  };
-  
-  const fetchIssuedCoupons = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/issue-coupon/all-issued-coupons'); // API 호출
-      console.log('Fetched data:', response.data); // 응답 데이터 확인
-  
-      // 응답 데이터가 배열인지 확인하고 처리
-      if (Array.isArray(response.data)) {
-        issuedCoupon.value = response.data; // 응답 데이터가 배열일 경우 그대로 사용
-      } else {
-        console.error('Error: Unexpected API response format');
-        issuedCoupon.value = []; // 배열이 아닌 경우 빈 배열로 초기화
-      }
-    } catch (error) {
-      console.error('Error fetching coupons:', error);
-      issuedCoupon.value = []; // 오류 발생 시 빈 배열로 초기화
-    }
-  };
-  
-  const applyFilters = async (filters) => {
-    try {
+      <div class="issue-coupon-content-body">
+        <div class="issue-coupon-board-container" :class="{ 'single-view': isSingleView }">
+          <div class="issue-coupon-board-header">
+            <div class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
+            <div class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
+            <div class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
+            <div class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
+            <div class="issue-coupon-board-header-student-code">고객 코드</div>
+            <div class="issue-coupon-board-header-student-name">고객명</div>
+            <div class="issue-coupon-board-header-use-status">사용 여부</div>
+            <div class="issue-coupon-board-header-discount-rate">할인율</div>
+            <div class="issue-coupon-board-header-start-date">시작일</div> 
+            <div class="issue-coupon-board-header-expire-date">만료일</div>
+            <div class="issue-coupon-board-header-issue-date">발급일</div>
+            <div class="issue-coupon-board-header-use-date">사용일</div>
+          </div>
 
-      const response = await axios.post('http://localhost:5000/issue-coupon/filters', camelToSnake(filters),
+          <div class="issue-coupon-board-body">
+            <div 
+              class="issue-coupon-board-row" 
+              v-for="coupon in coupons" 
+              :key="coupon.coupon_issuance_code" 
+              @click.stop="showIssueCouponDetail(coupon)"
+              :class="{'selected': selectedCoupon?.coupon_issuance_code === coupon.coupon_issuance_code }"
+            >
+              <div class="issue-coupon-board-row-issuance-code">{{ coupon.coupon_issuance_code }}</div>
+              <div class="issue-coupon-board-row-coupon-name">{{ coupon.coupon_name }}</div>
+              <div class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
+              <div class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
+              <div class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
+              <div class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
+              <div class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
+              <div class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
+              <div class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
+              <div class="issue-coupon-board-row-expire-date">{{ formatDate(coupon.coupon_expire_date) }}</div>
+              <div class="issue-coupon-board-row-issue-date">{{ formatDate(coupon.coupon_issue_date) }}</div>
+              <div class="issue-coupon-board-row-use-date">{{ formatDate(coupon.coupon_use_date) }}</div>
+            </div>
+          </div>
+
+          <div class="issue-coupon-pagination">
+            <button 
+              class="issue-coupon-page-button issue-coupon-prev-button" 
+              @click="changePage(currentPage - 1)" 
+              :disabled="currentPage === 1"
+            >◀</button>
+            <button 
+              class="issue-coupon-page-button" 
+              :class="{ active: currentPage === 1 }" 
+              @click="changePage(1)"
+            >1</button>
+            <span v-if="startPage > 2">...</span>
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== 1 && page !== totalPages" 
+                class="issue-coupon-page-button" 
+                :class="{ active: currentPage === page }" 
+                @click="changePage(page)"
+              >{{ page }}</button>
+            </template>
+            <span v-if="endPage < totalPages - 1">...</span>
+            <button 
+              v-if="totalPages > 1" 
+              class="issue-coupon-page-button" 
+              :class="{ active: currentPage === totalPages }" 
+              @click="changePage(totalPages)"
+            >{{ totalPages }}</button>
+            <button 
+              class="issue-coupon-page-button issue-coupon-next-button" 
+              @click="changePage(currentPage + 1)" 
+              :disabled="currentPage === totalPages"
+            >▶</button>
+          </div>
+        </div>
+
+        <IssuedCouponDetail 
+          v-if="selectedCoupon" 
+          :selectedCoupon="selectedCoupon"
+          @close="closeIssueCouponDetail"
+          :class="{ active: isSingleView }"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
+import { saveAs } from 'file-saver';
+import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
+import IssuedCouponFilter from '@/components/marketing/IssuedCouponFilter.vue';
+import IssuedCouponDetail from '@/components/marketing/IssuedCouponDetail.vue';
+
+const currentPage = ref(1);
+const totalPages = ref(1);
+const pageSize = 50;
+const totalCount = ref(0);
+const isFiltered = ref(false);
+const lastFilterData = ref(null);
+const selectedCoupon = ref(null);
+const isSingleView = ref(false);
+const coupons = ref([]);
+
+const fetchIssueCouponList = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/issue-coupon/all-issued-coupons2',
       {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
+        withCredentials: true,
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
         }
       }
-      );
-      console.log(filters);
-      issuedCoupon.value = response.data;
-      currentPage.value = 1;
-    } catch (error) {
-      console.error('Error fetching filtered coupons:', error);
-    }
-  };
-  
-  const resetFilters = () => {
-    fetchIssuedCoupons();
+    );
+
+    coupons.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+
+    console.log("발급쿠폰 데이터:",coupons.value);
+  } catch(error) {
+    console.error('IssueCoupon 목록을 불러오는데 실패했습니다:', error);
+  }
+};
+
+const applyFilters = async (filterData) => {
+  try {
+    isFiltered.value = true;
     currentPage.value = 1;
+    lastFilterData.value = filterData;
+
+    const response = await axios.post(
+      `http://localhost:5000/issue-coupon/filters2?page=0&size=${pageSize}`,
+      camelToSnake(filterData)
+    );
+
+    coupons.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    console.error('필터링 중 오류 발생:', error);
   }
-  
-  const camelToSnake = (obj) => {
-    if (!obj || typeof obj !== 'object') return obj;
-    if (Array.isArray(obj)) return obj.map(camelToSnake);
-    return Object.keys(obj).reduce((acc, key) => {
-      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-      acc[snakeKey] = camelToSnake(obj[key]);
-      return acc;
-    }, {});
-  };
-  
-  // 컴포넌트가 로드될 때 데이터 가져오기
-  onMounted(() => {
-    fetchIssuedCoupons(); // 처음 로드 시 쿠폰 데이터를 가져옴
-  });
-  
-  const formatDate = (isoDate) => {
-    if (!isoDate) return '-';
-    const date = new Date(isoDate);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
+};
+
+const resetFilters = async () => {
+  try {
+    isFiltered.value = false;
+    lastFilterData.value = null;
+    currentPage.value = 1;
+    await fetchIssueCouponList();
+    selectedCoupon.value = null;
+  } catch (error) {
+    console.error('리셋 중 오류 발생:', error);
+  }
+};
+
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+
+  try {
+    currentPage.value = newPage;
+
+    if (isFiltered.value && lastFilterData.value) {
+      const response = await axios.post(
+        `http://localhost:5000/issue-coupon/filters2?page=${currentPage.value - 1}&size=${pageSize}`,
+        camelToSnake(lastFilterData.value)
+      );
+
+      coupons.value = response.data.content;
+      totalCount.value = response.data.totalElements;
+      totalPages.value = response.data.totalPages;
+    } else {
+      await fetchIssueCouponList();
+    }
+  } catch (error) {
+    console.error('페이지 변경 중 오류 발생:', error);
+  }
+};
+
+const handleExcelDownload = async () => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/issue-coupon/excel/download',
+      isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
+      {
+        responseType: 'blob',
+      }
+    );
+
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
-  };
+
+    saveAs(blob, 'issue_coupon_data.xlsx');
+  } catch (error) {
+    console.error('엑셀 다운로드 중 오류 발생:', error);
+  }
+};
+
+const showIssueCouponDetail = (coupon) => {
+  if (selectedCoupon.value?.coupon_issuance_code === coupon.coupon_issuance_code) {
+    closeIssueCouponDetail();
+  } else {
+    selectedCoupon.value = coupon;  // 이미 가지고 있는 데이터 사용
+    showSingleView();
+  }
+};
+
+const closeIssueCouponDetail = () => {
+  selectedCoupon.value = null;
+  hideSingleView();
+};
+
+const showSingleView = () => {
+  isSingleView.value = true;
+};
+
+const hideSingleView = () => {
+  isSingleView.value = false;
+};
+
+const deselectCoupon = (event) => {
+  if (event.target.classList.contains('issue-coupon-content-container')) {
+    closeIssueCouponDetail();
+  }
+};
+
+const camelToSnake = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(camelToSnake);
+  return Object.keys(obj).reduce((acc, key) => {
+    const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    acc[snakeKey] = camelToSnake(obj[key]);
+    return acc;
+  }, {});
+};
+
+const formatDate = (isoDate) => {
+  if (!isoDate) return '-';
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+};
+
+const displayedPages = computed(() => {
+  let start = Math.max(currentPage.value - 2, 2);
+  let end = Math.min(start + 2, totalPages.value - 1);
   
-  </script>
-  
-  <style>
-  .issued-coupon-main-container {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
+  if (end === totalPages.value - 1) {
+    start = Math.max(end - 2, 2);
   }
   
-  .issued-coupon-content-container {
-    display: flex;
-    flex-grow: 1;
-    margin-left: 160px;
-    margin-top: 10px;
+  let pages = [];
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
   }
-  
-  .issued-coupon-count {
-    font-size: 17px;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .issued-coupon-table {
-    width: 100%;
-    min-width: 1200px;
-    table-layout: fixed;
-    border-collapse: collapse;
-    background-color: #ffffff;
-  }
-  
-  .issued-coupon-table th {
-    background-color: #f9f9f9;
-    font-size: 13px;
-    font-weight: bold;
-    color: #595656;
-  }
-  
-  .issued-coupon-table td {
-    border-bottom: 1px solid #eaeaea;
-    font-size: 11px;
-    color: #333333;
-  }
-  
-  .issued-coupon-table th,
-  .issued-coupon-table td {
-    padding: 10px 20px;
-    text-align: center;
-  }
-  
-  .issued-coupon-table-row:hover {
-    cursor: pointer;
-    background-color: #f4f4f4;
-  }
-  
-  .issued-coupon-table-container {
-    flex: 1;
-    transition: flex 0.3s ease;
-    overflow-x: hidden;
-  }
-  
-  .issued-coupon-table-container.shrink {
-    flex: 0.5;
-  }
-  
-  .issued-coupon-table-wrapper {
-    overflow-x: auto;
-    flex: 1;
-  }
-  
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  .page-button {
-    background: none;
-    border: none;
-    color: #333;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  
-  .page-button.active {
-    font-weight: bold;
-  }
-  
-  .page-button:disabled {
-    color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  .issued-coupon-detail-container {
-    flex: 0.5;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    transition: flex 0.3s ease;
-    margin-left: 10px;
-  }
-  
-  .issued-coupon-detail-container .close-button {
-    background-color: #ff6666;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .issued-coupon-detail-container .close-button:hover {
-    background-color: #cc0000;
-  }
-  
-  .issued-coupon-register-button {
-    background-color: #005950;
-      color: #ffffff;
-      border: none;
-      border-radius: 5px;
-      margin-left: 20px;
-      padding: 5px 10px;
-  }
-  
-  .issued-coupon-register-button:hover {
-    cursor: pointer;
-    background-color: #004c42;
-  }
-  
-  .issued-coupon-table-top {
-    display: flex;
-    justify-content:space-between;
-    padding: 0px 10px;
-  }
-  
-  /* 발급 쿠폰 번호 */
-  .issued-coupon-table th:nth-child(1),
-  .issued-coupon-table td:nth-child(1) {
-    width: 170px;
-  }
-  
-  /* 쿠폰 이름 */
-  .issued-coupon-table th:nth-child(2),
-  .issued-coupon-table td:nth-child(2) {
-    width: 150px;
-  }
-  
-  /* 쿠폰 종류 */
-  .issued-coupon-table th:nth-child(3),
-  .issued-coupon-table td:nth-child(3) {
-    width: 250px;
-  }
-  
-  /* 고객 코드 */
-  .issued-coupon-table th:nth-child(4),
-  .issued-coupon-table td:nth-child(4) {
-    width: 100px;
-  }
-  
-  /* 고객명 */
-  .issued-coupon-table th:nth-child(5),
-  .issued-coupon-table td:nth-child(5) {
-    width: 100px;
-  }
-  
-  /* 사용 여부 */
-  .issued-coupon-table th:nth-child(6),
-  .issued-coupon-table td:nth-child(6) {
-    width: 80px;
-  }
-  
-  /* 할인율 */
-  .issued-coupon-table th:nth-child(7),
-  .issued-coupon-table td:nth-child(7) {
-    width: 80px;
-  }
-  
-  /* 시작일 */
-  .issued-coupon-table th:nth-child(8),
-  .issued-coupon-table td:nth-child(8) {
-    width: 120px;
-  }
-  
-  /* 만료일 */
-  .issued-coupon-table th:nth-child(9),
-  .issued-coupon-table td:nth-child(9) {
-    width: 120px;
-  }
-  
-  /* 생성일 */
-  .issued-coupon-table th:nth-child(10),
-  .issued-coupon-table td:nth-child(10) {
-    width: 120px;
-  }
-  
-  /* 사용일 */
-  .issued-coupon-table th:nth-child(11),
-  .issued-coupon-table td:nth-child(11) {
-    width: 120px;
-  }
-  </style>
-  
+  return pages;
+});
+
+const startPage = computed(() => {
+  return displayedPages.value[0];
+});
+
+const endPage = computed(() => {
+  return displayedPages.value[displayedPages.value.length - 1];
+});
+
+onMounted(() => {
+  fetchIssueCouponList();
+});
+</script>
+
+<style scoped>
+.issue-coupon-container {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.issue-coupon-content-container {
+  flex: 1;
+  padding: 20px;
+  margin-left: 160px;
+  margin-top: 50px;
+}
+
+.issue-coupon-content-body {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  width: 100%;
+}
+
+.issue-coupon-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.issue-coupon-count {
+  flex: 1;
+  font-size: 17px;
+  font-weight: bold;
+  color: #333;
+}
+
+.issue-coupon-length {
+  color: #005950;
+}
+
+.issue-coupon-button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.issue-coupon-excel-button {
+  background: #005950;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 3px;
+}
+
+.issue-coupon-excel-button img {
+  width: 16px;
+  height: 16px;
+}
+
+.issue-coupon-board-container {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 570px;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.issue-coupon-board-header {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  padding: 7px 14px;
+  background-color: #f9f9f9;
+  font-size: 12px;
+  font-weight: bold;
+  color: #595656;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.issue-coupon-board-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100% - 35px);
+}
+
+.issue-coupon-board-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  padding: 10px 15px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 11px;
+  color: #333333;
+  text-align: center;
+  align-items: center;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.issue-coupon-board-row:hover {
+  background-color: #f4f4f4;
+}
+
+.issue-coupon-board-row.selected {
+  background-color: #f4f4f4;
+}
+
+.issue-coupon-board-row > div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 5px;
+}
+
+.issue-coupon-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.issue-coupon-page-button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.issue-coupon-page-button.active {
+  font-weight: bold;
+  color: #005950;
+}
+
+.issue-coupon-page-button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.issue-coupon-prev-button,
+.issue-coupon-next-button {
+  color: #005950;
+}
+
+.issue-coupon-excel-button img {
+  width: 16px;
+  height: 16px;
+}
+
+.issue-coupon-pagination span {
+  color: #666;
+  margin: 0 5px;
+}
+
+.issue-coupon-board-container.single-view {
+  flex: 0.7;
+}
+
+.issue-coupon-detail-container {
+  flex: 0;
+}
+
+.issue-coupon-detail-container.active {
+  flex: 0.3;
+}
+
+.issue-coupon-excel-button:hover {
+  background-color: #004c42;
+}
+</style>
