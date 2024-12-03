@@ -261,7 +261,7 @@
   }
   
   .payment-modal-header h2 {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     color: #333;
   }
@@ -308,7 +308,7 @@
   }
   
   .payment-filter-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
   }
@@ -326,6 +326,7 @@
   }
   
   .payment-year-input {
+    outline: none;
     width: 80px;
   }
   
@@ -379,6 +380,7 @@
     background: none;
     border: none;
     font-size: 30px;
+    margin-bottom: 10px;
     cursor: pointer;
     color: #999;
   }
