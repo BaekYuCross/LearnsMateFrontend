@@ -120,13 +120,14 @@
 .voc-board-row {
   display: grid;
   grid-template-columns: 0.8fr 1.8fr 0.7fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr;
-  padding: 10px 15px;
+  padding: 7px 14px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
   color: #333333;
   text-align: center;
   align-items: center;
   background-color: #ffffff;
+  cursor: pointer;
 }
 
 .voc-board-row:hover {
