@@ -1,12 +1,12 @@
 <template>
   <div class="layout-container">
     <div class="side-menu"><MemberSideMenu/></div>
-    <div class="main-content">
-      <MemberFilter 
-        type="student" 
-        @search="handleSearch" 
-        @reset="handleReset"
-      />
+      <div class="main-content">
+        <MemberFilter 
+          type="student" 
+          @search="handleSearch" 
+          @reset="handleReset"
+        />
           <div class="student-header-container" >
             <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
             <div class="button-group">
@@ -28,9 +28,6 @@
                 </div>
               </div>
               <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
-              <button class="excel-button" @click="$refs.fileInput.click()">
-                <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
-              </button>
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
@@ -39,6 +36,8 @@
               </button>
             </div>
           </div>
+
+
           <div class="content-section" :class="{ 'with-detail': selectedStudent }">
             <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-board-container">
@@ -85,16 +84,16 @@
                   {{ student.memberBirth }}
                 </div>
                 <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
-    backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
-    color: student.memberFlag ? '#166534' : '#991b1b', }">
+                  backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
+                  color: student.memberFlag ? '#166534' : '#991b1b', }">
                   {{ student.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
                   {{ student.createdAt }}
                 </div>
                 <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
-    backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
-    color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
+                  backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+                  color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
                   {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
                 </div>
               </div>
@@ -133,8 +132,11 @@
         </div>
 
         <div v-if="selectedStudent && studentDetail" class="detail-container">
-          <div class="detail-content">
+          <div class="detail-header">
             <h3>상세 정보</h3>
+            <button class="close-button" @click="closeStudentDetail">×</button>
+          </div>
+          <div class="detail-content">
               <div class="info-grid">
                 <div class="info-row">
                   <span class="label">이름</span>
@@ -472,41 +474,6 @@ const handleSearch = async (filterData) => {
   lastFilterData.value = filterData;
   currentPage.value = 1;
   await fetchFilteredStudents();
-};
-
-
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  try {
-    await axios.post('http://localhost:5000/member/excel/upload/student',formData, {
-      withCredentials: true,  
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    // 업로드 성공 후 목록 새로고침
-    await fetchStudents();
-    alert('엑셀 파일이 성공적으로 업로드되었습니다.');
-  } catch (error) {
-    console.error('엑셀 업로드 중 오류가 발생했습니다:', error);
-    if (error.response) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        console.error('상세 에러:', reader.result);
-      };
-      reader.readAsText(error.response.data);
-    }
-    alert('엑셀 업로드에 실패했습니다.');
-  } finally {
-    // input 초기화 (같은 파일 재선택 가능하도록)
-    event.target.value = '';
-  }
 };
 
 const handleExcelDownload = async() => {
