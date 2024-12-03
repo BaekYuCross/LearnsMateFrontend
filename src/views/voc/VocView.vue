@@ -235,6 +235,13 @@
               <button
                 v-if="isEditingAnswer"
                 class="voc-answer-complete-button"
+                @click="cancelEditing"
+              >
+                취소
+              </button>
+              <button
+                v-if="isEditingAnswer"
+                class="voc-answer-complete-button"
                 @click="confirmAction"
               >
                 완료
@@ -439,6 +446,10 @@ const translateMemberType = (type) => {
   }
 };
 
+const cancelEditing = () => {
+  isEditingAnswer.value = false;  
+  editAnswerContent.value = selectedVOC.value.voc_answer_content; 
+};
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
@@ -509,11 +520,16 @@ const startRegisteringAnswer = () => {
   editAnswerContent.value = '';
 };
 
+
 const confirmAction = () => {
   if (!editAnswerContent.value.trim()) {
     alert('답변 내용을 입력해주세요.');
     return;
   }
+
+
+
+
 
   if (!selectedVOC.value.voc_answer_code) {
     isRegisterModalOpen.value = true;
