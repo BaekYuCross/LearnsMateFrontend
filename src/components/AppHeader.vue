@@ -25,8 +25,9 @@
           <span :class="{ 'timer': true, 'expired': remainingTime === '만료됨' }">
             {{ remainingTime }}
           </span>
+
           <!-- Vue 방식으로 수정 -->
-          <button id="extend-btn" @click="handleRefreshToken">연장</button>
+          <button class="extend-btn" @click="refreshToken">연장</button>
         </div>
         <div class="user-info">
           [{{ loginState.adminTeam }}] 
@@ -66,6 +67,16 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
+// 만료 시간을 배열로 변환하는 함수
+function parseExpirationToArray(exp) {
+  const [date, time] = exp.split(' '); // 날짜와 시간을 분리
+  const [year, month, day] = date.split('-').map(Number); // 연, 월, 일을 숫자로 변환
+  const [hour, minute, second] = time.split(':').map(Number); // 시, 분, 초를 숫자로 변환
+  return [year, month, day, hour, minute, second]; // 배열 형식으로 반환
+}
+
+
+
 // 남은 시간을 계산하는 함수
 const calculateRemainingTime = () => {
   if (!loginState.exp || !Array.isArray(loginState.exp)) return '';
@@ -78,6 +89,7 @@ const calculateRemainingTime = () => {
   
   if (diffInSeconds <= 0) {
     clearInterval(timer.value);
+    Logout();
     return '만료됨';
   }
   
@@ -101,13 +113,6 @@ const currentGroup = computed(() => {
   });
   return matchedMenu ? matchedMenu.group : null;
 });
-
-
-
-// 버튼 클릭 시 토큰 갱신
-const handleRefreshToken = async () => {
-  await loginState.refreshToken();
-};
 
 
 // 로그아웃 처리
@@ -156,6 +161,7 @@ onUnmounted(() => {
     clearInterval(timer.value);
   }
 });
+
 </script>
 
   <style scoped>
@@ -265,7 +271,8 @@ onUnmounted(() => {
 }
 
 
-#extend-btn {
+.extend-btn {
+  pointer-events: auto;
   padding: 5px 7px;
   font-size: 11px;
   font-weight: bold;
@@ -273,13 +280,11 @@ onUnmounted(() => {
   background-color: #005950;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
+  cursor: pointer !important; 
   transition: background-color 0.3s;
 }
 
-#extend-btn:hover {
-  background-color: #005950;
-}
+
 
 .highlight {
   color: #005950; 
