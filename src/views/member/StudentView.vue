@@ -1,46 +1,39 @@
 <template>
   <div class="layout-container">
-    <div class="side-menu"><MemberSideMenu/></div>
+    <div class="side-menu">
+      <MemberSideMenu />
+    </div>
     <div class="main-content">
-      <MemberFilter 
-        type="student" 
-        @search="handleSearch" 
-        @reset="handleReset"
-      />
-          <div class="student-header-container" >
-            <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
-            <div class="button-group">
-              <div class="column-selector">
-                <button @click="toggleDropdown" class="dropdown-button">
-                  필요 컬럼 선택 ▼
-                </button>
-                <div v-show="isDropdownOpen" class="dropdown-menu">
-                  <div v-for="(label, key) in columns" :key="key" class="dropdown-item">
-                    <input 
-                      type="checkbox"   
-                      :value="key" 
-                      v-model="selectedColumns" 
-                      @change="updateSelectedColumns" 
-                      :id="key"
-                    />
-                    <label :for="key">{{ label }}</label>
-                  </div>
-                </div>
+      <MemberFilter type="student" @search="handleSearch" @reset="handleReset" />
+      <div class="student-header-container">
+        <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
+        <div class="button-group">
+          <div class="column-selector">
+            <button @click="toggleDropdown" class="dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="dropdown-item">
+                <input type="checkbox" :value="key" v-model="selectedColumns" @change="updateSelectedColumns"
+                  :id="key" />
+                <label :for="key">{{ label }}</label>
               </div>
-              <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
-              <button class="excel-button" @click="$refs.fileInput.click()">
-                <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
-              </button>
-              <button class="excel-button" @click="handleExcelDownload">
-                <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
-              </button>
-              <button class="excel-button" @click="showCategoryModal = true" style="font-size: 13.5px;">
-                카테고리 비율
-              </button>
             </div>
           </div>
-          <div class="content-section" :class="{ 'with-detail': selectedStudent }">
-            <div class="table-container" :class="{ 'shrink': selectedStudent }">
+          <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none" />
+          <button class="excel-button" @click="$refs.fileInput.click()">
+            <img src="/src/assets/icons/upload.svg" alt="">엑셀 업로드
+          </button>
+          <button class="excel-button" @click="handleExcelDownload">
+            <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
+          </button>
+          <button class="excel-button" @click="showCategoryModal = true" style="font-size: 13.5px;">
+            카테고리 비율
+          </button>
+        </div>
+      </div>
+      <div class="content-section" :class="{ 'with-detail': selectedStudent }">
+        <div class="table-container" :class="{ 'shrink': selectedStudent }">
           <div class="student-board-container">
             <div class="student-board-header">
               <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
@@ -52,17 +45,14 @@
               <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
               <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
               <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
-              <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
+              <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태
+              </div>
             </div>
 
             <div class="student-board-body">
-              <div 
-                class="student-board-row" 
-                v-for="(student, index) in students" 
-                :key="student.memberCode"
+              <div class="student-board-row" v-for="(student, index) in students" :key="student.memberCode"
                 @click="showDetail(student)"
-                :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
-              >
+                :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }">
                 <div v-if="selectedColumns.includes('memberCode')" class="student-board-row-code">
                   {{ student.memberCode }}
                 </div>
@@ -85,16 +75,18 @@
                   {{ student.memberBirth }}
                 </div>
                 <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
-    backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
-    color: student.memberFlag ? '#166534' : '#991b1b', }">
+                  backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
+                  color: student.memberFlag ? '#166534' : '#991b1b',
+                }">
                   {{ student.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
                   {{ student.createdAt }}
                 </div>
                 <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
-    backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
-    color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
+                  backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+                  color: student.memberDormantStatus ? '#991b1b' : '#166534'
+                }">
                   {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
                 </div>
               </div>
@@ -102,31 +94,19 @@
           </div>
 
           <div class="pagination">
-            <button 
-              class="page-button prev-button" 
-              @click="changePage(currentPage - 1)" 
-              :disabled="currentPage === 1"
-            >
+            <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">
               ◀
             </button>
-            
+
             <template v-for="page in displayedPages" :key="page">
               <span v-if="page === '...'" class="page-dots">...</span>
-              <button 
-                v-else
-                class="page-button" 
-                :class="{ active: currentPage === page }" 
-                @click="changePage(page)"
-              >
+              <button v-else class="page-button" :class="{ active: currentPage === page }" @click="changePage(page)">
                 {{ page }}
               </button>
             </template>
-            
-            <button 
-              class="page-button next-button"
-              @click="changePage(currentPage + 1)" 
-              :disabled="currentPage === totalPages"
-            >
+
+            <button class="page-button next-button" @click="changePage(currentPage + 1)"
+              :disabled="currentPage === totalPages">
               ▶
             </button>
           </div>
@@ -135,50 +115,46 @@
         <div v-if="selectedStudent && studentDetail" class="detail-container">
           <div class="detail-content">
             <h3>상세 정보</h3>
-              <div class="info-grid">
-                <div class="info-row">
-                  <span class="label">이름</span>
-                  <span>{{ studentDetail.memberDto.memberName }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">이메일</span>
-                  <span>{{ studentDetail.memberDto.memberEmail }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">연락처</span>
-                  <span>{{ studentDetail.memberDto.memberPhone }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">생년월일</span>
-                  <span>{{ studentDetail.memberDto.memberBirth }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">주소</span>
-                  <span>{{ studentDetail.memberDto.memberAddress }}</span>
-                </div>
+            <div class="info-grid">
+              <div class="info-row">
+                <span class="label">이름</span>
+                <span>{{ studentDetail.memberDto.memberName }}</span>
               </div>
+              <div class="info-row">
+                <span class="label">이메일</span>
+                <span>{{ studentDetail.memberDto.memberEmail }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">연락처</span>
+                <span>{{ studentDetail.memberDto.memberPhone }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">생년월일</span>
+                <span>{{ studentDetail.memberDto.memberBirth }}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">주소</span>
+                <span>{{ studentDetail.memberDto.memberAddress }}</span>
+              </div>
+            </div>
 
 
             <!-- 수강 진행 현황 -->
             <div class="course-section">
               <div class="course-header">
                 <h4>수강 진행 현황 ({{ studentDetail?.lectureVideoProgressDtolist?.length || 0 }})
-                <button class="course-toggle-button" @click="toggleCourseSection">
-                  {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
-                </button></h4>
+                  <button class="course-toggle-button" @click="toggleCourseSection">
+                    {{ isCourseSectionVisible ? '&#9650;' : '&#9660;' }}
+                  </button>
+                </h4>
               </div>
               <div v-if="isCourseSectionVisible" class="course-list">
-                <div
-                  v-for="lecture in studentDetail.lectureVideoProgressDtolist"
-                  :key="lecture.lectureCode"
-                  class="course-item"
-                >
+                <div v-for="lecture in studentDetail.lectureVideoProgressDtolist" :key="lecture.lectureCode"
+                  class="course-item">
                   <div class="course-title">{{ lecture.lectureTitle }}</div>
                   <div class="progress-bar">
-                    <div
-                      class="progress"
-                      :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
-                    ></div>
+                    <div class="progress"
+                      :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"></div>
                   </div>
                   <div class="progress-text">
                     {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
@@ -187,20 +163,18 @@
                 </div>
               </div>
             </div>
-          <!-- 추천 강의 섹션 -->
-          <div class="recommended-section">
+            <!-- 추천 강의 섹션 -->
+            <div class="recommended-section">
               <div class="recommended-header">
                 <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
-                <button class="recommended-toggle-button" @click="toggleRecommendedSection">
-                  {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
-                </button></h4>
+                  <button class="recommended-toggle-button" @click="toggleRecommendedSection">
+                    {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
+                  </button>
+                </h4>
               </div>
               <div v-if="isRecommendedSectionVisible" class="recommended-list">
-                <div
-                  v-for="lecture in studentDetail.recommendedLectureList"
-                  :key="lecture.lectureCode"
-                  class="recommended-item"
-                >
+                <div v-for="lecture in studentDetail.recommendedLectureList" :key="lecture.lectureCode"
+                  class="recommended-item">
                   <div class="recommended-content">
                     <div class="lecture-header">
                       <span class="lecture-title">{{ lecture.lectureTitle }}</span>
@@ -234,9 +208,8 @@
                 <div class="unused-coupons">
                   <h5>미사용 쿠폰 ({{ studentDetail.unusedCouponsList?.length || 0 }})</h5>
                   <div class="coupon-grid">
-                    <div v-for="coupon in studentDetail.unusedCouponsList" 
-                        :key="coupon.couponIssuanceCode" 
-                        class="coupon-item">
+                    <div v-for="coupon in studentDetail.unusedCouponsList" :key="coupon.couponIssuanceCode"
+                      class="coupon-item">
                       <div class="coupon-detail">
                         <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
                         <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
@@ -251,9 +224,8 @@
                 <div class="used-coupons">
                   <h5>사용완료 쿠폰 ({{ studentDetail.usedCouponsList?.length || 0 }})</h5>
                   <div class="coupon-grid">
-                    <div v-for="coupon in studentDetail.usedCouponsList" 
-                        :key="coupon.couponIssuanceCode" 
-                        class="coupon-item">
+                    <div v-for="coupon in studentDetail.usedCouponsList" :key="coupon.couponIssuanceCode"
+                      class="coupon-item">
                       <div class="coupon-detail">
                         <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
                         <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
@@ -275,9 +247,7 @@
                 <div class="unanswered">
                   <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})</h5>
                   <div class="voc-grid">
-                    <div v-for="voc in studentDetail.unansweredVocbyMemberList" 
-                        :key="voc.vocCode" 
-                        class="voc-item">
+                    <div v-for="voc in studentDetail.unansweredVocbyMemberList" :key="voc.vocCode" class="voc-item">
                       <div class="voc-detail">
                         <div class="voc-header">
                           <span>문의 코드: {{ voc.vocCode }}</span>
@@ -300,9 +270,7 @@
                 <div class="answered">
                   <h5>답변완료 문의 ({{ studentDetail.answeredVocbyMemberList?.length || 0 }})</h5>
                   <div class="voc-grid">
-                    <div v-for="voc in studentDetail.answeredVocbyMemberList" 
-                        :key="voc.vocCode" 
-                        class="voc-item">
+                    <div v-for="voc in studentDetail.answeredVocbyMemberList" :key="voc.vocCode" class="voc-item">
                       <div class="voc-detail">
                         <div class="voc-header">
                           <span>문의 코드: {{ voc.vocCode }}</span>
@@ -326,11 +294,8 @@
         </div>
       </div>
     </div>
-    <CategoryRatioModal 
-        :is-open="showCategoryModal" 
-        @close="showCategoryModal = false" 
-      />
-  </div>  
+    <CategoryRatioModal :is-open="showCategoryModal" @close="showCategoryModal = false" />
+  </div>
 </template>
 
 <script setup>
@@ -396,7 +361,7 @@ const toggleRecommendedSection = () => {
 const fetchStudents = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
-      withCredentials: true, 
+      withCredentials: true,
       params: {
         page: currentPage.value - 1,
         size: pageSize,
@@ -416,8 +381,8 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
-      withCredentials: true, 
+    const response = await axios.post('http://localhost:5000/member/filter/student', lastFilterData.value, {
+      withCredentials: true,
       params: {
         page: currentPage.value - 1,
         size: pageSize,
@@ -443,7 +408,7 @@ const showDetail = async (student) => {
   } else {
     try {
       const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
-        withCredentials: true,   
+        withCredentials: true,
       });
 
       selectedStudent.value = student;
@@ -483,13 +448,13 @@ const handleFileUpload = async (event) => {
   formData.append('file', file);
 
   try {
-    await axios.post('http://localhost:5000/member/excel/upload/student',formData, {
-      withCredentials: true,  
+    await axios.post('http://localhost:5000/member/excel/upload/student', formData, {
+      withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     });
-    
+
     // 업로드 성공 후 목록 새로고침
     await fetchStudents();
     alert('엑셀 파일이 성공적으로 업로드되었습니다.');
@@ -509,8 +474,8 @@ const handleFileUpload = async (event) => {
   }
 };
 
-const handleExcelDownload = async() => {
-  try{
+const handleExcelDownload = async () => {
+  try {
     const config = {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/student',
@@ -526,7 +491,7 @@ const handleExcelDownload = async() => {
     };
 
     const response = await axios(config);
-    
+
     // 에러 응답 체크
     if (response.data instanceof Blob) {
       const isJson = response.data.type === 'application/json';
@@ -536,15 +501,15 @@ const handleExcelDownload = async() => {
         throw new Error(textData);
       }
     }
-    
+
     // 파일 다운로드
-    const blob = new Blob([response.data], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
 
     const now = new Date();
     const fileName = `student_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
-    
+
     saveAs(blob, fileName);
   } catch (error) {
     console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
@@ -573,9 +538,9 @@ const displayedPages = computed(() => {
   if (currentPage.value - 1 > 2) {
     pages.push('...');
   }
-  for (let i = Math.max(2, currentPage.value - 2); 
-       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
-       i++) {
+  for (let i = Math.max(2, currentPage.value - 2);
+    i <= Math.min(totalPages.value - 1, currentPage.value + 2);
+    i++) {
     pages.push(i);
   }
   if (totalPages.value - currentPage.value > 2) {
@@ -600,15 +565,15 @@ const getVocCategory = (categoryCode) => {
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
-  
+
   const [year, month, day, hour, minute] = dateArray;
-  
+
   // 월과 일이 한자리수일 경우 앞에 0을 붙임
   const formattedMonth = month.toString().padStart(2, '0');
   const formattedDay = day.toString().padStart(2, '0');
   const formattedHour = hour.toString().padStart(2, '0');
   const formattedMinute = minute.toString().padStart(2, '0');
-  
+
   return `${year}-${formattedMonth}-${formattedDay}T${formattedHour}:${formattedMinute}:00`;
 };
 
@@ -617,7 +582,7 @@ onMounted(() => {
   fetchStudents();
   const header = document.querySelector('.student-header-container');
   const section = document.querySelector('.content-section');
-  
+
   if (header && section) {
     header.style.marginBottom = '0';
     section.style.marginTop = '0';
