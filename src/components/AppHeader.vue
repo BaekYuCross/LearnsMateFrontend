@@ -93,7 +93,15 @@ async function refreshToken() {
     const newExp = response.data.exp; //2024-12-03 09:21:27 이렇게 뽑힘
 
     if (newExp) {
-    
+      // 새로운 만료 시간을 배열 형식으로 변환
+      const parsedExp = parseExpirationToArray(newExp);
+
+      // 새로운 만료 시간을 loginState에 설정
+      loginState.setExp(parsedExp);
+
+      // 타이머 갱신
+      startTimer();
+
     } else {
       console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
     }
