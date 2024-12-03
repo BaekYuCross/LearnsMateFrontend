@@ -4,7 +4,7 @@
     <div class="voc-content-container" :class="{ 'single-view': isSingleView }">
       <VOCFilter @search="handleSearch" @reset="handleReset" />
       <div class="voc-actions">
-        <div class="voc-count">등록된 VOC <span class="voc-length">{{ totalCount }}</span>개</div>
+        <div class="voc-count">등록된 VOC <span class="voc-length">{{ formatNumber(totalCount) }}</span>개</div>
         <div class="voc-button-group">
           <button class="voc-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
@@ -333,6 +333,12 @@ const camelToSnake = (obj) => {
 const showSingleVoc = () => {
   isSingleView.value = true;
   console.log('showSingleVoc called: isSingleView =', isSingleView.value);
+};
+
+
+const formatNumber = (number) => {
+  if (!number) return '0';
+  return number.toLocaleString('ko-KR');
 };
 
 const hideSingleVoc = () => {
