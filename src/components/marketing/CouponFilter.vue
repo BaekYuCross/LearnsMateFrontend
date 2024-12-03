@@ -186,71 +186,27 @@
   
   const emit = defineEmits(['search', 'reset'])
   
-  // const search = () => {
-  //   console.log('필터조건: ', filters.value);
-  //   const formattedFilters = { ...filters.value };
-
-  // // 날짜 필드와 빈 문자열 처리
-  // Object.keys(formattedFilters).forEach(key => {
-  //   if (formattedFilters[key] === '') {
-  //     formattedFilters[key] = null;
-  //   } else if (key.includes('date') || key.includes('created_at')) {
-  //     formattedFilters[key] = formattedFilters[key] ? new Date(formattedFilters[key]).toISOString() : null;
-  //   }
-  // });
-
-  // // registration_type 빈 문자열 처리
-  // if (!formattedFilters.registration_type) {
-  //   formattedFilters.registration_type = null;
-  // }
-
-  // console.log('검색 필터:', formattedFilters); // 디버깅용
-  // emit('search', formattedFilters);
-  // }
-
   const search = () => {
+    console.log('필터조건: ', filters.value);
     const formattedFilters = { ...filters.value };
-    
-  // 1. 먼저 filters의 현재 상태를 자세히 출력
-  console.log('Before processing active_state:', formattedFilters.active_state);
-  console.log('Type of active_state before:', typeof formattedFilters.active_state);
-  
-  // 2. 각 필드의 타입과 값을 확인
-  Object.entries(filters.value).forEach(([key, value]) => {
-    console.log(`${key}: ${value} (type: ${typeof value})`);
-  });
 
-  // 3. formattedFilters 생성 및 확인
-  
-  console.log('Initial formattedFilters:', formattedFilters);
-
-  // 4. 각 필드 처리를 개별적으로 수행
+  // 날짜 필드와 빈 문자열 처리
   Object.keys(formattedFilters).forEach(key => {
-    console.log(`Processing ${key}:`, formattedFilters[key]);
-    
     if (formattedFilters[key] === '') {
-      console.log(`${key} is empty string, setting to null`);
       formattedFilters[key] = null;
-    } else if (key === 'active_state') {
-      // 문자열 "true"/"false"를 boolean으로 변환
-      formattedFilters[key] = formattedFilters[key] === 'true';
-    
-    } else if ((key.includes('date') || key.includes('created_at')) && formattedFilters[key]) {
-      console.log(`Converting date for ${key}`);
-      try {
-        formattedFilters[key] = new Date(formattedFilters[key]).toISOString();
-        console.log(`Converted ${key} to:`, formattedFilters[key]);
-      } catch (error) {
-        console.error(`Error converting date for ${key}:`, error);
-      }
+    } else if (key.includes('date') || key.includes('created_at')) {
+      formattedFilters[key] = formattedFilters[key] ? new Date(formattedFilters[key]).toISOString() : null;
     }
   });
 
-  // 5. 최종 결과 확인
-  console.log('Final formattedFilters:', formattedFilters);
-  
+  // registration_type 빈 문자열 처리
+  if (!formattedFilters.registration_type) {
+    formattedFilters.registration_type = null;
+  }
+
+  console.log('검색 필터:', formattedFilters); // 디버깅용
   emit('search', formattedFilters);
-} 
+  }
   
   const reset = () => {
     Object.keys(filters.value).forEach(key => {
