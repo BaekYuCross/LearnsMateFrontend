@@ -140,7 +140,7 @@
             </div>
             <div class="lecture-detail-item">
               <span class="label">강의 제목</span>
-              <span class="value" style="width: 200px;" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
+              <span class="value" style="width: 200px; text-align: right;" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">카테고리</span>
