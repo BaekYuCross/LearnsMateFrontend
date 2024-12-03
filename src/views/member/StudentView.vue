@@ -532,6 +532,11 @@ const handleReset = () => {
   fetchStudents();
 };
 
+const closeStudentDetail = () => {
+  selectedStudent.value = null;
+  studentDetail.value = null;
+};
+
 // 페이지네이션
 const displayedPages = computed(() => {
   const pages = [];
