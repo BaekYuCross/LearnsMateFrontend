@@ -293,7 +293,6 @@
 
   .payment-board-row-lecturecode,
 .payment-board-row-title {
-  padding: 2px 14px;
   overflow: hidden;
   white-space: nowrap;
 }
