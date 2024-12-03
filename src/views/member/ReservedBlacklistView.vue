@@ -3,37 +3,46 @@
     <div class="reserved-side-menu"><MemberSideMenu/></div>
     <div class="reserved-main-content">
       <div class="reserved-header-container">
-            <div class="reserved-count">
-              예비 {{ memberTypeText }} 블랙리스트 수 
-              <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
-            </div>
-          </div>
+        <div class="reserved-count">
+          예비 {{ memberTypeText }} 블랙리스트 수 
+          <span class="reserved-count-number">{{ formatCurrency(totalCount) }}</span>명
+        </div>
+      </div>
+
+
       <div class="reserved-content-section" :class="{ 'reserved-with-detail': selectedReserved }">
         <div class="reserved-table-container" :class="{ 'reserved-shrink': selectedReserved }">
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>{{ memberTypeText }} 코드</th>
-                <th>{{ memberTypeText }} 이름</th>
-                <th>신고 횟수</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
+          <div class="reserved-board-container">
+            <div class="reserved-board-header">
+              <div class="reserved-table-cell">No</div>
+              <div class="reserved-table-cell">{{ memberTypeText }} 코드</div>
+              <div class="reserved-table-cell">{{ memberTypeText }} 이름</div>
+              <div class="reserved-table-cell">신고 횟수</div>
+            </div>
+            
+            <div class="reserved-board-body">
+              <div 
                 v-for="(blacklist, index) in reservedList" 
                 :key="blacklist.memberCode"
                 @click="showDetail(blacklist)"
-                class="reserved-cursor-pointer hover:bg-gray-50"
+                class="reserved-table-row reserved-cursor-pointer hover:bg-gray-50"
                 :class="{ 'reserved-selected': selectedReserved?.memberCode === blacklist.memberCode }"
               >
-                <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ blacklist.memberCode }}</td>
-                <td>{{ blacklist.memberName }}</td>
-                <td>{{ blacklist.reportCount }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <div class="reserved-table-row-cell">
+                  {{ ((currentPage - 1) * pageSize) + index + 1 }}
+                </div>
+                <div class="reserved-table-row-cell">
+                  {{ blacklist.memberCode }}
+                </div>
+                <div class="reserved-table-row-cell">
+                  {{ blacklist.memberName }}
+                </div>
+                <div class="reserved-table-row-cell">
+                  {{ blacklist.reportCount }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="reserved-pagination">
             <button 
@@ -154,8 +163,6 @@ const memberTypeText = computed(() => ({
   'tutor': '강사',
   'student': '학생'
 }[memberType.value])); 
-
-const filterType = computed(() => memberType.value);
 
 // 모달 관련 상태
 const isModalOpen = ref(false);
