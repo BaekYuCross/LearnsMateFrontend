@@ -127,7 +127,7 @@
               <div class="voc-board-row-number">{{ voc.voc_code.slice(0, 10) }}...</div>
               <div class="voc-board-row-content">{{ voc.voc_content }}</div>
               <div class="voc-board-row-category">{{ voc.voc_category_name }}</div>
-              <div class="voc-board-row-type">{{ voc.member_type }}</div>
+              <div class="voc-board-row-type">{{ translateMemberType(voc.member_type) }}</div>
               <div class="voc-board-row-name">{{ maskName(voc.member_name) }}</div>
               <div class="voc-board-row-code">{{ voc.member_code }}</div>
               <div class="voc-board-row-manager">{{ voc.admin_name || '-' }}</div>
@@ -177,7 +177,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">고객 유형</span>
-              <span class="value">{{ selectedVOC.member_type }}</span>
+              <span class="value">{{ translateMemberType(selectedVOC.member_type) }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">고객명</span>
@@ -429,6 +429,16 @@ const handleExcelDownload = async () => {
   }
 };
 
+const translateMemberType = (type) => {
+  if (type === 'STUDENT') {
+    return '학생';
+  } else if (type === 'TUTOR') {
+    return '강사';
+  } else {
+    return type; // 예외 처리
+  }
+};
+
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
@@ -474,6 +484,7 @@ const showVOCDetail = async (voc) => {
     }
   }
 };
+
 
 const closeVOCDetail = () => {
   selectedVOC.value = null;
