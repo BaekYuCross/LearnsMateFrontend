@@ -324,11 +324,11 @@ onMounted(async() => {
 
     .campaign-column-selector {
       cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  border-radius: 5px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 5px;
     }
 
   .campaign-dropdown-button {

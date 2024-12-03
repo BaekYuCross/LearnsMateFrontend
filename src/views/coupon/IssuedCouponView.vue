@@ -6,6 +6,22 @@
       <div class="issue-coupon-actions">
         <div class="issue-coupon-count">발행된 쿠폰 <span class="issue-coupon-length">{{ totalCount }}</span>개</div>
         <div class="issue-coupon-button-group">
+          <div class="issue-coupon-column-selector">
+            <button @click="toggleDropdown" class="issue-coupon-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="issue-coupon-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="issue-coupon-dropdown-item">
+                <input 
+                  type="checkbox" 
+                  :value="key" 
+                  v-model="selectedColumns"
+                  id="key"
+                />
+                <label :for="key">{{ label }}</label>
+              </div>
+            </div>
+          </div>
           <button class="issue-coupon-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
             엑셀 다운로드
@@ -15,18 +31,18 @@
       <div class="issue-coupon-content-body">
         <div class="issue-coupon-board-container" :class="{ 'single-view': isSingleView }">
           <div class="issue-coupon-board-header">
-            <div class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
-            <div class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
-            <div class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
-            <div class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
-            <div class="issue-coupon-board-header-student-code">고객 코드</div>
-            <div class="issue-coupon-board-header-student-name">고객명</div>
-            <div class="issue-coupon-board-header-use-status">사용 여부</div>
-            <div class="issue-coupon-board-header-discount-rate">할인율</div>
-            <div class="issue-coupon-board-header-start-date">시작일</div> 
-            <div class="issue-coupon-board-header-expire-date">만료일</div>
-            <div class="issue-coupon-board-header-issue-date">발급일</div>
-            <div class="issue-coupon-board-header-use-date">사용일</div>
+            <div v-if="selectedColumns.includes('couponIssuanceCode')" class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
+            <div v-if="selectedColumns.includes('couponName')" class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
+            <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
+            <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
+            <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-header-student-code">고객 코드</div>
+            <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-header-student-name">고객명</div>
+            <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-header-use-status">사용 여부</div>
+            <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-header-discount-rate">할인율</div>
+            <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-header-start-date">시작일</div> 
+            <div v-if="selectedColumns.includes('couponExpireDate')" class="issue-coupon-board-header-expire-date">만료일</div>
+            <div v-if="selectedColumns.includes('couponIssueDate')" class="issue-coupon-board-header-issue-date">발급일</div>
+            <div v-if="selectedColumns.includes('couponUseDate')" class="issue-coupon-board-header-use-date">사용일</div>
           </div>
 
           <div class="issue-coupon-board-body">
@@ -37,18 +53,18 @@
               @click.stop="showIssueCouponDetail(coupon)"
               :class="{'selected': selectedCoupon?.coupon_issuance_code === coupon.coupon_issuance_code }"
             >
-              <div class="issue-coupon-board-row-issuance-code">{{ coupon.coupon_issuance_code }}</div>
-              <div class="issue-coupon-board-row-coupon-name">{{ coupon.coupon_name }}</div>
-              <div class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
-              <div class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
-              <div class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
-              <div class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
-              <div class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
-              <div class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
-              <div class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
-              <div class="issue-coupon-board-row-expire-date">{{ formatDate(coupon.coupon_expire_date) }}</div>
-              <div class="issue-coupon-board-row-issue-date">{{ formatDate(coupon.coupon_issue_date) }}</div>
-              <div class="issue-coupon-board-row-use-date">{{ formatDate(coupon.coupon_use_date) }}</div>
+              <div v-if="selectedColumns.includes('couponIssuanceCode')" class="issue-coupon-board-row-issuance-code">{{ coupon.coupon_issuance_code }}</div>
+              <div v-if="selectedColumns.includes('couponName')" class="issue-coupon-board-row-coupon-name">{{ coupon.coupon_name }}</div>
+              <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
+              <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
+              <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
+              <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
+              <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
+              <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
+              <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
+              <div v-if="selectedColumns.includes('couponExpireDate')" class="issue-coupon-board-row-expire-date">{{ formatDate(coupon.coupon_expire_date) }}</div>
+              <div v-if="selectedColumns.includes('couponIssueDate')" class="issue-coupon-board-row-issue-date">{{ formatDate(coupon.coupon_issue_date) }}</div>
+              <div v-if="selectedColumns.includes('couponUseDate')" class="issue-coupon-board-row-use-date">{{ formatDate(coupon.coupon_use_date) }}</div>
             </div>
           </div>
 
@@ -114,7 +130,26 @@ const isFiltered = ref(false);
 const lastFilterData = ref(null);
 const selectedCoupon = ref(null);
 const isSingleView = ref(false);
+const isDropdownOpen = ref(false);
 const coupons = ref([]);
+
+const columns = ref({
+  couponIssuanceCode: "발급 쿠폰 번호",
+  couponName: "쿠폰 이름",
+  couponContents: "쿠폰 내용",
+  couponCategoryName: "쿠폰 종류",
+  studentCode: "고객 코드",
+  studentName: "고객명",
+  couponUseStatus: "사용 여부",
+  couponDiscountRate: "할인율",
+  couponStartDate: "시작일",
+  couponExpireDate: "만료일",
+  couponIssueDate: "발급일",
+  couponUseDate: "사용일",
+
+  });
+
+  const selectedColumns = ref(Object.keys(columns.value));
 
 const fetchIssueCouponList = async () => {
   try {
@@ -196,19 +231,41 @@ const handleExcelDownload = async () => {
   try {
     const response = await axios.post(
       'http://localhost:5000/issue-coupon/excel/download',
-      isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
+      {
+        selectedColumns: selectedColumns.value, 
+        ...(isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {})
+      },
       {
         responseType: 'blob',
       }
     );
 
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+
     const blob = new Blob([response.data], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
-    saveAs(blob, 'issue_coupon_data.xlsx');
+    const now = new Date();
+    const fileName = `issue_coupon_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
   } catch (error) {
     console.error('엑셀 다운로드 중 오류 발생:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
   }
 };
 
@@ -232,6 +289,10 @@ const showSingleView = () => {
 
 const hideSingleView = () => {
   isSingleView.value = false;
+};
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
 };
 
 const deselectCoupon = (event) => {
@@ -331,6 +392,55 @@ onMounted(() => {
   display: flex;
   gap: 10px;
 }
+
+.issue-coupon-column-selector {
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
+}
+
+.issue-coupon-dropdown-button {
+  background-color: #ffffff;
+    color: #000000;
+    border: 0.5px solid #d5d5d5;
+    padding: 3px 5px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.issue-coupon-dropdown-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin-top: 277px;
+  z-index: 10;
+  width: 115px;
+  border-radius: 4px;
+}
+
+.issue-coupon-dropdown-menu input[type="checkbox"] {
+  outline: none;
+  accent-color: #005950; 
+}
+
+.issue-coupon-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.issue-coupon-dropdown-item label {
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+  }
 
 .issue-coupon-excel-button {
   background: #005950;
