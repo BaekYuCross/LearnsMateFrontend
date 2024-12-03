@@ -15,8 +15,7 @@
                 <input 
                   type="checkbox" 
                   :value="key" 
-                  v-model="selectedColumns" 
-                  @change="updateSelectedColumns" 
+                  v-model="selectedColumns"
                   id="key"
                 />
                 <label :for="key">{{ label }}</label>
@@ -32,18 +31,18 @@
       <div class="issue-coupon-content-body">
         <div class="issue-coupon-board-container" :class="{ 'single-view': isSingleView }">
           <div class="issue-coupon-board-header">
-            <div v-if="selectedColumns.includes('coupon_issuance_code')" class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
-            <div v-if="selectedColumns.includes('coupon_name')" class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
-            <div v-if="selectedColumns.includes('coupon_contents')" class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
-            <div v-if="selectedColumns.includes('coupon_category_name')" class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
-            <div v-if="selectedColumns.includes('student_code')" class="issue-coupon-board-header-student-code">고객 코드</div>
-            <div v-if="selectedColumns.includes('student_name')" class="issue-coupon-board-header-student-name">고객명</div>
-            <div v-if="selectedColumns.includes('coupon_use_status')" class="issue-coupon-board-header-use-status">사용 여부</div>
-            <div v-if="selectedColumns.includes('coupon_discount_rate')" class="issue-coupon-board-header-discount-rate">할인율</div>
-            <div v-if="selectedColumns.includes('coupon_start_date')" class="issue-coupon-board-header-start-date">시작일</div> 
-            <div v-if="selectedColumns.includes('coupon_expire_date')" class="issue-coupon-board-header-expire-date">만료일</div>
-            <div v-if="selectedColumns.includes('coupon_issue_date')" class="issue-coupon-board-header-issue-date">발급일</div>
-            <div v-if="selectedColumns.includes('coupon_use_date')" class="issue-coupon-board-header-use-date">사용일</div>
+            <div v-if="selectedColumns.includes('couponIssuanceCode')" class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
+            <div v-if="selectedColumns.includes('couponName')" class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
+            <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
+            <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
+            <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-header-student-code">고객 코드</div>
+            <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-header-student-name">고객명</div>
+            <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-header-use-status">사용 여부</div>
+            <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-header-discount-rate">할인율</div>
+            <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-header-start-date">시작일</div> 
+            <div v-if="selectedColumns.includes('couponExpireDate')" class="issue-coupon-board-header-expire-date">만료일</div>
+            <div v-if="selectedColumns.includes('couponIssueDate')" class="issue-coupon-board-header-issue-date">발급일</div>
+            <div v-if="selectedColumns.includes('couponUseDate')" class="issue-coupon-board-header-use-date">사용일</div>
           </div>
 
           <div class="issue-coupon-board-body">
@@ -54,18 +53,18 @@
               @click.stop="showIssueCouponDetail(coupon)"
               :class="{'selected': selectedCoupon?.coupon_issuance_code === coupon.coupon_issuance_code }"
             >
-              <div v-if="selectedColumns.includes('coupon_issuance_code')" class="issue-coupon-board-row-issuance-code">{{ coupon.coupon_issuance_code }}</div>
-              <div v-if="selectedColumns.includes('coupon_name')" class="issue-coupon-board-row-coupon-name">{{ coupon.coupon_name }}</div>
-              <div v-if="selectedColumns.includes('coupon_contents')" class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
-              <div v-if="selectedColumns.includes('coupon_category_name')" class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
-              <div v-if="selectedColumns.includes('student_code')" class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
-              <div v-if="selectedColumns.includes('student_name')" class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
-              <div v-if="selectedColumns.includes('coupon_use_status')" class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
-              <div v-if="selectedColumns.includes('coupon_discount_rate')" class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
-              <div v-if="selectedColumns.includes('coupon_start_date')" class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
-              <div v-if="selectedColumns.includes('coupon_expire_date')" class="issue-coupon-board-row-expire-date">{{ formatDate(coupon.coupon_expire_date) }}</div>
-              <div v-if="selectedColumns.includes('coupon_issue_date')" class="issue-coupon-board-row-issue-date">{{ formatDate(coupon.coupon_issue_date) }}</div>
-              <div v-if="selectedColumns.includes('coupon_use_date')" class="issue-coupon-board-row-use-date">{{ formatDate(coupon.coupon_use_date) }}</div>
+              <div v-if="selectedColumns.includes('couponIssuanceCode')" class="issue-coupon-board-row-issuance-code">{{ coupon.coupon_issuance_code }}</div>
+              <div v-if="selectedColumns.includes('couponName')" class="issue-coupon-board-row-coupon-name">{{ coupon.coupon_name }}</div>
+              <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
+              <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
+              <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
+              <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
+              <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
+              <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
+              <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
+              <div v-if="selectedColumns.includes('couponExpireDate')" class="issue-coupon-board-row-expire-date">{{ formatDate(coupon.coupon_expire_date) }}</div>
+              <div v-if="selectedColumns.includes('couponIssueDate')" class="issue-coupon-board-row-issue-date">{{ formatDate(coupon.coupon_issue_date) }}</div>
+              <div v-if="selectedColumns.includes('couponUseDate')" class="issue-coupon-board-row-use-date">{{ formatDate(coupon.coupon_use_date) }}</div>
             </div>
           </div>
 
@@ -135,18 +134,18 @@ const isDropdownOpen = ref(false);
 const coupons = ref([]);
 
 const columns = ref({
-  coupon_issuance_code: "발급 쿠폰 번호",
-  coupon_name: "쿠폰 이름",
-  coupon_code: "쿠폰 내용",
-  coupon_category_name: "쿠폰 종류",
-  student_code: "고객 코드",
-  student_name: "고객명",
-  coupon_use_status: "사용 여부",
-  coupon_discount_rate: "할인율",
-  coupon_start_date: "시작일",
-  coupon_expire_date: "만료일",
-  coupon_issue_date: "발급일",
-  coupon_use_date: "사용일",
+  couponIssuanceCode: "발급 쿠폰 번호",
+  couponName: "쿠폰 이름",
+  couponContents: "쿠폰 내용",
+  couponCategoryName: "쿠폰 종류",
+  studentCode: "고객 코드",
+  studentName: "고객명",
+  couponUseStatus: "사용 여부",
+  couponDiscountRate: "할인율",
+  couponStartDate: "시작일",
+  couponExpireDate: "만료일",
+  couponIssueDate: "발급일",
+  couponUseDate: "사용일",
 
   });
 
@@ -232,19 +231,41 @@ const handleExcelDownload = async () => {
   try {
     const response = await axios.post(
       'http://localhost:5000/issue-coupon/excel/download',
-      isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
+      {
+        selectedColumns: selectedColumns.value, 
+        ...(isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {})
+      },
       {
         responseType: 'blob',
       }
     );
 
+    if (response.data instanceof Blob) {
+      const isJson = response.data.type === 'application/json';
+      if (isJson) {
+        const textData = await response.data.text();
+        console.error('Server error:', textData);
+        throw new Error(textData);
+      }
+    }
+
     const blob = new Blob([response.data], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     });
 
-    saveAs(blob, 'issue_coupon_data.xlsx');
+    const now = new Date();
+    const fileName = `issue_coupon_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
+    
+    saveAs(blob, fileName);
   } catch (error) {
     console.error('엑셀 다운로드 중 오류 발생:', error);
+    if (error.response) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.error('상세 에러:', reader.result);
+      };
+      reader.readAsText(error.response.data);
+    }
   }
 };
 
