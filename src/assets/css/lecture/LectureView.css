@@ -553,6 +553,10 @@
   border-radius: 4px;
 }
 
+.lecture-filter-input{
+  outline: none;
+}
+
 .lecture-dropdown-menu input[type="checkbox"] {
   outline: none;
   accent-color: #005950; 
