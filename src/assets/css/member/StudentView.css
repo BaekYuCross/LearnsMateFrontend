@@ -30,22 +30,20 @@
   display: flex;
   gap: 20px;
   margin-top: 10px;
-  width: 100%;       /* 전체 너비 사용 */
+  width: 100%;
 }
 
 .table-container {
   display: flex;
   flex-direction: column;
-  flex: 1;             /* 유지 */
+  flex: 1;
   background: white;
-  border-radius: 4px;  /* 변경 */
+  border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  height: 570px;       /* 추가 */
-  overflow-x: auto;    /* 추가 */
-  transition: flex 0.5s ease; /* 추가 */
+  height: 570px;  
+  overflow-x: auto;
 }
 
-/* 닫기 버튼 추가 */
 .close-button {
   background: none;
   border: none;
@@ -58,14 +56,13 @@
   color: #333;
 }
 
-/* detail-container 수정 */
 .detail-container {
-  flex: 0.6;          /* 변경 */
+  flex: 0.6;     
   background: white;
-  border-radius: 8px;  /* 변경 */
+  border-radius: 8px; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 570px;      /* 변경 */
-  padding: 20px;      /* 변경 */
+  height: 570px;   
+  padding: 20px;   
   overflow-y: auto;
 }
 
@@ -113,10 +110,10 @@ th {
 }
 
 .info-row {
-  display: flex; /* 가로로 배치 */
-  align-items: left; /* 세로 정렬 */
-  gap: 3px; /* 이름과 값 사이에 간격 추가 */
-  margin-bottom: 3px; /* 각 행 간 간격 추가 */
+  display: flex;
+  align-items: left; 
+  gap: 3px; 
+  margin-bottom: 3px; 
 }
 
 .label {
@@ -132,8 +129,8 @@ th {
   flex-direction: column;
   height: 570px;
   flex: 1;
-  min-width: 0;      /* 추가: 내부 컨텐츠가 줄어들 수 있게 함 */
-  width: 100%;       /* 컨테이너 전체 너비 사용 */
+  min-width: 0;
+  width: 100%;
 }
 
 .student-board-header {
@@ -176,7 +173,6 @@ th {
   background-color: #f4f4f4;
 }
 
-
 .student-board-row-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -184,7 +180,6 @@ th {
   padding: 0 5px;
 }
 
-/* flag와 dormant는 특별 처리 */
 .student-board-row-flag,
 .student-board-row-dormant {
   margin: 0 auto;
@@ -194,7 +189,6 @@ th {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  direction: ltr !important; /* RTL 무시 */
 }
 
 .student-board-header > div,
@@ -206,11 +200,12 @@ th {
   align-items: center;
   justify-content: center;
   min-width: 0;
-  position: relative; /* direction: rtl을 위한 컨테이너 */
+  position: relative;
 }
+
 .student-board-row-email,
 .student-board-row-address {
-  justify-content: flex-start; /* 왼쪽 정렬 */
+  justify-content: flex-start;
 }
 
 .pagination {
@@ -287,13 +282,11 @@ th {
   color: #333;
 }
 
-/* 상세 정보 섹션 스타일 */
 .info-section, .course-section, .voc-section, .coupon-section {
   border-top: 1px solid #e2e8f0;
   padding: 20px 0;
   margin-top: 20px;
   padding-top: 20px;
-
  }
  
  .info-section h4, .course-section h4, .voc-section h4, .coupon-section h4 {
@@ -304,7 +297,6 @@ th {
   
  }
  
- /* 강의 진행 현황 */
  .course-list {
   display: flex;
   flex-direction: column;
@@ -346,7 +338,6 @@ th {
   text-align: right;
  }
  
-/* 추천 강의 섹션 스타일 */
 .recommended-section {
   padding: 20px 0;
 }
@@ -458,24 +449,23 @@ th {
 .course-toggle-button {
   background: none;
   border: none;
-  font-size: 16px; /* 화살표 크기 */
+  font-size: 16px; 
   color: #005950;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   padding: 0;
-  margin-left: 10px; /* 화살표와 텍스트 간 간격 */
-  position: relative; /* 위치 고정 */
+  margin-left: 10px; 
+  position: relative; 
 }
 
-/* 화살표를 텍스트와 일치하도록 정렬 */
 .recommended-toggle-button span,
 .course-toggle-button span {
-  line-height: 1; /* 세로 정렬 */
+  line-height: 1; 
   vertical-align: middle;
   display: inline-block;
 }
- /* VOC 섹션 */
+
  .voc-list {
   display: flex;
   flex-direction: column;
@@ -523,7 +513,6 @@ th {
   border-top: 1px solid #eee;
  }
  
- /* 쿠폰 섹션 */
  .coupon-list {
   display: grid;
   gap: 20px;
@@ -549,7 +538,6 @@ th {
   gap: 8px;
  }
  
- /* 섹션 제목 스타일 */
  h5 {
   font-size: 14px;
   color: #333;
@@ -557,11 +545,9 @@ th {
   font-weight: 500;
  }
  
- 
  .detail-content {
   padding-right: 20px;
  }
- 
  
  .column-selector {
   cursor: pointer;
@@ -571,7 +557,6 @@ th {
   gap: 5px;
   border-radius: 5px;
 }
-
 
 .dropdown-button {
   background-color: #ffffff;

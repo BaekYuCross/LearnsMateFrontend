@@ -27,7 +27,6 @@
                   </div>
                 </div>
               </div>
-              <input type="file" ref="fileInput" @change="handleFileUpload" accept=".xlsx, .xls" style="display: none"/>
               <button class="excel-button" @click="handleExcelDownload">
                 <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
               </button>
@@ -40,96 +39,96 @@
 
           <div class="content-section" :class="{ 'with-detail': selectedStudent }">
             <div class="table-container" :class="{ 'shrink': selectedStudent }">
-          <div class="student-board-container">
-            <div class="student-board-header">
-              <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
-              <div v-if="selectedColumns.includes('memberName')" class="student-board-header-name">이름</div>
-              <div v-if="selectedColumns.includes('memberEmail')" class="student-board-header-email">이메일</div>
-              <div v-if="selectedColumns.includes('memberPhone')" class="student-board-header-phone">연락처</div>
-              <div v-if="selectedColumns.includes('memberAddress')" class="student-board-header-address">주소</div>
-              <div v-if="selectedColumns.includes('memberAge')" class="student-board-header-age">나이</div>
-              <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
-              <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
-              <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
-              <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
-            </div>
+              <div class="student-board-container">
+                <div class="student-board-header">
+                  <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
+                  <div v-if="selectedColumns.includes('memberName')" class="student-board-header-name">이름</div>
+                  <div v-if="selectedColumns.includes('memberEmail')" class="student-board-header-email">이메일</div>
+                  <div v-if="selectedColumns.includes('memberPhone')" class="student-board-header-phone">연락처</div>
+                  <div v-if="selectedColumns.includes('memberAddress')" class="student-board-header-address">주소</div>
+                  <div v-if="selectedColumns.includes('memberAge')" class="student-board-header-age">나이</div>
+                  <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
+                  <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
+                  <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
+                  <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
+                </div>
 
-            <div class="student-board-body">
-              <div 
-                class="student-board-row" 
-                v-for="(student, index) in students" 
-                :key="student.memberCode"
-                @click="showDetail(student)"
-                :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
-              >
-                <div v-if="selectedColumns.includes('memberCode')" class="student-board-row-code">
-                  {{ student.memberCode }}
-                </div>
-                <div v-if="selectedColumns.includes('memberName')" class="student-board-row-name">
-                  {{ student.memberName }}
-                </div>
-                <div v-if="selectedColumns.includes('memberEmail')" class="student-board-row-email">
-                  {{ student.memberEmail }}
-                </div>
-                <div v-if="selectedColumns.includes('memberPhone')" class="student-board-row-phone">
-                  {{ student.memberPhone }}
-                </div>
-                <div v-if="selectedColumns.includes('memberAddress')" class="student-board-row-address">
-                  {{ student.memberAddress }}
-                </div>
-                <div v-if="selectedColumns.includes('memberAge')" class="student-board-row-age">
-                  {{ student.memberAge }}
-                </div>
-                <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
-                  {{ student.memberBirth }}
-                </div>
-                <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
-                  backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
-                  color: student.memberFlag ? '#166534' : '#991b1b', }">
-                  {{ student.memberFlag === true ? '활성' : '비활성' }}
-                </div>
-                <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
-                  {{ student.createdAt }}
-                </div>
-                <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
-                  backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
-                  color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
-                  {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
+                <div class="student-board-body">
+                  <div 
+                    class="student-board-row" 
+                    v-for="(student, index) in students" 
+                    :key="student.memberCode"
+                    @click="showDetail(student)"
+                    :class="{ 'selected': selectedStudent?.memberCode === student.memberCode }"
+                  >
+                    <div v-if="selectedColumns.includes('memberCode')" class="student-board-row-code">
+                      {{ student.memberCode }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberName')" class="student-board-row-name">
+                      {{ student.memberName }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberEmail')" class="student-board-row-email">
+                      {{ student.memberEmail }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberPhone')" class="student-board-row-phone">
+                      {{ student.memberPhone }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberAddress')" class="student-board-row-address">
+                      {{ student.memberAddress }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberAge')" class="student-board-row-age">
+                      {{ student.memberAge }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberBirth')" class="student-board-row-birth">
+                      {{ student.memberBirth }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberFlag')" class="student-board-row-flag" :style="{
+                      backgroundColor: student.memberFlag ? '#dcfce7' : '#fee2e2',
+                      color: student.memberFlag ? '#166534' : '#991b1b', }">
+                      {{ student.memberFlag === true ? '활성' : '비활성' }}
+                    </div>
+                    <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
+                      {{ student.createdAt }}
+                    </div>
+                    <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
+                      backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+                      color: student.memberDormantStatus ? '#991b1b' : '#166534'}">
+                      {{ student.memberDormantStatus === true ? '휴면' : '활성' }}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div class="pagination">
-            <button 
-              class="page-button prev-button" 
-              @click="changePage(currentPage - 1)" 
-              :disabled="currentPage === 1"
-            >
-              ◀
-            </button>
-            
-            <template v-for="page in displayedPages" :key="page">
-              <span v-if="page === '...'" class="page-dots">...</span>
-              <button 
-                v-else
-                class="page-button" 
-                :class="{ active: currentPage === page }" 
-                @click="changePage(page)"
-              >
-                {{ page }}
-              </button>
-            </template>
-            
-            <button 
-              class="page-button next-button"
-              @click="changePage(currentPage + 1)" 
-              :disabled="currentPage === totalPages"
-            >
-              ▶
-            </button>
-          </div>
-        </div>
+              <div class="pagination">
+                <button 
+                  class="page-button prev-button" 
+                  @click="changePage(currentPage - 1)" 
+                  :disabled="currentPage === 1"
+                >
+                  ◀
+                </button>
+                
+                <template v-for="page in displayedPages" :key="page">
+                  <span v-if="page === '...'" class="page-dots">...</span>
+                  <button 
+                    v-else
+                    class="page-button" 
+                    :class="{ active: currentPage === page }" 
+                    @click="changePage(page)"
+                  >
+                    {{ page }}
+                  </button>
+                </template>
+                
+                <button 
+                  class="page-button next-button"
+                  @click="changePage(currentPage + 1)" 
+                  :disabled="currentPage === totalPages"
+                >
+                  ▶
+                </button>
+              </div>
+            </div>
 
         <div v-if="selectedStudent && studentDetail" class="detail-container">
           <div class="detail-header">
