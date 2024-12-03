@@ -39,23 +39,11 @@ export const useLoginState = defineStore('loginState', {
       }
     },
 
-    // 토큰 갱신 처리
-    async refreshToken() {
-      try {
-        const response = await axios.post(
-          'http://localhost:5000/auth/refresh',
-          {}, // 요청 본문 (필요 시 수정)
-          { withCredentials: true } // 쿠키 포함
-        );
-        console.log('토큰 갱신 성공:', response.data);
-        await this.fetchLoginState(); // 갱신된 상태 재확인
-      } catch (error) {
-        console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
-        if (error.response && error.response.status === 401) {
-          alert('토큰 갱신 실패: 다시 로그인하세요.');
-          await this.logout();
-        }
-      }
+
+    // 새 토큰 만료 시간 설정
+    setExp(newExp) {
+      this.exp = newExp;
+      console.log('새로운 토큰 만료시간:', this.exp);
     },
 
     // 상태 초기화
