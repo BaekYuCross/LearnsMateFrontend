@@ -22,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .lecture-count {
@@ -44,7 +44,8 @@
 .lecture-excel-button,
 .lecture-monthly-counts-button {
   background: #005950;
-  padding: 5px 10px;
+  padding: 3px 5px;
+  margin-bottom: 3px;
   border: none;
   color: #ffffff;
   cursor: pointer;
@@ -52,7 +53,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .lecture-board-container {
@@ -118,7 +119,7 @@
 .lecture-board-row {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr 0.6fr 0.6fr 0.5fr 0.6fr 0.6fr 0.7fr 0.6fr 0.6fr;
-  padding: 10px 15px;
+  padding: 7px 14px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
   color: #333333;
@@ -126,6 +127,10 @@
   align-items: center;
   background-color: #ffffff;
   cursor: pointer;
+}
+
+.lecture-board-row.selected {
+  background-color: #E2E8F0;
 }
 
 .lecture-board-row:hover {
@@ -189,12 +194,12 @@
 
 .lecture-detail-item .value {
   color: #333;
-  word-break: break-all; /* 긴 텍스트 줄바꿈 */
-  white-space: pre-wrap; /* 줄바꿈 보존 */
-  text-align: left; /* 왼쪽 정렬 */
+  word-break: break-all;
+  white-space: pre-wrap;
+  text-align: left;
 }
 
-.lecture-detail-item ul, .value-ellipsis {
+.lecture-detail-item ul {
   list-style-type: none;
   max-width: 200px;
   padding: 0;
@@ -210,25 +215,53 @@
 }
 
 
-.ellipsis {
-  overflow: hidden;
-  text-align: right;
-  text-overflow: ellipsis;
-  display: inline-block;
-  max-width: 200px; /* 원하는 너비로 설정 */
-  vertical-align: middle;
+
+.lecture-recommended-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.ellipsis:hover {
-  overflow: visible;
-  white-space: normal;
-  position: relative;
-  background: #fff;
-  z-index: 10;
-  border: 1px solid #ccc;
-  padding: 5px;
-  max-width: 150px;
+.lecture-recommended-item {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #eee;
+
 }
+
+.lecture-toggle-header {
+  padding: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+ 
+}
+
+
+.lecture-toggle-header span {
+  font-weight: bold;
+  flex: 0 0 100px; /* 고정 너비 설정 */
+  min-width: 200px;
+  font-size: 13px;
+  color: #595656;
+ 
+}
+
+.lecture-toggle-button {
+  background: none;
+  border: none;
+  font-size: 13px; /* 화살표 크기 */
+  color: #005950;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 10px; /* 화살표와 텍스트 간 간격 */
+  position: relative; /* 위치 고정 */
+}
+
 
 .close-button {
   background: none;
@@ -339,9 +372,10 @@
 }
 
 .lecture-stats-title {
-  font-size: 12px;
+  margin-right: 165px;
+  font-size: 13px;
   font-weight: bold;
-  color: #333;
+  color: #666;
 }
 
 .lecture-stats-filter {
@@ -357,10 +391,10 @@
 }
 
 .lecture-stats-label {
-  font-size: 11px;
+  font-size: 13px;
+  margin-right: 10px;
   font-weight: 500;
   color: #595656;
-  padding-left:10px;
 }
 
 .lecture-stats-dates {
@@ -376,8 +410,9 @@
 }
 
 .lecture-stats-select {
-  padding: 3px 5px;
-  font-size: 9px;
+  outline: none;
+  padding: 4px 6px;
+  font-size: 10px;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   color: #333333;
@@ -389,6 +424,7 @@
 }
 
 .lecture-stats-actions {
+  margin-bottom: 10px;
   display: flex;
   justify-content: flex-end;
   gap: 5px;
@@ -397,24 +433,35 @@
 
 .lecture-stats-search,
 .lecture-stats-reset {
-  padding: 3px 5px;
-  border-radius: 4px;
-  font-size: 9px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  gap: 3px; 
+  padding: 4px 5px; 
+  font-size: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .lecture-stats-search {
-  background: #005950;
-  color: #ffffff;
   border: none;
+  background-color: #005950; 
+  color: #fff;
 }
 
 .lecture-stats-reset {
-  background-color: #ffffff;
-  border: 1px solid #A29D9D;
+  border: 1px solid #cacaca;
+  background-color: #fff;
+  color: #333;
 }
+
+.lecture-stats-search img,
+.lecture-stats-reset img {
+  width: 3px; /* 아이콘 크기 */
+  height: 3px;
+}
+
 
 .lecture-stats-charts {
   display: flex;
@@ -436,19 +483,20 @@
   font-size: 12px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
 .lecture-stats-chart-wrapper {
-  width: 80%;
-  height: 150px;
+  width: 75%;
+  height: 170px;
   position: relative;
   box-sizing: border-box;
   background-color: #f9f9f9;
   border: 1px solid #dcdcdc;
   border-radius: 8px;
-  padding: 10px;
+  padding: 6px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin: 0 auto; /* 가로로 가운데 정렬 */
   margin-bottom: 10px;
@@ -488,11 +536,12 @@
   border: 0.5px solid #d5d5d5;
   padding: 3px 5px;
   font-size: 12px;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
 }
 
 .lecture-dropdown-menu {
+  outline: none;
   position: absolute;
   background-color: white;
   border: 1px solid #ddd;
@@ -502,6 +551,10 @@
   z-index: 10;
   width: 100px;
   border-radius: 4px;
+}
+
+.lecture-filter-input{
+  outline: none;
 }
 
 .lecture-dropdown-menu input[type="checkbox"] {

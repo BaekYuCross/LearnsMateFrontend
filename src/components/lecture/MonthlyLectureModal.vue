@@ -284,7 +284,7 @@
 .lecture-modal-header h2 {
   padding-top: 10px;
   padding-left: 10px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   color: #333;
 }
@@ -334,7 +334,7 @@
   }
 
   .lecture-filter-label {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -345,6 +345,7 @@
 }
 
 .lecture-filter-input {
+  outline: none;
   padding: 5px 5px;
   font-size: 11px;
   border: 1px solid #e2e8f0;
@@ -364,10 +365,12 @@
 }
 
 .lecture-year-input {
+  outline: none;
   width: 80px;
 }
 
 .lecture-month-input {
+  outline: none;
   width: 60px;
 }
 

@@ -130,11 +130,23 @@
           size: pageSize,
         },
       });
-      campaigns.value = response.data.content; // content 배열로 설정
+      campaigns.value = response.data.content.map(campaign => ({
+        ...campaign,
+        campaign_type: translateCampaignType(campaign.campaign_type)
+      }));
+
       console.log('campaign data:', campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
+  };
+
+  const translateCampaignType = (type) => {
+    const campaignTypeMap = {
+      INSTANT: '즉시발송',
+      RESERVATION: '예약발송',
+    };
+    return campaignTypeMap[type] || type;
   };
 
 

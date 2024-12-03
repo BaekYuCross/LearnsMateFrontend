@@ -279,7 +279,7 @@
               </div>
               <div class="payment-detail-item">
                 <span class="label">강의명</span>
-                <span class="value">{{ selectedPayment.lecture_title }}</span>
+                <span class="value" style="width: 200px; text-align: right;">{{ selectedPayment.lecture_title }}</span>
               </div>
               <div class="payment-detail-item">
                 <span class="label">강의 가격</span>
