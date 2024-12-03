@@ -55,9 +55,9 @@
               <select
                 v-model="filters.active_state"
                 class="coupon-filter-input">
-                <option value = "">전체</option>
-                <option value = true>활성화</option>
-                <option value = false>비활성화</option>
+                <option :value = "null">전체</option>
+                <option :value = "true">활성화</option>
+                <option :value = "false">비활성화</option>
               </select>
           </div>
           <div class="coupon-filter-item">
@@ -170,7 +170,7 @@
     coupon_name: '',
     coupon_contents: '',
     coupon_category_name: '',
-    active_state: '',
+    active_state: null,
     min_discount_rate: '',
     max_discount_rate: '',
     start_coupon_start_date: '',
@@ -209,9 +209,11 @@
   // }
 
   const search = () => {
+    const formattedFilters = { ...filters.value };
+    
   // 1. 먼저 filters의 현재 상태를 자세히 출력
-  console.log('Raw filters:', filters);
-  console.log('Filters value:', filters.value);
+  console.log('Before processing active_state:', formattedFilters.active_state);
+  console.log('Type of active_state before:', typeof formattedFilters.active_state);
   
   // 2. 각 필드의 타입과 값을 확인
   Object.entries(filters.value).forEach(([key, value]) => {
@@ -219,7 +221,7 @@
   });
 
   // 3. formattedFilters 생성 및 확인
-  const formattedFilters = { ...filters.value };
+  
   console.log('Initial formattedFilters:', formattedFilters);
 
   // 4. 각 필드 처리를 개별적으로 수행
@@ -229,6 +231,10 @@
     if (formattedFilters[key] === '') {
       console.log(`${key} is empty string, setting to null`);
       formattedFilters[key] = null;
+    } else if (key === 'active_state') {
+      // 문자열 "true"/"false"를 boolean으로 변환
+      formattedFilters[key] = formattedFilters[key] === 'true';
+    
     } else if ((key.includes('date') || key.includes('created_at')) && formattedFilters[key]) {
       console.log(`Converting date for ${key}`);
       try {
