@@ -46,17 +46,9 @@
         submenus: [
             { name: '쿠폰', path: '/marketing/coupons', group: 'coupon' },
             { name: '발급 쿠폰', path: '/marketing/issued-coupons', group: 'issued-coupons' },
-            { name: '쿠폰 분석', path: '/coupon-analysis', group: 'coupon-analysis' },
         ],
         },
     ]);
-
-    // const currentGroup = computed(() => {
-    //     const matchedSubmenu = menus.value
-    //         .flatMap(menu => menu.submenus) 
-    //         .find(submenu => route.path.startsWith(submenu.path)); 
-    //     return matchedSubmenu ? matchedSubmenu.group : null; 
-    // });
 
     const currentRoute = computed(() => route.path);
 

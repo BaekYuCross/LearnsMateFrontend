@@ -464,7 +464,7 @@ const fetchCampaigns = async () => {
     }
   };
 
-  const translateCampaignType = (type) => {
+const translateCampaignType = (type) => {
   const campaignTypeMap = {
     INSTANT: '즉시발송',
     RESERVATION: '예약발송',

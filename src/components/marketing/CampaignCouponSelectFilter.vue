@@ -26,16 +26,16 @@
         <div class="coupon-select-filter-item">
           <span class="coupon-select-filter-label">쿠폰 종류</span>
             <select
-              v-model="filters.coupon_category_code"
+              v-model="filters.coupon_category_name"
               class="coupon-select-filter-input">
               <option value = "">전체</option>
-              <option value = "1">일반</option>
-              <option value = "2">기념일</option>
-              <option value = "3">신규가입</option>
-              <option value = "4">첫 구매</option>
-              <option value = "5">복귀</option>
-              <option value = "6">완강</option>
-              <option value = "7">이벤트</option>
+              <option value = "일반">일반</option>
+              <option value = "기념일">기념일</option>
+              <option value = "신규가입">신규가입</option>
+              <option value = "첫구매">첫 구매</option>
+              <option value = "복귀">복귀</option>
+              <option value = "완강">완강</option>
+              <option value = "이벤트">이벤트</option>
             </select>
         </div>
       </div>
@@ -134,24 +134,6 @@
       </div>
   </div>
   <div class="coupon-select-filter-row white">
-      <div class="coupon-select-filter-item">
-          <span class="coupon-select-filter-label">직원</span>
-          <input 
-              v-model="filters.admin_code"
-              type="text" 
-              placeholder="직원 이름을 입력하세요"
-              class="coupon-select-filter-input"
-          />
-      </div>
-      <div class="coupon-select-filter-item">
-          <span class="coupon-select-filter-label">강사</span>
-          <input 
-              v-model="filters.tutor_code"
-              type="text" 
-              placeholder="강사 이름을 입력하세요"
-              class="coupon-select-filter-input"
-          />
-      </div>
       <div class="coupon-select-button-group">
         <button @click="search" class="coupon-select-search-button">
           <i class="fas fa-search"></i>
@@ -173,7 +155,7 @@ import { ref, defineEmits  } from 'vue'
 const filters = ref({
   coupon_name: '',
   coupon_contents: '',
-  coupon_category_code: '',
+  coupon_category_name: '',
   coupon_flag: '',
   min_discount_rate: '',
   max_discount_rate: '',
@@ -187,6 +169,7 @@ const filters = ref({
   end_updated_at: '',
   admin_code: '',
   tutor_code: '',
+  registration_type: 'admin',
 })
 
 const emit = defineEmits(['search', 'reset'])
@@ -219,26 +202,24 @@ const reset = () => {
 }
 
 .coupon-select-section-title {
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 17px;
   font-weight: bold;
 }
 
 .coupon-select-filter-container {
   display: flex;
   flex-direction: column;
-  z-index: -100;
 }
 
 .coupon-select-filter-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  padding: 8px 16px;
-  gap: 16px;
+  display: flex;
+  padding: 3px 10px;
 }
 
 .coupon-select-filter-row.gray {
-  background-color: #f8f9fa;
+  background-color: #EFEFEF;
+  border-top: #D9D9D9;
+  border-bottom: #D9D9D9;
 }
 
 .coupon-select-filter-row.white {
@@ -246,56 +227,59 @@ const reset = () => {
 }
 
 .coupon-select-filter-item {
+  width: 35%;
+  padding-left: 8px;
   display: flex;
   align-items: center;
-  flex-direction: row;
-  gap: 8px;
 }
 
 .coupon-select-partial-width {
   width: 33.33%;
   flex: 0 0 33.33%;
 }
-
+ 
 .coupon-select-filter-label {
-  min-width: 80px;
+  width: 5rem;
+  min-width: 5rem;
   font-size: 11px;
   font-weight: 500;
-  white-space: nowrap;
+  text-align: end;
+  padding-right: 10px;
 }
 
 .coupon-select-filter-input {
   flex: 1;
-  padding: 5px;
+  padding: 5px 5px;
   font-size: 11px;
   border: 1px solid #e2e8f0;
+  min-width: 0;
+  width: 100%;
+  outline: none;
 }
 
 .coupon-select-date-range-container,
 .coupon-select-discount-rate-container {
-  display: flex;
   flex: 1;
-  gap: 0.5rem;
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .coupon-select-date-input,
 .coupon-select-discount-input {
   flex: 1;
-  min-width: 0;
 }
 
 .coupon-select-date-separator,
 .coupon-select-discount-rate-separator {
-  color: #64748b;
-  padding: 0 0.25rem;
-  font-size: 11px;
+   color: #64748b;
+    padding: 0 0.25rem;
 }
 
 .coupon-select-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 300px;
+  margin-left: 1100px;
 }
 
 .coupon-select-search-button {

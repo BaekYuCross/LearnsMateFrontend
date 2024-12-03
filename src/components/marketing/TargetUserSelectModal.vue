@@ -8,7 +8,7 @@
       <TargetUserFilter @search="handleSearch" @reset="handleReset" />
       <div class="target-user-select-modal-content">
         <div class="target-user-content-container">
-          <div class="target-user-count">전체 학생 <span class="target-user-length">{{ totalCount }}</span>명</div>
+          <div class="target-user-count">전체 학생 <span class="target-user-length">{{ formattedTotalCount }}</span>명</div>
           <div class="target-user-board-container">
             <div class="target-user-board-header">
               <div class="target-user-board-header-select">
@@ -90,6 +90,10 @@ const totalPages = ref(1);
 const pageSize = 15;
 const isFiltered = ref(false);
 const lastFilterData = ref(null);
+
+const formattedTotalCount = computed (() => {
+  return new Intl.NumberFormat().format(totalCount.value);
+});
 
 const camelToSnake = (obj) => {
   if (!obj || typeof obj !== 'object') return obj;

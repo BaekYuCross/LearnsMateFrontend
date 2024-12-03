@@ -711,11 +711,11 @@ fetchTemplate();
 }
 
 .send-type-btn, .send-method-btn {
-   padding: 5px 10px;
+   padding: 5px 8px;
    background-color: #f0f0f0;
    border: 1px solid #ddd;
    border-radius: 4px;
-   font-size: 10px;
+   font-size: 11px;
    cursor: pointer;
 }
 
