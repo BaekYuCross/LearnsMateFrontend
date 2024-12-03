@@ -43,20 +43,22 @@
   
   .payment-excel-button {
     background: #005950;
-    padding: 5px 10px;
-    border: none;
-    color: #ffffff;
-    cursor: pointer;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    border-radius: 5px;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 5px;
   }
 
   .payment-revenue-button {
     background: #005950;
-    padding: 5px 10px;
+    padding: 3px 5px;
+    margin-bottom: 3px;
     border: none;
     color: #ffffff;
     cursor: pointer;
@@ -274,10 +276,7 @@
     cursor: pointer;
   }
   
-  .payment-excel-button:hover {
-    background-color: #004c42;
-  }
-  
+ 
   .payment-excel-button img {
     width: 16px;
     height: 16px;

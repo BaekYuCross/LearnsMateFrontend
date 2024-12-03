@@ -56,8 +56,7 @@ const timer = ref(null);
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
-  { name: '강의', path: '/lecture', group: 'lecture' },
-  { name: '결제', path: '/payment', group: 'payment' },
+  { name: '강의', path: '/lecture', group: 'lecture' , includePaths: ['/payment']},
   { 
     name: '고객', 
     path: '/student', 
