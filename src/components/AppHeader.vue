@@ -76,6 +76,38 @@ function parseExpirationToArray(exp) {
 }
 
 
+async function refreshToken() {
+  try {
+    // 서버의 토큰 갱신 API
+    const response = await axios.post(
+      'http://localhost:5000/auth/refresh', // 서버의 토큰 갱신 API URL
+      {},
+      {
+        withCredentials: true, // 쿠키를 자동으로 포함하여 요청
+      }
+    );
+    
+    console.log('뉴토큰 갱신 성공:', response.data);
+
+    // 서버 응답에서 새로운 만료 시간 가져오기
+    const newExp = response.data.exp; //2024-12-03 09:21:27 이렇게 뽑힘
+
+    if (newExp) {
+    
+    } else {
+      console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
+    }
+
+    // 이후 클라이언트에서 newAccessToken을 활용할 로직 추가
+  } catch (error) {
+    console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
+    if (error.response && error.response.status === 401) {
+      alert('토큰 갱신 실패: 다시 로그인하세요.');
+      await Logout(); // 로그아웃 처리
+    }
+  }
+}
+
 
 // 남은 시간을 계산하는 함수
 const calculateRemainingTime = () => {
