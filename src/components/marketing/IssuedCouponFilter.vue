@@ -48,8 +48,6 @@
             <option value="이벤트">이벤트</option>
           </select>
         </div>
-      </div>
-      <div class="issued-coupon-filter-row white">
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">고객 코드</span>
           <input 
@@ -59,6 +57,8 @@
             class="issued-coupon-filter-input"
           />
         </div>
+      </div>
+      <div class="issued-coupon-filter-row white">
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">고객명</span>
           <input 
@@ -78,8 +78,6 @@
             <option value="false">미사용</option>
           </select>
         </div>
-      </div>
-      <div class="issued-coupon-filter-row gray">
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">쿠폰 할인율</span>
           <div class="issued-coupon-discount-rate-container">
@@ -114,6 +112,8 @@
             />
           </div>
         </div>
+      </div>
+      <div class="issued-coupon-filter-row gray">
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">쿠폰 만료일</span>
           <div class="issued-coupon-date-range-container">
@@ -130,8 +130,6 @@
             />
           </div>
         </div>
-      </div>
-      <div class="issued-coupon-filter-row white">
         <div class="issued-coupon-filter-item">
           <span class="issued-coupon-filter-label">쿠폰 발급일</span>
           <div class="issued-coupon-date-range-container">
@@ -217,139 +215,134 @@
 </script>
   
 <style scoped>
-  .issued-coupon-filter-card {
-    margin-bottom: 16px;
-    background-color: white;
-    padding: 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-top: 50px;
-    margin-left: 160px;
-  }
-  
-  .issued-coupon-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 3px 10px;
-    border-bottom: 1px solid #e9ecef;
-  }
-  
-  .issued-coupon-section-title {
-    font-size: 16px;
-    font-weight: 500;
-    font-weight: bold;
-  }
-  
-  .issued-coupon-filter-container {
-    display: flex;
-    flex-direction: column;
-    z-index: -100;
-  }
-  
-  .issued-coupon-filter-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    padding: 8px 16px;
-    gap: 16px;
-  }
-  
-  .issued-coupon-filter-row.gray {
-    background-color: #f8f9fa;
-  }
-  
-  .coupon-filter-row.white {
-    background-color: white;
-  }
-  
-  .issued-coupon-filter-item {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    gap: 8px;
-  }
+.issued-coupon-filter-card {
+  margin-bottom: 16px;
+  background-color: white;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* margin-top: 50px와 margin-left: 160px 제거 */
+}
 
-  .partial-width {
-    width: 33.33%;
-    flex: 0 0 33.33%;
-  }
+.issued-coupon-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 10px;
+  border-bottom: 1px solid #e9ecef;
+}
 
-  .issued-coupon-filter-label {
-    min-width: 80px;
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  
-  .issued-coupon-filter-input {
-    flex: 1;
-    padding: 5px;
-    font-size: 11px;
-    border: 1px solid #e2e8f0;
-  }
+.issued-coupon-section-title {
+  font-size: 17px;
+  font-weight: bold;
+}
 
-  .issued-coupon-date-range-container,
-  .issued-coupon-discount-rate-container {
-    display: flex;
-    flex: 1;
-    gap: 0.5rem;
-    align-items: center;
-  }
-  
-  .date-input,
-  .discount-input {
-    flex: 1;
-    min-width: 0;
-  }
-  
-  .issued-coupon-date-separator,
-  .issued-coupon-discount-rate-separator {
-    color: #64748b;
-    padding: 0 0.25rem;
-    font-size: 11px;
-  }
-  
-  .issued-coupon-button-group {
-    display: flex;
-    gap: 0.5rem;
-  }
-  
-  .issued-coupon-search-button {
-    padding: 2px 6px 3px 3px;        
-    background-color: #005950;
-    border: 1px solid #005950;
-    border-radius: 4px;
-    font-size: 11px;
-    color: white;
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
-    margin-top: 4px;
-    padding: 2px 4px;
-  }
-  
-  .issued-coupon-search-button:hover {
-    background-color: #004c42;
-    cursor: pointer;
-  }
-  
-  .reset-button {
-    padding: 4px 5px 3px;   
-    border: 1px solid #A29D9D;
-    border-radius: 4px;
-    font-size: 11px;
-    background-color: white;
-    margin-bottom: 4px;
-    margin-top: 4px;
-  }
-  
-  .reset-button:hover {
-    background-color: #f8fafc;
-    cursor: pointer;
-  }
-  
-  .coupon-search-button:focus,
-  .reset-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
-  }
+.issued-coupon-filter-container {
+  display: flex;
+  flex-direction: column;
+  /* z-index: -100 제거 */
+}
+
+.issued-coupon-filter-row {
+  display: flex;
+  padding: 3px 10px;
+}
+
+.issued-coupon-filter-row.gray {
+  background-color: #EFEFEF;
+  border-top: #D9D9D9;
+  border-bottom: #D9D9D9;
+}
+
+.issued-coupon-filter-row.white {
+  background-color: white;
+}
+
+.issued-coupon-filter-item {
+  width: 25%;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.issued-coupon-filter-label {
+  width: 5rem;
+  min-width: 5rem;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: end;
+  padding-right: 10px;
+}
+
+.issued-coupon-filter-input {
+  flex: 1;
+  padding: 5px 5px;
+  font-size: 11px;
+  border: 1px solid #e2e8f0;
+  min-width: 0;
+  width: 100%;
+}
+
+.issued-coupon-date-range-container,
+.issued-coupon-discount-rate-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.date-input,
+.discount-input {
+  width: calc(50% - 8px);
+  min-width: 0;
+}
+
+.issued-coupon-date-separator,
+.issued-discount-rate-separator {
+  color: #64748b;
+  padding: 0 0.25rem;
+  font-size: 11px;
+}
+
+.issued-coupon-button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.issued-coupon-search-button {
+  padding: 2px 6px 3px 3px;        
+  background-color: #005950;
+  border: 1px solid #005950;
+  border-radius: 4px;
+  font-size: 10px;
+  color: white;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.issued-coupon-search-button:hover {
+  background-color: #004c42;
+  cursor: pointer;
+}
+
+.reset-button {
+  padding: 4px 5px 3px;   
+  border: 1px solid #A29D9D;
+  border-radius: 4px;
+  font-size: 10px;
+  background-color: white;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+.reset-button:hover {
+  background-color: #f8fafc;
+  cursor: pointer;
+}
+
+.issued-coupon-search-button:focus,
+.reset-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
 </style>
