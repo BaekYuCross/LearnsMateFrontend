@@ -126,6 +126,16 @@
               />
             </div>
         </div>
+        <div class="coupon-filter-item">
+          <span class="coupon-filter-label">쿠폰 등록 유형</span>
+          <select 
+          v-model="filters.registration_type"
+          class="coupon-filter-input">
+            <option value="">전체</option>
+            <option value="admin">직원</option>
+            <option value="tutor">강사</option>
+          </select>
+        </div>
     </div>
     <div class="coupon-filter-row white">
         <div class="coupon-filter-item">
@@ -169,26 +179,72 @@
     end_coupon_expire_date: '',
     start_created_at: '',
     end_created_at: '',
+    registration_type: '',
     admin_name: '',
     tutor_name: '',
   })
   
   const emit = defineEmits(['search', 'reset'])
   
-  const search = () => {
-    const formattedFilters = { ...filters.value };
+  // const search = () => {
+  //   console.log('필터조건: ', filters.value);
+  //   const formattedFilters = { ...filters.value };
 
-  // 날짜 필드와 빈 문자열 처리
+  // // 날짜 필드와 빈 문자열 처리
+  // Object.keys(formattedFilters).forEach(key => {
+  //   if (formattedFilters[key] === '') {
+  //     formattedFilters[key] = null;
+  //   } else if (key.includes('date') || key.includes('created_at')) {
+  //     formattedFilters[key] = formattedFilters[key] ? new Date(formattedFilters[key]).toISOString() : null;
+  //   }
+  // });
+
+  // // registration_type 빈 문자열 처리
+  // if (!formattedFilters.registration_type) {
+  //   formattedFilters.registration_type = null;
+  // }
+
+  // console.log('검색 필터:', formattedFilters); // 디버깅용
+  // emit('search', formattedFilters);
+  // }
+
+  const search = () => {
+  // 1. 먼저 filters의 현재 상태를 자세히 출력
+  console.log('Raw filters:', filters);
+  console.log('Filters value:', filters.value);
+  
+  // 2. 각 필드의 타입과 값을 확인
+  Object.entries(filters.value).forEach(([key, value]) => {
+    console.log(`${key}: ${value} (type: ${typeof value})`);
+  });
+
+  // 3. formattedFilters 생성 및 확인
+  const formattedFilters = { ...filters.value };
+  console.log('Initial formattedFilters:', formattedFilters);
+
+  // 4. 각 필드 처리를 개별적으로 수행
   Object.keys(formattedFilters).forEach(key => {
+    console.log(`Processing ${key}:`, formattedFilters[key]);
+    
     if (formattedFilters[key] === '') {
+      console.log(`${key} is empty string, setting to null`);
       formattedFilters[key] = null;
-    } else if (key.includes('date') && formattedFilters[key]) {
-      formattedFilters[key] = new Date(formattedFilters[key]).toISOString();
+    } else if ((key.includes('date') || key.includes('created_at')) && formattedFilters[key]) {
+      console.log(`Converting date for ${key}`);
+      try {
+        formattedFilters[key] = new Date(formattedFilters[key]).toISOString();
+        console.log(`Converted ${key} to:`, formattedFilters[key]);
+      } catch (error) {
+        console.error(`Error converting date for ${key}:`, error);
+      }
     }
   });
 
+  // 5. 최종 결과 확인
+  console.log('Final formattedFilters:', formattedFilters);
+  
   emit('search', formattedFilters);
-  }
+} 
   
   const reset = () => {
     Object.keys(filters.value).forEach(key => {
