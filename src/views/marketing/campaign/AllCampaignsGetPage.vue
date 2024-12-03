@@ -324,46 +324,46 @@ onMounted(async() => {
 
     .campaign-column-selector {
       cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  border-radius: 5px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 5px;
     }
 
-    .campaign-dropdown-button {
-      background-color: #ffffff;
-      color: #000000;
-      border: 1px solid #000000;
-      padding: 5px 10px;
-      font-size: 13px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+  .campaign-dropdown-button {
+    background-color: #ffffff;
+    color: #000000;
+    border: 0.5px solid #d5d5d5;
+    padding: 3px 5px;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
     .campaign-dropdown-menu {
       position: absolute;
-  background-color: white;
-  border: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  margin-top: 200px;
-  z-index: 10;
-  width: 100px;
-  border-radius: 4px;
+      background-color: white;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      margin-top: 200px;
+      z-index: 10;
+      width: 100px;
+      border-radius: 4px;
     }
 
     .campaign-dropdown-menu input[type="checkbox"] {
-  outline: none;
-  accent-color: #005950; 
-}
+      outline: none;
+      accent-color: #005950; 
+    }
 
     .campaign-dropdown-item {
       display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
-    }
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+      }
 
     .campaign-dropdown-item label {
       font-size: 12px;
@@ -373,7 +373,8 @@ onMounted(async() => {
 
     .campaign-register-button, .campaign-excel-button {
       background: #005950;
-      padding: 5px 10px;
+      padding: 3px 5px;
+      margin-bottom: 3px;
       border: none;
       color: #ffffff;
       cursor: pointer;
@@ -381,7 +382,12 @@ onMounted(async() => {
       display: flex;
       align-items: center;
       gap: 5px;
-      border-radius: 5px;
+      border-radius: 3px;
+    }
+
+    .campaign-excel-button img {
+      width: 16px;
+      height: 16px;
     }
 
     .campaign-length {

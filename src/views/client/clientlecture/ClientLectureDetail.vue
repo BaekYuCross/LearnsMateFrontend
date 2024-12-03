@@ -7,7 +7,6 @@
         @continue="closeActivityModal"
         @logout="activityLogout"
       />
-
     <!-- 강의 상세 섹션 -->
     <div class="lecture-detail-header">
       <div class="lecture-header-left">
@@ -41,15 +40,15 @@
 
     <!-- 탭 메뉴 -->
     <div class="lecture-tabs">
-  <button class="lecture-tab active">강의 소개</button>
-  <button class="lecture-tab">커리큘럼</button>
-  <button class="lecture-tab">
-    수강평 <span class="lecture-tab-number">130</span>
-  </button>
-  <button class="lecture-tab">수강 전 문의</button>
-  <button class="lecture-tab">댓글</button>
-  <button class="lecture-tab">새소식</button>
-</div>
+      <button class="lecture-tab active">강의 소개</button>
+      <button class="lecture-tab">커리큘럼</button>
+      <button class="lecture-tab">
+        수강평 <span class="lecture-tab-number">130</span>
+      </button>
+      <button class="lecture-tab">수강 전 문의</button>
+      <button class="lecture-tab">댓글</button>
+      <button class="lecture-tab">새소식</button>
+    </div>
 
 
     <!-- 강의 소개 및 가격 섹션 -->
@@ -60,21 +59,21 @@
         <p><strong>[앱 개발 , Android]</strong> 강의입니다.</p>
         <div class="lecture-intro-section">
           <div class="lecture-intro-icon">
-  <img src="@/assets/icons/doit.svg" alt="이런 걸 배워요" />
-  <span>이런 걸 배워요!</span>
-</div>
+            <img src="@/assets/icons/doit.svg" alt="이런 걸 배워요" />
+            <span>이런 걸 배워요!</span>
+          </div>
           <div class="lecture-intro-content">
             <ul>
-  <li>모바일 애플리케이션 아키텍처 설계</li>
-  <li>Android 및 iOS 개발 환경 구축</li>
-  <li>UI/UX 디자인 및 구현</li>
-  <li>React Native를 이용한 크로스플랫폼 앱 개발</li>
-  <li>백엔드 API와의 통신 및 데이터 처리</li>
-  <li>실시간 데이터 동기화를 위한 WebSocket 활용</li>
-  <li>애플리케이션 보안 및 데이터 보호</li>
-  <li>테스트 주도 개발(TDD)로 안정성 확보</li>
-  <li>앱 배포 및 스토어 최적화</li>
-</ul>
+              <li>모바일 애플리케이션 아키텍처 설계</li>
+              <li>Android 및 iOS 개발 환경 구축</li>
+              <li>UI/UX 디자인 및 구현</li>
+              <li>React Native를 이용한 크로스플랫폼 앱 개발</li>
+              <li>백엔드 API와의 통신 및 데이터 처리</li>
+              <li>실시간 데이터 동기화를 위한 WebSocket 활용</li>
+              <li>애플리케이션 보안 및 데이터 보호</li>
+              <li>테스트 주도 개발(TDD)로 안정성 확보</li>
+              <li>앱 배포 및 스토어 최적화</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -133,7 +132,7 @@ const selectedCourse = {
 </script>
 
 
-<style lang="scss" scoped>
+<style scoped>
 .clientvoc-app-container  {
   font-family: "Arial", sans-serif;
   color: #333;

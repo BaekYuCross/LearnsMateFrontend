@@ -1,186 +1,244 @@
 <template>
-    <div class="issued-coupon-top-line"></div>
-    <div class="issued-coupon-detail-contents">
-    <table class="issued-coupon-detail-table" v-if="selectedCoupon">
-      <tbody>
-          <tr>
-              <th>발급 쿠폰 번호</th>
-              <td>{{ selectedCoupon.coupon_issuance_code }}</td>
-          </tr>
-          <tr>
-              <th>쿠폰 이름</th>
-              <td>{{ selectedCoupon.coupon_name }}</td>
-          </tr>
-          <tr>
-              <th>쿠폰 내용</th>
-              <td>{{ selectedCoupon.coupon_contents || '-' }}</td>
-          </tr>
-          <tr>
-              <th>쿠폰 종류</th>
-              <td>{{ selectedCoupon.coupon_category_name }}</td>
-          </tr>
-          <tr>
-            <th>고객 코드</th>
-            <td>{{ selectedCoupon.student_code }}</td>
-          </tr>
-          <tr>
-            <th>고객명</th>
-            <td>{{ selectedCoupon.student_name }}</td>
-          </tr>
-          <tr>
-            <th>사용 여부</th>
-            <td>{{ selectedCoupon.coupon_use_status  ? 'O' : 'X' }}</td>
-          </tr>
-          <tr>
-            <th>할인율</th>
-            <td>{{ selectedCoupon.coupon_discount_rate }}</td>
-          </tr>
-          <tr>
-            <th>시작일</th>
-            <td>{{ formatDate(selectedCoupon.coupon_start_date) }}</td>
-          </tr>
-          <tr>
-            <th>만료일</th>
-            <td>{{ formatDate(selectedCoupon.coupon_expire_date) }}</td>
-          </tr>
-          <tr>
-            <th>생성일</th>
-            <td>{{ formatDate(selectedCoupon.coupon_issue_date) }}</td>
-          </tr>
-          <tr>
-            <th>사용일</th>
-            <td>{{ formatDate(selectedCoupon.coupon_use_date) }}</td>
-          </tr>
-      </tbody>
-    </table>
-    <table class="lecture-by-coupon-table">
-        <thead>
-          <tr>
-              <th>강의 코드</th>
-              <th>강의 이름</th>
-              <th>강사 이름</th>
-              <th>강의 가격</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-              <td>{{ selectedCoupon.lectureCode || '-'  }}</td>
-              <td>{{ selectedCoupon.lectureName || '-'  }}</td>
-              <td>{{ selectedCoupon.tutorName || '-'  }}</td>
-              <td>{{ selectedCoupon.lecturePrice || '-'  }}</td>
-          </tr>
-        </tbody>
-    </table>
-    <div class="issued-coupon-buttons">
-      <button class="issued-coupon-edit-button">쿠폰 수정</button>
-      <button class="issued-coupon-delete-button">쿠폰 삭제</button>
+  <div class="issued-coupon-detail-container">
+    <div class="issued-coupon-detail-header">
+      <h3 class="issued-coupon-detail-title">쿠폰 상세 정보</h3>
+      <button class="close-button" @click="$emit('close')">×</button>
+    </div>
+    <div class="issued-coupon-detail-content">
+      <div class="issued-coupon-detail-item">
+        <span class="label">발급 쿠폰 번호</span>
+        <span class="value">{{ selectedCoupon.coupon_issuance_code }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">쿠폰 이름</span>
+        <span class="value">{{ selectedCoupon.coupon_name }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">쿠폰 내용</span>
+        <span class="value">{{ selectedCoupon.coupon_contents || '-' }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">쿠폰 종류</span>
+        <span class="value">{{ selectedCoupon.coupon_category_name }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">고객 코드</span>
+        <span class="value">{{ selectedCoupon.student_code }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">고객명</span>
+        <span class="value">{{ selectedCoupon.student_name }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">사용 여부</span>
+        <span class="value">{{ selectedCoupon.coupon_use_status ? 'O' : 'X' }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">할인율</span>
+        <span class="value">{{ selectedCoupon.coupon_discount_rate }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">시작일</span>
+        <span class="value">{{ formatDate(selectedCoupon.coupon_start_date) }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">만료일</span>
+        <span class="value">{{ formatDate(selectedCoupon.coupon_expire_date) }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">생성일</span>
+        <span class="value">{{ formatDate(selectedCoupon.coupon_issue_date) }}</span>
+      </div>
+      <div class="issued-coupon-detail-item">
+        <span class="label">사용일</span>
+        <span class="value">{{ formatDate(selectedCoupon.coupon_use_date) }}</span>
+      </div>
+
+      <div class="lecture-info-section" v-if="hasLectureInfo">
+      <h4 class="lecture-info-title">강의 정보
+        <button class="lecture-toggle-button" @click="toggleLectureSection">
+          {{ isLectureSectionVisible ? '&#9650;' : '&#9660;' }}
+        </button>
+      </h4>
+      <div v-if="selectedCoupon.lecture_code?.length > 0 && isLectureSectionVisible">
+        <div 
+          v-for="(_, index) in selectedCoupon.lecture_code" 
+          :key="index"
+          class="lecture-item"
+        >
+          <div class="issued-coupon-detail-item">
+            <span class="label">강의 코드</span>
+            <span class="value">{{ selectedCoupon.lecture_code[index] }}</span>
+          </div>
+          <div class="issued-coupon-detail-item">
+            <span class="label">강의 이름</span>
+            <span class="value">{{ selectedCoupon.lecture_name[index] }}</span>
+          </div>
+          <div class="issued-coupon-detail-item">
+            <span class="label">강사 이름</span>
+            <span class="value">{{ selectedCoupon.tutor_name[index] }}</span>
+          </div>
+          <div class="issued-coupon-detail-item">
+            <span class="label">강의 가격</span>
+            <span class="value">{{ formatPrice(selectedCoupon.lecture_price[index]) }}</span>
+          </div>
+          <div v-if="index < selectedCoupon.lecture_code.length - 1" class="lecture-divider"></div>
+        </div>
+      </div>
+
+      <div v-else-if="isLectureSectionVisible" class="no-lecture-info">
+        <span>사용 가능한 강의가 존재하지 않습니다.</span>
+      </div>
+    </div>
     </div>
   </div>
-  </template>
-  
-  <script setup>
-  defineProps(['selectedCoupon']);
-  
-  // 날짜 포맷 함수
-  const formatDate = (isoDate) => {
-    if (!isoDate) return '-';
-    const date = new Date(isoDate);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  };
-  </script>
-  
-  <style scoped>
-  .issued-coupon-top-line {
-    height: 15px;
-    background-color: #005950;
+</template>
+
+<script setup>
+import { ref, computed } from 'vue';
+
+const props = defineProps({
+  selectedCoupon: {
+    type: Object,
+    required: true
   }
+});
+
+const hasLectureInfo = computed(() => {
+  if (!props.selectedCoupon) return false;
   
-  .issued-coupon-detail-contents {
-    padding: 20px 30px;
-  }
-  
-  .issued-coupon-detail-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin: 0px auto;
-    background-color: #ffffff;
-  }
-  
-  .issued-coupon-detail-table th {
-    background-color: #f9f9f9;
-    font-size: 13px;
-    font-weight: bold;
-    color: #595656;
-    text-align: right;
-    width: 100px;
-    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
-  }
-  
-  .issued-coupon-detail-table td {
-      font-size: 11px;
-      color: #333333;
-      text-align: left;
-      width: 82%;
-  }
-  
-  .issued-coupon-detail-table th,
-  .issued-coupon-detail-table td {
-    padding: 10px 20px;
-    border-bottom: 1px solid #eaeaea;
-  }
-  
-  .lecture-by-coupon-table th {
-    background-color: #f9f9f9;
-    font-size: 13px;
-    font-weight: bold;
-    color: #595656;
-    text-align: center;
-  }
-  
-  .lecture-by-coupon-table td {
-      font-size: 11px;
-      color: #333333;
-      text-align: center;
-      background-color: #ffffff;
-  }
-  
-  .lecture-by-coupon-table th,
-  .lecture-by-coupon-table td {
-      padding: 10px 20px;
-      margin-top: 20px;
-      border-bottom: 1px solid #eaeaea;
-  }
-  
-  .lecture-by-coupon-table {
-      width: 100%;
-      margin-top: 20px;
-      border-collapse: collapse;
-  }
-  
-  .issued-coupon-buttons {
-      position: relative;
-      margin-top: 20px;
-      text-align: right;
-  }
-  
-  .issued-coupon-edit-button,
-  .issued-coupon-delete-button {
-      background-color: #005950;
-      color: #ffffff;
-      border: none;
-      border-radius: 3px;
-      margin-left: 20px;
-      padding: 5px 10px;
-  }
-  
-  .issued-coupon-edit-button:hover,
-  .issued-coupon-delete-button:hover {
-    cursor: pointer;
-    background-color: #004c42;
-  }
-  </style>
+  return !!(props.selectedCoupon.lecture_code || 
+            props.selectedCoupon.lecture_name || 
+            props.selectedCoupon.tutor_name || 
+            props.selectedCoupon.lecture_price);
+});
+
+const formatDate = (isoDate) => {
+  if (!isoDate) return '-';
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+};
+
+const formatPrice = (price) => {
+  if (!price) return '-';
+  return price.toLocaleString('ko-KR') + '원';
+};
+
+const isLectureSectionVisible = ref(false);
+
+const toggleLectureSection = () => {
+  isLectureSectionVisible.value = !isLectureSectionVisible.value;
+};
+</script>
+
+<style scoped>
+.issued-coupon-detail-container {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  height: 570px;
+  width: 400px;
+  overflow-y: auto;
+  flex: 0.4;
+  margin-left: 10px;
+}
+
+.issued-coupon-detail-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.issued-coupon-detail-title {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.issued-coupon-detail-content {
+  padding: 20px;
+}
+
+.issued-coupon-detail-item {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.label {
+  width: 120px;
+  color: #666;
+  font-size: 14px;
+}
+
+.value {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+}
+
+.lecture-info-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #eaeaea;
+}
+
+.lecture-info-title {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.lecture-item {
+  margin-bottom: 16px;
+}
+
+.lecture-divider {
+  height: 1px;
+  background-color: #eaeaea;
+  margin: 16px 0;
+}
+
+.no-lecture-info {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.lecture-toggle-button {
+  background: none;
+  border: none;
+  font-size: 16px; /* 화살표 크기 */
+  color: #005950;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 10px; /* 화살표와 텍스트 간 간격 */
+  position: relative;
+}
+
+</style>
