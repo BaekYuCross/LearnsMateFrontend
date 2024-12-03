@@ -482,10 +482,9 @@ const getMappedLevel = (level) => {
 };
 
 const getMappedCategory = (category) => {
-  return categoryMapping[category] || '알 수 없음'; // 맵핑되지 않은 값은 '알 수 없음'으로 처리
+  return categoryMapping[category] || '알 수 없음';
 };
 
-// 토글 상태 관리
 const isCourseSectionVisible = ref(false);
 
 const toggleCourseSection = () => {

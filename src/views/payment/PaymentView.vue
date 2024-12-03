@@ -441,13 +441,25 @@ const camelToSnake = (obj) => {
 const handleSearch = async (filterData) => {
     try {
         isFiltered.value = true;
-        lastFilterData.value = filterData;
+
+        const convertToISODate = (date) => {
+            if (!date) return null;
+            const parsedDate = new Date(date);
+            return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
+        };
+
+        const processedData = {
+            ...filterData,
+            startCreatedAt: convertToISODate(filterData.startCreatedAt),
+            endCreatedAt: convertToISODate(filterData.endCreatedAt),
+        };
+
+        lastFilterData.value = processedData;
+
         const response = await axios.post(
-            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`, 
-            camelToSnake(filterData)
+            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+            camelToSnake(processedData)
         );
-        
-        console.log(response);
 
         paymentList.value = response.data.content;
         totalElements.value = response.data.totalElements;

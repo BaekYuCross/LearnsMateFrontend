@@ -345,11 +345,19 @@ const handleSearch = async (filterData) => {
     isFiltered.value = true;
     currentPage.value = 1;
 
+    const convertToISODate = (date) => {
+      if (!date) return null;
+      const parsedDate = new Date(date);
+      return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
+    };
+
     const processedData = {
       ...filterData,
+      startCreateDate: convertToISODate(filterData.startCreateDate),
+      endCreateDate: convertToISODate(filterData.endCreateDate),
+      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null,
       vocAnswerStatus: filterData.vocAnswerStatus === "true" ? true :
                       filterData.vocAnswerStatus === "false" ? false : null,
-      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null,
     };
 
     lastFilterData.value = processedData;
