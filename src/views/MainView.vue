@@ -54,7 +54,7 @@
         <div class="card full-width">
           <h3>강의</h3>
           <ul>
-            <li v-for="lecture in lectures" :key="lecture.lecture_code">
+            <li v-for="lecture in formattedTutors" :key="lecture.lecture_code">
               [강사] {{ lecture.tutor_name }} / {{ lecture.lecture_title }}
               <span class="rating">({{ lecture.lecture_category_name }}) {{ lecture.rating }} ★★★★★</span>
             </li>
@@ -65,7 +65,7 @@
         <!-- 계약 섹션 -->
         <div class="card full-width">
           <h3>계약</h3>
-          <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ contracts.client }}</p>
+          <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ formattedContract.client }}</p>
           <div class="contract-status">
             <div
               class="step"
@@ -118,7 +118,7 @@
         <div class="card small">
           <h3>예비 블랙리스트</h3>
           <ul>
-            <li v-for="(reserved, index) in reservedList" :key="index">
+            <li v-for="(reserved, index) in formattedReservedStudents" :key="index">
               {{ reserved.member_name }} - 신고횟수: {{ reserved.report_count }}
             </li>
             <a href="/student/blacklist/reserved" class="more-link">+ 더보기</a>
@@ -333,6 +333,32 @@ const formattedMembers = computed(() => {
   });
 });
 
+const formattedTutors = computed(() => {
+  return lectures.value.map((tutor) => {
+    return {
+      ...tutor,
+      tutor_name: maskName(tutor.tutor_name) 
+    };
+  });
+});
+
+const formattedContract = computed(() => {
+  return {
+    ...contracts.value,
+    client: maskName(contracts.value.client), 
+  };
+});
+
+
+const formattedReservedStudents = computed(() => {
+  return reservedList.value.map((student) => {
+    return {
+      ...student,
+      member_name: maskName(student.member_name) 
+    };
+  });
+}); 
+
 const fetchContract = async () => {
   try {
     const response = await axios.get('http://localhost:5000/contract-status/list', {
@@ -530,11 +556,6 @@ const fetchReservedList = async () => {
     console.error('Failed to fetch reserved list:', error);
   }
 };
-
-
-
-
-
 
 // OnMounted - 전체 로딩 관리
 onMounted(async () => {
