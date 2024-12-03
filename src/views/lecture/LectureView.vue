@@ -198,11 +198,19 @@
             </div>
             <div class="lecture-stats-section">
               <div class="lecture-stats-header">
-                <h3 class="lecture-stats-title">구매 전환율 필터링</h3>
+                <div class="lecture-stats-actions">
+                  <h3 class="lecture-stats-title">구매 전환율 필터링 </h3>
+                    <button @click="fetchLectureStats" class="lecture-stats-search">
+                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
+                    </button>
+                    <button @click="resetStatsFilter" class="lecture-stats-reset">
+                      <img src="@/assets/icons/reset.svg" alt="초기화">
+                    </button>
+                  </div>
                 <div class="lecture-stats-filter">
                   <div class="lecture-stats-period">
-                    <span class="lecture-stats-label">조회 기간</span>
                     <div class="lecture-stats-dates">
+                      <span class="lecture-stats-label">조회 기간</span>
                       <div class="lecture-stats-date-group">
                         <select v-model="statsFilter.startYear" class="lecture-stats-select">
                           <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
@@ -226,14 +234,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="lecture-stats-actions">
-                    <button @click="fetchLectureStats" class="lecture-stats-search">
-                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
-                    </button>
-                    <button @click="resetStatsFilter" class="lecture-stats-reset">
-                      <img src="@/assets/icons/reset.svg" alt="초기화">
-                    </button>
-                  </div>
+                 
                 </div>
               </div>
 
