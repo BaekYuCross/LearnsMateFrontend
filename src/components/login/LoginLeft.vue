@@ -54,7 +54,8 @@ const loginUser = async () => {
       }
     );
 
-    console.log('로그인 응답:', loginResponse);
+    console.log('Login Response:', loginResponse); // 서버 응답 확인
+    console.log('Set-Cookie Header:', document.cookie); // 클라이언트에 저장된 쿠키 확인
 
     if (!loginResponse || !loginResponse.data) {
       throw new Error('로그인 응답 데이터가 없습니다.');
