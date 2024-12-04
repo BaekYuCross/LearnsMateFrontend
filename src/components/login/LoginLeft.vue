@@ -26,31 +26,28 @@ const formData = ref({
 });
 
 const loginUser = async () => {
-  if (!formData.value.adminCode || !formData.value.adminPassword) {
-    alert('사번과 비밀번호를 입력해주세요.');
-    return;
-  }
-
   try {
     const response = await axios.post(
-      'https://learnsmate.shop/users/login',
+      'https://learnsmate.shop/auth/login',
       {
         admin_code: formData.value.adminCode,
         admin_password: formData.value.adminPassword,
       },
       {
-        withCredentials: true, // 쿠키 포함
-        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
       }
     );
-
-    console.log('login success :', response);
-
-    // 로그인 상태 확인 (쿠키 기반)
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
     await loginState.fetchLoginState();
-
-    alert(`${loginState.adminName}님, 환영합니다.`);
-    router.push('/'); 
+    
+    if (loginState.isLoggedIn) {
+      alert(`${loginState.adminName}님, 환영합니다.`);
+      router.push('/');
+    } else {
+      throw new Error('로그인 상태 확인 실패');
+    }
   } catch (error) {
     console.error('로그인 실패:', error);
     alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');

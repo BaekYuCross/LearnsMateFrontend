@@ -26,7 +26,6 @@
             {{ remainingTime }}
           </span>
 
-          <!-- Vue 방식으로 수정 -->
           <button class="extend-btn" @click="refreshToken">연장</button>
         </div>
         <div class="user-info">
@@ -86,8 +85,6 @@ async function refreshToken() {
         withCredentials: true, // 쿠키를 자동으로 포함하여 요청
       }
     );
-    
-    console.log('뉴토큰 갱신 성공:', response.data);
 
     // 서버 응답에서 새로운 만료 시간 가져오기
     const newExp = response.data.exp; //2024-12-03 09:21:27 이렇게 뽑힘
