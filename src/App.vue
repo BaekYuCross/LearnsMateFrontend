@@ -6,9 +6,6 @@
         <RouterView />
       </main>
     </div>
-    <main>
-      <RouterView />
-    </main>
   </div>
 </template>
 
