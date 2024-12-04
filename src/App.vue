@@ -32,17 +32,23 @@ const excludedPaths = [
 ];
 
 const shouldShowHeader = computed(() => {
-  console.log('Computing header visibility:', {
-    path: route.path,
-    isLoggedIn: isLoggedIn.value,
-    isExcluded: excludedPaths.includes(route.path),
-    isClientLectureDetail: route.path.startsWith('/client-lecturedetail/')
-  });
+  if (route && isLoggedIn !== undefined) {
+    const pathCheck = !excludedPaths.includes(route.path);
+    const clientCheck = !route.path.startsWith('/client-lecturedetail/');
+    const loginCheck = isLoggedIn.value;
+    const transitioning = !isTransitioning.value;
+
+    console.log('Computing header visibility:', {
+      path: route.path,
+      isLoggedIn: loginCheck,
+      isExcluded: !pathCheck,
+      isClientLectureDetail: !clientCheck
+    });
+
+    return loginCheck && pathCheck && clientCheck && transitioning;
+  }
   
-  return isLoggedIn.value && 
-         !excludedPaths.includes(route.path) && 
-         !route.path.startsWith('/client-lecturedetail/') && 
-         !isTransitioning.value;
+  return false;
 });
 </script>
 
