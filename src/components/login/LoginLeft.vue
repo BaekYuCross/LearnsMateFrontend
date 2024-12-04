@@ -47,6 +47,9 @@ const loginUser = async () => {
       {
         admin_code: formData.value.adminCode,
         admin_password: formData.value.adminPassword,
+      },
+      {
+        withCredentials: true
       }
     );
     console.log('로그인 응답:', response);
