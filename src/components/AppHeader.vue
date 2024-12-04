@@ -34,7 +34,7 @@
         </div>
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click="Logout">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click.stop="Logout">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
         <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
@@ -146,14 +146,20 @@ const currentGroup = computed(() => {
   return matchedMenu ? matchedMenu.group : 'defaultGroup';
 });
 
+let isLoggingOut = false;
+
 const Logout = async () => {
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+
   try {
     await loginState.logout();
-    alert('로그아웃되었습니다.');
     router.push('/login');
   } catch (error) {
     console.error('Logout error:', error);
     alert('로그아웃 중 문제가 발생했습니다.');
+  } finally {
+    isLoggingOut = false;
   }
 };
 
