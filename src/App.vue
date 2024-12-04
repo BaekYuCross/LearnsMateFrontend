@@ -38,17 +38,11 @@ const excludedPaths = [
 ];
 
 const shouldShowHeader = computed(() => {
-  if (!route || typeof isLoggedIn.value !== 'boolean') {
-    return false;
-  }
-
+  if (!route || !isLoggedIn.value) return false;
   const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
-  return (
-    isLoggedIn.value &&
-    !excludedPaths.includes(route.path) &&
-    !isClientLectureDetail
-  );
+  return !excludedPaths.includes(route.path) && !isClientLectureDetail;
 });
+
 
 onMounted(async () => {
   if (!loginState.isLoggedIn) {
