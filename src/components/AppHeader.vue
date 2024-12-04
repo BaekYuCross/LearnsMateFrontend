@@ -80,7 +80,7 @@ async function refreshToken() {
   try {
     // 서버의 토큰 갱신 API
     const response = await axios.post(
-      'http://localhost:5000/auth/refresh', // 서버의 토큰 갱신 API URL
+      'https://learnsmate.shop/auth/refresh', // 서버의 토큰 갱신 API URL
       {},
       {
         withCredentials: true, // 쿠키를 자동으로 포함하여 요청

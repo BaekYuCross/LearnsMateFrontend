@@ -215,7 +215,7 @@ const formatCurrency = (value) => {
 // 전체 강사 목록
 const fetchTutors = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/member/tutors', {
+    const response = await axios.get('https://learnsmate.shop/member/tutors', {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -238,7 +238,7 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = filterData;
     currentPage.value = 1;
 
-    const response = await axios.post('http://localhost:5000/member/filter/tutor', lastFilterData.value, {
+    const response = await axios.post('https://learnsmate.shop/member/filter/tutor', lastFilterData.value, {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -261,7 +261,7 @@ const handleExcelDownload = async() => {
   try{
     const config = {
       method: 'POST',
-      url: 'http://localhost:5000/member/excel/download/tutor',
+      url: 'https://learnsmate.shop/member/excel/download/tutor',
       responseType: 'blob',
       withCredentials: true, 
       headers: {
@@ -320,7 +320,7 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post('http://localhost:5000/member/filter/tutor',lastFilterData.value, {
+    const response = await axios.post('https://learnsmate.shop/member/filter/tutor',lastFilterData.value, {
       withCredentials: true,   
       params: {
         page: currentPage.value - 1,
@@ -375,7 +375,7 @@ const showDetail = async (tutor) => {
   } else {
     selectedTutor.value = tutor;
     try {
-      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`);
+      const response = await axios.get(`https://learnsmate.shop/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
     } catch (error) {
       console.error('Failed to load tutor detail:', error);

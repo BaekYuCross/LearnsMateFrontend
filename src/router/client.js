@@ -13,7 +13,7 @@ const checkLoginAndTime = async () => {
     if (diffHours >= 6) {
         try {
             // 로그아웃 요청 보내기
-            await axios.post('http://localhost:5000/client/logout', {
+            await axios.post('https://learnsmate.shop/client/logout', {
                 loginHistoryCode: clientInfo.loginHistoryCode,
             });
         } catch (error) {
