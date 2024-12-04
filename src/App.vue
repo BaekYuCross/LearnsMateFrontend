@@ -11,7 +11,9 @@
 import AppHeader from './components/AppHeader.vue';
 import { RouterView, useRoute } from 'vue-router';
 import { computed, ref, watch, nextTick } from 'vue';
+import { useLoginState } from '@/stores/loginState';  // loginState import 추가
 
+const loginState = useLoginState();  // store 초기화
 const route = useRoute();
 const isTransitioning = ref(false);
 
@@ -31,9 +33,9 @@ const isHeaderVisible = computed(() => {
   const currentPath = route.path;
   const isExcluded = excludedPaths.includes(currentPath);
   const isClientLectureDetail = currentPath.startsWith('/client-lecturedetail/');
-  const isAuthenticated = loginState.isLoggedIn;
-
-  console.log('Header visibility check:', {
+  const isAuthenticated = loginState.isLoggedIn;  // store에서 로그인 상태 확인
+  
+  console.log('Header visibility:', {
     currentPath,
     isExcluded,
     isClientLectureDetail,
