@@ -3,11 +3,11 @@ import axios from 'axios';
 
 export const useLoginState = defineStore('loginState', {
   state: () => ({
-    isLoggedIn: false, // 로그인 상태
-    adminName: '',     // 관리자 이름
-    adminTeam: '',     // 관리자 부서
-    adminCode: '',     // 관리자 코드
-    exp: '',           // 토큰 만료 시간
+    isLoggedIn: false,
+    adminName: '',
+    adminTeam: '',
+    adminCode: '',
+    exp: null,
   }),
   actions: {
     // 로그인 상태 확인
@@ -59,7 +59,7 @@ export const useLoginState = defineStore('loginState', {
       this.adminName = '';
       this.adminTeam = '';
       this.adminCode = '';
-      this.exp = '';
+      this.exp = null;
     },
   },
 });

@@ -116,7 +116,9 @@ async function refreshToken() {
 
 // 남은 시간을 계산하는 함수
 const calculateRemainingTime = () => {
-  if (!loginState.exp || !Array.isArray(loginState.exp)) return '';
+  if (!loginState.exp || !Array.isArray(loginState.exp) || loginState.exp.length !== 6) {
+    return '00:00:00';
+  }
   
   const [year, month, day, hour, minute, second] = loginState.exp;
   const expirationDate = new Date(year, month - 1, day, hour, minute, second);
@@ -179,17 +181,28 @@ const startTimer = () => {
   }, 1000);
 };
 
-watch(() => loginState.exp, (newValue) => {
-  if (newValue) {
-    startTimer();
-  }
-}, { immediate: true });
+watch(
+  () => loginState.exp,
+  (newValue) => {
+    if (newValue) {
+      startTimer();
+    } else {
+      if (timer.value) {
+        clearInterval(timer.value);
+      }
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   if (!loginState.isLoggedIn) {
-    await loginState.fetchLoginState(); 
+    try {
+      await loginState.fetchLoginState();
+    } catch (error) {
+      console.error('Failed to fetch login state:', error);
+    }
   }
-  startTimer();
 });
 
 // 컴포넌트가 언마운트될 때 타이머 정리
