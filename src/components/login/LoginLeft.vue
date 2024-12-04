@@ -25,9 +25,16 @@ const formData = ref({
 });
 
 const checkLoginStatus = async () => {
-  await loginState.fetchLoginState();
-  if (loginState.isLoggedIn) {
-    router.push('/');
+  try {
+    await loginState.fetchLoginState();
+    if (loginState.isLoggedIn) {
+      router.push('/');
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      return;
+    }
+    console.error('로그인 상태 확인 중 에러:', error);
   }
 };
 
