@@ -55,7 +55,7 @@
       </div>
 
       <div class="lecture-info-section" v-if="hasLectureInfo">
-      <h4 class="lecture-info-title">강의 정보
+      <h4 class="lecture-info-title">강의 정보 ({{ selectedCoupon.lecture_code.length }})
         <button class="lecture-toggle-button" @click="toggleLectureSection">
           {{ isLectureSectionVisible ? '&#9650;' : '&#9660;' }}
         </button>

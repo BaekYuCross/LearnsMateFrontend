@@ -4,7 +4,7 @@
     <div class="voc-content-container" :class="{ 'single-view': isSingleView }">
       <VOCFilter @search="handleSearch" @reset="handleReset" />
       <div class="voc-actions">
-        <div class="voc-count">등록된 VOC <span class="voc-length">{{ totalCount }}</span>개</div>
+        <div class="voc-count">등록된 VOC <span class="voc-length">{{ formatNumber(totalCount) }}</span>개</div>
         <div class="voc-button-group">
           <button class="voc-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
@@ -20,16 +20,106 @@
       <div class="voc-content-body">
         <div class="voc-board-container">
           <div class="voc-board-header">
-            <div class="voc-board-header-number">VOC 번호</div>
-            <div class="voc-board-header-content">VOC 내용</div>
-            <div class="voc-board-header-category">카테고리</div>
-            <div class="voc-board-header-type">고객 유형</div>
-            <div class="voc-board-header-name">고객명</div>
-            <div class="voc-board-header-code">고객 코드</div>
-            <div class="voc-board-header-manager">담당자</div>
-            <div class="voc-board-header-date">등록일</div>
-            <div class="voc-board-header-status">답변 상태</div>
-            <div class="voc-board-header-satisfaction">만족도</div>
+            <div 
+              class="voc-board-header-number"
+              @click="sortVOCList('voc_code')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_code' && sortState.order === 2
+              }"
+            >
+              VOC 번호
+            </div>
+            <div 
+              class="voc-board-header-content"
+              @click="sortVOCList('voc_content')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_content' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_content' && sortState.order === 2
+              }"
+            >
+              VOC 내용
+            </div>
+            <div 
+              class="voc-board-header-category"
+              @click="sortVOCList('voc_category_name')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_category_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_category_name' && sortState.order === 2
+              }"
+            >
+              카테고리
+            </div>
+            <div 
+              class="voc-board-header-type"
+              @click="sortVOCList('member_type')"
+              :class="{
+                'sort-asc': sortState.column === 'member_type' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_type' && sortState.order === 2
+              }"
+            >
+              고객 유형
+            </div>
+            <div 
+              class="voc-board-header-name"
+              @click="sortVOCList('member_name')"
+              :class="{
+                'sort-asc': sortState.column === 'member_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_name' && sortState.order === 2
+              }"
+            >
+              고객명
+            </div>
+            <div 
+              class="voc-board-header-code"
+              @click="sortVOCList('member_code')"
+              :class="{
+                'sort-asc': sortState.column === 'member_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'member_code' && sortState.order === 2
+              }"
+            >
+              고객 코드
+            </div>
+            <div 
+              class="voc-board-header-manager"
+              @click="sortVOCList('admin_name')"
+              :class="{
+                'sort-asc': sortState.column === 'admin_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'admin_name' && sortState.order === 2
+              }"
+            >
+              담당자
+            </div>
+            <div 
+              class="voc-board-header-date"
+              @click="sortVOCList('created_at')"
+              :class="{
+                'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
+                'sort-desc': sortState.column === 'created_at' && sortState.order === 2
+              }"
+            >
+              등록일
+            </div>
+            <div 
+              class="voc-board-header-status"
+              @click="sortVOCList('voc_answer_status')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_answer_status' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_answer_status' && sortState.order === 2
+              }"
+            >
+              답변 상태
+            </div>
+            <div 
+              class="voc-board-header-satisfaction"
+              @click="sortVOCList('voc_answer_satisfaction')"
+              :class="{
+                'sort-asc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 1,
+                'sort-desc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 2
+              }"
+            >
+              만족도
+            </div>
           </div>
 
           <div class="voc-board-body">
@@ -37,8 +127,8 @@
               <div class="voc-board-row-number">{{ voc.voc_code.slice(0, 10) }}...</div>
               <div class="voc-board-row-content">{{ voc.voc_content }}</div>
               <div class="voc-board-row-category">{{ voc.voc_category_name }}</div>
-              <div class="voc-board-row-type">{{ voc.member_type }}</div>
-              <div class="voc-board-row-name">{{ voc.member_name }}</div>
+              <div class="voc-board-row-type">{{ translateMemberType(voc.member_type) }}</div>
+              <div class="voc-board-row-name">{{ maskName(voc.member_name) }}</div>
               <div class="voc-board-row-code">{{ voc.member_code }}</div>
               <div class="voc-board-row-manager">{{ voc.admin_name || '-' }}</div>
               <div class="voc-board-row-date">{{ formatDateFromArray(voc.created_at) }}</div>
@@ -79,7 +169,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 내용</span>
-              <span class="value">{{ selectedVOC.voc_content }}</span>
+              <span class="value" style="width: 200px;">{{ selectedVOC.voc_content }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">카테고리</span>
@@ -87,7 +177,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">고객 유형</span>
-              <span class="value">{{ selectedVOC.member_type }}</span>
+              <span class="value">{{ translateMemberType(selectedVOC.member_type) }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">고객명</span>
@@ -119,7 +209,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 답변</span>
-              <span v-if="!isEditingAnswer" class="value">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
+              <span v-if="!isEditingAnswer" class="value" style="width: 200px;">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
               <textarea
                 v-else
                 v-model="editAnswerContent"
@@ -141,6 +231,13 @@
                 @click="startEditingAnswer"
               >
                 VOC 답변 수정
+              </button>
+              <button
+                v-if="isEditingAnswer"
+                class="voc-answer-complete-button"
+                @click="cancelEditing"
+              >
+                취소
               </button>
               <button
                 v-if="isEditingAnswer"
@@ -245,6 +342,12 @@ const showSingleVoc = () => {
   console.log('showSingleVoc called: isSingleView =', isSingleView.value);
 };
 
+
+const formatNumber = (number) => {
+  if (!number) return '0';
+  return number.toLocaleString('ko-KR');
+};
+
 const hideSingleVoc = () => {
   isSingleView.value = false;
   console.log('hideSingleVoc called: isSingleView =', isSingleView.value);
@@ -333,6 +436,20 @@ const handleExcelDownload = async () => {
   }
 };
 
+const translateMemberType = (type) => {
+  if (type === 'STUDENT') {
+    return '학생';
+  } else if (type === 'TUTOR') {
+    return '강사';
+  } else {
+    return type; // 예외 처리
+  }
+};
+
+const cancelEditing = () => {
+  isEditingAnswer.value = false;  
+  editAnswerContent.value = selectedVOC.value.voc_answer_content; 
+};
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
@@ -379,6 +496,7 @@ const showVOCDetail = async (voc) => {
   }
 };
 
+
 const closeVOCDetail = () => {
   selectedVOC.value = null;
   hideSingleVoc();
@@ -392,6 +510,7 @@ const closeRegisterModal = () => {
   isRegisterModalOpen.value = false;
 };
 
+
 const startEditingAnswer = () => {
     isEditingAnswer.value = true;
     editAnswerContent.value = selectedVOC.value?.voc_answer_content || '';
@@ -402,11 +521,16 @@ const startRegisteringAnswer = () => {
   editAnswerContent.value = '';
 };
 
+
 const confirmAction = () => {
   if (!editAnswerContent.value.trim()) {
     alert('답변 내용을 입력해주세요.');
     return;
   }
+
+
+
+
 
   if (!selectedVOC.value.voc_answer_code) {
     isRegisterModalOpen.value = true;
@@ -512,4 +636,40 @@ const startPage = computed(() => {
 const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1]
 })
+
+const maskName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
+};
+
+const sortState = ref({
+  column: null,
+  order: 0,
+});
+
+const sortVOCList = (columnKey) => {
+  if (sortState.value.column === columnKey) {
+    sortState.value.order = (sortState.value.order + 1) % 3;
+  } else {
+    sortState.value.column = columnKey;
+    sortState.value.order = 1;
+  }
+
+  if (sortState.value.order === 0) {
+    fetchVOCList();
+  } else {
+    vocList.value.sort((a, b) => {
+      const valueA = a[columnKey];
+      const valueB = b[columnKey];
+
+      if (sortState.value.order === 1) {
+        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      } else {
+        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+      }
+    });
+  }
+};
 </script>

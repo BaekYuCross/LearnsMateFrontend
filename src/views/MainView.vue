@@ -12,7 +12,7 @@
           <h3>고객</h3>
           <ul>
             <li v-for="member in formattedMembers" :key="member.memberCode">
-              [{{ member.memberType }}] {{ member.memberName }} / {{ member.createdAt }}
+              [{{ member.memberType }}]&nbsp; {{ member.memberName }} &nbsp;| &nbsp;{{ member.createdAt }} &nbsp;|&nbsp; {{ member.memberEmail }}
             </li>
           </ul>
           <a href="/student" class="more-link">+ 더보기</a>
@@ -54,7 +54,7 @@
         <div class="card full-width">
           <h3>강의</h3>
           <ul>
-            <li v-for="lecture in lectures" :key="lecture.lecture_code">
+            <li v-for="lecture in formattedTutors" :key="lecture.lecture_code">
               [강사] {{ lecture.tutor_name }} / {{ lecture.lecture_title }}
               <span class="rating">({{ lecture.lecture_category_name }}) {{ lecture.rating }} ★★★★★</span>
             </li>
@@ -65,7 +65,7 @@
         <!-- 계약 섹션 -->
         <div class="card full-width">
           <h3>계약</h3>
-          <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ contracts.client }}</p>
+          <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ formattedContract.client }}</p>
           <div class="contract-status">
             <div
               class="step"
@@ -118,7 +118,7 @@
         <div class="card small">
           <h3>예비 블랙리스트</h3>
           <ul>
-            <li v-for="(reserved, index) in reservedList" :key="index">
+            <li v-for="(reserved, index) in formattedReservedStudents" :key="index">
               {{ reserved.member_name }} - 신고횟수: {{ reserved.report_count }}
             </li>
             <a href="/student/blacklist/reserved" class="more-link">+ 더보기</a>
@@ -287,11 +287,38 @@ const fetchLectures = async () => {
       },
       withCredentials: true,
     })
-    lectures.value = response.data.content;
+    lectures.value = response.data.content.map(lecture => ({
+      ...lecture,
+      lecture_category_name: translateCategory(lecture.lecture_category_name)
+    }));
     console.log('최근 등록된 강의 데이터:',lectures.value);
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
   }
+};
+
+const maskEmail = (email) => {
+  if (!email) return '';
+  const [localPart, domain] = email.split('@');
+  
+  let maskedLocalPart;
+  if (localPart.length <= 4) {
+    maskedLocalPart = localPart.slice(0, -1) + '*';
+  } else {
+    maskedLocalPart = localPart.slice(0, 2) + '*'.repeat(localPart.length - 2);
+  }
+  
+  return `${maskedLocalPart}@${domain}`;
+};
+
+const maskName = (name) => {
+  if (!name) return '';
+  
+  if (name.length === 2) {
+    return name.charAt(0) + '*';
+  }
+  
+  return name.charAt(0) + '*'.repeat(name.length - 2) + name.charAt(name.length - 1);
 };
 
 const formattedMembers = computed(() => {
@@ -299,10 +326,38 @@ const formattedMembers = computed(() => {
     return {
       ...member,
       memberType: member.memberType === 'STUDENT' ? '학생' : member.memberType,
-      createdAt: new Date(member.createdAt).toISOString().split('T')[0], 
+      createdAt: new Date(member.createdAt).toISOString().split('T')[0],
+      memberEmail: maskEmail(member.memberEmail),
+      memberName: maskName(member.memberName) 
     };
   });
 });
+
+const formattedTutors = computed(() => {
+  return lectures.value.map((tutor) => {
+    return {
+      ...tutor,
+      tutor_name: maskName(tutor.tutor_name) 
+    };
+  });
+});
+
+const formattedContract = computed(() => {
+  return {
+    ...contracts.value,
+    client: maskName(contracts.value.client), 
+  };
+});
+
+
+const formattedReservedStudents = computed(() => {
+  return reservedList.value.map((student) => {
+    return {
+      ...student,
+      member_name: maskName(student.member_name) 
+    };
+  });
+}); 
 
 const fetchContract = async () => {
   try {
@@ -425,12 +480,23 @@ const fetchCampaigns = async () => {
           sort: 'created_at,DESC'
         },
       });
-      marketing.value = response.data.content;
+      marketing.value = response.data.content.map(campaign => ({
+        ...campaign,
+        campaign_type: translateCampaignType(campaign.campaign_type)
+      }));
       console.log('캠페인 데이터:', marketing.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
   };
+
+const translateCampaignType = (type) => {
+  const campaignTypeMap = {
+    INSTANT: '즉시발송',
+    RESERVATION: '예약발송',
+  };
+  return campaignTypeMap[type] || type;
+};
 
 const goToCampaignDetail = (campaignCode) => {
   router.push({
@@ -449,7 +515,7 @@ const translateCategory = (category) => {
     MOBILE_APP_DEVELOPMENT: '앱 개발',
     FULL_STACK: '풀스택',
   };
-  return categoryMap[category] || category; // 매핑되지 않은 경우 원래 이름 반환
+  return categoryMap[category] || category;
 };
 
 const fetchCategoryRatio = async () => {
@@ -490,11 +556,6 @@ const fetchReservedList = async () => {
     console.error('Failed to fetch reserved list:', error);
   }
 };
-
-
-
-
-
 
 // OnMounted - 전체 로딩 관리
 onMounted(async () => {

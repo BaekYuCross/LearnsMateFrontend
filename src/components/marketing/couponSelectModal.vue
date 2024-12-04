@@ -1,151 +1,138 @@
 <template>
-      <div v-if="isOpen" class="coupon-select-modal-overlay" @click="closeModal">
-        <div class="coupon-select-modal-container" @click.stop>
-          <div class="coupon-select-modal-header">
-            <h2>쿠폰 첨부</h2>
-            <button class="coupon-select-close-button" @click="closeModal">&times;</button>
-          </div>
-          <div>
-            <CampaignCouponSelectFilter @search="applyFilters" @reset="applyFilters({})" />
-          </div>
-          <div class="coupon-select-modal-content">
-            <div class="content-container">
-                <div class="coupon-count">전체 쿠폰 <span class="coupon-length">{{ coupons.length }}</span>개</div>
-                <div class="board-container">
-                    <div class="board-header">
-                      <div class="board-header-select">
-                        <input
-                          type="checkbox"
-                          :checked="allSelected"
-                          @change="selectAll"
-                          class="select-all-checkbox"
-                        />
-                      </div>
-
-                    <div class="board-header-name">쿠폰 이름</div>
-                    <div class="board-header-contents">쿠폰 내용</div>
-                    <div class="board-header-discount-rate">쿠폰 할인율</div>
-                    <div class="board-header-type">쿠폰 종류</div>
-                    <div class="board-header-start-date">시작일</div>
-                    <div class="board-header-expire-date">만료일</div>
-                    <div class="board-header-created-at">생성일</div>
-                    <div class="board-header-updated-at">수정일</div>
-                    </div>
-                    <div class="board-body">
-                      <div class="board-row" v-for="coupon in paginatedCoupons" :key="coupon.coupon_code">
-                        <div class="board-row-select">
-                          <input
-                            type="checkbox"
-                            :value="coupon"
-                            v-model="selectedCoupons"
-                          />
-                        </div>
-                        <div class="board-row-name">{{ coupon.coupon_name }}</div>
-                        <div class="board-row-contents">{{ coupon.coupon_contents }}</div>
-                        <div class="board-row-discount-rate">{{ coupon.coupon_discount_rate }}%</div>
-                        <div class="board-row-type">{{ coupon.coupon_category_name }}</div>
-                        <div class="board-row-start-date">{{ coupon.coupon_start_date }}</div>
-                        <div class="board-row-expire-date">{{ coupon.coupon_expire_date }}</div>
-                        <div class="board-row-created-at">{{ coupon.created_at }}</div>
-                        <div class="board-row-updated-at">{{ coupon.updated_at }}</div>
-                      </div>
-
-                    </div>
-                    <div class="pagination">
-                    <button 
-                        class="page-button prev-button" 
-                        @click="changePage(currentPage - 1)" 
-                        :disabled="currentPage === 1">◀이전</button>
-                    <span v-for="page in totalPages" :key="page" class="page-number">
-                        <button 
-                        class="page-button" 
-                        :class="{ active: currentPage === page }" 
-                        @click="changePage(page)">{{ page }}</button>
-                    </span>
-                    <button 
-                        class="page-button next-button"
-                        @click="changePage(currentPage + 1)" 
-                        :disabled="currentPage === totalPages">다음▶</button>
-                    </div>
+  <div v-if="isOpen" class="coupon-select-modal-overlay" @click="closeModal">
+    <div class="coupon-select-modal-container" @click.stop>
+      <div class="coupon-select-modal-header">
+        <h2>쿠폰 첨부</h2>
+        <button class="coupon-select-close-button" @click="closeModal">&times;</button>
+      </div>
+      <div>
+        <CampaignCouponSelectFilter @search="applyFilters" @reset="applyFilters({})" />
+      </div>
+      <div class="coupon-select-modal-content">
+        <div class="content-container">
+          <div class="coupon-count">전체 쿠폰 <span class="coupon-length">{{ totalCount }}</span>개</div>
+          <div class="board-container">
+            <div class="board-header">
+              <div class="board-header-select">
+                <input
+                  type="checkbox"
+                  :checked="allSelected"
+                  @change="selectAll"
+                  class="select-all-checkbox"
+                />
+              </div>
+              <div class="board-header-name">쿠폰 이름</div>
+              <div class="board-header-contents">쿠폰 내용</div>
+              <div class="board-header-discount-rate">쿠폰 할인율</div>
+              <div class="board-header-type">쿠폰 종류</div>
+              <div class="board-header-start-date">시작일</div>
+              <div class="board-header-expire-date">만료일</div>
+              <div class="board-header-created-at">생성일</div>
+              <div class="board-header-updated-at">수정일</div>
+            </div>
+            <div class="board-body">
+              <div class="board-row" v-for="coupon in paginatedCoupons" :key="coupon.coupon_code">
+                <div class="board-row-select">
+                  <input
+                    type="checkbox"
+                    :value="coupon"
+                    v-model="selectedCoupons"
+                  />
                 </div>
-                </div>
-          </div>
-          <div class="coupon-select-modal-footer">
-            <button class="coupon-select-submit-button" @click='saveSelection'>저장</button>
+                <div class="board-row-name">{{ coupon.coupon_name }}</div>
+                <div class="board-row-contents">{{ coupon.coupon_contents }}</div>
+                <div class="board-row-discount-rate">{{ coupon.coupon_discount_rate }}%</div>
+                <div class="board-row-type">{{ coupon.coupon_category_name }}</div>
+                <div class="board-row-start-date">{{ coupon.coupon_start_date }}</div>
+                <div class="board-row-expire-date">{{ coupon.coupon_expire_date }}</div>
+                <div class="board-row-created-at">{{ coupon.created_at }}</div>
+                <div class="board-row-updated-at">{{ coupon.updated_at }}</div>
+              </div>
+            </div>
+            <!-- 페이지네이션 버튼 -->
+            <div class="pagination">
+              <button 
+                class="page-button prev-button" 
+                @click="changePage(currentPage - 1)" 
+                :disabled="currentPage === 1">◀</button>
+              <span v-for="page in totalPages" :key="page" class="page-number">
+                <button 
+                  class="page-button" 
+                  :class="{ active: currentPage === page }" 
+                  @click="changePage(page)">{{ page }}</button>
+              </span>
+              <button 
+                class="page-button next-button"
+                @click="changePage(currentPage + 1)" 
+                :disabled="currentPage === totalPages">▶</button>
+            </div>
           </div>
         </div>
       </div>
-  </template>
-  
-  <script setup>
-  import { ref, defineEmits, computed, onMounted } from 'vue';
-  import axios from 'axios';
-  import CampaignCouponSelectFilter from '@/components/marketing/CampaignCouponSelectFilter.vue';
-  
-  const emit = defineEmits(['submit', 'close']);
-  const cancleModal = ref(false);
+      <div class="coupon-select-modal-footer">
+        <button class="coupon-select-submit-button" @click="saveSelection">저장</button>
+      </div>
+    </div>
+  </div>
+</template>
 
-  const isOpen = ref(true);
+<script setup>
+import { ref, defineEmits, computed, onMounted } from 'vue';
+import axios from 'axios';
+import CampaignCouponSelectFilter from '@/components/marketing/CampaignCouponSelectFilter.vue';
 
-  const coupons = ref([]);
-  const selectedCoupons = ref([]);
-  
-  const closeModal = () => {
-    isOpen.value = false;
-    emit('close');
-  };
-
-  const fetchCoupons = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/coupon/admin-coupons',{
-        method: 'GET',
-        withCredentials: true,
-        });
-        coupons.value = response.data;
-        console.log(coupons.value);
-        console.log(coupons.value.length);
-    } catch (error) {
-      console.error('Failed to fetch coupons:', error);
-    }
-  };
-  
-
-  const saveSelection = () => {
-    emit('submit', selectedCoupons.value);
-  };
-    
-
+const emit = defineEmits(['submit', 'close']);
+const isOpen = ref(true);
+const coupons = ref([]);
+const selectedCoupons = ref([]);
+const totalCount = ref(0);
 const currentPage = ref(1);
-const pageSize = 15;
+const pageSize = 30;
+const lastFilterData = ref({});
 
-const totalPages = computed(() => Math.ceil(coupons.value.length / pageSize));
+const closeModal = () => {
+  isOpen.value = false;
+  emit('close');
+};
+
+const fetchCoupons = async () => {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/coupon/filters2',
+      { 
+        registration_type: 'admin',
+       },
+      {
+        withCredentials: true,
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+        },
+      }
+    );
+    totalCount.value = response.data.totalElements;
+    coupons.value = response.data.content;
+
+  } catch (error) {
+    console.error('Failed to fetch coupons:', error);
+  }
+};
+
+
+const saveSelection = () => {
+  emit('submit', selectedCoupons.value);
+};
+
+const totalPages = computed(() => Math.ceil(totalCount.value / pageSize));
 
 const paginatedCoupons = computed(() =>
-  Array.isArray(coupons.value)
-    ? coupons.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
-    : []
+  coupons.value.slice((currentPage.value - 1) * pageSize, currentPage.value * pageSize)
 );
 
 const changePage = (page) => {
   if (page > 0 && page <= totalPages.value) {
     currentPage.value = page;
-  }
-};
-
-const applyFilters = async (filters) => {
-  try {
-    const response = await axios.post(
-      'http://localhost:5000/coupon/filters',
-      filters,
-      {
-        withCredentials: true,
-      }
-    );
-    coupons.value = response.data;
-    currentPage.value = 1; 
-    console.log('Filtered Coupons:', coupons.value);
-  } catch (error) {
-    console.error('Error fetching filtered coupons:', error);
+    applyFilters(lastFilterData.value);
   }
 };
 
@@ -161,12 +148,50 @@ const selectAll = () => {
   }
 };
 
+const applyFilters = async (filters) => {
+  try {
+    function formatToLocalDateTime(dateString) {
+      if (!dateString || dateString.includes('T')) return dateString; 
+      return `${dateString}T00:00:00`;
+    }
+    const modifiedFilters = { 
+      ...filters, 
+      registration_type: 'admin', 
+      start_coupon_start_date: formatToLocalDateTime(filters.start_coupon_start_date),
+      end_coupon_start_date: formatToLocalDateTime(filters.end_coupon_start_date),
+      start_expire_date: formatToLocalDateTime(filters.start_expire_date),
+      end_expire_date: formatToLocalDateTime(filters.end_expire_date),
+      start_created_at: formatToLocalDateTime(filters.start_created_at),
+      end_created_at: formatToLocalDateTime(filters.end_created_at),
+      start_updated_at: formatToLocalDateTime(filters.start_updated_at),
+      end_updated_at: formatToLocalDateTime(filters.end_updated_at),
+     };
+    const response = await axios.post(
+      'http://localhost:5000/coupon/filters2',
+      modifiedFilters,
+      {
+        withCredentials: true,
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+        },
+      }
+    );
+    console.log('요청한 필터: ',modifiedFilters);
+    coupons.value = response.data.content;
+    totalCount.value = response.data.totalElements;
+    currentPage.value = 1;
+    lastFilterData.value = filters;
+  } catch (error) {
+    console.error('Error fetching filtered coupons:', error);
+  }
+};
 
-  onMounted(async() => {
-    await fetchCoupons();
-  });
-  </script>
-  
+onMounted(async () => {
+  await fetchCoupons();
+});
+</script>
+
   <style scoped>
   .coupon-select-modal-overlay {
     position: fixed;

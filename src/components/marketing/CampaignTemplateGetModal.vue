@@ -5,7 +5,7 @@
         <h2>캠페인 템플릿 조회</h2>
         <button class="close-button" @click="closeModal">&times;</button>
       </div>
-      <div class="modal-content">
+      <div class="template-modal-content">
         <div class="input-group">
           <label>템플릿 제목</label>
           <input 
@@ -208,7 +208,7 @@ cursor: pointer;
 color: #666;
 }
 
-.modal-content {
+.template-modal-content {
 padding: 20px;
 }
 

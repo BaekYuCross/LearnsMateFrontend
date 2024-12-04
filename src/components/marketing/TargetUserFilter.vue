@@ -39,7 +39,10 @@
             />
           </div>
         </div>
+      </div>
 
+      <!-- White Row -->
+      <div class="target-filter-row white">
         <div class="target-filter-item">
           <span class="target-filter-label">이메일</span>
           <input 
@@ -49,10 +52,6 @@
             class="target-filter-input" 
           />
         </div>
-      </div>
-
-      <!-- White Row -->
-      <div class="target-filter-row white">
         <div class="target-filter-item partial">
           <span class="target-filter-label">주소</span>
           <input 
@@ -62,7 +61,6 @@
             class="target-filter-input" 
           />
         </div>
-
         <div class="target-filter-item partial">
           <span class="target-filter-label">계정상태</span>
           <select 
@@ -74,16 +72,15 @@
             <option value="false">비활성</option>
           </select>
         </div>
-
-        <div class="target-filter-item">
-          <div class="target-button-group">
-            <button @click="search" class="target-search-button">
-              <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-            </button>
-            <button @click="reset" class="reset-button">
-              <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
-            </button>
-          </div>
+      </div>
+      <div class="target-filter-row white">
+        <div class="target-button-group">
+          <button @click="search" class="target-search-button">
+            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+          </button>
+          <button @click="reset" class="reset-button">
+            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="초기화">
+          </button>
         </div>
       </div>
     </div>
@@ -158,12 +155,12 @@ const reset = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 0px 15px;
+  padding: 3px 10px;
   border-bottom: 1px solid #e9ecef;
 }
 
 .target-section-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: bold;
 }
 
@@ -175,11 +172,12 @@ const reset = () => {
 .target-filter-row {
   display: flex;
   padding: 3px 10px;
-  gap: 16px;
 }
 
 .target-filter-row.gray {
-  background-color: #f8f9fa;
+  background-color: #EFEFEF;
+  border-top: #D9D9D9;
+  border-bottom: #D9D9D9;
 }
 
 .target-filter-row.white {
@@ -187,28 +185,29 @@ const reset = () => {
 }
 
 .target-filter-item {
-  flex: 1;
+  width: 30%;
+  padding-left: 8px;
   display: flex;
   align-items: center;
-  min-width: 0;
-}
-
-.target-filter-item.partial {
-  flex: 1;
-  max-width: 300px;
 }
 
 .target-filter-label {
-  width: 4rem;
-  font-size: 10px;
+  width: 5rem;
+  min-width: 5rem;
+  font-size: 11px;
   font-weight: 500;
+  text-align: end;
+  padding-right: 10px;
 }
 
 .target-filter-input {
   flex: 1;
-  padding: 5px 0px;
-  font-size: 10px;
+  padding: 5px 5px;
+  font-size: 11px;
   border: 1px solid #e2e8f0;
+  min-width: 0;
+  width: 100%;
+  outline: none;
 }
 
 .date-range-container {
@@ -230,19 +229,18 @@ const reset = () => {
 .target-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 470px;
+  margin-left: 1100px;
 }
 
 .target-search-button {
-  padding: 2px 6px 3px 3px;
+  padding: 2px 6px 3px 3px;        
   background-color: #005950;
   border: 1px solid #005950;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   color: white;
   display: flex;
   align-items: center;
-  cursor: pointer;
   margin-bottom: 4px;
   margin-top: 4px;
 }
@@ -252,12 +250,11 @@ const reset = () => {
 }
 
 .reset-button {
-  padding: 4px 5px 3px;
+  padding: 4px 5px 3px;   
   border: 1px solid #A29D9D;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 11px;
   background-color: white;
-  cursor: pointer;
   margin-bottom: 4px;
   margin-top: 4px;
 }

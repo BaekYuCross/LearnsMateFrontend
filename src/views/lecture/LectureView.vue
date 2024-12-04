@@ -37,16 +37,116 @@
       <div class="lecture-content-body">
         <div class="lecture-board-container">
           <div class="lecture-board-header">
-            <div v-if="selectedColumns.includes('lectureCode')" class="lecture-board-header-code">강의 코드</div>
-            <div v-if="selectedColumns.includes('lectureTitle')" class="lecture-board-header-title">강의 제목</div>
-            <div v-if="selectedColumns.includes('lectureCategoryName')" class="lecture-board-header-category">카테고리</div>
-            <div v-if="selectedColumns.includes('lectureLevel')" class="lecture-board-header-level">난이도</div>
-            <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-header-tutor">강사명</div>
-            <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-header-tutorcode">강사 코드</div>
-            <div v-if="selectedColumns.includes('createdAt')" class="lecture-board-header-date">등록일</div>
-            <div v-if="selectedColumns.includes('price')" class="lecture-board-header-price">가격</div>
-            <div v-if="selectedColumns.includes('lectureConfirmStatus')" class="lecture-board-header-confirm">승인 상태</div>
-            <div v-if="selectedColumns.includes('lectureStatus')" class="lecture-board-header-status">강의 상태</div>
+            <div 
+              v-if="selectedColumns.includes('lectureCode')" 
+              class="lecture-board-header-code"
+              @click="sortLectureList('lecture_code')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_code' && sortState.order === 2,
+              }"
+            >
+              강의 코드
+            </div>
+            <div 
+              v-if="selectedColumns.includes('lectureTitle')" 
+              class="lecture-board-header-title"
+              @click="sortLectureList('lecture_title')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_title' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_title' && sortState.order === 2,
+              }"
+            >
+              강의 제목
+            </div>
+            <div 
+              v-if="selectedColumns.includes('lectureCategoryName')" 
+              class="lecture-board-header-category"
+              @click="sortLectureList('lecture_category_name')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_category_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_category_name' && sortState.order === 2,
+              }"
+            >
+              카테고리
+            </div>
+            <div 
+              v-if="selectedColumns.includes('lectureLevel')" 
+              class="lecture-board-header-level"
+              @click="sortLectureList('lecture_level')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_level' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_level' && sortState.order === 2,
+              }"
+            >
+              난이도
+            </div>
+            <div 
+              v-if="selectedColumns.includes('tutorName')" 
+              class="lecture-board-header-tutor"
+              @click="sortLectureList('tutor_name')"
+              :class="{
+                'sort-asc': sortState.column === 'tutor_name' && sortState.order === 1,
+                'sort-desc': sortState.column === 'tutor_name' && sortState.order === 2,
+              }"
+            >
+              강사명
+            </div>
+            <div 
+              v-if="selectedColumns.includes('tutorCode')" 
+              class="lecture-board-header-tutorcode"
+              @click="sortLectureList('tutor_code')"
+              :class="{
+                'sort-asc': sortState.column === 'tutor_code' && sortState.order === 1,
+                'sort-desc': sortState.column === 'tutor_code' && sortState.order === 2,
+              }"
+            >
+              강사 코드
+            </div>
+            <div 
+              v-if="selectedColumns.includes('createdAt')" 
+              class="lecture-board-header-date"
+              @click="sortLectureList('created_at')"
+              :class="{
+                'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
+                'sort-desc': sortState.column === 'created_at' && sortState.order === 2,
+              }"
+            >
+              등록일
+            </div>
+            <div 
+              v-if="selectedColumns.includes('price')" 
+              class="lecture-board-header-price"
+              @click="sortLectureList('lecture_price')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_price' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_price' && sortState.order === 2,
+              }"
+            >
+              가격
+            </div>
+            <div 
+              v-if="selectedColumns.includes('lectureConfirmStatus')" 
+              class="lecture-board-header-confirm"
+              @click="sortLectureList('lecture_confirm_status')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_confirm_status' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_confirm_status' && sortState.order === 2,
+              }"
+            >
+              승인 상태
+            </div>
+            <div 
+              v-if="selectedColumns.includes('lectureStatus')" 
+              class="lecture-board-header-status"
+              @click="sortLectureList('lecture_status')"
+              :class="{
+                'sort-asc': sortState.column === 'lecture_status' && sortState.order === 1,
+                'sort-desc': sortState.column === 'lecture_status' && sortState.order === 2,
+              }"
+            >
+              강의 상태
+            </div>
           </div>
 
           <div class="lecture-board-body">
@@ -70,7 +170,7 @@
                 {{ getMappedLevel(lecture.lecture_level) }}
               </div>
               <div v-if="selectedColumns.includes('tutorName')" class="lecture-board-row-tutor">
-                {{ lecture.tutor_name }}
+                {{ maskTutorName(lecture.tutor_name) }}
               </div>
               <div v-if="selectedColumns.includes('tutorCode')" class="lecture-board-row-tutorcode">
                 {{ lecture.tutor_code }}
@@ -140,7 +240,7 @@
             </div>
             <div class="lecture-detail-item">
               <span class="label">강의 제목</span>
-              <span class="value ellipsis" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
+              <span class="value" style="width: 200px; text-align: right;" :title="selectedLecture.lecture_title">{{ selectedLecture.lecture_title }}</span>
             </div>
             <div class="lecture-detail-item">
               <span class="label">카테고리</span>
@@ -182,21 +282,35 @@
               <span class="label">총 학생 수</span>
               <span class="value">{{ selectedLecture.purchase_count }}</span>
             </div>
-            <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
-              <span>강의 비디오 목록</span>
-              <ul>
-                <li v-for="(video, index) in selectedLecture.lecture_videos" :key="index" class="ellipsis">
-                  {{ video.videoTitle }}
-                </li>
-              </ul>
+            <div class="lecture-toggle-header">
+            <span>
+            강의 비디오 목록
+            <button class="lecture-toggle-button" @click="toggleCourseSection">
+            {{ isCourseSectionVisible ? '&#9650;' : '&#9660;' }}
+             </button> </span>
+            </div>
+             <div v-if="selectedLecture.lecture_videos && selectedLecture.lecture_videos.length > 0" class="lecture-detail-item">
+              <div v-if="isCourseSectionVisible" class="lecture-recommended-list">
+                <div v-for="(video, index) in selectedLecture.lecture_videos" :key="index" class="lecture-recommended-item">
+                  {{ video.videoTitle || '비디오 제목 없음' }}
+                </div>
+              </div>
             </div>
             <div class="lecture-stats-section">
               <div class="lecture-stats-header">
-                <h3 class="lecture-stats-title">구매 전환율 필터링</h3>
+                <div class="lecture-stats-actions">
+                  <h3 class="lecture-stats-title">구매 전환율 필터링 </h3>
+                    <button @click="fetchLectureStats" class="lecture-stats-search">
+                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
+                    </button>
+                    <button @click="resetStatsFilter" class="lecture-stats-reset">
+                      <img src="@/assets/icons/reset.svg" alt="초기화">
+                    </button>
+                  </div>
                 <div class="lecture-stats-filter">
                   <div class="lecture-stats-period">
-                    <span class="lecture-stats-label">조회 기간</span>
                     <div class="lecture-stats-dates">
+                      <span class="lecture-stats-label">조회 기간</span>
                       <div class="lecture-stats-date-group">
                         <select v-model="statsFilter.startYear" class="lecture-stats-select">
                           <option v-for="year in years" :key="year" :value="year">{{ year }}년</option>
@@ -220,14 +334,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="lecture-stats-actions">
-                    <button @click="fetchLectureStats" class="lecture-stats-search">
-                      <img src="@/assets/icons/search_white.svg" alt="조회">조회
-                    </button>
-                    <button @click="resetStatsFilter" class="lecture-stats-reset">
-                      <img src="@/assets/icons/reset.svg" alt="초기화">
-                    </button>
-                  </div>
+                 
                 </div>
               </div>
 
@@ -309,6 +416,7 @@ const columns = ref({
   lectureConfirmStatus: "승인 상태",
   lectureStatus: "강의 상태",
 });
+
 const levelMapping = {
   BEGINNER: '입문',
   INTERMEDIATE: '중급',
@@ -325,6 +433,48 @@ const categoryMapping = {
   FULL_STACK: '풀스택',
 };
 
+const sortState = ref({
+  column: null,
+  order: 0,
+});
+
+const levelOrder = {
+  '입문': 1,
+  '중급': 2,
+  '고급': 3,
+};
+
+const sortLectureList = (columnKey) => {
+  if (sortState.value.column === columnKey) {
+    sortState.value.order = (sortState.value.order + 1) % 3;
+  } else {
+    sortState.value.column = columnKey;
+    sortState.value.order = 1;
+  }
+
+  if (sortState.value.order === 0) {
+    fetchLectureList();
+  } else {
+    lectureList.value.sort((a, b) => {
+      const valueA = columnKey === 'lecture_level' ? levelOrder[getMappedLevel(a[columnKey])] : a[columnKey];
+      const valueB = columnKey === 'lecture_level' ? levelOrder[getMappedLevel(b[columnKey])] : b[columnKey];
+
+      if (sortState.value.order === 1) {
+        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
+      } else {
+        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
+      }
+    });
+  }
+};
+
+const maskTutorName = (name) => {
+  if (!name || name.length < 2) return name;
+  const firstChar = name[0];
+  const lastChar = name[name.length - 1];
+  return `${firstChar}**${lastChar}`;
+};
+
 const selectedColumns = ref(Object.keys(columns.value));
 
 const getMappedLevel = (level) => {
@@ -333,6 +483,13 @@ const getMappedLevel = (level) => {
 
 const getMappedCategory = (category) => {
   return categoryMapping[category] || '알 수 없음'; // 맵핑되지 않은 값은 '알 수 없음'으로 처리
+};
+
+// 토글 상태 관리
+const isCourseSectionVisible = ref(false);
+
+const toggleCourseSection = () => {
+  isCourseSectionVisible.value = !isCourseSectionVisible.value;
 };
 
 const camelToSnake = (obj) => {

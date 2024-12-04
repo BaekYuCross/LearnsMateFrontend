@@ -56,7 +56,7 @@ const timer = ref(null);
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
-  { name: '강의', path: '/lecture', group: 'lecture' },
+  { name: '강의', path: '/lecture', group: 'lecture' , includePaths: ['/lecture','/payment']},
   { 
     name: '고객', 
     path: '/student', 
@@ -283,11 +283,12 @@ onUnmounted(() => {
   
   .icon-section {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
   }
 
   .user-info {
+    padding-right: 6px;
     padding-top: 5px;
     font-size: 13.5px;
     font-weight: bold;

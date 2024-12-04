@@ -130,11 +130,23 @@
           size: pageSize,
         },
       });
-      campaigns.value = response.data.content; // content 배열로 설정
+      campaigns.value = response.data.content.map(campaign => ({
+        ...campaign,
+        campaign_type: translateCampaignType(campaign.campaign_type)
+      }));
+
       console.log('campaign data:', campaigns.value);
     } catch (error) {
       console.error('Failed to fetch campaigns:', error);
     }
+  };
+
+  const translateCampaignType = (type) => {
+    const campaignTypeMap = {
+      INSTANT: '즉시발송',
+      RESERVATION: '예약발송',
+    };
+    return campaignTypeMap[type] || type;
   };
 
 
@@ -422,7 +434,7 @@ onMounted(async() => {
     .board-row {
       display: grid;
       grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
-      padding: 7px 14px;
+      padding: 10px 14px;
       border-bottom: 1px solid #eaeaea;
       font-size: 11px;
       color: #333333;

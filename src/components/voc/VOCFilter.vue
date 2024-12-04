@@ -183,6 +183,7 @@ const reset = () => {
 }
 
 .voc-filter-input {
+  outline: none;
   flex: 1;
   padding: 5px 5px;
   font-size: 11px;
@@ -198,6 +199,7 @@ const reset = () => {
 }
 
 .voc-date-input {
+  outline: none;
   width: calc(50% - 8px);
   min-width: 0;
 }

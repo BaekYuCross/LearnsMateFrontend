@@ -16,7 +16,6 @@
   
     // 상태 관리
     const isModalOpen = ref(true);
-    const modalTitle = ref('취소하시겠습니까?'); // 모달의 제목을 동적으로 설정
 
     defineProps({
       modalTitle: String, // 모달 제목
