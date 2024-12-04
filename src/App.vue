@@ -1,13 +1,11 @@
 <template>
   <div>
-    <Suspense>
-      <template #default>
-        <AppHeader v-if="isLoggedIn && shouldShowHeader" />
-      </template>
-      <template #fallback>
-        <div>Loading...</div>
-      </template>
-    </Suspense>
+    <div>
+      <AppHeader v-if="isLoggedIn && shouldShowHeader" />
+      <main>
+        <RouterView />
+      </main>
+    </div>
     <main>
       <RouterView />
     </main>
