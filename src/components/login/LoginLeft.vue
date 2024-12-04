@@ -51,11 +51,17 @@ const loginUser = async () => {
       },
       {
         withCredentials: true,
-      }
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
     );
 
     console.log('Login Response:', loginResponse); // 서버 응답 확인
-    console.log('Set-Cookie Header:', document.cookie); // 클라이언트에 저장된 쿠키 확인
+    console.log('Response Headers:', loginResponse.headers);
+
+    // 쿠키 확인
+    console.log('Document Cookies after login:', document.cookie);
 
     if (!loginResponse || !loginResponse.data) {
       throw new Error('로그인 응답 데이터가 없습니다.');
@@ -65,6 +71,7 @@ const loginUser = async () => {
     await loginState.fetchLoginState();
 
     if (loginState.isLoggedIn) {
+      console.log('Cookies after login:', document.cookie);
       alert(`${loginState.adminName}님, 환영합니다.`);
       await router.push('/main');
     } else {
