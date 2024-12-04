@@ -42,7 +42,7 @@ const loginUser = async () => {
   try {
     console.log('로그인 시도:', formData.value);
     
-    const response = await axios.post(
+    const loginResponse = await axios.post(
       'https://learnsmate.shop/users/login',
       {
         admin_code: formData.value.adminCode,
@@ -52,18 +52,25 @@ const loginUser = async () => {
         withCredentials: true
       }
     );
-    console.log('로그인 응답:', response);
+    console.log('로그인 응답:', loginResponse);
     
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // 상태 체크 전에 약간의 지연을 줍니다
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    await loginState.fetchLoginState();
-    console.log('로그인 상태:', loginState);
-    
-    if (loginState.isLoggedIn) {
-      alert(`${loginState.adminName}님, 환영합니다.`);
-      router.push('/');
-    } else {
-      throw new Error('로그인 상태 확인 실패');
+    try {
+      await loginState.fetchLoginState();
+      console.log('로그인 상태:', loginState.$state);  // $state로 전체 상태 확인
+      
+      if (loginState.isLoggedIn) {
+        alert(`${loginState.adminName}님, 환영합니다.`);
+        await router.push('/main');  // await 추가
+        window.location.reload();  // 페이지 새로고침 추가
+      } else {
+        throw new Error('로그인 상태 확인 실패');
+      }
+    } catch (stateError) {
+      console.error('로그인 상태 업데이트 실패:', stateError);
+      throw new Error('로그인 상태 확인에 실패했습니다.');
     }
   } catch (error) {
     console.error('로그인 실패:', error);

@@ -1,46 +1,57 @@
 <template>
   <div>
-    <AppHeader v-if="showHeader && !isTransitioning" />
+    <AppHeader v-if="isHeaderVisible" />
+    <main>
+      <RouterView />
+    </main>
   </div>
-  <main>
-    <RouterView />
-  </main>
 </template>
 
 <script setup>
 import AppHeader from './components/AppHeader.vue';
 import { RouterView, useRoute } from 'vue-router';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, nextTick } from 'vue';
 
 const route = useRoute();
 const isTransitioning = ref(false);
-const isLoginPage = computed(() => route.path === '/login');
-const isClientLoginPage = computed(() => route.path === '/client-login');
-const isClientMainPage = computed(() => route.path === '/client-main');
-const isClientVocPage = computed(() => route.path === '/client-voc');
-const isClientMyVocPage = computed(() => route.path === '/client-myvoc');
-const isClientLecturePage = computed(() => route.path === '/client-lecture');
-const isClientMyLecturePage = computed(() => route.path === '/client-mylecture');
-const isClientLectureDetailPage = computed(() =>
-  route.matched.some((record) => record.path === '/client-lecturedetail/:id')
+
+const excludedPaths = [
+  '/login',
+  '/client-login',
+  '/client-main',
+  '/client-voc',
+  '/client-myvoc',
+  '/client-lecture',
+  '/client-mylecture',
+  '/client-lecturecart',
+  '/client-addcoupon'
+];
+
+const isHeaderVisible = computed(() => {
+  const currentPath = route.path;
+  const isExcluded = excludedPaths.includes(currentPath);
+  const isClientLectureDetail = currentPath.startsWith('/client-lecturedetail/');
+  const isAuthenticated = loginState.isLoggedIn;
+
+  console.log('Header visibility check:', {
+    currentPath,
+    isExcluded,
+    isClientLectureDetail,
+    isAuthenticated
+  });
+  
+  return isAuthenticated && !isExcluded && !isClientLectureDetail && !isTransitioning.value;
+});
+
+watch(
+  () => route.path,
+  () => {
+    isTransitioning.value = true;
+    nextTick(() => {
+      isTransitioning.value = false;
+    });
+  }
 );
-const isClientLectureCartPage = computed(() => route.path === '/client-lecturecart');
-const isClientAddCouponPage = computed(() => route.path === '/client-addcoupon');
-
-
-const showHeader = computed(() => {
-  return !isLoginPage.value && !isClientLoginPage.value 
-  && !isClientMainPage.value && !isClientVocPage.value 
-  && !isClientMyVocPage.value && !isClientLecturePage.value 
-  && !isClientMyLecturePage.value && !isClientLectureDetailPage.value
-  && !isClientLectureCartPage.value && !isClientAddCouponPage.value;
-});
-
-watch(route, () => {
-  isTransitioning.value = true;
-  isTransitioning.value = false;
- 
-});
 </script>
 
 <style>

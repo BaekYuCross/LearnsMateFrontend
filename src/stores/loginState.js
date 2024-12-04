@@ -16,15 +16,22 @@ export const useLoginState = defineStore('loginState', {
         const response = await axios.get('https://learnsmate.shop/admin/status', {
           withCredentials: true,
         });
-        this.isLoggedIn = true;
-        this.adminName = response.data.name;
-        this.adminTeam = response.data.adminDepartment;
-        this.adminCode = response.data.code;
-        this.exp = response.data.exp;
-        console.log('토큰 만료시간:', this.exp);
+        if (response.data) {
+          this.isLoggedIn = true;
+          this.adminName = response.data.name;
+          this.adminTeam = response.data.adminDepartment;
+          this.adminCode = response.data.code;
+          this.exp = response.data.exp;
+          console.log('로그인 상태 업데이트:', {
+            isLoggedIn: this.isLoggedIn,
+            adminName: this.adminName,
+            adminTeam: this.adminTeam
+          });
+        }
       } catch (error) {
         console.error('로그인 상태를 확인할 수 없습니다:', error);
         this.resetState();
+        throw error;
       }
     },
 
