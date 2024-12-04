@@ -220,6 +220,7 @@ export default {
   border: 1px solid #ddd;
   padding: 10px;
   word-wrap: break-word;
+  max-width: 690px;
 }
 
 .voc-ai-modal-summary-table th {
