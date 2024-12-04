@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="isLoggedIn">
+  <header class="header-container" v-if="isLoggedIn !== null">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -45,12 +45,14 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
 
 const loginState = useLoginState();
-const { isLoggedIn, adminName, adminTeam, exp } = storeToRefs(loginState); // Pinia 상태 참조
+const isLoggedIn = computed(() => loginState.isLoggedIn);
+const adminName = computed(() => loginState.adminName);
+const adminTeam = computed(() => loginState.adminTeam);
+const exp = computed(() => loginState.exp);
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);
