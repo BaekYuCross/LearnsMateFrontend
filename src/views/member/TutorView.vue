@@ -8,30 +8,30 @@
         @reset="handleReset"
       />
       <div class="tutor-header-container">
-            <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
-            <div class="tutor-button-group">
-              <div class="column-selector">
-                <button @click="toggleDropdown" class="tutor-dropdown-button">
-                  필요 컬럼 선택 ▼
-                </button>
-                <div v-show="isDropdownOpen" class="tutor-dropdown-menu">
-                  <div v-for="(label, key) in columns" :key="key" class="tutor-dropdown-item">
-                    <input 
-                      type="checkbox"
-                      :value="key" 
-                      v-model="selectedColumns" 
-                      @change="updateSelectedColumns" 
-                      :id="key"
-                    />
-                    <label :for="key">{{ label }}</label>
-                  </div>
-                </div>
+        <div class="tutor-count">전체 강사 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
+        <div class="tutor-button-group">
+          <div class="column-selector">
+            <button @click="toggleDropdown" class="tutor-dropdown-button">
+              필요 컬럼 선택 ▼
+            </button>
+            <div v-show="isDropdownOpen" class="tutor-dropdown-menu">
+              <div v-for="(label, key) in columns" :key="key" class="tutor-dropdown-item">
+                <input 
+                  type="checkbox"
+                  :value="key" 
+                  v-model="selectedColumns" 
+                  @change="updateSelectedColumns" 
+                  :id="key"
+                />
+                <label :for="key">{{ label }}</label>
               </div>
-              <button class="tutor-excel-button" @click="handleExcelDownload">
-                <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
-              </button>
             </div>
           </div>
+          <button class="tutor-excel-button" @click="handleExcelDownload">
+            <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
+          </button>
+        </div>
+      </div>
 
       <div class="tutor-content-section" :class="{ 'with-detail': selectedTutor }">
         <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
@@ -79,18 +79,18 @@
                   {{ tutor.memberBirth }}
                 </div>
                 <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-row-flag" :style="{
-    backgroundColor: tutor.memberFlag ? '#dcfce7' : '#fee2e2',
-    color: tutor.memberFlag ? '#166534' : '#991b1b'
-  }">
+                    backgroundColor: tutor.memberFlag ? '#dcfce7' : '#fee2e2',
+                    color: tutor.memberFlag ? '#166534' : '#991b1b'
+                  }">
                   {{ tutor.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-row-created">
                   {{ tutor.createdAt }}
                 </div>
                 <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant" :style="{
-    backgroundColor: tutor.memberDormantStatus ? '#fee2e2' : '#dcfce7',
-    color: tutor.memberDormantStatus ? '#991b1b' : '#166534'}">
-                  {{ tutor.memberDormantStatus === true ? '휴면' : '활성' }}
+                    backgroundColor: tutor.memberDormantStatus ? '#fee2e2' : '#dcfce7',
+                    color: tutor.memberDormantStatus ? '#991b1b' : '#166534'}">
+                  {{ tutor.memberDormantStatus === true ? '비활성' : '활성' }}
                 </div>
               </div>
             </div>
@@ -109,9 +109,14 @@
           </div>
         </div>
 
+
+
         <div v-if="selectedTutor" class="tutor-detail-container">
+          <div class="tutor-detail-header">
+            <h3>강사 상세 정보</h3>
+            <button class="close-button" @click="closeTutorDetail">×</button>
+          </div>          
           <div class="tutor-detail-content">
-            <h3>상세 정보</h3>
             <div class="tutor-info-grid">
               <div class="tutor-info-item">
                 <span class="tutor-label">강사 코드</span>
@@ -135,9 +140,9 @@
               </div>
         
               <!-- 강의 정보 -->
-              <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-section">
+              <div class="lecture-section">
                 <h4 class="lecture-title">강의 목록</h4>
-                <div class="lecture-list">
+                <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-list">
                   <div v-for="lecture in tutorDetail.tutorLectureDetailList" 
                       :key="lecture.lectureCode" 
                       class="lecture-item">
@@ -377,6 +382,11 @@ const showDetail = async (tutor) => {
     }
   }
 };
+
+const closeTutorDetail = () =>{
+  selectedTutor.value = null;
+  tutorDetail.value = null;
+}
 
 onMounted(() => {
   fetchTutors();

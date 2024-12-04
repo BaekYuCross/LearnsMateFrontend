@@ -20,16 +20,19 @@
   overflow-x: hidden;
 }
 
-.content-section {
+.blacklist-content-section {
   display: flex;
   gap: 20px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .blacklist-header-container {
+  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  padding-bottom: 10px;
 }
 
 .blacklist-count {
@@ -45,6 +48,7 @@
 
 .blacklist-button-group {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
 
@@ -67,70 +71,72 @@
   height: 16px;
 }
 
-.table-container {
+.blacklist-table-container {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: 570px;  
   overflow-x: auto;
-  white-space: nowrap;
 }
 
-.table-container.shrink {
-  flex: 0 0 50%;
-}
-
-/* 초기화 스타일 추가 */
-table, th, td {
-  overflow-y: auto;
-  font-size: inherit;
-  margin: 0;
-  font-size: 13px;
-  padding: 0;
-  border: none;
-  box-sizing: border-box;
-}
-
-table {
+.blacklist-board-container {
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 570px;
+  flex: 1;
+  min-width: 0;
   width: 100%;
-  min-width: 1200px;
-  border-collapse: collapse;
 }
 
-th, td {
-  padding: 12px;
+.blacklist-board-header {
+  display: grid;
+  grid-template-columns: 0.4fr 0.6fr 0.4fr 0.6fr 0.6fr 1fr 1fr 0.6fr;
+  padding: 7px 14px;
+  background-color: #f9f9f9;
+  font-size: 12px;
+  font-weight: bold;
+  color: #595656;
   text-align: center;
-  border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap;
-  font-size: 13px;
+  border-bottom: 1px solid #eaeaea;
+  top: 0;
 }
 
-.table-container th,
-.table-container td {
-  overflow-y: auto;
-  max-width: 300px; 
-  padding: 12px;
+.blacklist-board-body {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 35px);
+}
+
+.blacklist-board-row {
+  display: grid;
+  grid-template-columns: 0.4fr 0.6fr 0.4fr 0.6fr 0.6fr 1fr 1fr 0.6fr;
+  padding: 7px 14px;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 11px;
+  color: #333333;
   text-align: center;
-  border-bottom: 1px solid #e2e8f0;
+  align-items: center;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.blacklist-board-header > div,
+.blackllist-board-row > div {
+  text-overflow: ellipsis;
+  padding: 0 5px;
   white-space: nowrap;
-  overflow: hidden; 
-  text-overflow: ellipsis; 
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  position: relative;
 }
-
-th {
-  font-size: 13px;
-}
-
-th:nth-child(1), td:nth-child(1) { width: 100px; }
-th:nth-child(2), td:nth-child(2) { width: 100px; }
-th:nth-child(3), td:nth-child(3) { width: 150px; }
-th:nth-child(4), td:nth-child(4) { width: 120px; }
-th:nth-child(5), td:nth-child(5) { width: 200px; }
-th:nth-child(6), td:nth-child(6) { width: 80px; }
-th:nth-child(7), td:nth-child(7) { width: 100px; }
-th:nth-child(8), td:nth-child(8) { width: 100px; }
-th:nth-child(9), td:nth-child(9) { width: 100px; }
-th:nth-child(10), td:nth-child(10) { width: 100px; }
 
 .selected {
   background-color: #e2e8f0;
@@ -168,33 +174,42 @@ th:nth-child(10), td:nth-child(10) { width: 100px; }
   cursor: not-allowed;
 }
 
-.detail-container {
-  flex: 1; 
-  min-height: 100vh; 
-  max-height: calc(100vh - 40px); 
-  overflow-y: auto;
+.blacklist-detail-container {
+  flex: 0.6;     
   background: white;
-  padding-right: 10px; 
-  padding-left: 20px;
-  padding-top: 20px;
   border-radius: 8px; 
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
-  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 570px;   
+  padding: 20px;   
+  overflow-y: auto;
 }
 
-.detail-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  height: 100%;
-  overflow-y: auto;
+.blacklist-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.blacklist-detail-content {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
 }
 
 .info-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .info-item {

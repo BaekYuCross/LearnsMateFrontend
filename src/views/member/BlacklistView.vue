@@ -9,49 +9,63 @@
       />
 
       <div class="blacklist-header-container">
-            <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
-            <div class="blacklist-button-group">
-              <button class="blacklist-excel-button" @click="handleExcelDownload">
-                <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
-              </button>
+        <div class="blacklist-count">전체 {{ memberTypeText }} 블랙리스트 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
+        <div class="blacklist-button-group">
+          <button class="blacklist-excel-button" @click="handleExcelDownload">
+            <img src="/src/assets/icons/download.svg" alt="">엑셀 다운로드
+          </button>
+        </div>
+      </div>
+
+      <div class="blacklist-content-section">
+        <div class="blacklist-table-container" :class="{ 'shrink': selectedBlacklist }">
+          <div class="blacklist-board-container">
+            <div class="blacklist-board-header">
+              <div class="blacklist-board-header-code">No</div>
+              <div class="blacklist-board-header-code">블랙리스트 코드</div>
+              <div class="blacklist-board-header-code">{{ memberTypeText }} 코드</div>
+              <div class="blacklist-board-header-name">{{ memberTypeText }} 이름</div>
+              <div class="blacklist-board-header-email">{{ memberTypeText }} 이메일</div>
+              <div class="blacklist-board-header-address">블랙리스트 사유</div>
+              <div class="blacklist-board-header-address">정지일</div>
+              <div class="blacklist-board-header-address">담당자</div>
             </div>
-          </div>
 
-      <div class="content-section" :class="{ 'with-detail': selectedBlacklist }">
-        <div class="table-container" :class="{ 'shrink': selectedBlacklist }">
-
-          <table>
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>블랙리스트 코드</th>
-                <th>{{ memberTypeText }} 코드</th>
-                <th>{{ memberTypeText }} 이름</th>
-                <th>{{ memberTypeText }} 이메일</th>
-                <th>블랙리스트 사유</th>
-                <th>정지일</th>
-                <th>담당자</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr 
+            <div class="blacklist-board-body">
+              <div 
+                class="blacklist-board-row" 
                 v-for="(blacklist, index) in blacklists" 
                 :key="blacklist.blackCode"
                 @click="showDetail(blacklist)"
-                class="cursor-pointer hover:bg-gray-50"
                 :class="{ 'selected': selectedBlacklist?.blackCode === blacklist.blackCode }"
               >
-                <td>{{ ((currentPage - 1) * pageSize) + index + 1 }}</td>
-                <td>{{ blacklist.blackCode }}</td>
-                <td>{{ blacklist.memberCode }}</td>
-                <td>{{ blacklist.memberName }}</td>
-                <td>{{ blacklist.memberEmail }}</td>
-                <td :title="blacklist.blackReason">{{ blacklist.blackReason }}</td>
-                <td>{{ blacklist.createdAt }}</td>
-                <td>{{ blacklist.adminName }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <div class="blacklist-board-row-code">
+                  {{ ((currentPage - 1) * pageSize) + index + 1 }}
+                </div>
+                <div class="blacklist-board-row-code">
+                  {{ blacklist.blackCode }}
+                </div>
+                <div class="blacklist-board-row-code">
+                  {{ blacklist.memberCode }}
+                </div>
+                <div class="blacklist-board-row-name">
+                  {{ blacklist.memberName }}
+                </div>
+                <div class="blacklist-board-row-email">
+                  {{ blacklist.memberEmail }}
+                </div>
+                <div class="blacklist-board-row-address" :title="blacklist.blackReason">
+                  {{ blacklist.blackReason }}
+                </div>
+                <div class="blacklist-board-row-address">
+                  {{ blacklist.createdAt }}
+                </div>
+                <div class="blacklist-board-row-address">
+                  {{ blacklist.adminName }}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <div class="pagination">
             <button class="page-button prev-button" @click="changePage(currentPage - 1)" :disabled="currentPage === 1">◀</button>
@@ -66,12 +80,16 @@
           </div>
         </div>
 
-        <div v-if="selectedBlacklist" class="detail-container">
-          <div class="detail-content">
+        
+        <div v-if="selectedBlacklist" class="blacklist-detail-container">
+          <div class="blacklist-detail-header">
             <h3>블랙리스트 상세 정보</h3>
+            <button class="close-button" @click="closeBlacklistDetail">×</button>
+          </div>
+          <div class="blacklist-detail-content">
             <div class="info-grid">
               <div class="info-item">
-                <span class="label"> {{ memberTypeText }} 코드:</span>
+                <span class="label">{{ memberTypeText }} 코드:</span>
                 <span>{{ selectedBlacklist.memberCode }}</span>
               </div>
               <div class="info-item">
@@ -100,7 +118,8 @@
               </div>
             </div>
 
-            <h4 class="report-title">신고 내역</h4>
+            <div class="report-section">
+              <h4 class="report-title">신고 내역</h4>
               <div class="report-list">
                 <div v-for="(group, commentCode) in groupedReports" :key="commentCode" class="report-group">
                   <div class="comment-section">
@@ -125,7 +144,8 @@
               </div>
             </div>
           </div>
-          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -311,6 +331,11 @@ const handleReset = () => {
   currentPage.value = 1;
   selectedBlacklist.value = null;
   fetchBlacklists();
+};
+
+const closeBlacklistDetail = () => {
+  selectedBlacklist.value = null;
+  reportDetails.value = null;
 };
 
 // 페이지 변경

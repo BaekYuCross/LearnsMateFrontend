@@ -60,8 +60,8 @@
           <span class="filter-label">휴면상태</span>
           <select v-model="filters.memberDormantFlag" class="filter-input">
             <option value="">전체</option>
-            <option value="true">휴면</option>
-            <option value="false">비휴면</option>
+            <option value="true">비활성</option>
+            <option value="false">활성</option>
           </select>
         </div>
       </div>
