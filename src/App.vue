@@ -38,6 +38,12 @@ const excludedPaths = [
 ];
 
 const shouldShowHeader = computed(() => {
+  console.log('Route path:', route.path);
+console.log('Is logged in:', isLoggedIn.value);
+console.log('Is excluded path:', excludedPaths.includes(route.path));
+console.log('Is client lecture detail:', route.path.startsWith('/client-lecturedetail/'));
+console.log('Should show header:', shouldShowHeader.value);
+
   if (!route || !isLoggedIn.value) return false;
   const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
   return !excludedPaths.includes(route.path) && !isClientLectureDetail;
