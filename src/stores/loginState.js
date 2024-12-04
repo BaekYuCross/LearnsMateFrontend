@@ -19,12 +19,18 @@ export const useLoginState = defineStore('loginState', {
         
         console.log('Fetched login state response:', response.data);
         
-        if (response.data) {
+        if (response.data && response.data.code) {
           this.isLoggedIn = true;
           this.adminName = response.data.name;
           this.adminTeam = response.data.adminDepartment;
           this.adminCode = response.data.code;
           this.exp = response.data.exp;
+          
+          console.log('Login state updated:', {
+            isLoggedIn: this.isLoggedIn,
+            adminName: this.adminName,
+            adminTeam: this.adminTeam
+          });
         } else {
           this.resetState();
         }
