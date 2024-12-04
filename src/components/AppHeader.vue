@@ -176,10 +176,13 @@ const startTimer = () => {
 watch(
   () => exp.value,
   (newValue) => {
-    if (newValue) {
+    if (newValue && Array.isArray(newValue) && newValue.length === 6) {
       startTimer();
-    } else if (timer.value) {
-      clearInterval(timer.value);
+    } else {
+      console.warn('Invalid expiration format or null value:', newValue);
+      if (timer.value) {
+        clearInterval(timer.value);
+      }
     }
   },
   { immediate: true }

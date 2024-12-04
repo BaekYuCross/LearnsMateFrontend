@@ -22,11 +22,8 @@ export const useLoginState = defineStore('loginState', {
           this.resetState();
         }
       } catch (error) {
+        console.error('Error fetching login state:', error);
         this.resetState();
-        if (error.response && error.response.status !== 401) {
-          console.error('로그인 상태 확인 실패:', error);
-        }
-        throw error;
       }
     },
 
