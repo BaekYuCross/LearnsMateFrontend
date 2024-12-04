@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="isLoggedIn">
+  <header class="header-container" v-if="isLoggedIn !== null && isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>

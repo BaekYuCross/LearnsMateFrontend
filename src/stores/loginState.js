@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const useLoginState = defineStore('loginState', {
   state: () => ({
-    isLoggedIn: null,
+    isLoggedIn: false,
     adminName: '',
     adminTeam: '',
     adminCode: '',
@@ -11,36 +11,26 @@ export const useLoginState = defineStore('loginState', {
   }),
   
   actions: {
-    // 로그인 상태 확인
     async fetchLoginState() {
       try {
         const response = await axios.get('https://learnsmate.shop/admin/status', { withCredentials: true });
         if (response.data && response.data.code) {
           this.updateLoginState(response.data);
         } else {
-          this.isLoggedIn = false; // 명확히 초기화
           this.resetState();
         }
       } catch (error) {
-        this.isLoggedIn = false; // 명확히 초기화
         this.resetState();
         throw error;
       }
     },
 
-    // 상태 업데이트
     updateLoginState(data) {
       this.isLoggedIn = true;
-      this.adminName = data.name;
-      this.adminTeam = data.adminDepartment;
-      this.adminCode = data.code;
-      this.exp = data.exp;
-
-      console.log('Login state updated:', {
-        isLoggedIn: this.isLoggedIn,
-        adminName: this.adminName,
-        adminTeam: this.adminTeam,
-      });
+      this.adminName = data.name || ''; // 안전 처리
+      this.adminTeam = data.adminDepartment || ''; // 안전 처리
+      this.adminCode = data.code || '';
+      this.exp = data.exp || null;
     },
 
     // 로그아웃 처리
@@ -60,7 +50,6 @@ export const useLoginState = defineStore('loginState', {
       console.log('Updated token expiration time:', this.exp);
     },
 
-    // 상태 초기화
     resetState() {
       this.isLoggedIn = false;
       this.adminName = '';
