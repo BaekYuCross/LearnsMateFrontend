@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="isLoggedIn !== null">
+  <header class="header-container" v-if="isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -50,8 +50,8 @@ import { useLoginState } from '@/stores/loginState';
 
 const loginState = useLoginState();
 const isLoggedIn = computed(() => loginState.isLoggedIn);
-const adminName = computed(() => loginState.adminName);
-const adminTeam = computed(() => loginState.adminTeam);
+const adminName = computed(() => loginState.adminName || '');
+const adminTeam = computed(() => loginState.adminTeam || '');
 const exp = computed(() => loginState.exp);
 const router = useRouter();
 const route = useRoute();

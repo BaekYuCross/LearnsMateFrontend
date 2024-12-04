@@ -45,12 +45,10 @@ console.log('Should show header:', shouldShowHeader.value);
 
 
 onMounted(async () => {
-  if (!loginState.isLoggedIn) {
-    try {
-      await loginState.fetchLoginState();
-    } catch (error) {
-      console.error('Failed to fetch login state:', error);
-    }
+  try {
+    await loginState.fetchLoginState();
+  } catch (error) {
+    console.error('Failed to fetch login state:', error);
   }
 });
 </script>

@@ -3,30 +3,28 @@ import axios from 'axios';
 
 export const useLoginState = defineStore('loginState', {
   state: () => ({
-    isLoggedIn: false,
+    isLoggedIn: null,
     adminName: '',
     adminTeam: '',
     adminCode: '',
     exp: null,
   }),
+  
   actions: {
     // 로그인 상태 확인
     async fetchLoginState() {
       try {
-        const response = await axios.get('https://learnsmate.shop/admin/status', {
-          withCredentials: true,
-        });
-        
+        const response = await axios.get('https://learnsmate.shop/admin/status', { withCredentials: true });
         if (response.data && response.data.code) {
-          // 상태 업데이트
           this.updateLoginState(response.data);
         } else {
+          this.isLoggedIn = false; // 명확히 초기화
           this.resetState();
         }
       } catch (error) {
-        console.error('Failed to fetch login state:', error);
+        this.isLoggedIn = false; // 명확히 초기화
         this.resetState();
-        throw error; // 예외를 다시 throw
+        throw error;
       }
     },
 
