@@ -42,19 +42,16 @@ const shouldShowHeader = computed(() => {
   console.log('Login state:', isLoggedIn.value);
   console.log('Is excluded path:', excludedPaths.includes(route.path));
 
-  // route나 isLoggedIn이 undefined인 경우 처리
   if (!route || isLoggedIn.value === undefined) {
     return false;
   }
 
-  // 클라이언트 상세 페이지 체크
   const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
-
-  // 조건 체크
-  return isLoggedIn.value && 
-         !excludedPaths.includes(route.path) && 
+  return isLoggedIn.value &&
+         !excludedPaths.includes(route.path) &&
          !isClientLectureDetail;
 });
+
 
 onMounted(async () => {
   if (!loginState.isLoggedIn) {
