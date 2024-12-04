@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted  } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
