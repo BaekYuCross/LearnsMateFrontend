@@ -46,16 +46,18 @@ export const useLoginState = defineStore('loginState', {
     
         if (response.status === 200) {
           this.resetState();
-          alert('로그아웃되었습니다.');
+          return true;
         } else {
           console.error('Unexpected response status:', response.status);
           alert('로그아웃에 실패했습니다.');
+          return false;
         }
       } catch (error) {
         console.error('Logout failed:', error);
         alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
+        return false;
       }
-    },    
+    },
 
     // 토큰 만료 시간 설정
     setExp(newExp) {

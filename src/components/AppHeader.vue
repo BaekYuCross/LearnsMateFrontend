@@ -57,6 +57,7 @@ const exp = computed(() => Array.isArray(loginState.exp) ? loginState.exp : null
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);
+const remainingTime = ref('00:00:00');
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
@@ -103,37 +104,34 @@ async function refreshToken() {
     if (error.response && error.response.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
-      router.push('/login');
+      router.replace('/login');
     }
   }
 }
 
-const remainingTime = ref('00:00:00');
-
 const calculateRemainingTime = () => {
   if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
     console.warn('Invalid expiration format:', exp.value);
-    return '00:00:00'; // 기본값 반환
+    return '00:00:00';
   }
 
   const [year, month, day, hour, minute, second] = exp.value;
   const expirationDate = new Date(year, month - 1, day, hour, minute, second);
   const now = new Date();
 
-  const diffInSeconds = Math.floor((expirationDate - now) / 1000);
-
-  if (diffInSeconds <= 0) {
+  if (expirationDate <= now) {
     clearInterval(timer.value);
-    Logout();
     return '만료됨';
   }
 
+  const diffInSeconds = Math.floor((expirationDate - now) / 1000);
   const hours = Math.floor(diffInSeconds / 3600);
   const minutes = Math.floor((diffInSeconds % 3600) / 60);
   const seconds = diffInSeconds % 60;
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
+
 
 const currentGroup = computed(() => {
   const currentPath = route.path || '';
@@ -153,8 +151,10 @@ const Logout = async () => {
   isLoggingOut = true;
 
   try {
-    await loginState.logout();
-    router.push('/login');
+    const logoutSuccessful = await loginState.logout();
+    if (logoutSuccessful) {
+      router.replace('/login');
+    }
   } catch (error) {
     console.error('Logout error:', error);
     alert('로그아웃 중 문제가 발생했습니다.');
