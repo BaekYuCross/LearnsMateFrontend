@@ -130,12 +130,12 @@
               </div>
             </div>
 
-        <div v-if="selectedStudent && studentDetail" class="detail-container">
-          <div class="detail-header">
-            <h3>상세 정보</h3>
-            <button class="close-button" @click="closeStudentDetail">×</button>
-          </div>
-          <div class="detail-content">
+          <div v-if="selectedStudent && studentDetail" class="detail-container">
+            <div class="detail-header">
+              <h3>상세 정보</h3>
+              <button class="close-button" @click="closeStudentDetail">×</button>
+            </div>
+            <div class="detail-content">
               <div class="info-grid">
                 <div class="info-row">
                   <span class="label">이름</span>
@@ -160,150 +160,189 @@
               </div>
 
 
-            <!-- 수강 진행 현황 -->
-            <div class="course-section">
-              <div class="course-header">
-                <h4>수강 진행 현황 ({{ studentDetail?.lectureVideoProgressDtolist?.length || 0 }})
+              <!-- 수강 진행 현황 -->
+              <div class="course-section">
+                <div class="course-header">
+                  <h4>수강 진행 현황 ({{ studentDetail?.lectureVideoProgressDtolist?.length || 0 }})
                   <button class="course-toggle-button" @click="toggleCourseSection">
-                    {{ isCourseSectionVisible ? '&#9650;' : '&#9660;' }}
+                    {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
                   </button>
                 </h4>
-              </div>
-              <div v-if="isCourseSectionVisible" class="course-list">
-                <div v-for="lecture in studentDetail.lectureVideoProgressDtolist" :key="lecture.lectureCode"
-                  class="course-item">
-                  <div class="course-title">{{ lecture.lectureTitle }}</div>
-                  <div class="progress-bar">
-                    <div class="progress"
-                      :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"></div>
-                  </div>
-                  <div class="progress-text">
-                    {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
-                    ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
+                </div>
+                <div v-if="isCourseSectionVisible" class="course-list">
+                  <div
+                    v-for="lecture in studentDetail.lectureVideoProgressDtolist"
+                    :key="lecture.lectureCode"
+                    class="course-item"
+                  >
+                    <div class="course-title">{{ lecture.lectureTitle }}</div>
+                    <div class="progress-bar">
+                      <div
+                        class="progress"
+                        :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
+                      ></div>
+                    </div>
+                    <div class="progress-text">
+                      {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
+                      ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <!-- 추천 강의 섹션 -->
-            <div class="recommended-section">
-              <div class="recommended-header">
-                <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
+              
+              <!-- 추천 강의 섹션 -->
+              <div class="recommended-section">
+                <div class="recommended-header">
+                  <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
                   <button class="recommended-toggle-button" @click="toggleRecommendedSection">
                     {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
-                  </button>
-                </h4>
-              </div>
-              <div v-if="isRecommendedSectionVisible" class="recommended-list">
-                <div v-for="lecture in studentDetail.recommendedLectureList" :key="lecture.lectureCode"
-                  class="recommended-item">
-                  <div class="recommended-content">
-                    <div class="lecture-header">
-                      <span class="lecture-title">{{ lecture.lectureTitle }}</span>
-                      <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
-                        {{ lecture.lectureLevel }}
-                      </span>
-                    </div>
-                    <div class="lecture-info">
-                      <div class="info-item">
-                        <span class="label">강의 가격</span>
-                        <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">조회수</span>
-                        <span>{{ lecture.lectureClickCount }}회</span>
-                      </div>
-                      <div class="info-item">
-                        <span class="label">등록일</span>
-                        <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
-                      </div>
-                    </div>
-                  </div>
+                  </button></h4>
                 </div>
-              </div>
-            </div>
-            <!-- 쿠폰 정보 -->
-            <div class="coupon-section">
-              <h4>쿠폰 정보</h4>
-              <div class="coupon-list">
-                <!-- 미사용 쿠폰 -->
-                <div class="unused-coupons">
-                  <h5>미사용 쿠폰 ({{ studentDetail.unusedCouponsList?.length || 0 }})</h5>
-                  <div class="coupon-grid">
-                    <div v-for="coupon in studentDetail.unusedCouponsList" :key="coupon.couponIssuanceCode"
-                      class="coupon-item">
-                      <div class="coupon-detail">
-                        <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
-                        <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
-                        <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
-                        <div>쿠폰 코드: {{ coupon.couponCode }}</div>
+                <div v-if="isRecommendedSectionVisible" class="recommended-list">
+                  <div
+                    v-for="lecture in studentDetail.recommendedLectureList"
+                    :key="lecture.lectureCode"
+                    class="recommended-item"
+                  >
+                    <div class="recommended-content">
+                      <div class="lecture-header">
+                        <span class="lecture-title">{{ lecture.lectureTitle }}</span>
+                        <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+                          {{ lecture.lectureLevel }}
+                        </span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 사용완료 쿠폰 -->
-                <div class="used-coupons">
-                  <h5>사용완료 쿠폰 ({{ studentDetail.usedCouponsList?.length || 0 }})</h5>
-                  <div class="coupon-grid">
-                    <div v-for="coupon in studentDetail.usedCouponsList" :key="coupon.couponIssuanceCode"
-                      class="coupon-item">
-                      <div class="coupon-detail">
-                        <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
-                        <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
-                        <div>사용일: {{ formatDate(coupon.couponUseDate) }}</div>
-                        <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
-                        <div>쿠폰 코드: {{ coupon.couponCode }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- VOC 내역 -->
-            <div class="voc-section">
-              <h4>문의 내역</h4>
-              <div class="voc-list">
-                <!-- 미답변 문의 -->
-                <div class="unanswered">
-                  <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})</h5>
-                  <div class="voc-grid">
-                    <div v-for="voc in studentDetail.unansweredVocbyMemberList" :key="voc.vocCode" class="voc-item">
-                      <div class="voc-detail">
-                        <div class="voc-header">
-                          <span>문의 코드: {{ voc.vocCode }}</span>
-                          <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                      <div class="lecture-info">
+                        <div class="info-item">
+                          <span class="label">강의 가격</span>
+                          <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
                         </div>
-                        <div class="voc-body">
-                          <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
-                          <div class="voc-content">{{ voc.vocContent }}</div>
+                        <div class="info-item">
+                          <span class="label">조회수</span>
+                          <span>{{ lecture.lectureClickCount }}회</span>
                         </div>
-                        <div class="voc-footer">
-                          <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
-                          <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                        <div class="info-item">
+                          <span class="label">등록일</span>
+                          <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 쿠폰 정보 -->
+              <div class="coupon-section">
+                <h4>쿠폰 정보</h4>
+                <div class="coupon-list">
+                  <!-- 미사용 쿠폰 -->
+                  <div class="unused-coupons">
+                    <div class="subsection-header">
+                      <h5>미사용 쿠폰 ({{ studentDetail.unusedCouponsList?.length || 0 }})
+                        <button class="coupon-toggle-button" @click="toggleUnusedCoupons">
+                          {{ isUnusedCouponsVisible ? '▲' : '▼' }}
+                        </button>
+                      </h5>
+                    </div>
+                    <div v-if="isUnusedCouponsVisible" class="coupon-grid">
+                      <div v-for="coupon in studentDetail.unusedCouponsList" 
+                          :key="coupon.couponIssuanceCode" 
+                          class="coupon-item">
+                        <div class="coupon-detail">
+                          <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
+                          <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
+                          <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
+                          <div>쿠폰 코드: {{ coupon.couponCode }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 사용완료 쿠폰 -->
+                  <div class="used-coupons">
+                    <div class="subsection-header">
+                      <h5>사용완료 쿠폰 ({{ studentDetail.usedCouponsList?.length || 0 }})
+                        <button class="coupon-toggle-button" @click="toggleUsedCoupons">
+                          {{ isUsedCouponsVisible ? '▲' : '▼' }}
+                        </button>
+                      </h5>
+                    </div>
+                    <div v-if="isUsedCouponsVisible" class="coupon-grid">
+                      <div v-for="coupon in studentDetail.usedCouponsList" 
+                          :key="coupon.couponIssuanceCode" 
+                          class="coupon-item">
+                        <div class="coupon-detail">
+                          <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
+                          <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
+                          <div>사용일: {{ formatDate(coupon.couponUseDate) }}</div>
+                          <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
+                          <div>쿠폰 코드: {{ coupon.couponCode }}</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- 답변완료 문의 -->
-                <div class="answered">
-                  <h5>답변완료 문의 ({{ studentDetail.answeredVocbyMemberList?.length || 0 }})</h5>
-                  <div class="voc-grid">
-                    <div v-for="voc in studentDetail.answeredVocbyMemberList" :key="voc.vocCode" class="voc-item">
-                      <div class="voc-detail">
-                        <div class="voc-header">
-                          <span>문의 코드: {{ voc.vocCode }}</span>
-                          <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                <!-- VOC 내역 -->
+                <div class="voc-section">
+                  <h4>문의 내역</h4>
+                  <div class="voc-list">
+                  <!-- 미답변 문의 -->
+                  <div class="unanswered">
+                    <div class="subsection-header">
+                      <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})
+                        <button class="voc-toggle-button" @click="toggleUnansweredVoc">
+                          {{ isUnansweredVocVisible ? '▲' : '▼' }}
+                        </button>
+                      </h5>
+                    </div>
+                    <div v-if="isUnansweredVocVisible" class="voc-grid">
+                      <div v-for="voc in studentDetail.unansweredVocbyMemberList" 
+                          :key="voc.vocCode" 
+                          class="voc-item">
+                        <div class="voc-detail">
+                          <div class="voc-header">
+                            <span>문의 코드: {{ voc.vocCode }}</span>
+                            <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                          </div>
+                          <div class="voc-body">
+                            <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                            <div class="voc-content">{{ voc.vocContent }}</div>
+                          </div>
+                          <div class="voc-footer">
+                            <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
+                            <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                          </div>
                         </div>
-                        <div class="voc-body">
-                          <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
-                          <div class="voc-content">{{ voc.vocContent }}</div>
-                        </div>
-                        <div class="voc-footer">
-                          <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
-                          <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 답변완료 문의 -->
+                  <div class="answered">
+                    <div class="subsection-header">
+                      <h5>답변완료 문의 ({{ studentDetail.answeredVocbyMemberList?.length || 0 }})
+                        <button class="voc-toggle-button" @click="toggleAnsweredVoc">
+                          {{ isAnsweredVocVisible ? '▲' : '▼' }}
+                        </button>
+                      </h5>
+                    </div>
+                    <div v-if="isAnsweredVocVisible" class="voc-grid">
+                      <div v-for="voc in studentDetail.answeredVocbyMemberList" 
+                          :key="voc.vocCode" 
+                          class="voc-item">
+                        <div class="voc-detail">
+                          <div class="voc-header">
+                            <span>문의 코드: {{ voc.vocCode }}</span>
+                            <span>작성일: {{ formatDate(voc.createdAt) }}</span>
+                          </div>
+                          <div class="voc-body">
+                            <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                            <div class="voc-content">{{ voc.vocContent }}</div>
+                          </div>
+                          <div class="voc-footer">
+                            <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
+                            <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -315,8 +354,11 @@
         </div>
       </div>
     </div>
-    <CategoryRatioModal :is-open="showCategoryModal" @close="showCategoryModal = false" />
-  </div>
+    <CategoryRatioModal 
+        :is-open="showCategoryModal" 
+        @close="showCategoryModal = false" 
+      />
+  </div>  
 </template>
 
 <script setup>
@@ -352,6 +394,10 @@ const columns = ref({
 });
 const selectedColumns = ref(Object.keys(columns.value));
 
+const isUnusedCouponsVisible = ref(false);
+const isUsedCouponsVisible = ref(false);
+const isUnansweredVocVisible = ref(false);
+const isAnsweredVocVisible = ref(false);
 // 함수 추가
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -367,6 +413,23 @@ const toggleCourseSection = () => {
 const updateSelectedColumns = () => {
   console.log("current selected column :", selectedColumns.value);
 };
+
+const toggleUnusedCoupons = () => {
+  isUnusedCouponsVisible.value = !isUnusedCouponsVisible.value;
+};
+
+const toggleUsedCoupons = () => {
+  isUsedCouponsVisible.value = !isUsedCouponsVisible.value;
+};
+
+const toggleUnansweredVoc = () => {
+  isUnansweredVocVisible.value = !isUnansweredVocVisible.value;
+};
+
+const toggleAnsweredVoc = () => {
+  isAnsweredVocVisible.value = !isAnsweredVocVisible.value;
+};
+
 const formatCurrency = (value) => {
   return value.toLocaleString(); // 숫자를 로컬 형식으로 변환 (3자리 단위 콤마)
 };
@@ -382,7 +445,7 @@ const toggleRecommendedSection = () => {
 const fetchStudents = async () => {
   try {
     const response = await axios.get('http://localhost:5000/member/students', {
-      withCredentials: true,
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize,
@@ -402,8 +465,8 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post('http://localhost:5000/member/filter/student', lastFilterData.value, {
-      withCredentials: true,
+    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
+      withCredentials: true, 
       params: {
         page: currentPage.value - 1,
         size: pageSize,
@@ -429,7 +492,7 @@ const showDetail = async (student) => {
   } else {
     try {
       const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
-        withCredentials: true,
+        withCredentials: true,   
       });
 
       selectedStudent.value = student;
@@ -460,8 +523,8 @@ const handleSearch = async (filterData) => {
   await fetchFilteredStudents();
 };
 
-const handleExcelDownload = async () => {
-  try {
+const handleExcelDownload = async() => {
+  try{
     const config = {
       method: 'POST',
       url: 'http://localhost:5000/member/excel/download/student',
@@ -477,7 +540,7 @@ const handleExcelDownload = async () => {
     };
 
     const response = await axios(config);
-
+    
     // 에러 응답 체크
     if (response.data instanceof Blob) {
       const isJson = response.data.type === 'application/json';
@@ -489,13 +552,13 @@ const handleExcelDownload = async () => {
     }
 
     // 파일 다운로드
-    const blob = new Blob([response.data], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    const blob = new Blob([response.data], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
     });
 
     const now = new Date();
     const fileName = `student_data_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}.xlsx`;
-
+    
     saveAs(blob, fileName);
   } catch (error) {
     console.error('엑셀 다운로드 중 오류가 발생했습니다:', error);
@@ -517,6 +580,11 @@ const handleReset = () => {
   fetchStudents();
 };
 
+const closeStudentDetail = () => {
+  selectedStudent.value = null;
+  studentDetail.value = null;
+};
+
 // 페이지네이션
 const displayedPages = computed(() => {
   const pages = [];
@@ -524,9 +592,9 @@ const displayedPages = computed(() => {
   if (currentPage.value - 1 > 2) {
     pages.push('...');
   }
-  for (let i = Math.max(2, currentPage.value - 2);
-    i <= Math.min(totalPages.value - 1, currentPage.value + 2);
-    i++) {
+  for (let i = Math.max(2, currentPage.value - 2); 
+       i <= Math.min(totalPages.value - 1, currentPage.value + 2); 
+       i++) {
     pages.push(i);
   }
   if (totalPages.value - currentPage.value > 2) {
@@ -551,15 +619,15 @@ const getVocCategory = (categoryCode) => {
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
-
+  
   const [year, month, day, hour, minute] = dateArray;
-
+  
   // 월과 일이 한자리수일 경우 앞에 0을 붙임
   const formattedMonth = month.toString().padStart(2, '0');
   const formattedDay = day.toString().padStart(2, '0');
   const formattedHour = hour.toString().padStart(2, '0');
   const formattedMinute = minute.toString().padStart(2, '0');
-
+  
   return `${year}-${formattedMonth}-${formattedDay}T${formattedHour}:${formattedMinute}:00`;
 };
 
@@ -568,7 +636,7 @@ onMounted(() => {
   fetchStudents();
   const header = document.querySelector('.student-header-container');
   const section = document.querySelector('.content-section');
-
+  
   if (header && section) {
     header.style.marginBottom = '0';
     section.style.marginTop = '0';

@@ -101,7 +101,6 @@ th {
   display: flex;
   flex-direction: column;
   gap: 12px;
-
 }
 
 .info-item {
@@ -445,8 +444,11 @@ th {
   justify-content: space-between;
   align-items: center;
 }
+
 .recommended-toggle-button,
-.course-toggle-button {
+.course-toggle-button,
+.coupon-toggle-button,
+.voc-toggle-button {
   background: none;
   border: none;
   font-size: 16px; 
@@ -513,7 +515,8 @@ th {
   border-top: 1px solid #eee;
  }
  
- .coupon-list {
+ .coupon-list,
+ .voc-list {
   display: grid;
   gap: 20px;
  }

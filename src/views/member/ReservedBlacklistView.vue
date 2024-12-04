@@ -79,9 +79,13 @@
           </div>
         </div>
 
+
         <div v-if="selectedReserved" class="reserved-detail-container">
-          <div class="reserved-detail-content">
+          <div class="reserved-detail-header">
             <h3>예비 블랙리스트 상세 정보</h3>
+            <button class="close-button" @click="closeResveredBlacklistDetail">×</button>
+          </div>
+          <div class="reserved-detail-content">
             <div class="reserved-info-grid">
               <div class="reserved-info-item">
                 <span class="reserved-label">{{ memberTypeText }} 코드:</span>
@@ -354,6 +358,11 @@ const confirmRegister = async () => {
     alert('블랙리스트 등록에 실패했습니다.');
   }
 };
+
+const closeResveredBlacklistDetail = () => {
+  selectedReserved.value = null;
+  reportDetails.value = null;
+}
 
 onMounted(() => {
   fetchReservedList();

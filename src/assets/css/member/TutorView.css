@@ -42,7 +42,6 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: 570px;
   overflow-x: auto;
-
 }
 
 .tutor-detail-container {
@@ -55,23 +54,28 @@
   height: auto; 
 }
 
-table {
-  width: 100%;
-  min-width: 1200px;
-  border-collapse: collapse;
+.tutor-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 }
 
-th, td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap;
-  font-size: 11px;
+.tutor-detail-content {
+  margin-bottom: 20px;
+  color: #333;
 }
 
-th {
-  font-size: 13px;
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
 }
+
 
 .tutor-selected {
   background-color: #e2e8f0;
