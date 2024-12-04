@@ -5,6 +5,7 @@
   </template>
   
   <script>
+  import { ref, watch, onMounted } from 'vue';
   import Chart from 'chart.js/auto';
   
   export default {
@@ -15,15 +16,42 @@
       required: true,
     },
   },
+  data() {
+    return {
+      chartInstance: null,
+    };
+  },
+  watch: {
+    categories: {
+      handler() {
+        this.$nextTick(() => {
+          if (this.chartInstance) {
+            this.chartInstance.destroy();
+          }
+          this.createChart();
+        });
+      },
+      deep: true,
+    },
+  },
   mounted() {
-    this.createChart();
+    if (this.categories.length > 0) {
+      this.createChart();
+    }
+  },
+  beforeUnmount() {
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+    }
   },
   methods: {
     createChart() {
-      const ctx = document.getElementById('categoryBarChart').getContext('2d');
-      const topCategories = this.categories.slice(0, 3); // 상위 3개만 가져오기
+      const ctx = document.getElementById('categoryBarChart')?.getContext('2d');
+      if (!ctx || !this.categories.length) return;
 
-      new Chart(ctx, {
+      const topCategories = this.categories.slice(0, 3);
+
+      this.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: topCategories.map((category) => category.name),
@@ -37,12 +65,12 @@
           ],
         },
         options: {
-          indexAxis: 'y', // 가로 막대형 차트로 변경
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false, // 범례 숨기기
+              display: false,
             },
           },
           scales: {
@@ -50,14 +78,14 @@
               beginAtZero: true,
               ticks: { stepSize: 5 },
               grid: {
-                display: false, // x축 격자 무늬 제거
-                },
+                display: false,
+              },
             },
             y: {
               ticks: { font: { size: 12 } },
               grid: {
-                display: false, // x축 격자 무늬 제거
-                },
+                display: false,
+              },
             },
           },
         },
@@ -65,7 +93,6 @@
     },
   },
 };
-
   
   </script>
   

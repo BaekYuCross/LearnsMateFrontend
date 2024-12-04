@@ -8,74 +8,100 @@
 import Chart from 'chart.js/auto';
 
 export default {
-  name: "RevenueComparisonChart",
-  props: {
-    revenueData: {
-      type: Array,
-      required: true,
-    },
-  },
-  mounted() {
-    this.createChart();
-  },
-  methods: {
-    createChart() {
-      const ctx = document.getElementById('revenueComparisonChart').getContext('2d');
+ name: "RevenueComparisonChart",
+ props: {
+   revenueData: {
+     type: Array,
+     required: true,
+   },
+ },
+ data() {
+   return {
+     chartInstance: null,
+   };
+ },
+ watch: {
+   revenueData: {
+     handler() {
+       this.$nextTick(() => {
+         if (this.chartInstance) {
+           this.chartInstance.destroy();
+         }
+         this.createChart();
+       });
+     },
+     deep: true,
+   },
+ },
+ mounted() {
+   if (this.revenueData.length > 0) {
+     this.createChart();
+   }
+ },
+ beforeUnmount() {
+   if (this.chartInstance) {
+     this.chartInstance.destroy();
+   }
+ },
+ methods: {
+   createChart() {
+     const ctx = document.getElementById('revenueComparisonChart')?.getContext('2d');
+     if (!ctx || !this.revenueData.length) return;
 
-      // 데이터 가공
-      const labels = [...new Set(this.revenueData.map(item => `${item.month}월`))];
-      const currentYearData = this.revenueData
-        .filter(item => item.year === new Date().getFullYear())
-        .map(item => item.revenue);
-      const previousYearData = this.revenueData
-        .filter(item => item.year === new Date().getFullYear() - 1)
-        .map(item => item.revenue);
+     const labels = [...new Set(this.revenueData.map(item => `${item.month}월`))];
+     const currentYearData = this.revenueData
+       .filter(item => item.year === new Date().getFullYear())
+       .map(item => item.revenue);
+     const previousYearData = this.revenueData
+       .filter(item => item.year === new Date().getFullYear() - 1)
+       .map(item => item.revenue);
 
-      new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels, // x축: 월
-          datasets: [
-            {
-              label: `${new Date().getFullYear() - 1}년`, // 전년도
-              data: previousYearData,
-              backgroundColor: '#BCF2E3', 
-            },
-            {
-              label: `${new Date().getFullYear()}년`, // 올해
-              data: currentYearData,
-              backgroundColor: '#029688',
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: true, position: 'top' },
-          },
-          scales: {
-            x: { stacked: false,
-                  barPercentage: 0.3, // 막대 너비 설정 (0~1, 1이 최대 너비)
-                  categoryPercentage: 0.6, 
-                  grid: {
-              display: false, // x축 격자 무늬 제거
-              },
-              },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                callback: value => `${value.toLocaleString()} 원`, // 숫자 콤마 표시
-              },
-              grid: {
-              display: false, // x축 격자 무늬 제거
-              },
-            },
-          },
-        },
-      });
-    },
-  },
+     this.chartInstance = new Chart(ctx, {
+       type: 'bar',
+       data: {
+         labels,
+         datasets: [
+           {
+             label: `${new Date().getFullYear() - 1}년`,
+             data: previousYearData,
+             backgroundColor: '#BCF2E3',
+           },
+           {
+             label: `${new Date().getFullYear()}년`,
+             data: currentYearData,
+             backgroundColor: '#029688',
+           },
+         ],
+       },
+       options: {
+         responsive: true,
+         maintainAspectRatio: false,
+         plugins: {
+           legend: { display: true, position: 'top' },
+         },
+         scales: {
+           x: { 
+             stacked: false,
+             barPercentage: 0.3,
+             categoryPercentage: 0.6,
+             grid: {
+               display: false,
+             },
+           },
+           y: {
+             beginAtZero: true,
+             ticks: {
+               callback: value => `${value.toLocaleString()} 원`,
+             },
+             grid: {
+               display: false,
+             },
+           },
+         },
+       },
+     });
+   },
+ },
 };
 </script>
 

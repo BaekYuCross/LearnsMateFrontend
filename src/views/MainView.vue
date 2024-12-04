@@ -439,7 +439,7 @@ const fetchContractAdmin = async (adminCode) => {
 
 const fetchContractLecture = async (lectureCode) => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/${lectureCode}`,{
+    const response = await axios.get(`https://learnsmate.shop/lecture/${lectureCode}`,{
       withCredentials: true,
     });
     const contractLecture = response.data;
