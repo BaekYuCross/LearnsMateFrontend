@@ -147,9 +147,13 @@ const currentGroup = computed(() => {
 });
 
 const Logout = async () => {
-  await loginState.logout();
-  alert('로그아웃되었습니다.');
-  router.push('/login');
+  try {
+    await loginState.logout();
+    router.push('/login');
+  } catch (error) {
+    console.error('Logout error:', error);
+    alert('로그아웃 처리 중 오류가 발생했습니다.');
+  }
 };
 
 const navigateTo = (path) => {
@@ -177,15 +181,10 @@ const startTimer = () => {
 };
 
 watch(
-  () => exp.value,
+  () => loginState.isLoggedIn,
   (newValue) => {
-    if (newValue && Array.isArray(newValue) && newValue.length === 6) {
-      startTimer();
-    } else {
-      console.warn('Invalid or null expiration value:', newValue);
-      if (timer.value) {
-        clearInterval(timer.value);
-      }
+    if (!newValue) {
+      router.push('/login');
     }
   },
   { immediate: true }

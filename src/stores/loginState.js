@@ -38,13 +38,24 @@ export const useLoginState = defineStore('loginState', {
     // 로그아웃 처리
     async logout() {
       try {
-        await axios.post('https://learnsmate.shop/auth/logout', {}, { withCredentials: true });
-        this.resetState();
+        const response = await axios.post(
+          'https://learnsmate.shop/auth/logout',
+          {},
+          { withCredentials: true }
+        );
+    
+        if (response.status === 200) {
+          this.resetState();
+          alert('로그아웃되었습니다.');
+        } else {
+          console.error('Unexpected response status:', response.status);
+          alert('로그아웃에 실패했습니다.');
+        }
       } catch (error) {
         console.error('Logout failed:', error);
-        alert('로그아웃에 실패했습니다. 다시 시도해주세요.');
+        alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    },
+    },    
 
     // 토큰 만료 시간 설정
     setExp(newExp) {
