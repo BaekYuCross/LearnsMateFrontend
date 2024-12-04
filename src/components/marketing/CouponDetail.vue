@@ -1,121 +1,121 @@
 <template>
-  <div class="coupon-top-line"></div>
+  
   <div class="coupon-detail-contents">
-  <table class="coupon-detail-table" v-if="props.selectedCoupon">
-    <tbody>
-        <tr>
-            <th>쿠폰 번호</th>
-            <td>{{ props.selectedCoupon.coupon_code }}</td>
-        </tr>
-        <tr>
-            <th>쿠폰 이름</th>
-            <td>
-              <div v-if="isEditMode">
-                <input type="text" v-model="editCouponData.coupon_name">
-              </div>
-              <div v-else>
-                {{ props.selectedCoupon.coupon_name }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>쿠폰 내용</th>
-            <td>
-              <div v-if="isEditMode">
-                <textarea v-model="editCouponData.coupon_contents"></textarea>
-              </div>
-              <div v-else>
-              {{ props.selectedCoupon.coupon_contents || '-' }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>쿠폰 할인율</th>
-            <td>
-              <div v-if="isEditMode">
-                <input type="number" min="0" max="100" v-model="editCouponData.coupon_discount_rate">
-              </div>
-              <div v-else>
-              {{ props.selectedCoupon.coupon_discount_rate }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>쿠폰 종류</th>
-            <td>
-              <div v-if="isEditMode">
-                <select v-model="editCouponData.coupon_category_name">
-                  <option value="일반">일반</option>
-                  <option value="기념일">기념일</option>
-                  <option value="신규가입">신규가입</option>
-                  <option value="첫구매">첫 구매</option>
-                  <option value="복귀">복귀</option>
-                  <option value="완강">완강</option>
-                  <option value="이벤트">이벤트</option>
-                </select>
-              </div>
-              <div v-else>
-              {{ props.selectedCoupon.coupon_category_name }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>상태</th>
-            <td>{{ props.selectedCoupon.active_state ? '활성' : '비활성' }}</td>
-        </tr>
-        <tr>
-            <th>시작일</th>
-            <td>
-              <div v-if="isEditMode">
-                <input type="date" v-model="editCouponData.coupon_start_date">
-              </div>
-              <div v-else>
-              {{ formatDate(props.selectedCoupon.coupon_start_date) }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>만료일</th>
-            <td>
-              <div v-if="isEditMode">
-                <input type="date" v-model="editCouponData.coupon_expire_date">
-              </div>
-              <div v-else>
-              {{ formatDate(props.selectedCoupon.coupon_expire_date) }}
-              </div>
-            </td>
-        </tr>
-        <tr>
-            <th>생성일</th>
-            <td>{{ formatDate(props.selectedCoupon.created_at) }}</td>
-        </tr>
-        <tr>
-            <th>수정일</th>
-            <td>{{ formatDate(props.selectedCoupon.updated_at) }}</td>
-        </tr>
-        <tr>
-            <th>직원</th>
-            <td>{{ selectedCoupon.admin_name || '-' }}</td>
-        </tr>
-        <tr>
-            <th>강사</th>
-            <td>{{ props.selectedCoupon.tutor_name || '-' }}</td>
-        </tr>
-    </tbody>
-  </table>
-  <div class="coupon-buttons">
-    <button class="coupon-edit-button" v-if="!isEditMode" @click="enableEditMode">쿠폰 수정</button>
-    <div v-else>
-      <button class="coupon-save-button" @click="saveCoupon">저장</button>
-      <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
-    </div>
-    <button class="coupon-delete-button" @click="deleteCoupon">쿠폰 삭제</button>
+    <div class="coupon-detail-header">
+    <div class="coupon-detail-title">쿠폰</div>
+    <button class="coupon-detail-close-button">x</button>
   </div>
+    <div class="coupon-detail-table" v-if="props.selectedCoupon">
+      <div class="coupon-detail-table-row">
+        <div class="coupon-detail-table-head">쿠폰 번호</div>
+        <div class="coupon-detail-table-body">{{ props.selectedCoupon.coupon_code }}</div>
+      </div>
+      <div class="coupon-detail-table-row">
+        <div class="coupon-detail-table-head">쿠폰 이름</div>
+        <div class="coupon-detail-table-body" v-if="isEditMode">
+          <input type="text" v-model="editCouponData.coupon_name">
+        </div>
+        <div class="coupon-detail-table-body" v-else>
+          {{ props.selectedCoupon.coupon_name }}
+        </div>
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">쿠폰 내용</div>
+      <div class="coupon-detail-table-body" v-if="isEditMode">
+        <textarea v-model="editCouponData.coupon_contents"></textarea>
+      </div>
+      <div class="coupon-detail-table-body" v-else>
+        {{ props.selectedCoupon.coupon_contents || '-' }}
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">쿠폰 할인율</div>
+      <div class="coupon-detail-table-body" v-if="isEditMode">
+        <input type="number" min="0" max="100" v-model="editCouponData.coupon_discount_rate">
+      </div>
+      <div class="coupon-detail-table-body" v-else>
+        {{ props.selectedCoupon.coupon_discount_rate }}
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">쿠폰 종류</div>
+      <div class="coupon-detail-table-body" v-if="isEditMode">
+        <select v-model="editCouponData.coupon_category_name">
+          <option value="일반">일반</option>
+          <option value="기념일">기념일</option>
+          <option value="신규가입">신규가입</option>
+          <option value="첫구매">첫 구매</option>
+          <option value="복귀">복귀</option>
+          <option value="완강">완강</option>
+          <option value="이벤트">이벤트</option>
+        </select>
+      </div>
+      <div class="coupon-detail-table-body" v-else>
+        {{ props.selectedCoupon.coupon_category_name }}
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">상태</div>
+      <div class="coupon-detail-table-body">
+        <div div class="active-state" :class="{
+      'active-state': true,
+      'active': props.selectedCoupon.active_state,
+      'inactive': !props.selectedCoupon.active_state
+    }">
+        {{ props.selectedCoupon.active_state ? '활성' : '비활성' }}
+      </div>
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">시작일</div>
+      <div class="coupon-detail-table-body" v-if="isEditMode">
+        <input type="date" v-model="formattedStartDate">
+      </div>
+      <div class="coupon-detail-table-body" v-else>
+        {{ formatDate(props.selectedCoupon.coupon_start_date) }}
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">만료일</div>
+      <div class="coupon-detail-table-body" v-if="isEditMode">
+        <input type="date" v-model="formattedExpireDate">
+      </div>
+      <div class="coupon-detail-table-body" v-else>
+        {{ formatDate(props.selectedCoupon.coupon_expire_date) }}
+      </div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">생성일</div>
+      <div class="coupon-detail-table-body">{{ formatDate(props.selectedCoupon.created_at) }}</div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">수정일</div>
+      <div class="coupon-detail-table-body">{{ formatDate(props.selectedCoupon.updated_at) }}</div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">직원</div>
+      <div class="coupon-detail-table-body">{{ selectedCoupon.admin_name || '-' }}</div>
+    </div>
+    <div class="coupon-detail-table-row">
+      <div class="coupon-detail-table-head">강사</div>
+      <div class="coupon-detail-table-body">{{ props.selectedCoupon.tutor_name || '-' }}</div>
+    </div>
+    <div class="coupon-buttons">
+  <template v-if="!isEditMode">
+    <button class="coupon-edit-button" @click="enableEditMode">수정</button>
+    <button class="coupon-delete-button" @click="deleteCoupon">삭제</button>
+  </template>
+  <template v-else>
+    <button class="coupon-save-button" @click="saveCoupon">저장</button>
+    <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
+  </template>
 </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import axios from 'axios';
 
 const props = defineProps(['selectedCoupon']);
@@ -133,6 +133,22 @@ watch(
   { immediate: true }
 );
 
+const formattedStartDate = computed({
+  get: () => formatDateForInput(editCouponData.value.coupon_start_date),
+  set: (value) => editCouponData.value.coupon_start_date = value
+});
+
+const formattedExpireDate = computed({
+  get: () => formatDateForInput(editCouponData.value.coupon_expire_date),
+  set: (value) => editCouponData.value.coupon_expire_date = value
+});
+
+const formatDateForInput = (isoDate) => {
+  if (!isoDate) return '';
+  // ISO 날짜 문자열에서 'YYYY-MM-DD' 부분만 추출
+  return isoDate.split('T')[0];
+};
+
 // 날짜 포맷 함수
 const formatDate = (isoDate) => {
   if (!isoDate) return '-';
@@ -148,23 +164,27 @@ const formatDateWithTime = {
   // 시작일: 해당 날짜의 00:00:00
   startDate: (date) => {
     if (!date) return null;
+    if (date.includes('T')) return date;
     return `${date}T00:00:00`;
   },
 
   // 만료일: 해당 날짜의 23:59:59
   endDate: (date) => {
     if (!date) return null;
+    if (date.includes('T')) return date;
     return `${date}T23:59:59`;
   },
 
   // 여러 날짜를 쿠폰 데이터에 직접 업데이트
   applyCouponDates: (editCouponData) => {
-    if (editCouponData.coupon_start_date) {
-      editCouponData.coupon_start_date = formatDateWithTime.startDate(editCouponData.coupon_start_date);
+    const editedData = { ...editCouponData };
+    if (editedData.coupon_start_date) {
+      editedData.coupon_start_date = formatDateWithTime.startDate(editedData.coupon_start_date);
     }
-    if (editCouponData.coupon_expire_date) {
-      editCouponData.coupon_expire_date = formatDateWithTime.endDate(editCouponData.coupon_expire_date);
+    if (editedData.coupon_expire_date) {
+      editedData.coupon_expire_date = formatDateWithTime.endDate(editedData.coupon_expire_date);
     }
+    return editedData;
   }
 };
 
@@ -184,23 +204,22 @@ const cancelEdit = () => {
 const saveCoupon = async () => {
   try {
 
-    formatDateWithTime.applyCouponDates(editCouponData.value);
-    
+    const requestData = formatDateWithTime.applyCouponDates({ ...editCouponData.value });
+
     // 저장 로직 (예: API 호출)
-    const requestData = { ...editCouponData.value };
     const response = await axios.patch(`http://localhost:5000/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
-    requestData,
-    {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    }
-  );
+      requestData,
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      }
+    );
     console.log("edit success", response.data);
 
     // 성공 시 화면 데이터 갱신
-    Object.assign(props.selectedCoupon, editCouponData.value);
+    Object.assign(props.selectedCoupon, response.data);
     isEditMode.value = false;
   } catch (error) {
     console.error("edit fail", error.message);
@@ -211,12 +230,12 @@ const saveCoupon = async () => {
 const deleteCoupon = async () => {
   try {
     const response = await axios.patch(`http://localhost:5000/coupon/admin/delete/${props.selectedCoupon.coupon_code}`,
-      {},{
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      {}, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
       }
+    }
     );
     window.location.href = '/marketing/coupons'
     console.log("delete success", response.data);
@@ -230,13 +249,32 @@ const deleteCoupon = async () => {
 </script>
 
 <style scoped>
-.coupon-top-line {
-  height: 15px;
-  background-color: #005950;
+
+.coupon-detail-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.coupon-detail-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
 }
 
 .coupon-detail-contents {
   padding: 20px 30px;
+  background-color: #ffffff;
+}
+
+.coupon-detail-close-button {
+  background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
 }
 
 .coupon-detail-table {
@@ -247,27 +285,29 @@ const deleteCoupon = async () => {
   background-color: #ffffff;
 }
 
-.coupon-detail-table th {
-  background-color: #f9f9f9;
+.coupon-detail-table-head {
+  background-color: #ffffff;
   font-size: 13px;
   font-weight: bold;
   color: #595656;
   text-align: right;
   width: 100px;
-  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  white-space: nowrap;
+  /* 텍스트 줄바꿈 방지 */
 }
 
-.coupon-detail-table td {
-    font-size: 11px;
-    color: #333333;
-    text-align: left;
-    width: 82%;
+.coupon-detail-table-body {
+  font-size: 13px;
+  color: #333333;
+  text-align: left;
+  width: 82%;
+  background-color: #ffffff;
 }
 
-.coupon-detail-table th,
-.coupon-detail-table td {
+.coupon-detail-table-head,
+.coupon-detail-table-body {
   padding: 10px 20px;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px dashed #eaeaea;
 }
 
 .lecture-by-coupon-table th {
@@ -279,43 +319,43 @@ const deleteCoupon = async () => {
 }
 
 .lecture-by-coupon-table td {
-    font-size: 11px;
-    color: #333333;
-    text-align: center;
-    background-color: #ffffff;
+  font-size: 11px;
+  color: #333333;
+  text-align: center;
+  background-color: #ffffff;
 }
 
 .lecture-by-coupon-table th,
 .lecture-by-coupon-table td {
-    padding: 10px 20px;
-    margin-top: 20px;
-    border-bottom: 1px solid #eaeaea;
+  padding: 10px 20px;
+  margin-top: 20px;
+  border-bottom: 1px solid #eaeaea;
 }
 
 .lecture-by-coupon-table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
 }
 
 .coupon-buttons {
-    display: flex;
-    justify-content: right;
-    position: relative;
-    margin-top: 20px;
-    text-align: right;
+  display: flex;
+  justify-content: right;
+  position: relative;
+  margin-top: 20px;
+  text-align: right;
 }
 
 .coupon-edit-button,
 .coupon-delete-button,
 .coupon-save-button,
 .coupon-cancel-button {
-    background-color: #005950;
-    color: #ffffff;
-    border: none;
-    border-radius: 3px;
-    margin-left: 20px;
-    padding: 5px 10px;
+  background-color: #005950;
+  color: #ffffff;
+  border: none;
+  border-radius: 3px;
+  margin-left: 20px;
+  padding: 5px 10px;
 }
 
 .coupon-edit-button:hover,
@@ -324,5 +364,47 @@ const deleteCoupon = async () => {
 .coupon-cancel-button:hover {
   cursor: pointer;
   background-color: #004c42;
+}
+
+.coupon-detail-table-row {
+  display: flex;
+}
+
+.coupon-detail-table-body .active-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  padding: 0.5px;
+  text-align: center;
+  width: 50px;
+  font-size: 13px;
+}
+
+.coupon-detail-table-body .active-state.active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.coupon-detail-table-body .active-state.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.coupon-detail-table-body textarea {
+  width: 100%;
+  height: 100px;
+  resize: none;
+  padding: 8px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+}
+
+.coupon-detail-table-body input {
+  width: 100%;
+  padding: 2px;
+  padding-left: 5px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
 }
 </style>

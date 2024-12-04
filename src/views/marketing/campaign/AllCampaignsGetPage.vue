@@ -434,7 +434,7 @@ onMounted(async() => {
     .board-row {
       display: grid;
       grid-template-columns: 0.6fr 2fr 3fr 1fr 1fr 1fr 1fr 0.5fr;
-      padding: 7px 14px;
+      padding: 10px 14px;
       border-bottom: 1px solid #eaeaea;
       font-size: 11px;
       color: #333333;

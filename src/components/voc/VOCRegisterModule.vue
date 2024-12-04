@@ -46,11 +46,24 @@ const confirmAction = () => {
 }
 
   
-  /* 모달 창 스타일 */
-  .voc-register-modal-container {
+.voc-register-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  
+/* 모달 창 스타일 */
+.voc-register-modal-container {
   background-color: #ffffff;
   width: 500px;
-  height: 200px;
+  min-height: 200px; /* 최소 높이를 설정하여 내용이 많을 경우 높이가 늘어나도록 함 */
+  max-width: 90%; /* 화면 크기에 따라 모달 너비가 너무 커지지 않도록 제한 */
+  height: auto; /* 내용에 맞게 자동으로 높이가 조정되도록 설정 */
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   padding: 20px;
@@ -83,48 +96,44 @@ const confirmAction = () => {
     border-bottom-right-radius: 10px; /* 모서리 둥글게 */
   }
 }
-
-  
-  /* 닫기 버튼 */
-  .voc-register-modal-close {
-    position: absolute;
-    top: 15px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  /* 제목 스타일 */
-  .voc-register-modal-title {
-    margin-top: 35px;
+.voc-register-modal-title {
+    margin-top: 25px;
     font-size: 23px;
     color: #193325; /* 제목 글자 색 */
   }
-  
-  /* 버튼 컨테이너 */
-  .voc-register-modal-actions {
-    display: flex;
-    justify-content: center; 
-    margin-top: 40px;
-    gap: 70px;
-    
-    .voc-register-modal-button {
-      background-color: #145f58;
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      width: 90px;
-      height: 32px;
-      cursor: pointer;
-      font-size: 16px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  
-      &:hover {
-        background-color: #124c47;
-      }
-    }
+
+
+.voc-register-modal-message {
+    margin-top: 15px;
+    font-size: 17px;
+    color: #000000; /* 제목 글자 색 */
   }
+  
+/* 버튼 컨테이너 */
+.voc-register-modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* 높이를 조정하여 내용에 맞게 배치 */
+  gap: 70px; /* 버튼 간격을 좁힘 */
+}
+
+/* 버튼 스타일 */
+.voc-register-modal-button {
+  background-color: #145f58;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  width: 90px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center; /* 버튼 텍스트 정렬 */
+  
+  &:hover {
+    background-color: #124c47;
+  }
+}
+
   </style>
   

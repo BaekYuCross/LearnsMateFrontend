@@ -4,7 +4,7 @@
     <div class="voc-content-container" :class="{ 'single-view': isSingleView }">
       <VOCFilter @search="handleSearch" @reset="handleReset" />
       <div class="voc-actions">
-        <div class="voc-count">등록된 VOC <span class="voc-length">{{ totalCount }}</span>개</div>
+        <div class="voc-count">등록된 VOC <span class="voc-length">{{ formatNumber(totalCount) }}</span>개</div>
         <div class="voc-button-group">
           <button class="voc-excel-button" @click="handleExcelDownload">
             <img src="@/assets/icons/download.svg" alt="다운로드">
@@ -127,7 +127,7 @@
               <div class="voc-board-row-number">{{ voc.voc_code.slice(0, 10) }}...</div>
               <div class="voc-board-row-content">{{ voc.voc_content }}</div>
               <div class="voc-board-row-category">{{ voc.voc_category_name }}</div>
-              <div class="voc-board-row-type">{{ voc.member_type }}</div>
+              <div class="voc-board-row-type">{{ translateMemberType(voc.member_type) }}</div>
               <div class="voc-board-row-name">{{ maskName(voc.member_name) }}</div>
               <div class="voc-board-row-code">{{ voc.member_code }}</div>
               <div class="voc-board-row-manager">{{ voc.admin_name || '-' }}</div>
@@ -169,7 +169,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 내용</span>
-              <span class="value">{{ selectedVOC.voc_content }}</span>
+              <span class="value" style="width: 200px;">{{ selectedVOC.voc_content }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">카테고리</span>
@@ -177,7 +177,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">고객 유형</span>
-              <span class="value">{{ selectedVOC.member_type }}</span>
+              <span class="value">{{ translateMemberType(selectedVOC.member_type) }}</span>
             </div>
             <div class="voc-detail-item">
               <span class="label">고객명</span>
@@ -209,7 +209,7 @@
             </div>
             <div class="voc-detail-item">
               <span class="label">VOC 답변</span>
-              <span v-if="!isEditingAnswer" class="value">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
+              <span v-if="!isEditingAnswer" class="value" style="width: 200px;">{{ selectedVOC.voc_answer_content || '답변이 등록되지 않았습니다.' }}</span>
               <textarea
                 v-else
                 v-model="editAnswerContent"
@@ -231,6 +231,13 @@
                 @click="startEditingAnswer"
               >
                 VOC 답변 수정
+              </button>
+              <button
+                v-if="isEditingAnswer"
+                class="voc-answer-complete-button"
+                @click="cancelEditing"
+              >
+                취소
               </button>
               <button
                 v-if="isEditingAnswer"
@@ -335,6 +342,12 @@ const showSingleVoc = () => {
   console.log('showSingleVoc called: isSingleView =', isSingleView.value);
 };
 
+
+const formatNumber = (number) => {
+  if (!number) return '0';
+  return number.toLocaleString('ko-KR');
+};
+
 const hideSingleVoc = () => {
   isSingleView.value = false;
   console.log('hideSingleVoc called: isSingleView =', isSingleView.value);
@@ -423,6 +436,20 @@ const handleExcelDownload = async () => {
   }
 };
 
+const translateMemberType = (type) => {
+  if (type === 'STUDENT') {
+    return '학생';
+  } else if (type === 'TUTOR') {
+    return '강사';
+  } else {
+    return type; // 예외 처리
+  }
+};
+
+const cancelEditing = () => {
+  isEditingAnswer.value = false;  
+  editAnswerContent.value = selectedVOC.value.voc_answer_content; 
+};
 
 const formatDateFromArray = (dateArray) => {
   if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
@@ -469,6 +496,7 @@ const showVOCDetail = async (voc) => {
   }
 };
 
+
 const closeVOCDetail = () => {
   selectedVOC.value = null;
   hideSingleVoc();
@@ -482,6 +510,7 @@ const closeRegisterModal = () => {
   isRegisterModalOpen.value = false;
 };
 
+
 const startEditingAnswer = () => {
     isEditingAnswer.value = true;
     editAnswerContent.value = selectedVOC.value?.voc_answer_content || '';
@@ -492,11 +521,16 @@ const startRegisteringAnswer = () => {
   editAnswerContent.value = '';
 };
 
+
 const confirmAction = () => {
   if (!editAnswerContent.value.trim()) {
     alert('답변 내용을 입력해주세요.');
     return;
   }
+
+
+
+
 
   if (!selectedVOC.value.voc_answer_code) {
     isRegisterModalOpen.value = true;
