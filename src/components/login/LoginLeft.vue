@@ -1,29 +1,35 @@
 <template>
   <div class="login-left">
     <h1>Login</h1>
-    <!-- @submit.prevent를 사용하여 재로딩 방지 -->
     <form class="login-form" @submit.prevent="loginUser">
       <input v-model="formData.adminCode" type="text" placeholder="사번 ID" class="login-input" />
       <input v-model="formData.adminPassword" type="password" placeholder="비밀번호" class="login-input" />
       <button type="submit" class="login-button">로그인</button>
-      <!-- 비밀번호 재설정 버튼 -->
       <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
     </form>
   </div>
 </template>
+
 <script setup>
 import { useLoginState } from '@/stores/loginState';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-const loginState = useLoginState(); // Pinia 상태
-const router = useRouter(); // Vue Router 사용
+const loginState = useLoginState();
+const router = useRouter();
 
 const formData = ref({
   adminCode: '',
   adminPassword: '',
 });
+
+const checkLoginStatus = async () => {
+  await loginState.fetchLoginState();
+  if (loginState.isLoggedIn) {
+    router.push('/');
+  }
+};
 
 const loginUser = async () => {
   try {
@@ -32,9 +38,6 @@ const loginUser = async () => {
       {
         admin_code: formData.value.adminCode,
         admin_password: formData.value.adminPassword,
-      },
-      {
-        withCredentials: true,
       }
     );
     
@@ -54,13 +57,11 @@ const loginUser = async () => {
   }
 };
 
-// 앱 로드 시 로그인 상태 확인
 onMounted(async () => {
-  await loginState.fetchLoginState(); // 쿠키 기반 인증 정보 확인
+  checkLoginStatus();
 });
 
 </script>
-
   
   <style scoped>
   .login-left {
