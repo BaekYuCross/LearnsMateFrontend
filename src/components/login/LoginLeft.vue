@@ -28,10 +28,11 @@ const checkLoginStatus = async () => {
   try {
     await loginState.fetchLoginState();
     if (loginState.isLoggedIn) {
-      router.push('/');
+      await router.push('/');
     }
   } catch (error) {
     if (error.response && error.response.status === 401) {
+      console.warn('인증되지 않은 사용자입니다.');
       return;
     }
     console.error('로그인 상태 확인 중 에러:', error);
@@ -41,7 +42,7 @@ const checkLoginStatus = async () => {
 const loginUser = async () => {
   try {
     console.log('로그인 시도:', formData.value);
-    
+
     const loginResponse = await axios.post(
       'https://learnsmate.shop/users/login',
       {
@@ -49,14 +50,19 @@ const loginUser = async () => {
         admin_password: formData.value.adminPassword,
       },
       {
-        withCredentials: true
+        withCredentials: true,
       }
     );
+
     console.log('로그인 응답:', loginResponse);
-    
+
+    if (!loginResponse || !loginResponse.data) {
+      throw new Error('로그인 응답 데이터가 없습니다.');
+    }
+
     // 로그인 상태를 즉시 업데이트
     await loginState.fetchLoginState();
-    
+
     if (loginState.isLoggedIn) {
       alert(`${loginState.adminName}님, 환영합니다.`);
       await router.push('/main');

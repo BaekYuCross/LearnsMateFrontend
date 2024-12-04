@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="isLoggedIn !== null && isLoggedIn">
+  <header class="header-container" v-if="!isLoading && isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -48,6 +48,7 @@ import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
 
+const isLoading = ref(true);
 const loginState = useLoginState();
 const isLoggedIn = computed(() => loginState.isLoggedIn);
 const adminName = computed(() => loginState.adminName || '');
@@ -183,12 +184,14 @@ watch(
 );
 
 onMounted(async () => {
-  if (!isLoggedIn.value) {
-    try {
+  try {
+    if (!isLoggedIn.value) {
       await loginState.fetchLoginState();
-    } catch (error) {
-      console.error('Failed to fetch login state:', error);
     }
+  } catch (error) {
+    console.error('Failed to fetch login state:', error);
+  } finally {
+    isLoading.value = false; // 로딩 완료
   }
 });
 

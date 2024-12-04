@@ -13,7 +13,9 @@ export const useLoginState = defineStore('loginState', {
   actions: {
     async fetchLoginState() {
       try {
-        const response = await axios.get('https://learnsmate.shop/admin/status', { withCredentials: true });
+        const response = await axios.get('https://learnsmate.shop/admin/status', {
+          withCredentials: true,
+        });
         if (response.data && response.data.code) {
           this.updateLoginState(response.data);
         } else {
@@ -21,6 +23,9 @@ export const useLoginState = defineStore('loginState', {
         }
       } catch (error) {
         this.resetState();
+        if (error.response && error.response.status !== 401) {
+          console.error('로그인 상태 확인 실패:', error);
+        }
         throw error;
       }
     },
