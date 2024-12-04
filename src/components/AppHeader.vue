@@ -50,7 +50,7 @@ import { useLoginState } from '@/stores/loginState';
 
 const isLoading = ref(true);
 const loginState = useLoginState();
-const isLoggedIn = computed(() => loginState.isLoggedIn);
+const isLoggedIn = computed(() => loginState.isLoggedIn || false);
 const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
 const exp = computed(() => loginState.exp);
@@ -79,16 +79,19 @@ function parseExpirationToArray(exp) {
   return [year, month, day, hour, minute, second];
 }
 
-// 토큰 갱신
 async function refreshToken() {
   try {
     const response = await axios.post('https://learnsmate.shop/auth/refresh', {}, { withCredentials: true });
-
     const newExp = response.data.exp;
+
     if (newExp) {
       const parsedExp = parseExpirationToArray(newExp);
-      loginState.setExp(parsedExp); // Pinia 상태 업데이트
-      startTimer(); // 타이머 갱신
+      if (Array.isArray(parsedExp) && parsedExp.length === 6) {
+        loginState.setExp(parsedExp);
+        startTimer();
+      } else {
+        console.warn('Invalid parsed expiration time:', parsedExp);
+      }
     } else {
       console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
     }
@@ -96,16 +99,15 @@ async function refreshToken() {
     console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
-      await Logout(); // 로그아웃 처리
+      await Logout();
     }
   }
 }
 
-// 남은 시간 계산
 const calculateRemainingTime = () => {
   if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
     console.warn('Invalid expiration format:', exp.value);
-    return '00:00:00';
+    return '00:00:00'; // 기본값 반환
   }
 
   const [year, month, day, hour, minute, second] = exp.value;
@@ -130,7 +132,7 @@ const calculateRemainingTime = () => {
 const remainingTime = ref(calculateRemainingTime());
 
 const currentGroup = computed(() => {
-  const currentPath = route.path;
+  const currentPath = route.path || '';
   const matchedMenu = menus.value.find((menu) => {
     if (menu.includePaths) {
       return menu.includePaths.some((path) => currentPath.startsWith(path));
