@@ -39,13 +39,13 @@ const authRequiredRoutes = ['/main', '/lecture', '/marketing', '/client', '/voc'
 
 router.beforeEach(async (to, from, next) => {
   const loginState = useLoginState();
-  const requiresAuth = authRequiredRoutes.some(path => to.path.startsWith(path));
+  const requiresAuth = authRequiredRoutes.some((path) => to.path.startsWith(path));
 
   try {
     if (!loginState.isLoggedIn) {
       await loginState.fetchLoginState();
     }
-    
+
     if (requiresAuth && !loginState.isLoggedIn) {
       next({ path: '/login', query: { redirect: to.fullPath } });
     } else {

@@ -2,7 +2,7 @@
   <div>
     <Suspense>
       <template #default>
-        <AppHeader v-if="shouldShowHeader" />
+        <AppHeader v-if="isLoggedIn && shouldShowHeader" />
       </template>
       <template #fallback>
         <div>Loading...</div>
@@ -38,20 +38,17 @@ const excludedPaths = [
 ];
 
 const shouldShowHeader = computed(() => {
-  console.log('Current route path:', route.path);
-  console.log('Login state:', isLoggedIn.value);
-  console.log('Is excluded path:', excludedPaths.includes(route.path));
-
-  if (!route || isLoggedIn.value === undefined) {
+  if (!route || typeof isLoggedIn.value !== 'boolean') {
     return false;
   }
 
   const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
-  return isLoggedIn.value &&
-         !excludedPaths.includes(route.path) &&
-         !isClientLectureDetail;
+  return (
+    isLoggedIn.value &&
+    !excludedPaths.includes(route.path) &&
+    !isClientLectureDetail
+  );
 });
-
 
 onMounted(async () => {
   if (!loginState.isLoggedIn) {
