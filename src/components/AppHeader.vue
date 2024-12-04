@@ -53,7 +53,10 @@ const loginState = useLoginState();
 const isLoggedIn = computed(() => loginState.isLoggedIn || false);
 const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
-const exp = computed(() => Array.isArray(loginState.exp) ? loginState.exp : null);
+const exp = computed(() => {
+  const expiration = loginState.exp;
+  return Array.isArray(expiration) ? expiration : null; // 초기화되지 않았을 경우 null 반환
+});
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);

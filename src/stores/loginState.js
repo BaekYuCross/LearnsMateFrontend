@@ -29,10 +29,10 @@ export const useLoginState = defineStore('loginState', {
 
     updateLoginState(data) {
       this.isLoggedIn = true;
-      this.adminName = data.name || ''; // 안전 처리
-      this.adminTeam = data.adminDepartment || ''; // 안전 처리
+      this.adminName = data.name || '';
+      this.adminTeam = data.adminDepartment || '';
       this.adminCode = data.code || '';
-      this.exp = Array.isArray(data.exp) ? data.exp : null; // 배열 검증
+      this.exp = Array.isArray(data.exp) ? data.exp : null;
     },
 
     // 로그아웃 처리
