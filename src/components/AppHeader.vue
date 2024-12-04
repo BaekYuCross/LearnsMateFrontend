@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="!isLoading && isLoggedIn">
+  <header class="header-container" v-if="isLoading === false && isLoggedIn !== null && isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -55,7 +55,7 @@ const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
 const exp = computed(() => {
   const expiration = loginState.exp;
-  return Array.isArray(expiration) ? expiration : null; // 초기화되지 않았을 경우 null 반환
+  return Array.isArray(expiration) ? expiration : null;
 });
 const router = useRouter();
 const route = useRoute();
@@ -175,14 +175,13 @@ const startTimer = () => {
   }, 1000);
 };
 
-
 watch(
   () => exp.value,
   (newValue) => {
     if (newValue && Array.isArray(newValue) && newValue.length === 6) {
       startTimer();
     } else {
-      console.warn('Invalid expiration format or null value:', newValue);
+      console.warn('Invalid or null expiration value:', newValue);
       if (timer.value) {
         clearInterval(timer.value);
       }
