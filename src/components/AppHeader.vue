@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container" v-if="isLoading === false && isLoggedIn !== null && isLoggedIn">
+  <header class="header-container" v-if="!isLoading && isLoggedIn !== null && isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -50,13 +50,10 @@ import { useLoginState } from '@/stores/loginState';
 
 const isLoading = ref(true);
 const loginState = useLoginState();
-const isLoggedIn = computed(() => loginState.isLoggedIn || false);
+const isLoggedIn = computed(() => loginState.isLoggedIn ?? false);
 const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
-const exp = computed(() => {
-  const expiration = loginState.exp;
-  return Array.isArray(expiration) ? expiration : null;
-});
+const exp = computed(() => Array.isArray(loginState.exp) ? loginState.exp : null);
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);
@@ -74,13 +71,17 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
-// 만료 시간을 배열로 변환하는 함수
 function parseExpirationToArray(exp) {
+  if (!exp || typeof exp !== 'string') {
+    console.warn('Invalid expiration format:', exp);
+    return [];
+  }
   const [date, time] = exp.split(' ');
   const [year, month, day] = date.split('-').map(Number);
   const [hour, minute, second] = time.split(':').map(Number);
   return [year, month, day, hour, minute, second];
 }
+
 
 async function refreshToken() {
   try {
@@ -107,6 +108,8 @@ async function refreshToken() {
   }
 }
 
+const remainingTime = ref('00:00:00');
+
 const calculateRemainingTime = () => {
   if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
     console.warn('Invalid expiration format:', exp.value);
@@ -131,8 +134,6 @@ const calculateRemainingTime = () => {
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
-
-const remainingTime = ref(calculateRemainingTime());
 
 const currentGroup = computed(() => {
   const currentPath = route.path || '';
