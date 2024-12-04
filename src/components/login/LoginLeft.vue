@@ -40,6 +40,8 @@ const checkLoginStatus = async () => {
 
 const loginUser = async () => {
   try {
+    console.log('로그인 시도:', formData.value);
+    
     const response = await axios.post(
       'https://learnsmate.shop/users/login',
       {
@@ -47,10 +49,12 @@ const loginUser = async () => {
         admin_password: formData.value.adminPassword,
       }
     );
+    console.log('로그인 응답:', response);
     
     await new Promise(resolve => setTimeout(resolve, 100));
     
     await loginState.fetchLoginState();
+    console.log('로그인 상태:', loginState);
     
     if (loginState.isLoggedIn) {
       alert(`${loginState.adminName}님, 환영합니다.`);
@@ -60,6 +64,11 @@ const loginUser = async () => {
     }
   } catch (error) {
     console.error('로그인 실패:', error);
+    if (error.response) {
+      console.log('에러 응답:', error.response.data);
+      console.log('에러 상태:', error.response.status);
+      console.log('에러 헤더:', error.response.headers);
+    }
     alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
   }
 };
