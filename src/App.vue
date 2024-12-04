@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <AppHeader v-if="isLoggedIn && shouldShowHeader" />
+      <AppHeader v-if="isLoggedIn !== null && isLoggedIn && shouldShowHeader" />
       <main>
         <RouterView />
       </main>
@@ -34,15 +34,17 @@ const excludedPaths = [
 
 const shouldShowHeader = computed(() => {
   if (!route || !isLoggedIn.value) return false;
-  const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
-  console.log('Route path:', route.path);
-console.log('Is logged in:', isLoggedIn.value);
-console.log('Is excluded path:', excludedPaths.includes(route.path));
-console.log('Is client lecture detail:', route.path.startsWith('/client-lecturedetail/'));
-console.log('Should show header:', shouldShowHeader.value);
-  return !excludedPaths.includes(route.path) && !isClientLectureDetail;
-});
 
+  const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
+  const isExcludedPath = excludedPaths.includes(route.path);
+
+  console.log('Route path:', route.path);
+  console.log('Is logged in:', isLoggedIn.value);
+  console.log('Is excluded path:', isExcludedPath);
+  console.log('Is client lecture detail:', isClientLectureDetail);
+
+  return !isExcludedPath && !isClientLectureDetail;
+});
 
 onMounted(async () => {
   try {

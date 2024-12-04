@@ -53,7 +53,7 @@ const loginState = useLoginState();
 const isLoggedIn = computed(() => loginState.isLoggedIn || false);
 const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
-const exp = computed(() => loginState.exp);
+const exp = computed(() => Array.isArray(loginState.exp) ? loginState.exp : null);
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);

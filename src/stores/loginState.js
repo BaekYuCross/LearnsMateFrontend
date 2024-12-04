@@ -32,7 +32,7 @@ export const useLoginState = defineStore('loginState', {
       this.adminName = data.name || ''; // 안전 처리
       this.adminTeam = data.adminDepartment || ''; // 안전 처리
       this.adminCode = data.code || '';
-      this.exp = data.exp || null;
+      this.exp = Array.isArray(data.exp) ? data.exp : null; // 배열 검증
     },
 
     // 로그아웃 처리
