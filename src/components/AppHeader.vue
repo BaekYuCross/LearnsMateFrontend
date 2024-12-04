@@ -103,6 +103,7 @@ async function refreshToken() {
 // 남은 시간 계산
 const calculateRemainingTime = () => {
   if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
+    console.warn('Invalid expiration format:', exp.value);
     return '00:00:00';
   }
 
@@ -135,7 +136,7 @@ const currentGroup = computed(() => {
     }
     return currentPath.startsWith(menu.path);
   });
-  return matchedMenu ? matchedMenu.group : null;
+  return matchedMenu ? matchedMenu.group : 'defaultGroup';
 });
 
 const Logout = async () => {
@@ -157,12 +158,17 @@ const Main = () => {
 };
 
 const startTimer = () => {
+  if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
+    console.warn('Timer not started due to invalid expiration:', exp.value);
+    return;
+  }
   if (timer.value) clearInterval(timer.value);
   remainingTime.value = calculateRemainingTime();
   timer.value = setInterval(() => {
     remainingTime.value = calculateRemainingTime();
   }, 1000);
 };
+
 
 watch(
   () => exp.value,
