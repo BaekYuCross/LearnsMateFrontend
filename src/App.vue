@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppHeader v-if="isHeaderVisible" />
+    <AppHeader v-if="shouldShowHeader" />
     <main>
       <RouterView />
     </main>
@@ -10,10 +10,12 @@
 <script setup>
 import AppHeader from './components/AppHeader.vue';
 import { RouterView, useRoute } from 'vue-router';
-import { computed, ref, watch, nextTick } from 'vue';
-import { useLoginState } from '@/stores/loginState';  // loginState import 추가
+import { computed, ref } from 'vue';
+import { useLoginState } from '@/stores/loginState';
+import { storeToRefs } from 'pinia';
 
-const loginState = useLoginState();  // store 초기화
+const loginState = useLoginState();
+const { isLoggedIn } = storeToRefs(loginState);
 const route = useRoute();
 const isTransitioning = ref(false);
 
@@ -29,31 +31,19 @@ const excludedPaths = [
   '/client-addcoupon'
 ];
 
-const isHeaderVisible = computed(() => {
-  const currentPath = route.path;
-  const isExcluded = excludedPaths.includes(currentPath);
-  const isClientLectureDetail = currentPath.startsWith('/client-lecturedetail/');
-  const isAuthenticated = loginState.isLoggedIn;  // store에서 로그인 상태 확인
-  
-  console.log('Header visibility:', {
-    currentPath,
-    isExcluded,
-    isClientLectureDetail,
-    isAuthenticated
+const shouldShowHeader = computed(() => {
+  console.log('Computing header visibility:', {
+    path: route.path,
+    isLoggedIn: isLoggedIn.value,
+    isExcluded: excludedPaths.includes(route.path),
+    isClientLectureDetail: route.path.startsWith('/client-lecturedetail/')
   });
   
-  return isAuthenticated && !isExcluded && !isClientLectureDetail && !isTransitioning.value;
+  return isLoggedIn.value && 
+         !excludedPaths.includes(route.path) && 
+         !route.path.startsWith('/client-lecturedetail/') && 
+         !isTransitioning.value;
 });
-
-watch(
-  () => route.path,
-  () => {
-    isTransitioning.value = true;
-    nextTick(() => {
-      isTransitioning.value = false;
-    });
-  }
-);
 </script>
 
 <style>

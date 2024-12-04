@@ -43,7 +43,12 @@
         <div class="card">
           <h3>전년 동월 대비 매출액</h3>
           <div class="stat">
-            <RevenueComparisonChart :revenueData="revenueData" />
+            <Suspense>
+              <RevenueComparisonChart :revenueData="revenueData" />
+              <template #fallback>
+                <div>Loading chart...</div>
+              </template>
+            </Suspense>
           </div>
         </div>
       </div>
@@ -110,7 +115,12 @@
         <div class="card small">
           <h3>TOP3 강의 카테고리</h3>
           <div class="chart-stats">
-            <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
+            <Suspense>
+              <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
+              <template #fallback>
+                <div>Loading chart...</div>
+              </template>
+            </Suspense>
           </div>
         </div>
 
@@ -133,8 +143,13 @@
 import { ref, computed, onMounted  } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import CategoryBarChart from '@/components/main/CategoryBarChart.vue';
-import RevenueComparisonChart from '@/components/main/RevenueComparisonChart.vue';
+
+const CategoryBarChart = defineAsyncComponent(() => 
+  import('@/components/main/CategoryBarChart.vue')
+);
+const RevenueComparisonChart = defineAsyncComponent(() => 
+  import('@/components/main/RevenueComparisonChart.vue')
+);
 
 const router = useRouter();
 
