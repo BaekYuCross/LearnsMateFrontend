@@ -82,7 +82,6 @@ function parseExpirationToArray(exp) {
   return [year, month, day, hour, minute, second];
 }
 
-
 async function refreshToken() {
   try {
     const response = await axios.post('https://learnsmate.shop/auth/refresh', {}, { withCredentials: true });
@@ -103,7 +102,8 @@ async function refreshToken() {
     console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
-      await Logout();
+      loginState.resetState();
+      router.push('/login');
     }
   }
 }
@@ -149,10 +149,11 @@ const currentGroup = computed(() => {
 const Logout = async () => {
   try {
     await loginState.logout();
+    alert('로그아웃되었습니다.');
     router.push('/login');
   } catch (error) {
     console.error('Logout error:', error);
-    alert('로그아웃 처리 중 오류가 발생했습니다.');
+    alert('로그아웃 중 문제가 발생했습니다.');
   }
 };
 
