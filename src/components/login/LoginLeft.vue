@@ -28,7 +28,7 @@ const formData = ref({
 const loginUser = async () => {
   try {
     const response = await axios.post(
-      'https://learnsmate.shop/auth/login',
+      'https://learnsmate.shop/users/login',
       {
         admin_code: formData.value.adminCode,
         admin_password: formData.value.adminPassword,
