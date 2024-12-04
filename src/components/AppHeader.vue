@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container">
+  <header class="header-container" v-if="isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -7,8 +7,8 @@
 
       <div class="menu-section">
         <ul class="menu-list">
-          <li 
-            v-for="menu in menus" 
+          <li
+            v-for="menu in menus"
             :key="menu.path"
             class="menu-item"
             :class="{ 'active': currentGroup === menu.group }"
@@ -18,7 +18,7 @@
           </li>
         </ul>
       </div>
-    
+
       <div class="icon-section">
         <div class="user-info2">
           <p class="logouttime">자동 로그아웃 시간 : </p>
@@ -29,8 +29,8 @@
           <button class="extend-btn" @click="refreshToken">연장</button>
         </div>
         <div class="user-info">
-          [{{ loginState.adminTeam }}] 
-          <span class="highlight">{{ loginState.adminName }}</span> 님, 반갑습니다.
+          [{{ adminTeam }}]
+          <span class="highlight">{{ adminName }}</span> 님, 반갑습니다.
         </div>
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
@@ -45,22 +45,24 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
 
-const loginState = useLoginState(); 
+const loginState = useLoginState();
+const { isLoggedIn, adminName, adminTeam, exp } = storeToRefs(loginState); // Pinia 상태 참조
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
-  { name: '강의', path: '/lecture', group: 'lecture' , includePaths: ['/lecture','/payment']},
-  { 
-    name: '고객', 
-    path: '/student', 
+  { name: '강의', path: '/lecture', group: 'lecture', includePaths: ['/lecture', '/payment'] },
+  {
+    name: '고객',
+    path: '/student',
     group: 'member',
-    includePaths: ['/student', '/tutor']
+    includePaths: ['/student', '/tutor'],
   },
   { name: '마케팅', path: '/marketing', group: 'marketing' },
   { name: 'VOC', path: '/voc', group: 'voc' },
@@ -68,42 +70,25 @@ const menus = ref([
 
 // 만료 시간을 배열로 변환하는 함수
 function parseExpirationToArray(exp) {
-  const [date, time] = exp.split(' '); // 날짜와 시간을 분리
-  const [year, month, day] = date.split('-').map(Number); // 연, 월, 일을 숫자로 변환
-  const [hour, minute, second] = time.split(':').map(Number); // 시, 분, 초를 숫자로 변환
-  return [year, month, day, hour, minute, second]; // 배열 형식으로 반환
+  const [date, time] = exp.split(' ');
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute, second] = time.split(':').map(Number);
+  return [year, month, day, hour, minute, second];
 }
 
-
+// 토큰 갱신
 async function refreshToken() {
   try {
-    // 서버의 토큰 갱신 API
-    const response = await axios.post(
-      'https://learnsmate.shop/auth/refresh', // 서버의 토큰 갱신 API URL
-      {},
-      {
-        withCredentials: true, // 쿠키를 자동으로 포함하여 요청
-      }
-    );
+    const response = await axios.post('https://learnsmate.shop/auth/refresh', {}, { withCredentials: true });
 
-    // 서버 응답에서 새로운 만료 시간 가져오기
-    const newExp = response.data.exp; //2024-12-03 09:21:27 이렇게 뽑힘
-
+    const newExp = response.data.exp;
     if (newExp) {
-      // 새로운 만료 시간을 배열 형식으로 변환
       const parsedExp = parseExpirationToArray(newExp);
-
-      // 새로운 만료 시간을 loginState에 설정
-      loginState.setExp(parsedExp);
-
-      // 타이머 갱신
-      startTimer();
-
+      loginState.setExp(parsedExp); // Pinia 상태 업데이트
+      startTimer(); // 타이머 갱신
     } else {
       console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
     }
-
-    // 이후 클라이언트에서 newAccessToken을 활용할 로직 추가
   } catch (error) {
     console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 401) {
@@ -113,48 +98,44 @@ async function refreshToken() {
   }
 }
 
-
-// 남은 시간을 계산하는 함수
+// 남은 시간 계산
 const calculateRemainingTime = () => {
-  if (!loginState.exp || !Array.isArray(loginState.exp) || loginState.exp.length !== 6) {
+  if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
     return '00:00:00';
   }
-  
-  const [year, month, day, hour, minute, second] = loginState.exp;
+
+  const [year, month, day, hour, minute, second] = exp.value;
   const expirationDate = new Date(year, month - 1, day, hour, minute, second);
   const now = new Date();
-  
+
   const diffInSeconds = Math.floor((expirationDate - now) / 1000);
-  
+
   if (diffInSeconds <= 0) {
     clearInterval(timer.value);
-    Logout(); 
+    Logout();
     return '만료됨';
   }
-  
+
   const hours = Math.floor(diffInSeconds / 3600);
   const minutes = Math.floor((diffInSeconds % 3600) / 60);
   const seconds = diffInSeconds % 60;
-  
+
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-// 남은 시간을 표시할 ref
 const remainingTime = ref(calculateRemainingTime());
 
 const currentGroup = computed(() => {
   const currentPath = route.path;
-  const matchedMenu = menus.value.find(menu => {
+  const matchedMenu = menus.value.find((menu) => {
     if (menu.includePaths) {
-      return menu.includePaths.some(path => currentPath.startsWith(path));
+      return menu.includePaths.some((path) => currentPath.startsWith(path));
     }
     return currentPath.startsWith(menu.path);
   });
   return matchedMenu ? matchedMenu.group : null;
 });
 
-
-// 로그아웃 처리
 const Logout = async () => {
   await loginState.logout();
   alert('로그아웃되었습니다.');
@@ -165,11 +146,11 @@ const navigateTo = (path) => {
   router.push(path);
 };
 
-const goToLearnsBuddy = (path) => {
+const goToLearnsBuddy = () => {
   router.push('/client-main');
 };
 
-const Main = (path) => {
+const Main = () => {
   router.push('/');
 };
 
@@ -182,21 +163,19 @@ const startTimer = () => {
 };
 
 watch(
-  () => loginState.exp,
+  () => exp.value,
   (newValue) => {
     if (newValue) {
       startTimer();
-    } else {
-      if (timer.value) {
-        clearInterval(timer.value);
-      }
+    } else if (timer.value) {
+      clearInterval(timer.value);
     }
   },
   { immediate: true }
 );
 
 onMounted(async () => {
-  if (!loginState.isLoggedIn) {
+  if (!isLoggedIn.value) {
     try {
       await loginState.fetchLoginState();
     } catch (error) {
@@ -205,13 +184,11 @@ onMounted(async () => {
   }
 });
 
-// 컴포넌트가 언마운트될 때 타이머 정리
 onUnmounted(() => {
   if (timer.value) {
     clearInterval(timer.value);
   }
 });
-
 </script>
 
   <style scoped>
