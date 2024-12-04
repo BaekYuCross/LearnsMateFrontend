@@ -54,31 +54,17 @@ const loginUser = async () => {
     );
     console.log('로그인 응답:', loginResponse);
     
-    // 상태 체크 전에 약간의 지연을 줍니다
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // 로그인 상태를 즉시 업데이트
+    await loginState.fetchLoginState();
     
-    try {
-      await loginState.fetchLoginState();
-      console.log('로그인 상태:', loginState.$state);  // $state로 전체 상태 확인
-      
-      if (loginState.isLoggedIn) {
-        alert(`${loginState.adminName}님, 환영합니다.`);
-        await router.push('/main');  // await 추가
-        window.location.reload();  // 페이지 새로고침 추가
-      } else {
-        throw new Error('로그인 상태 확인 실패');
-      }
-    } catch (stateError) {
-      console.error('로그인 상태 업데이트 실패:', stateError);
-      throw new Error('로그인 상태 확인에 실패했습니다.');
+    if (loginState.isLoggedIn) {
+      alert(`${loginState.adminName}님, 환영합니다.`);
+      await router.push('/main');
+    } else {
+      throw new Error('로그인 상태 확인 실패');
     }
   } catch (error) {
     console.error('로그인 실패:', error);
-    if (error.response) {
-      console.log('에러 응답:', error.response.data);
-      console.log('에러 상태:', error.response.status);
-      console.log('에러 헤더:', error.response.headers);
-    }
     alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
   }
 };
