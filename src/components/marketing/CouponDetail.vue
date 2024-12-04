@@ -70,7 +70,7 @@
     <div class="coupon-detail-table-row">
       <div class="coupon-detail-table-head">시작일</div>
       <div class="coupon-detail-table-body" v-if="isEditMode">
-        <input type="date" v-model="editCouponData.coupon_start_date">
+        <input type="date" v-model="formattedStartDate">
       </div>
       <div class="coupon-detail-table-body" v-else>
         {{ formatDate(props.selectedCoupon.coupon_start_date) }}
@@ -79,7 +79,7 @@
     <div class="coupon-detail-table-row">
       <div class="coupon-detail-table-head">만료일</div>
       <div class="coupon-detail-table-body" v-if="isEditMode">
-        <input type="date" v-model="editCouponData.coupon_expire_date">
+        <input type="date" v-model="formattedExpireDate">
       </div>
       <div class="coupon-detail-table-body" v-else>
         {{ formatDate(props.selectedCoupon.coupon_expire_date) }}
@@ -102,18 +102,20 @@
       <div class="coupon-detail-table-body">{{ props.selectedCoupon.tutor_name || '-' }}</div>
     </div>
     <div class="coupon-buttons">
-      <button class="coupon-edit-button" v-if="!isEditMode" @click="enableEditMode">쿠폰 수정</button>
-      <div class="coupon-detail-table-body" v-else>
-        <button class="coupon-save-button" @click="saveCoupon">저장</button>
-        <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
-      </div>
-      <button class="coupon-delete-button" @click="deleteCoupon">쿠폰 삭제</button>
-    </div>
+  <template v-if="!isEditMode">
+    <button class="coupon-edit-button" @click="enableEditMode">수정</button>
+    <button class="coupon-delete-button" @click="deleteCoupon">삭제</button>
+  </template>
+  <template v-else>
+    <button class="coupon-save-button" @click="saveCoupon">저장</button>
+    <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
+  </template>
+</div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import axios from 'axios';
 
 const props = defineProps(['selectedCoupon']);
@@ -131,6 +133,22 @@ watch(
   { immediate: true }
 );
 
+const formattedStartDate = computed({
+  get: () => formatDateForInput(editCouponData.value.coupon_start_date),
+  set: (value) => editCouponData.value.coupon_start_date = value
+});
+
+const formattedExpireDate = computed({
+  get: () => formatDateForInput(editCouponData.value.coupon_expire_date),
+  set: (value) => editCouponData.value.coupon_expire_date = value
+});
+
+const formatDateForInput = (isoDate) => {
+  if (!isoDate) return '';
+  // ISO 날짜 문자열에서 'YYYY-MM-DD' 부분만 추출
+  return isoDate.split('T')[0];
+};
+
 // 날짜 포맷 함수
 const formatDate = (isoDate) => {
   if (!isoDate) return '-';
@@ -146,23 +164,27 @@ const formatDateWithTime = {
   // 시작일: 해당 날짜의 00:00:00
   startDate: (date) => {
     if (!date) return null;
+    if (date.includes('T')) return date;
     return `${date}T00:00:00`;
   },
 
   // 만료일: 해당 날짜의 23:59:59
   endDate: (date) => {
     if (!date) return null;
+    if (date.includes('T')) return date;
     return `${date}T23:59:59`;
   },
 
   // 여러 날짜를 쿠폰 데이터에 직접 업데이트
   applyCouponDates: (editCouponData) => {
-    if (editCouponData.coupon_start_date) {
-      editCouponData.coupon_start_date = formatDateWithTime.startDate(editCouponData.coupon_start_date);
+    const editedData = { ...editCouponData };
+    if (editedData.coupon_start_date) {
+      editedData.coupon_start_date = formatDateWithTime.startDate(editedData.coupon_start_date);
     }
-    if (editCouponData.coupon_expire_date) {
-      editCouponData.coupon_expire_date = formatDateWithTime.endDate(editCouponData.coupon_expire_date);
+    if (editedData.coupon_expire_date) {
+      editedData.coupon_expire_date = formatDateWithTime.endDate(editedData.coupon_expire_date);
     }
+    return editedData;
   }
 };
 
@@ -182,10 +204,9 @@ const cancelEdit = () => {
 const saveCoupon = async () => {
   try {
 
-    formatDateWithTime.applyCouponDates(editCouponData.value);
+    const requestData = formatDateWithTime.applyCouponDates({ ...editCouponData.value });
 
     // 저장 로직 (예: API 호출)
-    const requestData = { ...editCouponData.value };
     const response = await axios.patch(`http://localhost:5000/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
       requestData,
       {
@@ -198,7 +219,7 @@ const saveCoupon = async () => {
     console.log("edit success", response.data);
 
     // 성공 시 화면 데이터 갱신
-    Object.assign(props.selectedCoupon, editCouponData.value);
+    Object.assign(props.selectedCoupon, response.data);
     isEditMode.value = false;
   } catch (error) {
     console.error("edit fail", error.message);
@@ -368,5 +389,22 @@ const deleteCoupon = async () => {
 .coupon-detail-table-body .active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b;
+}
+
+.coupon-detail-table-body textarea {
+  width: 100%;
+  height: 100px;
+  resize: none;
+  padding: 8px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+}
+
+.coupon-detail-table-body input {
+  width: 100%;
+  padding: 2px;
+  padding-left: 5px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
 }
 </style>

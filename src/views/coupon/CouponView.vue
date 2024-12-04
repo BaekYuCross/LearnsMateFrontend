@@ -1,6 +1,6 @@
 <template>
   <MarketingSideMenu />
-  <div class="coupon-main-container" @click="deselectCoupon">
+  <div class="coupon-main-container">
     <CouponFilter @search="applyFilters" @reset="resetFilters" />
     <!-- 전체 쿠폰 개수 -->
     <div class="coupon-table-top">
@@ -635,7 +635,7 @@ const handleExcelDownload = async () => {
   align-items: center;
   gap: 5px;
   margin-top: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .coupon-page-button {
