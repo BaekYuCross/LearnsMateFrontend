@@ -1,14 +1,14 @@
 <template>
-    <div class="chart-container">
-      <canvas id="categoryBarChart"></canvas>
-    </div>
-  </template>
-  
-  <script>
-  import { ref, watch, onMounted } from 'vue';
-  import Chart from 'chart.js/auto';
-  
-  export default {
+  <div class="chart-container">
+    <canvas ref="categoryBarChart"></canvas>
+  </div>
+</template>
+
+<script>
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import Chart from 'chart.js/auto';
+
+export default {
   name: "CategoryBarChart",
   props: {
     categories: {
@@ -24,29 +24,20 @@
   watch: {
     categories: {
       handler() {
-        this.$nextTick(() => {
-          if (this.chartInstance) {
-            this.chartInstance.destroy();
-          }
-          this.createChart();
-        });
+        this.updateChart();
       },
       deep: true,
     },
   },
   mounted() {
-    if (this.categories.length > 0) {
-      this.createChart();
-    }
+    this.createChart();
   },
   beforeUnmount() {
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-    }
+    this.destroyChart();
   },
   methods: {
     createChart() {
-      const ctx = document.getElementById('categoryBarChart')?.getContext('2d');
+      const ctx = this.$refs.categoryBarChart.getContext('2d');
       if (!ctx || !this.categories.length) return;
 
       const topCategories = this.categories.slice(0, 3);
@@ -77,29 +68,35 @@
             x: {
               beginAtZero: true,
               ticks: { stepSize: 5 },
-              grid: {
-                display: false,
-              },
+              grid: { display: false },
             },
             y: {
               ticks: { font: { size: 12 } },
-              grid: {
-                display: false,
-              },
+              grid: { display: false },
             },
           },
         },
       });
     },
+    updateChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+      this.createChart();
+    },
+    destroyChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+        this.chartInstance = null;
+      }
+    },
   },
 };
-  
-  </script>
-  
-  <style scoped>
-  .chart-container {
-    max-width: 400px;
-    margin: auto;
-  }
-  </style>
-  
+</script>
+
+<style scoped>
+.chart-container {
+  max-width: 400px;
+  margin: auto;
+}
+</style>
