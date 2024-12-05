@@ -41,42 +41,20 @@ const checkLoginStatus = async () => {
 
 const loginUser = async () => {
   try {
-    console.log('로그인 시도:', formData.value);
+    const loginResponse = await axios.post('/users/login', {
+      admin_code: formData.value.adminCode,
+      admin_password: formData.value.adminPassword,
+    });
 
-    const loginResponse = await axios.post(
-      'https://learnsmate.shop/users/login',
-      {
-        admin_code: formData.value.adminCode,
-        admin_password: formData.value.adminPassword,
-      },
-      {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
+    console.log('Login Response:', loginResponse.data);
 
-    console.log('Login Response:', loginResponse); // 서버 응답 확인
-    console.log('Response Headers:', loginResponse.headers);
+    const { accessToken, refreshToken, name } = loginResponse.data;
 
-    // 쿠키 확인
-    console.log('Document Cookies after login:', document.cookie);
+    document.cookie = `token=${accessToken}; SameSite=None; Secure; HttpOnly; Path=/;`;
+    document.cookie = `refreshToken=${refreshToken}; SameSite=None; Secure; HttpOnly; Path=/;`;
 
-    if (!loginResponse || !loginResponse.data) {
-      throw new Error('로그인 응답 데이터가 없습니다.');
-    }
-
-    // 로그인 상태를 즉시 업데이트
-    await loginState.fetchLoginState();
-
-    if (loginState.isLoggedIn) {
-      console.log('Cookies after login:', document.cookie);
-      alert(`${loginState.adminName}님, 환영합니다.`);
-      await router.push('/main');
-    } else {
-      throw new Error('로그인 상태 확인 실패');
-    }
+    alert(`${name}님, 환영합니다.`);
+    await router.push('/main');
   } catch (error) {
     console.error('로그인 실패:', error);
     alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
