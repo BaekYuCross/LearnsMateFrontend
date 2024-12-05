@@ -80,6 +80,10 @@ const menus = ref([
 
 const refreshToken = async () => {
   try {
+    console.log(document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('refreshToken=')));
+
     const refreshToken = document.cookie
       .split('; ')
       .find((row) => row.startsWith('refreshToken='))
@@ -89,7 +93,7 @@ const refreshToken = async () => {
       alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
       return;
     }
-
+    
     const response = await axios.post(
       'https://learnsmate.shop/auth/refresh',
       { refreshToken },
