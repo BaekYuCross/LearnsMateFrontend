@@ -87,7 +87,7 @@
 
       <!-- 쿠폰 단건 조회 -->
       <div class="coupon-detail-container" v-if="selectedCoupon">
-        <CouponDetail :selectedCoupon="selectedCoupon" :token="token" />
+        <CouponDetail :selectedCoupon="selectedCoupon" @close-coupon-detail="deselectCoupon" />
       </div>
     </div>
 
@@ -182,7 +182,11 @@ const paginatedCoupons = computed(() => {
 });
 
 const selectCoupon = (couponData) => {
-  selectedCoupon.value = couponData;
+  if (selectedCoupon.value === couponData) {
+    selectedCoupon.value = null; // 이미 선택된 쿠폰이면 상세 정보를 닫음
+  } else {
+    selectedCoupon.value = couponData; // 새로운 쿠폰을 선택하여 상세 정보 표시
+  }
 };
 
 const deselectCoupon = () => {
