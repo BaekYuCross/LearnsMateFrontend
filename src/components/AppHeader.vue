@@ -26,7 +26,13 @@
             {{ remainingTime }}
           </span>
 
-          <button class="extend-btn" @click="refreshToken">연장</button>
+          <button class="extend-btn" 
+                  @click.prevent="() => { 
+                    console.log('clicked'); 
+                    refreshToken(); 
+                  }">
+            연장
+          </button>
         </div>
         <div class="user-info">
           [{{ adminTeam }}]
@@ -199,6 +205,12 @@ const convertArrayToDate = (dateArray) => {
 
 
 onMounted(async () => {
+  const button = document.querySelector('.extend-btn');
+  button?.addEventListener('click', (e) => {
+    console.log('Button clicked');
+    e.preventDefault();
+  });
+
   try {
     await loginState.fetchLoginState();
 
