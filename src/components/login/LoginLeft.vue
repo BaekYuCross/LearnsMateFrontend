@@ -7,6 +7,8 @@
       <button type="submit" class="login-button">로그인</button>
       <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
     </form>
+    <!-- 디버깅용: 남은 시간 표시 -->
+    <p v-if="remainingTime !== '만료됨'">남은 시간: {{ remainingTime }}</p>
   </div>
 </template>
 
@@ -24,19 +26,36 @@ const formData = ref({
   adminPassword: '',
 });
 
-const checkLoginStatus = async () => {
-  try {
-    await loginState.fetchLoginState();
-    if (loginState.isLoggedIn) {
-      await router.push('/');
+const remainingTime = ref('00:00:00');
+const timer = ref(null);
+
+const startTimer = (expirationDate) => {
+  clearInterval(timer.value);
+
+  timer.value = setInterval(() => {
+    const remaining = calculateRemainingTime(expirationDate);
+    remainingTime.value = remaining;
+
+    if (remaining === '만료됨') {
+      clearInterval(timer.value);
+      alert('세션이 만료되었습니다. 다시 로그인하세요.');
+      loginState.resetState();
+      router.replace('/login');
     }
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      console.warn('인증되지 않은 사용자입니다.');
-      return;
-    }
-    console.error('로그인 상태 확인 중 에러:', error);
-  }
+  }, 1000);
+};
+
+const calculateRemainingTime = (expirationDate) => {
+  const now = new Date();
+  const diff = expirationDate - now;
+
+  if (diff <= 0) return '만료됨';
+
+  const hours = Math.floor(diff / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const loginUser = async () => {
@@ -69,11 +88,20 @@ const loginUser = async () => {
   }
 };
 
-
 onMounted(async () => {
-  checkLoginStatus();
+  try {
+    await loginState.fetchLoginState();
+    if (loginState.isLoggedIn) {
+      await router.push('/');
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.warn('인증되지 않은 사용자입니다.');
+      return;
+    }
+    console.error('로그인 상태 확인 중 에러:', error);
+  }
 });
-
 </script>
   
   <style scoped>
