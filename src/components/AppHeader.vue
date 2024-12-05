@@ -155,13 +155,14 @@ watch(
 );
 
 const convertArrayToDate = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) {
+  if (!Array.isArray(dateArray) || dateArray.length < 5) {
     console.error('Invalid date array:', dateArray);
     return null;
   }
-  const [year, month, day, hour, minute, second] = dateArray;
+  const [year, month, day, hour, minute, second = 0] = dateArray;
   return new Date(year, month - 1, day, hour, minute, second);
 };
+
 
 onMounted(async () => {
   try {

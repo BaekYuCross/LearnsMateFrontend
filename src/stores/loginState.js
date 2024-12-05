@@ -43,11 +43,17 @@ export const useLoginState = defineStore('loginState', {
       this.adminCode = data.code || '';
     
       if (Array.isArray(data.exp)) {
-        this.exp = convertArrayToDate(data.exp).toISOString();
+        const expirationDate = convertArrayToDate(data.exp);
+        if (expirationDate && !isNaN(expirationDate.getTime())) {
+          this.exp = expirationDate.toISOString();
+        } else {
+          console.error('Invalid expiration date:', data.exp);
+          this.exp = null;
+        }
       } else {
         this.exp = data.exp || '';
       }
-    },
+    },    
 
     async logout() {
       try {
