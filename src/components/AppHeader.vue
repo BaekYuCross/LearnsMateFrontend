@@ -47,6 +47,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
+import { startTimer } from '@/utils/timer';
 
 const isLoading = ref(true);
 const loginState = useLoginState();
@@ -100,45 +101,6 @@ const refreshToken = async () => {
       router.replace('/login');
     }
   }
-};
-
-const startTimer = (expirationTime) => {
-  clearInterval(timer.value);
-
-  const [hours, minutes, seconds] = expirationTime.split(':').map(Number);
-  const now = new Date();
-  const expirationDate = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    hours,
-    minutes,
-    seconds
-  );
-
-  timer.value = setInterval(() => {
-    const remaining = calculateRemainingTime(expirationDate);
-    if (remaining === '만료됨') {
-      clearInterval(timer.value);
-      alert('토큰이 만료되었습니다. 다시 로그인하세요.');
-      loginState.resetState();
-      router.replace('/login');
-    }
-    remainingTime.value = remaining;
-  }, 1000);
-};
-
-const calculateRemainingTime = (expirationDate) => {
-  const now = new Date();
-  const diff = expirationDate - now;
-
-  if (diff <= 0) return '만료됨';
-
-  const hours = Math.floor(diff / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
 const currentGroup = computed(() => {
@@ -199,10 +161,14 @@ onMounted(async () => {
     if (!isLoggedIn.value) {
       await loginState.fetchLoginState();
     }
+    const expirationTime = new Date(`1970-01-01T${exp}Z`);
+    startTimer(expirationTime, (remaining) => {
+      remainingTime.value = remaining;
+    });
   } catch (error) {
     console.error('Failed to fetch login state:', error);
   } finally {
-    isLoading.value = false; // 로딩 완료
+    isLoading.value = false;
   }
 });
 
