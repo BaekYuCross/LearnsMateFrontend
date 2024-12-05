@@ -209,7 +209,7 @@ onMounted(async () => {
   button?.addEventListener('click', (e) => {
     console.log('Button clicked');
     e.preventDefault();
-  });
+  }); 
 
   try {
     await loginState.fetchLoginState();
