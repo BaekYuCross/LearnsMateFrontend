@@ -75,8 +75,7 @@ const handleLogin = async () => {
       memberPassword: password.value
     });
 
-    console.log(memberEmail);
-    console.log(memberPassword);
+    console.log('Login response:', response.data);
 
     const loginData = {
       ...response.data,
