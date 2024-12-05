@@ -90,6 +90,8 @@ const refreshToken = async () => {
       return;
     }
     
+    clearTimer();
+    
     const response = await axios.post(
       'https://learnsmate.shop/auth/refresh',
       { refreshToken },
@@ -104,31 +106,27 @@ const refreshToken = async () => {
     const { accessToken, exp } = response.data;
 
     if (accessToken && exp) {
-      clearTimer();
-      
-      await new Promise(resolve => {
-        document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
-        setTimeout(resolve, 100);
-      });
-
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
-      loginState.setExp(exp);
       
-      const newExpirationTime = Array.isArray(exp) ? convertArrayToDate(exp) : new Date(exp);
+      loginState.setExp(exp);
+      const newExpirationTime = new Date(exp[0], exp[1] - 1, exp[2], exp[3], exp[4], exp[5]);
+      
+      console.log('New expiration time:', newExpirationTime);
+      
       if (newExpirationTime && !isNaN(newExpirationTime.getTime())) {
-        console.log('Starting new timer with expiration:', newExpirationTime);
         startTimer(newExpirationTime, (remaining) => {
           remainingTime.value = remaining;
         });
       } else {
-        console.error('Invalid expiration time received:', exp);
+        console.error('Invalid expiration time:', exp);
         remainingTime.value = '만료됨';
       }
     }
   } catch (error) {
     console.error('토큰 갱신 에러:', error);
     if (error.response?.status === 401) {
-      await clearTimer();
+      clearTimer();
       document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       alert('토큰 갱신 실패: 다시 로그인하세요.');

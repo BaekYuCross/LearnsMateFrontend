@@ -2,7 +2,7 @@ let currentTimer = null;
 let timerCallback = null;
 
 export const startTimer = (expirationTime, callback) => {
-  clearTimer(); // Clear existing timer first
+  clearTimer();
   
   if (!expirationTime || isNaN(expirationTime.getTime())) {
     console.error('Invalid expirationTime:', expirationTime);
@@ -10,9 +10,13 @@ export const startTimer = (expirationTime, callback) => {
     return;
   }
 
+  console.log('Starting timer with expiration:', expirationTime);
+  
   timerCallback = callback;
   currentTimer = setInterval(() => {
     const remaining = calculateRemainingTime(expirationTime);
+    console.log('Remaining time:', remaining);
+    
     if (remaining === '만료됨') {
       clearTimer();
     }
