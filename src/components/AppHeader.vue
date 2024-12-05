@@ -153,6 +153,7 @@ const Logout = async () => {
   try {
     const logoutSuccessful = await loginState.logout();
     if (logoutSuccessful) {
+      alert('로그아웃 성공!');
       router.replace('/login');
     }
   } catch (error) {

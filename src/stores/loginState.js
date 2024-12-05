@@ -38,22 +38,29 @@ export const useLoginState = defineStore('loginState', {
     // 로그아웃 처리
     async logout() {
       try {
+        // 로그아웃 요청
         const response = await axios.post(
-          'https://learnsmate.shop/auth/logout', 
-          {}, 
+          'https://learnsmate.shop/auth/logout',
+          {},
           { withCredentials: true } // 쿠키 전송
         );
     
+        // 성공 처리
         if (response.status === 200) {
+          console.log('Logout successful:', response.data);
           this.resetState();
           return true;
         } else {
-          console.error('Unexpected response status:', response.status);
+          console.error('Unexpected response status:', response.status, response.data);
           alert('로그아웃에 실패했습니다.');
           return false;
         }
       } catch (error) {
-        console.error('Logout failed:', error);
+        if (error.response) {
+          console.error('Logout failed with response:', error.response.data);
+        } else {
+          console.error('Logout failed with no response:', error.message);
+        }
         alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
         return false;
       }
