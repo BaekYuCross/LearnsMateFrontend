@@ -23,22 +23,22 @@
             <div class="reserved-board-body">
               <div 
                 v-for="(blacklist, index) in reservedList" 
-                :key="blacklist.memberCode"
+                :key="blacklist.member_code"
                 @click="showDetail(blacklist)"
                 class="reserved-table-row reserved-cursor-pointer hover:bg-gray-50"
-                :class="{ 'reserved-selected': selectedReserved?.memberCode === blacklist.memberCode }"
+                :class="{ 'reserved-selected': selectedReserved?.member_code === blacklist.member_code }"
               >
                 <div class="reserved-table-row-cell">
                   {{ ((currentPage - 1) * pageSize) + index + 1 }}
                 </div>
                 <div class="reserved-table-row-cell">
-                  {{ blacklist.memberCode }}
+                  {{ blacklist.member_code }}
                 </div>
                 <div class="reserved-table-row-cell">
-                  {{ blacklist.memberName }}
+                  {{ blacklist.member_name }}
                 </div>
                 <div class="reserved-table-row-cell">
-                  {{ blacklist.reportCount }}
+                  {{ blacklist.report_count }}
                 </div>
               </div>
             </div>
@@ -89,15 +89,15 @@
             <div class="reserved-info-grid">
               <div class="reserved-info-item">
                 <span class="reserved-label">{{ memberTypeText }} 코드:</span>
-                <span>{{ selectedReserved.memberCode }}</span>
+                <span>{{ selectedReserved.member_code }}</span>
               </div>
               <div class="reserved-info-item">
                 <span class="reserved-label">이름:</span>
-                <span>{{ selectedReserved.memberName }}</span>
+                <span>{{ selectedReserved.member_name }}</span>
               </div>
               <div class="reserved-info-item">
                 <span class="reserved-label">신고 횟수:</span>
-                <span>{{ selectedReserved.reportCount }}회</span>
+                <span>{{ selectedReserved.report_count }}회</span>
               </div>
             </div>
 
@@ -115,9 +115,9 @@
                   </div>
                 </div>
                 <div class="reserved-reports-section">
-                  <div v-for="report in group.reports" :key="report.reportDto.reportCode" class="reserved-report-entry">
-                    <p>신고 코드: {{ report.reportDto.reportCode }}</p>
-                    <p>신고 사유: {{ report.reportDto.reportReason }}</p>
+                  <div v-for="report in group.reports" :key="report.report_dto.reportCode" class="reserved-report-entry">
+                    <p>신고 코드: {{ report.report_dto.reportCode }}</p>
+                    <p>신고 사유: {{ report.report_dto.reportReason }}</p>
                   </div>
                 </div>
               </div>
@@ -159,7 +159,7 @@ import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import RegisterModule from '@/components/modules/RegisterModule.vue';
 import BlackReason from '@/components/member/BlackReason.vue';
 import '@/assets/css/member/ReservedBlacklistView.css';
-import axios from '@/plugins/axios';
+import axios from 'axios';
 
 const route = useRoute();
 const memberType = ref(route.path.includes('/tutor') ? 'tutor' : 'student');
@@ -212,11 +212,11 @@ const groupedReports = computed(() => {
   const grouped = {};
   
   reportDetails.value.forEach(detail => {
-    const commentCode = detail.commentDto.commentCode;
+    const commentCode = detail.comment_dto.commentCode;
     
     if (!grouped[commentCode]) {
       grouped[commentCode] = {
-        commentInfo: detail.commentDto,
+        commentInfo: detail.comment_dto,
         reports: []
       };
     }
@@ -298,13 +298,13 @@ const startPage = computed(() => displayedPages.value[0]);
 const endPage = computed(() => displayedPages.value[displayedPages.value.length - 1]);
 
 const showDetail = async (blacklist) => {
-  if (selectedReserved.value?.memberCode === blacklist.memberCode) {
+  if (selectedReserved.value?.member_code === blacklist.member_code) {
     selectedReserved.value = null;
     reportDetails.value = [];
   } else {
     selectedReserved.value = blacklist;
     try {
-      const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/${blacklist.memberCode}`, {
+      const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/${blacklist.member_code}`, {
           withCredentials: true
         }
       );
@@ -342,7 +342,7 @@ const closeConfirmModal = () => {
 const confirmRegister = async () => {
   try {
     await axios.post(
-      `https://learnsmate.shop/blacklist/${selectedReserved.value.memberCode}`,{ blackReason: blacklistReason.value }, {
+      `https://learnsmate.shop/blacklist/${selectedReserved.value.member_code}`,{ blackReason: blacklistReason.value }, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',
