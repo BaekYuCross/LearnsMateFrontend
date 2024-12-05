@@ -139,23 +139,23 @@
               <div class="info-grid">
                 <div class="info-row">
                   <span class="label">이름</span>
-                  <span>{{ studentDetail.memberDto.memberName }}</span>
+                  <span>{{ studentDetail.member_dto.member_name }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">이메일</span>
-                  <span>{{ studentDetail.memberDto.memberEmail }}</span>
+                  <span>{{ studentDetail.member_dto.member_email }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">연락처</span>
-                  <span>{{ studentDetail.memberDto.memberPhone }}</span>
+                  <span>{{ studentDetail.member_dto.member_phone }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">생년월일</span>
-                  <span>{{ studentDetail.memberDto.memberBirth }}</span>
+                  <span>{{ studentDetail.member_dto.member_birth }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">주소</span>
-                  <span>{{ studentDetail.memberDto.memberAddress }}</span>
+                  <span>{{ studentDetail.member_dto.member_address }}</span>
                 </div>
               </div>
 
@@ -163,7 +163,7 @@
               <!-- 수강 진행 현황 -->
               <div class="course-section">
                 <div class="course-header">
-                  <h4>수강 진행 현황 ({{ studentDetail?.lectureVideoProgressDtolist?.length || 0 }})
+                  <h4>수강 진행 현황 ({{ studentDetail?.lecture_video_progress_dtolist?.length || 0 }})
                   <button class="course-toggle-button" @click="toggleCourseSection">
                     {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
                   </button>
@@ -171,7 +171,7 @@
                 </div>
                 <div v-if="isCourseSectionVisible" class="course-list">
                   <div
-                    v-for="lecture in studentDetail.lectureVideoProgressDtolist"
+                    v-for="lecture in studentDetail.lecture_video_progress_dtolist"
                     :key="lecture.lectureCode"
                     class="course-item"
                   >
@@ -193,14 +193,14 @@
               <!-- 추천 강의 섹션 -->
               <div class="recommended-section">
                 <div class="recommended-header">
-                  <h4>추천 강의 ({{ studentDetail.recommendedLectureList?.length || 0 }})
+                  <h4>추천 강의 ({{ studentDetail.recommended_lecture_list?.length || 0 }})
                   <button class="recommended-toggle-button" @click="toggleRecommendedSection">
                     {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
                   </button></h4>
                 </div>
                 <div v-if="isRecommendedSectionVisible" class="recommended-list">
                   <div
-                    v-for="lecture in studentDetail.recommendedLectureList"
+                    v-for="lecture in studentDetail.recommended_lecture_list"
                     :key="lecture.lectureCode"
                     class="recommended-item"
                   >
@@ -237,14 +237,14 @@
                   <!-- 미사용 쿠폰 -->
                   <div class="unused-coupons">
                     <div class="subsection-header">
-                      <h5>미사용 쿠폰 ({{ studentDetail.unusedCouponsList?.length || 0 }})
+                      <h5>미사용 쿠폰 ({{ studentDetail.unused_coupons_list?.length || 0 }})
                         <button class="coupon-toggle-button" @click="toggleUnusedCoupons">
                           {{ isUnusedCouponsVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
                     <div v-if="isUnusedCouponsVisible" class="coupon-grid">
-                      <div v-for="coupon in studentDetail.unusedCouponsList" 
+                      <div v-for="coupon in studentDetail.unused_coupons_list" 
                           :key="coupon.couponIssuanceCode" 
                           class="coupon-item">
                         <div class="coupon-detail">
@@ -260,14 +260,14 @@
                   <!-- 사용완료 쿠폰 -->
                   <div class="used-coupons">
                     <div class="subsection-header">
-                      <h5>사용완료 쿠폰 ({{ studentDetail.usedCouponsList?.length || 0 }})
+                      <h5>사용완료 쿠폰 ({{ studentDetail.used_coupons_list?.length || 0 }})
                         <button class="coupon-toggle-button" @click="toggleUsedCoupons">
                           {{ isUsedCouponsVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
                     <div v-if="isUsedCouponsVisible" class="coupon-grid">
-                      <div v-for="coupon in studentDetail.usedCouponsList" 
+                      <div v-for="coupon in studentDetail.used_coupons_list" 
                           :key="coupon.couponIssuanceCode" 
                           class="coupon-item">
                         <div class="coupon-detail">
@@ -289,14 +289,14 @@
                   <!-- 미답변 문의 -->
                   <div class="unanswered">
                     <div class="subsection-header">
-                      <h5>미답변 문의 ({{ studentDetail.unansweredVocbyMemberList?.length || 0 }})
+                      <h5>미답변 문의 ({{ studentDetail.unanswered_vocby_member_list?.length || 0 }})
                         <button class="voc-toggle-button" @click="toggleUnansweredVoc">
                           {{ isUnansweredVocVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
                     <div v-if="isUnansweredVocVisible" class="voc-grid">
-                      <div v-for="voc in studentDetail.unansweredVocbyMemberList" 
+                      <div v-for="voc in studentDetail.unanswered_vocby_member_list" 
                           :key="voc.vocCode" 
                           class="voc-item">
                         <div class="voc-detail">
@@ -320,14 +320,14 @@
                   <!-- 답변완료 문의 -->
                   <div class="answered">
                     <div class="subsection-header">
-                      <h5>답변완료 문의 ({{ studentDetail.answeredVocbyMemberList?.length || 0 }})
+                      <h5>답변완료 문의 ({{ studentDetail.answered_vocby_member_list?.length || 0 }})
                         <button class="voc-toggle-button" @click="toggleAnsweredVoc">
                           {{ isAnsweredVocVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
                     <div v-if="isAnsweredVocVisible" class="voc-grid">
-                      <div v-for="voc in studentDetail.answeredVocbyMemberList" 
+                      <div v-for="voc in studentDetail.answered_vocby_member_list" 
                           :key="voc.vocCode" 
                           class="voc-item">
                         <div class="voc-detail">
@@ -363,12 +363,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from '@/plugins/axios';
 import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/StudentView.css';
 import CategoryRatioModal from '@/components/member/StudentCategoryRatioModal.vue';
+import axios from 'axios';
 const showCategoryModal = ref(false);
 const selectedStudent = ref(null);
 const studentDetail = ref(null);

@@ -142,8 +142,8 @@
               <!-- 강의 정보 -->
               <div class="lecture-section">
                 <h4 class="lecture-title">강의 목록</h4>
-                <div v-if="tutorDetail?.tutorLectureDetailList?.length" class="lecture-list">
-                  <div v-for="lecture in tutorDetail.tutorLectureDetailList" 
+                <div v-if="tutorDetail?.tutor_lecture_detail_list?.length" class="lecture-list">
+                  <div v-for="lecture in tutorDetail.tutor_lecture_detail_list" 
                       :key="lecture.lectureCode" 
                       class="lecture-item">
                     <div class="lecture-header">
@@ -170,11 +170,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import axios from '@/plugins/axios';
 import { saveAs } from 'file-saver';
 import MemberSideMenu from '@/components/sideMenu/MemberSideMenu.vue';
 import MemberFilter from '@/components/member/MemberFilter.vue';
 import '@/assets/css/member/TutorView.css'
+import axios from 'axios';
+
 
 const selectedTutor = ref(null);
 const tutors = ref([]);
@@ -224,6 +225,7 @@ const fetchTutors = async () => {
     });
     
     tutors.value = response.data.content;
+    console.log(tutors.value);
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -377,6 +379,7 @@ const showDetail = async (tutor) => {
     try {
       const response = await axios.get(`https://learnsmate.shop/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
+      console.log(tutorDetail.value);
     } catch (error) {
       console.error('Failed to load tutor detail:', error);
     }

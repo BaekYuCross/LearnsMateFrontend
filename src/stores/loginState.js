@@ -43,17 +43,22 @@ export const useLoginState = defineStore('loginState', {
       this.adminCode = data.code || '';
     
       if (data.exp) {
-        const expirationDate = new Date(data.exp);
-        if (!isNaN(expirationDate.getTime())) {
-          this.exp = expirationDate.toISOString();
-        } else {
+        try {
+          const expDate = Array.isArray(data.exp) 
+            ? new Date(data.exp[0], data.exp[1]-1, data.exp[2], data.exp[3], data.exp[4], data.exp[5])
+            : new Date(data.exp);
+            
+          if (!isNaN(expDate.getTime())) {
+            this.exp = expDate.toISOString();
+          } else {
+            throw new Error('Invalid date');
+          }
+        } catch (error) {
           console.error('Invalid expiration date:', data.exp);
           this.exp = null;
         }
-      } else {
-        this.exp = null;
       }
-    },  
+    },
 
     async logout() {
       try {
@@ -99,16 +104,15 @@ export const useLoginState = defineStore('loginState', {
 
     setExp(newExp) {
       try {
-        const expirationDate = new Date(newExp);
-    
-        if (isNaN(expirationDate.getTime())) {
-          console.error('Invalid expiration date:', newExp);
-          this.exp = null;
-          return;
+        const expDate = Array.isArray(newExp)
+          ? new Date(newExp[0], newExp[1]-1, newExp[2], newExp[3], newExp[4], newExp[5])
+          : new Date(newExp);
+
+        if (!isNaN(expDate.getTime())) {
+          this.exp = expDate.toISOString();
+        } else {
+          throw new Error('Invalid date');
         }
-    
-        this.exp = expirationDate.toISOString();
-        console.log('Updated token expiration time:', this.exp);
       } catch (error) {
         console.error('Error in setExp:', error);
         this.exp = null;
