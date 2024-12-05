@@ -90,6 +90,8 @@ async function refreshToken() {
       { withCredentials: true }
     );
 
+    console.log('Response data:', response.data); // 응답 데이터 출력
+
     const newAccessToken = response.data.accessToken;
     const newExp = response.data.exp;
 
@@ -99,7 +101,8 @@ async function refreshToken() {
     }
 
     if (newExp) {
-      const expArray = parseExpirationToArray(newExp);
+      console.log('New expiration timestamp:', newExp);
+      const expArray = parseExpirationToArray(newExp); // 만료 시간을 배열로 변환
       if (expArray.length === 6) {
         const expirationDate = new Date(
           expArray[0],
@@ -109,6 +112,7 @@ async function refreshToken() {
           expArray[4],
           expArray[5]
         );
+        console.log('Expiration date parsed:', expirationDate);
         startTimer(expirationDate);
       } else {
         console.warn('Failed to parse expiration time:', newExp);
@@ -144,6 +148,9 @@ function startTimer(expirationDate) {
 function calculateRemainingTime(expirationDate) {
   const now = new Date();
 
+  console.log('Current time:', now);
+  console.log('Expiration time:', expirationDate);
+
   if (expirationDate <= now) {
     return '만료됨';
   }
@@ -152,6 +159,8 @@ function calculateRemainingTime(expirationDate) {
   const hours = Math.floor(diffInSeconds / 3600);
   const minutes = Math.floor((diffInSeconds % 3600) / 60);
   const seconds = diffInSeconds % 60;
+
+  console.log('Remaining time:', { hours, minutes, seconds });
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
