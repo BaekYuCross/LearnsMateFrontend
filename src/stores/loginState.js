@@ -35,19 +35,30 @@ export const useLoginState = defineStore('loginState', {
       this.exp = Array.isArray(data.exp) ? data.exp : null;
     },
 
-    // 로그아웃 처리
     async logout() {
       try {
-        // 로그아웃 요청
+        const refreshToken = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('refreshToken='))
+          ?.split('=')[1];
+    
+        if (!refreshToken) {
+          alert('RefreshToken이 없습니다. 로그아웃할 수 없습니다.');
+          return false;
+        }
+    
         const response = await axios.post(
           'https://learnsmate.shop/auth/logout',
-          {},
-          { withCredentials: true } // 쿠키 전송
+          { refreshToken },
+          { withCredentials: false }
         );
     
-        // 성공 처리
         if (response.status === 200) {
           console.log('Logout successful:', response.data);
+    
+          document.cookie = 'token=; Path=/; Max-Age=0;';
+          document.cookie = 'refreshToken=; Path=/; Max-Age=0;';
+    
           this.resetState();
           return true;
         } else {
@@ -66,7 +77,6 @@ export const useLoginState = defineStore('loginState', {
       }
     },
 
-    // 토큰 만료 시간 설정
     setExp(newExp) {
       this.exp = newExp;
       console.log('Updated token expiration time:', this.exp);

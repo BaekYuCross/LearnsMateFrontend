@@ -85,12 +85,32 @@ function parseExpirationToArray(exp) {
 
 async function refreshToken() {
   try {
+    // 쿠키에서 refreshToken 추출
+    const refreshToken = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('refreshToken='))
+      ?.split('=')[1];
+
+    if (!refreshToken) {
+      alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
+      return;
+    }
+
+    // 백엔드로 refreshToken 전송
     const response = await axios.post(
-      '/auth/refresh', 
-      {}, 
-      { withCredentials: true } // 쿠키 전송
+      'https://learnsmate.shop/auth/refresh',
+      { refreshToken }, // 요청 본문
+      { withCredentials: false } // 쿠키 자동 전송 비활성화
     );
 
+    // 새로 발급받은 AccessToken 쿠키 저장
+    const newAccessToken = response.data.accessToken;
+    if (newAccessToken) {
+      document.cookie = `token=${newAccessToken}; Path=/; Secure; SameSite=None; HttpOnly=false;`;
+      console.log('New accessToken saved to cookies.');
+    }
+
+    // 새 만료 시간 반영
     const newExp = response.data.exp;
     if (newExp) {
       const parsedExp = parseExpirationToArray(newExp);
