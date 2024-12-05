@@ -102,8 +102,20 @@ const refreshToken = async () => {
   }
 };
 
-const startTimer = (expirationDate) => {
+const startTimer = (expirationTime) => {
   clearInterval(timer.value);
+
+  const [hours, minutes, seconds] = expirationTime.split(':').map(Number);
+  const now = new Date();
+  const expirationDate = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hours,
+    minutes,
+    seconds
+  );
+
   timer.value = setInterval(() => {
     const remaining = calculateRemainingTime(expirationDate);
     if (remaining === '만료됨') {
@@ -128,17 +140,6 @@ const calculateRemainingTime = (expirationDate) => {
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
-
-function parseExpirationToArray(exp) {
-  if (!exp || typeof exp !== 'string') {
-    console.warn('Invalid expiration format:', exp);
-    return [];
-  }
-  const [date, time] = exp.split(' ');
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, minute, second] = time.split(':').map(Number);
-  return [year, month, day, hour, minute, second];
-}
 
 const currentGroup = computed(() => {
   const currentPath = route.path || '';

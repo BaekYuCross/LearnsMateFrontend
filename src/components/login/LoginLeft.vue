@@ -7,8 +7,6 @@
       <button type="submit" class="login-button">로그인</button>
       <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
     </form>
-    <!-- 디버깅용: 남은 시간 표시 -->
-    <p v-if="remainingTime !== '만료됨'">남은 시간: {{ remainingTime }}</p>
   </div>
 </template>
 
@@ -26,36 +24,19 @@ const formData = ref({
   adminPassword: '',
 });
 
-const remainingTime = ref('00:00:00');
-const timer = ref(null);
-
-const startTimer = (expirationDate) => {
-  clearInterval(timer.value);
-
-  timer.value = setInterval(() => {
-    const remaining = calculateRemainingTime(expirationDate);
-    remainingTime.value = remaining;
-
-    if (remaining === '만료됨') {
-      clearInterval(timer.value);
-      alert('세션이 만료되었습니다. 다시 로그인하세요.');
-      loginState.resetState();
-      router.replace('/login');
+const checkLoginStatus = async () => {
+  try {
+    await loginState.fetchLoginState();
+    if (loginState.isLoggedIn) {
+      await router.push('/');
     }
-  }, 1000);
-};
-
-const calculateRemainingTime = (expirationDate) => {
-  const now = new Date();
-  const diff = expirationDate - now;
-
-  if (diff <= 0) return '만료됨';
-
-  const hours = Math.floor(diff / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.warn('인증되지 않은 사용자입니다.');
+      return;
+    }
+    console.error('로그인 상태 확인 중 에러:', error);
+  }
 };
 
 const loginUser = async () => {
@@ -65,7 +46,7 @@ const loginUser = async () => {
       admin_password: formData.value.adminPassword,
     });
 
-    const { accessToken, refreshToken, exp } = loginResponse.data;
+    const { accessToken, refreshToken, exp, name } = loginResponse.data;
 
     if (accessToken) {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
@@ -80,7 +61,7 @@ const loginUser = async () => {
       startTimer(expirationDate);
     }
 
-    alert('로그인 성공!');
+    alert(`${name}님, 환영합니다.`);
     await router.push('/main');
   } catch (error) {
     console.error('로그인 실패:', error);
@@ -89,19 +70,9 @@ const loginUser = async () => {
 };
 
 onMounted(async () => {
-  try {
-    await loginState.fetchLoginState();
-    if (loginState.isLoggedIn) {
-      await router.push('/');
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      console.warn('인증되지 않은 사용자입니다.');
-      return;
-    }
-    console.error('로그인 상태 확인 중 에러:', error);
-  }
+  checkLoginStatus();
 });
+
 </script>
   
   <style scoped>
