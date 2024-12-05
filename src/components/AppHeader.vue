@@ -53,7 +53,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
-import { startTimer } from '@/utils/timer';
+import { startTimer, clearTimer } from '@/utils/timer';
 
 const isLoading = ref(true);
 const loginState = useLoginState();

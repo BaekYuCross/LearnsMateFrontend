@@ -1,6 +1,13 @@
 let currentTimer = null;
 let timerCallback = null;
 
+export const clearTimer = () => {
+  if (currentTimer) {
+    clearInterval(currentTimer);
+    currentTimer = null;
+  }
+};
+
 export const startTimer = (expirationTime, callback) => {
   clearTimer();
   
@@ -10,13 +17,9 @@ export const startTimer = (expirationTime, callback) => {
     return;
   }
 
-  console.log('Starting timer with expiration:', expirationTime);
-  
   timerCallback = callback;
   currentTimer = setInterval(() => {
     const remaining = calculateRemainingTime(expirationTime);
-    console.log('Remaining time:', remaining);
-    
     if (remaining === '만료됨') {
       clearTimer();
     }
@@ -24,13 +27,6 @@ export const startTimer = (expirationTime, callback) => {
   }, 1000);
 };
 
-export const clearTimer = () => {
-  if (currentTimer) {
-    clearInterval(currentTimer);
-    currentTimer = null;
-  }
-};
-  
 export const calculateRemainingTime = (expirationDate) => {
   if (!expirationDate || isNaN(expirationDate.getTime())) {
     return '만료됨';
