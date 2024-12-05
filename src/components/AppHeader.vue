@@ -72,6 +72,7 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
+// Frontend (AppHeader.vue)
 const refreshToken = async () => {
   try {
     const refreshToken = document.cookie
@@ -79,13 +80,15 @@ const refreshToken = async () => {
       .find((row) => row.startsWith('refreshToken='))
       ?.split('=')[1];
 
+    console.log('Found refresh token:', refreshToken ? 'exists' : 'not found');
+
     if (!refreshToken) {
       alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
       return;
     }
 
-    console.log('Refreshing token...');
-    const response = await axios.post('https://learnsmate.shop/auth/refresh', 
+    const response = await axios.post(
+      'https://learnsmate.shop/auth/refresh', 
       { refreshToken }, 
       { 
         withCredentials: true,
@@ -95,13 +98,15 @@ const refreshToken = async () => {
       }
     );
 
-    console.log('Refresh response:', response.data);
-
     const { accessToken, exp } = response.data;
+    console.log('Refresh response:', {
+      hasAccessToken: !!accessToken,
+      expiration: exp
+    });
+
     if (accessToken && exp) {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
       loginState.setExp(exp);
-      console.log('Token refreshed, new expiration:', exp);
       
       const newExpirationTime = Array.isArray(exp) 
         ? convertArrayToDate(exp)
@@ -112,7 +117,12 @@ const refreshToken = async () => {
       });
     }
   } catch (error) {
-    console.error('토큰 갱신 실패:', error);
+    console.error('토큰 갱신 상세 에러:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    
     if (error.response?.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
