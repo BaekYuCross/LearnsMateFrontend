@@ -85,7 +85,10 @@ const refreshToken = async () => {
       .find((row) => row.startsWith('refreshToken='))
       ?.split('=')[1];
 
+    console.log('Refresh token:', refreshToken);
+
     if (!refreshToken) {
+      console.error('Refresh token is missing or not found in cookies.');
       alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
       return;
     }
@@ -105,6 +108,8 @@ const refreshToken = async () => {
 
     const { accessToken, exp } = response.data;
 
+    console.log('Refresh response:', response.data);
+    
     if (accessToken && exp) {
       document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
