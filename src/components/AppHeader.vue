@@ -85,7 +85,7 @@ const refreshToken = async () => {
     }
 
     console.log('Refreshing token...');
-    const response = await axios.post('https://learnsmate/auth/refresh', 
+    const response = await axios.post('https://learnsmate.shop/auth/refresh', 
       { refreshToken }, 
       { 
         withCredentials: true,
