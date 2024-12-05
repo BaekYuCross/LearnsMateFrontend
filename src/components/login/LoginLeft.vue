@@ -50,8 +50,9 @@ const loginUser = async () => {
 
     const { accessToken, refreshToken, name } = loginResponse.data;
 
-    document.cookie = `token=${accessToken}; SameSite=None; Secure; HttpOnly; Path=/;`;
-    document.cookie = `refreshToken=${refreshToken}; SameSite=None; Secure; HttpOnly; Path=/;`;
+    // 쿠키 저장 (SameSite=None, Secure=true)
+    document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
+    document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
 
     alert(`${name}님, 환영합니다.`);
     await router.push('/main');

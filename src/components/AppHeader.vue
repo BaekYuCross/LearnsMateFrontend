@@ -85,19 +85,19 @@ function parseExpirationToArray(exp) {
 
 async function refreshToken() {
   try {
-    const response = await axios.post('https://learnsmate.shop/auth/refresh', {}, { withCredentials: true });
-    const newExp = response.data.exp;
+    const response = await axios.post(
+      '/auth/refresh', 
+      {}, 
+      { withCredentials: true } // 쿠키 전송
+    );
 
+    const newExp = response.data.exp;
     if (newExp) {
       const parsedExp = parseExpirationToArray(newExp);
       if (Array.isArray(parsedExp) && parsedExp.length === 6) {
         loginState.setExp(parsedExp);
         startTimer();
-      } else {
-        console.warn('Invalid parsed expiration time:', parsedExp);
       }
-    } else {
-      console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
     }
   } catch (error) {
     console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
