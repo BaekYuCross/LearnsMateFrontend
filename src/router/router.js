@@ -35,7 +35,7 @@ const router = createRouter({
   routes
 });
 
-const authRequiredRoutes = ['/main', '/lecture', '/marketing', '/client', '/voc', '/member'];
+const authRequiredRoutes = ['/main', '/lecture', '/marketing', '/voc', '/member'];
 
 router.beforeEach(async (to, from, next) => {
   const loginState = useLoginState();
@@ -46,11 +46,6 @@ router.beforeEach(async (to, from, next) => {
       await loginState.fetchLoginState();
     }
 
-    if (to.path.startsWith('/client') && !loginState.isLoggedIn) {
-      next({ path: '/client-login', query: { redirect: to.fullPath } });
-      return;
-    }
-
     if (requiresAuth && !loginState.isLoggedIn) {
       next({ path: '/login', query: { redirect: to.fullPath } });
     } else {
@@ -58,11 +53,6 @@ router.beforeEach(async (to, from, next) => {
     }
   } catch (error) {
     console.error('Auth check failed:', error);
-
-    if (to.path.startsWith('/client')) {
-      next({ path: '/client-login', query: { redirect: to.fullPath } });
-      return;
-    }
 
     if (requiresAuth) {
       next({ path: '/login', query: { redirect: to.fullPath } });
