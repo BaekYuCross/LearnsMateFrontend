@@ -80,10 +80,6 @@ const menus = ref([
 
 const refreshToken = async () => {
   try {
-    console.log(document.cookie
-    .split('; ')
-    .find((row) => row.startsWith('refreshToken=')));
-
     const refreshToken = document.cookie
       .split('; ')
       .find((row) => row.startsWith('refreshToken='))
@@ -108,6 +104,7 @@ const refreshToken = async () => {
     const { accessToken, exp } = response.data;
 
     if (accessToken && exp) {
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
       loginState.setExp(exp);
       
@@ -121,6 +118,8 @@ const refreshToken = async () => {
   } catch (error) {
     console.error('토큰 갱신 에러:', error);
     if (error.response?.status === 401) {
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
+      document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
       router.replace('/login');
