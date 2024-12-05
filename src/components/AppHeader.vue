@@ -53,7 +53,6 @@ const loginState = useLoginState();
 const isLoggedIn = computed(() => loginState.isLoggedIn ?? false);
 const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
-const exp = computed(() => Array.isArray(loginState.exp) ? loginState.exp : null);
 const router = useRouter();
 const route = useRoute();
 const timer = ref(null);
@@ -72,7 +71,7 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
-async function refreshToken() {
+const refreshToken = async () => {
   try {
     const refreshToken = document.cookie
       .split('; ')
@@ -84,86 +83,51 @@ async function refreshToken() {
       return;
     }
 
-    const response = await axios.post(
-      'https://learnsmate.shop/auth/refresh',
-      { refreshToken },
-      { withCredentials: true }
-    );
+    const response = await axios.post('/auth/refresh', { refreshToken }, { withCredentials: true });
 
-    console.log('Response data:', response.data); // 응답 데이터 출력
+    const { accessToken, exp } = response.data;
+    if (accessToken && exp) {
+      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None; HttpOnly=false;`;
 
-    const newAccessToken = response.data.accessToken;
-    const newExp = response.data.exp;
-
-    if (newAccessToken) {
-      document.cookie = `token=${newAccessToken}; Path=/; Secure; SameSite=None; HttpOnly=false;`;
-      console.log('New accessToken saved to cookies.');
-    }
-
-    if (newExp) {
-      console.log('New expiration timestamp:', newExp);
-      const expArray = parseExpirationToArray(newExp); // 만료 시간을 배열로 변환
-      if (expArray.length === 6) {
-        const expirationDate = new Date(
-          expArray[0],
-          expArray[1] - 1,
-          expArray[2],
-          expArray[3],
-          expArray[4],
-          expArray[5]
-        );
-        console.log('Expiration date parsed:', expirationDate);
-        startTimer(expirationDate);
-      } else {
-        console.warn('Failed to parse expiration time:', newExp);
-      }
+      const expirationDate = new Date(exp);
+      startTimer(expirationDate);
     }
   } catch (error) {
-    console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
-    if (error.response && error.response.status === 401) {
+    console.error('토큰 갱신 실패:', error.response?.data || error.message);
+    if (error.response?.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
       router.replace('/login');
     }
   }
-}
+};
 
-function startTimer(expirationDate) {
+const startTimer = (expirationDate) => {
   clearInterval(timer.value);
-
   timer.value = setInterval(() => {
-    const remainingTime = calculateRemainingTime(expirationDate);
-
-    if (remainingTime === '만료됨') {
+    const remaining = calculateRemainingTime(expirationDate);
+    if (remaining === '만료됨') {
       clearInterval(timer.value);
       alert('토큰이 만료되었습니다. 다시 로그인하세요.');
       loginState.resetState();
       router.replace('/login');
     }
-
-    loginState.remainingTime = remainingTime;
+    remainingTime.value = remaining;
   }, 1000);
-}
+};
 
-function calculateRemainingTime(expirationDate) {
+const calculateRemainingTime = (expirationDate) => {
   const now = new Date();
+  const diff = expirationDate - now;
 
-  console.log('Current time:', now);
-  console.log('Expiration time:', expirationDate);
+  if (diff <= 0) return '만료됨';
 
-  if (expirationDate <= now) {
-    return '만료됨';
-  }
-
-  const diffInSeconds = Math.floor((expirationDate - now) / 1000);
-  const hours = Math.floor(diffInSeconds / 3600);
-  const minutes = Math.floor((diffInSeconds % 3600) / 60);
-  const seconds = diffInSeconds % 60;
-
-  console.log('Remaining time:', { hours, minutes, seconds });
+  const hours = Math.floor(diff / 3600000);
+  const minutes = Math.floor((diff % 3600000) / 60000);
+  const seconds = Math.floor((diff % 60000) / 1000);
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
+};
 
 function parseExpirationToArray(exp) {
   if (!exp || typeof exp !== 'string') {
@@ -242,9 +206,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-  if (timer.value) {
-    clearInterval(timer.value);
-  }
+  if (timer.value) clearInterval(timer.value);
 });
 </script>
 
