@@ -46,21 +46,29 @@ const loginUser = async () => {
       admin_password: formData.value.adminPassword,
     });
 
-    console.log('Login Response:', loginResponse.data);
+    const { accessToken, refreshToken, exp } = loginResponse.data;
 
-    const { accessToken, refreshToken, name } = loginResponse.data;
+    if (accessToken) {
+      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
+    }
 
-    // 쿠키 저장 (SameSite=None, Secure=true)
-    document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
-    document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
+    if (refreshToken) {
+      document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
+    }
 
-    alert(`${name}님, 환영합니다.`);
+    if (exp) {
+      const expirationDate = new Date(exp);
+      startTimer(expirationDate);
+    }
+
+    alert('로그인 성공!');
     await router.push('/main');
   } catch (error) {
     console.error('로그인 실패:', error);
-    alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
+    alert('로그인에 실패했습니다.');
   }
 };
+
 
 onMounted(async () => {
   checkLoginStatus();
