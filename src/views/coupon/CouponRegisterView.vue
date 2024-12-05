@@ -386,7 +386,7 @@ const registerCoupon = async () => {
       }
     });
     isRegisterModalOpen.value = false;
-    window.location.href = '/marketing/register-coupon'
+    window.location.href = '/marketing/coupons'
 
     console.log('coupon register success', response.data);
     
@@ -475,7 +475,7 @@ const cancelRegister = () => {
 
 const confirmCancel = () => {
     isCancelModalOpen.value = false; 
-    window.location.href = '/marketing/register-coupon'; 
+    window.location.href = '/marketing/coupons'; 
 };
 
 const showCancelModal = () => {
