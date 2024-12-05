@@ -91,9 +91,9 @@ const refreshToken = async () => {
     }
 
     const response = await axios.post(
-      'https://learnsmate.shop/auth/refresh', 
-      { refreshToken }, 
-      { 
+      'https://learnsmate.shop/auth/refresh',
+      { refreshToken },
+      {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -104,20 +104,18 @@ const refreshToken = async () => {
     const { accessToken, exp } = response.data;
 
     if (accessToken && exp) {
-      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
       loginState.setExp(exp);
       
       const newExpirationTime = Array.isArray(exp) ? convertArrayToDate(exp) : new Date(exp);
-      resetTimer(newExpirationTime);
+      if (newExpirationTime) {
+        startTimer(newExpirationTime, (remaining) => {
+          remainingTime.value = remaining;
+        });
+      }
     }
   } catch (error) {
-    console.error('토큰 갱신 상세 에러:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message
-    });
-    
+    console.error('토큰 갱신 에러:', error);
     if (error.response?.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();

@@ -2,31 +2,28 @@ let currentTimer = null;
 let timerCallback = null;
 
 export const startTimer = (expirationTime, callback) => {
-  if (currentTimer) {
-    clearInterval(currentTimer);
-    currentTimer = null;
-  }
-
-  timerCallback = callback;
-
+  clearTimer(); // Clear existing timer first
+  
   if (!expirationTime || isNaN(expirationTime.getTime())) {
     console.error('Invalid expirationTime:', expirationTime);
     callback('만료됨');
     return;
   }
 
+  timerCallback = callback;
   currentTimer = setInterval(() => {
     const remaining = calculateRemainingTime(expirationTime);
     if (remaining === '만료됨') {
-      clearInterval(currentTimer);
+      clearTimer();
     }
     callback(remaining);
   }, 1000);
 };
 
-export const resetTimer = (newExpirationTime) => {
-  if (timerCallback) {
-    startTimer(newExpirationTime, timerCallback);
+export const clearTimer = () => {
+  if (currentTimer) {
+    clearInterval(currentTimer);
+    currentTimer = null;
   }
 };
   
