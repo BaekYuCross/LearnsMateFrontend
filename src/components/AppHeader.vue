@@ -154,19 +154,34 @@ watch(
   { immediate: true }
 );
 
+const convertArrayToDate = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
+    console.error('Invalid date array:', dateArray);
+    return null;
+  }
+  const [year, month, day, hour, minute, second] = dateArray;
+  return new Date(year, month - 1, day, hour, minute, second);
+};
+
 onMounted(async () => {
   try {
     await loginState.fetchLoginState();
+
     console.log('Login state after fetch:', {
       isLoggedIn: loginState.isLoggedIn,
       exp: loginState.exp,
     });
 
     if (loginState.isLoggedIn && loginState.exp) {
-      const expirationTime = new Date(loginState.exp);
+      let expirationTime;
 
-      // expirationTime 유효성 검증
-      if (isNaN(expirationTime.getTime())) {
+      if (Array.isArray(loginState.exp)) {
+        expirationTime = convertArrayToDate(loginState.exp);
+      } else {
+        expirationTime = new Date(loginState.exp);
+      }
+
+      if (!expirationTime || isNaN(expirationTime.getTime())) {
         console.error('Invalid expirationTime:', loginState.exp);
         remainingTime.value = '만료됨';
         return;
@@ -177,7 +192,6 @@ onMounted(async () => {
         remainingTime.value = remaining;
       });
     } else {
-      console.warn('Login state is invalid or exp is missing');
       remainingTime.value = '만료됨';
     }
   } catch (error) {

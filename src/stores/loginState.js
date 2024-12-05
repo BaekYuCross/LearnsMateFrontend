@@ -1,6 +1,15 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+const convertArrayToDate = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
+    console.error('Invalid date array:', dateArray);
+    return null;
+  }
+  const [year, month, day, hour, minute, second] = dateArray;
+  return new Date(year, month - 1, day, hour, minute, second);
+};
+
 export const useLoginState = defineStore('loginState', {
   state: () => ({
     isLoggedIn: false,
@@ -32,7 +41,12 @@ export const useLoginState = defineStore('loginState', {
       this.adminName = data.name || '';
       this.adminTeam = data.adminDepartment || '';
       this.adminCode = data.code || '';
-      this.exp = Array.isArray(data.exp) ? data.exp : null;
+    
+      if (Array.isArray(data.exp)) {
+        this.exp = convertArrayToDate(data.exp).toISOString();
+      } else {
+        this.exp = data.exp || '';
+      }
     },
 
     async logout() {
