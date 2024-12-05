@@ -78,8 +78,10 @@ export const useLoginState = defineStore('loginState', {
     },
 
     setExp(newExp) {
-      this.exp = newExp;
-      console.log('Updated token expiration time:', this.exp);
+      const expirationDate = new Date(newExp);
+      const kstDate = new Date(expirationDate.getTime() + 9 * 60 * 60 * 1000);
+      this.exp = kstDate.toISOString();
+      console.log('Updated token expiration time (KST):', this.exp);
     },
 
     resetState() {

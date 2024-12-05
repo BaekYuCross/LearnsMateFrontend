@@ -154,11 +154,26 @@ watch(
   { immediate: true }
 );
 
-onMounted(() => {
-  if (expirationTime.value) {
-    startTimer(expirationTime.value, (remaining) => {
-      remainingTime.value = remaining;
+onMounted(async () => {
+  try {
+    await loginState.fetchLoginState();
+    console.log('Login state after fetch:', {
+      isLoggedIn: loginState.isLoggedIn,
+      exp: loginState.exp,
     });
+    if (loginState.isLoggedIn && loginState.exp) {
+      const expirationTime = new Date(loginState.exp);
+      startTimer(expirationTime, (remaining) => {
+        remainingTime.value = remaining;
+      });
+    } else {
+      remainingTime.value = '만료됨';
+    }
+  } catch (error) {
+    console.error('Failed to fetch login state:', error);
+    loginState.resetState();
+  } finally {
+    isLoading.value = false;
   }
 });
 
