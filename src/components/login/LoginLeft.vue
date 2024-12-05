@@ -57,6 +57,8 @@ const loginUser = async () => {
       document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
     }
 
+    console.log("백엔드에서 받은 exp:", exp);
+
     if (exp) {
       const expirationTime = new Date(`1970-01-01T${exp}Z`);
       startTimer(expirationTime, (remaining) => {
