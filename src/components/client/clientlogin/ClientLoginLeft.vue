@@ -70,6 +70,9 @@ const password = ref(""); // 사용자 비밀번호 입력값
 // 로그인 버튼 처리
 const handleLogin = async () => {
   try {
+    console.log(userId.value);
+    console.log(password.value);
+    
     const response = await axios.post('https://learnsmate.shop/client/login', {
       memberEmail: userId.value,
       memberPassword: password.value
