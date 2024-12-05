@@ -42,18 +42,18 @@ export const useLoginState = defineStore('loginState', {
       this.adminTeam = data.adminDepartment || '';
       this.adminCode = data.code || '';
     
-      if (Array.isArray(data.exp)) {
-        const expirationDate = convertArrayToDate(data.exp);
-        if (expirationDate && !isNaN(expirationDate.getTime())) {
+      if (data.exp) {
+        const expirationDate = new Date(data.exp);
+        if (!isNaN(expirationDate.getTime())) {
           this.exp = expirationDate.toISOString();
         } else {
           console.error('Invalid expiration date:', data.exp);
           this.exp = null;
         }
       } else {
-        this.exp = data.exp || '';
+        this.exp = null;
       }
-    },    
+    },  
 
     async logout() {
       try {
@@ -107,9 +107,8 @@ export const useLoginState = defineStore('loginState', {
           return;
         }
     
-        const kstDate = new Date(expirationDate.getTime() + 9 * 60 * 60 * 1000);
-        this.exp = kstDate.toISOString();
-        console.log('Updated token expiration time (KST):', this.exp);
+        this.exp = expirationDate.toISOString();
+        console.log('Updated token expiration time:', this.exp);
       } catch (error) {
         console.error('Error in setExp:', error);
         this.exp = null;
