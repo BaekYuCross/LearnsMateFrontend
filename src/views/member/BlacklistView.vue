@@ -133,11 +133,11 @@
                     </div>
                   </div>
                   <div class="reports-section">
-                    <div v-for="report in group.reports" :key="report.reportDto.reportCode" class="report-entry">
-                      <p>신고 코드: {{ report.reportDto.reportCode }}</p>
-                      <p>신고 사유: {{ report.reportDto.reportReason }}</p>
-                      <p>신고일: {{ report.reportDto.reportDate }}</p>
-                      <p>신고자: {{ report.reportDto.reportMemberCode }}</p>
+                    <div v-for="report in group.reports" :key="report.report_dto.reportCode" class="report-entry">
+                      <p>신고 코드: {{ report.report_dto.reportCode }}</p>
+                      <p>신고 사유: {{ report.report_dto.reportReason }}</p>
+                      <p>신고일: {{ report.report_dto.reportDate }}</p>
+                      <p>신고자: {{ report.report_dto.reportMemberCode }}</p>
                     </div>
                   </div>
                 </div>
@@ -151,7 +151,7 @@
 </template>
 
 <script setup>
-import axios from '@/plugins/axios';
+import axios from 'axios';
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { saveAs } from 'file-saver';
@@ -208,13 +208,13 @@ const groupedReports = computed(() => {
   }
   
   reportDetails.value.forEach(detail => {
-    if (!detail.commentDto) return;
+    if (!detail.comment_dto) return;
     
-    const commentCode = detail.commentDto.commentCode;
+    const commentCode = detail.comment_dto.commentCode;
     
     if (!grouped[commentCode]) {
       grouped[commentCode] = {
-        commentInfo: detail.commentDto,
+        commentInfo: detail.comment_dto,
         reports: []
       };
     }
