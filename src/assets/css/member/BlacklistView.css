@@ -126,6 +126,13 @@
   cursor: pointer;
 }
 
+.blacklist-board-row-address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;  
+  padding: 0 5px;
+}
+
 .blacklist-board-header > div,
 .blackllist-board-row > div {
   text-overflow: ellipsis;

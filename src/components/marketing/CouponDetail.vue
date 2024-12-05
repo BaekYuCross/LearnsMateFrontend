@@ -3,7 +3,7 @@
   <div class="coupon-detail-contents">
     <div class="coupon-detail-header">
     <div class="coupon-detail-title">쿠폰</div>
-    <button class="coupon-detail-close-button">x</button>
+    <button class="coupon-detail-close-button" @click="closeCouponDetail">x</button>
   </div>
     <div class="coupon-detail-table" v-if="props.selectedCoupon">
       <div class="coupon-detail-table-row">
@@ -118,6 +118,7 @@
 import { ref, watch, computed } from "vue";
 import axios from 'axios';
 
+const emit = defineEmits();
 const props = defineProps(['selectedCoupon']);
 
 const isEditMode = ref(false);
@@ -147,6 +148,10 @@ const formatDateForInput = (isoDate) => {
   if (!isoDate) return '';
   // ISO 날짜 문자열에서 'YYYY-MM-DD' 부분만 추출
   return isoDate.split('T')[0];
+};
+
+const closeCouponDetail = () => {
+  emit('close-coupon-detail'); 
 };
 
 // 날짜 포맷 함수

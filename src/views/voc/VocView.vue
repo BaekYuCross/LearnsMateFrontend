@@ -492,7 +492,11 @@ const getSatisfactionClass = (satisfaction) => {
 const showVOCDetail = async (voc) => {
   if (selectedVOC.value?.voc_code === voc.voc_code) {
     closeVOCDetail();
-  } else {
+    return;
+  }
+  if (isEditingAnswer.value) {
+    cancelEditing();
+  }
     try {
       const response = await axios.get(`https://learnsmate.shop/voc/${voc.voc_code}`);
       selectedVOC.value = response.data;
@@ -500,7 +504,6 @@ const showVOCDetail = async (voc) => {
       console.log('Selected VOC:', selectedVOC.value);
     } catch (error) {
       console.error('Failed to fetch VOC details:', error);
-    }
   }
 };
 
