@@ -79,16 +79,11 @@ const menus = ref([
 ]);
 
 const refreshToken = async () => {
-  console.log('Refresh token function started');
   try {
-    console.log('All cookies:', document.cookie);
-
     const refreshToken = document.cookie
       .split('; ')
       .find((row) => row.startsWith('refreshToken='))
       ?.split('=')[1];
-
-    console.log('Found refresh token:', refreshToken ? 'exists' : 'not found');
 
     if (!refreshToken) {
       alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
@@ -107,21 +102,14 @@ const refreshToken = async () => {
     );
 
     const { accessToken, exp } = response.data;
-    console.log('Refresh response:', {
-      hasAccessToken: !!accessToken,
-      expiration: exp
-    });
-
-    console.log('Response received:', response);
 
     if (accessToken && exp) {
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
       loginState.setExp(exp);
       
-      const newExpirationTime = Array.isArray(exp) 
-        ? convertArrayToDate(exp)
-        : new Date(exp);
-        
+      remainingTime.value = '00:00:00';
+      const newExpirationTime = Array.isArray(exp) ? convertArrayToDate(exp) : new Date(exp);
       startTimer(newExpirationTime, (remaining) => {
         remainingTime.value = remaining;
       });
