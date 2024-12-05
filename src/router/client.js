@@ -1,31 +1,35 @@
-import axios from '@/plugins/axios'; 
+import axios from 'axios'; 
 
 const checkLoginAndTime = async () => {
-    const clientInfo = JSON.parse(localStorage.getItem('clientInfo'));
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-   
-    if (!clientInfo || !isAuthenticated) return false;
-   
-    const loginTime = new Date(clientInfo.loginTime);
-    const now = new Date();
-    const diffHours = (now - loginTime) / (1000000000000000000);
-   
-    if (diffHours >= 6) {
-        try {
-            // 로그아웃 요청 보내기
-            await axios.post('https://learnsmate.shop/client/logout', {
-                loginHistoryCode: clientInfo.loginHistoryCode,
-            });
-        } catch (error) {
-            console.error('자동 로그아웃 요청 실패:', error);
+    try {
+        const clientInfo = JSON.parse(localStorage.getItem('clientInfo'));
+        const isAuthenticated = localStorage.getItem('isAuthenticated');
+        
+        if (!clientInfo || !isAuthenticated) return false;
+        
+        const loginTime = new Date(clientInfo.loginTime);
+        const now = new Date();
+        const diffHours = (now - loginTime) / (1000 * 60 * 60);
+        
+        if (diffHours >= 3) {
+            try {
+                await axios.post('https://learnsmate.shop/client/logout', {
+                    loginHistoryCode: clientInfo.loginHistoryCode,
+                });
+            } catch (error) {
+                console.error('자동 로그아웃 요청 실패:', error);
+            } finally {
+                localStorage.removeItem('clientInfo');
+                localStorage.removeItem('isAuthenticated');
+                return false;
+            }
         }
-
-        localStorage.removeItem('clientInfo');
-        localStorage.removeItem('isAuthenticated');
+        
+        return true;
+    } catch (error) {
+        console.error('로그인 체크 중 오류 발생:', error);
         return false;
     }
-   
-    return true;
 };
 
 const ClientRouter = [

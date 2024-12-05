@@ -71,12 +71,12 @@ const password = ref(""); // 사용자 비밀번호 입력값
 const handleLogin = async () => {
   try {
     const response = await axios.post('https://learnsmate.shop/client/login', {
-      member_email: userId.value,
-      member_password: password.value
+      memberEmail: userId.value,
+      memberPassword: password.value
     });
 
-    console.log(member_email);
-    console.log(member_password);
+    console.log(memberEmail);
+    console.log(memberPassword);
 
     const loginData = {
       ...response.data,
