@@ -39,7 +39,7 @@ export const useLoginState = defineStore('loginState', {
     async logout() {
       try {
         const response = await axios.post(
-          '/auth/logout', 
+          'https://learnsmate.shop/auth/logout', 
           {}, 
           { withCredentials: true } // 쿠키 전송
         );
