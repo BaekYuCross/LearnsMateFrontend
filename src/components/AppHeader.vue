@@ -72,20 +72,8 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
-function parseExpirationToArray(exp) {
-  if (!exp || typeof exp !== 'string') {
-    console.warn('Invalid expiration format:', exp);
-    return [];
-  }
-  const [date, time] = exp.split(' ');
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, minute, second] = time.split(':').map(Number);
-  return [year, month, day, hour, minute, second];
-}
-
 async function refreshToken() {
   try {
-    // 쿠키에서 refreshToken 추출
     const refreshToken = document.cookie
       .split('; ')
       .find((row) => row.startsWith('refreshToken='))
@@ -96,27 +84,34 @@ async function refreshToken() {
       return;
     }
 
-    // 백엔드로 refreshToken 전송
     const response = await axios.post(
       'https://learnsmate.shop/auth/refresh',
-      { refreshToken }, // 요청 본문
-      { withCredentials: false } // 쿠키 자동 전송 비활성화
+      { refreshToken },
+      { withCredentials: true }
     );
 
-    // 새로 발급받은 AccessToken 쿠키 저장
     const newAccessToken = response.data.accessToken;
+    const newExp = response.data.exp;
+
     if (newAccessToken) {
       document.cookie = `token=${newAccessToken}; Path=/; Secure; SameSite=None; HttpOnly=false;`;
       console.log('New accessToken saved to cookies.');
     }
 
-    // 새 만료 시간 반영
-    const newExp = response.data.exp;
     if (newExp) {
-      const parsedExp = parseExpirationToArray(newExp);
-      if (Array.isArray(parsedExp) && parsedExp.length === 6) {
-        loginState.setExp(parsedExp);
-        startTimer();
+      const expArray = parseExpirationToArray(newExp);
+      if (expArray.length === 6) {
+        const expirationDate = new Date(
+          expArray[0],
+          expArray[1] - 1,
+          expArray[2],
+          expArray[3],
+          expArray[4],
+          expArray[5]
+        );
+        startTimer(expirationDate);
+      } else {
+        console.warn('Failed to parse expiration time:', newExp);
       }
     }
   } catch (error) {
@@ -129,18 +124,27 @@ async function refreshToken() {
   }
 }
 
-const calculateRemainingTime = () => {
-  if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
-    console.warn('Invalid expiration format:', exp.value);
-    return '00:00:00';
-  }
+function startTimer(expirationDate) {
+  clearInterval(timer.value);
 
-  const [year, month, day, hour, minute, second] = exp.value;
-  const expirationDate = new Date(year, month - 1, day, hour, minute, second);
+  timer.value = setInterval(() => {
+    const remainingTime = calculateRemainingTime(expirationDate);
+
+    if (remainingTime === '만료됨') {
+      clearInterval(timer.value);
+      alert('토큰이 만료되었습니다. 다시 로그인하세요.');
+      loginState.resetState();
+      router.replace('/login');
+    }
+
+    loginState.remainingTime = remainingTime;
+  }, 1000);
+}
+
+function calculateRemainingTime(expirationDate) {
   const now = new Date();
 
   if (expirationDate <= now) {
-    clearInterval(timer.value);
     return '만료됨';
   }
 
@@ -150,8 +154,18 @@ const calculateRemainingTime = () => {
   const seconds = diffInSeconds % 60;
 
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
+}
 
+function parseExpirationToArray(exp) {
+  if (!exp || typeof exp !== 'string') {
+    console.warn('Invalid expiration format:', exp);
+    return [];
+  }
+  const [date, time] = exp.split(' ');
+  const [year, month, day] = date.split('-').map(Number);
+  const [hour, minute, second] = time.split(':').map(Number);
+  return [year, month, day, hour, minute, second];
+}
 
 const currentGroup = computed(() => {
   const currentPath = route.path || '';
