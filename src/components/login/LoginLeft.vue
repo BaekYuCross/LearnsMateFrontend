@@ -15,7 +15,6 @@ import { useLoginState } from '@/stores/loginState';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { startTimer } from '@/utils/timer';
 
 const loginState = useLoginState();
 const router = useRouter();
@@ -29,7 +28,7 @@ const checkLoginStatus = async () => {
   try {
     await loginState.fetchLoginState();
     if (loginState.isLoggedIn) {
-      await router.push('/');
+      await router.push('/main');
     }
   } catch (error) {
     if (error.response && error.response.status === 401) {
@@ -47,7 +46,7 @@ const loginUser = async () => {
       admin_password: formData.value.adminPassword,
     });
 
-    const { accessToken, refreshToken, exp, name } = loginResponse.data;
+    const { accessToken, refreshToken, exp, name, adminDepartment } = loginResponse.data;
 
     if (accessToken) {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
@@ -57,20 +56,16 @@ const loginUser = async () => {
       document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
     }
 
-    console.log("백엔드에서 받은 exp:", exp);
-
     if (exp) {
-      const expirationTime = new Date(`1970-01-01T${exp}Z`);
-      startTimer(expirationTime, (remaining) => {
-        if (remaining === '만료됨') {
-          alert('세션이 만료되었습니다. 다시 로그인하세요.');
-          loginState.resetState();
-          router.replace('/login');
-        } else {
-          console.log(`남은 시간: ${remaining}`);
-        }
-      });
+      loginState.setExp(exp);
     }
+
+    loginState.updateLoginState({
+      name,
+      adminDepartment,
+      code: formData.value.adminCode,
+      exp,
+    });
 
     alert(`${name}님, 환영합니다.`);
     await router.push('/main');
@@ -84,6 +79,7 @@ onMounted(async () => {
   checkLoginStatus();
 });
 </script>
+
   
   <style scoped>
   .login-left {

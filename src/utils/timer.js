@@ -12,6 +12,11 @@ export const startTimer = (expirationTime, callback) => {
   };
   
   export const calculateRemainingTime = (expirationDate) => {
+    if (!expirationDate || !(expirationDate instanceof Date)) {
+      console.warn('Invalid expiration date:', expirationDate);
+      return '만료됨';
+    }
+  
     const now = new Date();
     const diff = expirationDate - now;
   
@@ -23,4 +28,3 @@ export const startTimer = (expirationTime, callback) => {
   
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   };
-  

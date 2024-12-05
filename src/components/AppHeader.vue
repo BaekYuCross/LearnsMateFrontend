@@ -56,7 +56,7 @@ const adminName = computed(() => loginState.adminName || '');
 const adminTeam = computed(() => loginState.adminTeam || '');
 const router = useRouter();
 const route = useRoute();
-const timer = ref(null);
+const expirationTime = computed(() => loginState.exp ? new Date(loginState.exp) : null);
 const remainingTime = ref('00:00:00');
 
 const menus = ref([
@@ -88,10 +88,8 @@ const refreshToken = async () => {
 
     const { accessToken, exp } = response.data;
     if (accessToken && exp) {
-      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None; HttpOnly=false;`;
-
-      const expirationDate = new Date(exp);
-      startTimer(expirationDate);
+      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
+      loginState.setExp(exp); // 스토어에 만료 시간 업데이트
     }
   } catch (error) {
     console.error('토큰 갱신 실패:', error.response?.data || error.message);
@@ -156,24 +154,16 @@ watch(
   { immediate: true }
 );
 
-onMounted(async () => {
-  try {
-    if (!isLoggedIn.value) {
-      await loginState.fetchLoginState();
-    }
-    const expirationTime = new Date(`1970-01-01T${exp}Z`);
-    startTimer(expirationTime, (remaining) => {
+onMounted(() => {
+  if (expirationTime.value) {
+    startTimer(expirationTime.value, (remaining) => {
       remainingTime.value = remaining;
     });
-  } catch (error) {
-    console.error('Failed to fetch login state:', error);
-  } finally {
-    isLoading.value = false;
   }
 });
 
 onUnmounted(() => {
-  if (timer.value) clearInterval(timer.value);
+  remainingTime.value = '00:00:00';
 });
 </script>
 
