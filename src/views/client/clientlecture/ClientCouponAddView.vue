@@ -135,7 +135,7 @@ const closeModal = () => {
 const fetchCoupons = async () => {
 try {
   const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).memberCode;
-  const response = await axios.get(`http://localhost:5000/coupon/client/${tutorCode}/allcoupon`, {
+  const response = await axios.get(`https://learnsmate.shop/coupon/client/${tutorCode}/allcoupon`, {
     withCredentials: true
   });
   coupons.value = response.data;

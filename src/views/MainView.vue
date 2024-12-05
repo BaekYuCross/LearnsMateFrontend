@@ -43,7 +43,12 @@
         <div class="card">
           <h3>전년 동월 대비 매출액</h3>
           <div class="stat">
-            <RevenueComparisonChart :revenueData="revenueData" />
+            <Suspense>
+              <RevenueComparisonChart :revenueData="revenueData" />
+              <template #fallback>
+                <div>Loading chart...</div>
+              </template>
+            </Suspense>
           </div>
         </div>
       </div>
@@ -110,7 +115,12 @@
         <div class="card small">
           <h3>TOP3 강의 카테고리</h3>
           <div class="chart-stats">
-            <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
+            <Suspense>
+              <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
+              <template #fallback>
+                <div>Loading chart...</div>
+              </template>
+            </Suspense>
           </div>
         </div>
 
@@ -130,11 +140,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted  } from 'vue';
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import CategoryBarChart from '@/components/main/CategoryBarChart.vue';
-import RevenueComparisonChart from '@/components/main/RevenueComparisonChart.vue';
+
+const CategoryBarChart = defineAsyncComponent(() => 
+  import('@/components/main/CategoryBarChart.vue')
+);
+const RevenueComparisonChart = defineAsyncComponent(() => 
+  import('@/components/main/RevenueComparisonChart.vue')
+);
 
 const router = useRouter();
 
@@ -192,7 +207,7 @@ const loading = ref(true);
 
 const fetchMembers = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/member/students', {
+    const response = await axios.get('https://learnsmate.shop/member/students', {
       params: {
         page: 0,
         size: 5, 
@@ -210,7 +225,7 @@ const fetchMembers = async () => {
 
 const fetchYesterdayStudentCount = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/member/count", {
+    const response = await axios.get("https://learnsmate.shop/member/count", {
       params: { type: "student" },
       withCredentials: true,
     });
@@ -223,7 +238,7 @@ const fetchYesterdayStudentCount = async () => {
 
 const fetchYesterdayTutorCount = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/member/count", {
+    const response = await axios.get("https://learnsmate.shop/member/count", {
       params: { type: "tutor" },
       withCredentials: true,
     });
@@ -237,7 +252,7 @@ const fetchYesterdayTutorCount = async () => {
 
 const fetchRevenueData = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/payments', {
+    const response = await axios.get('https://learnsmate.shop/payments', {
       params: { page: 0, size: 50 },
       withCredentials: true,
     });
@@ -279,7 +294,7 @@ const fetchRevenueData = async () => {
 
 const fetchLectures = async () => {
   try { 
-    const response = await axios.get('http://localhost:5000/lecture/list',{
+    const response = await axios.get('https://learnsmate.shop/lecture/list',{
       params: {
         page: 0,
         size: 3,
@@ -361,7 +376,7 @@ const formattedReservedStudents = computed(() => {
 
 const fetchContract = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/contract-status/list', {
+    const response = await axios.get('https://learnsmate.shop/contract-status/list', {
       withCredentials: true,
     });
     const contractList = response.data;
@@ -383,7 +398,7 @@ const fetchContract = async () => {
 
 const countContracts = async (lectureCode) => {
   try { 
-    const response = await axios.get(`http://localhost:5000/contract-status/lecture/${lectureCode}`,{
+    const response = await axios.get(`https://learnsmate.shop/contract-status/lecture/${lectureCode}`,{
       withCredentials: true,
     })
     contracts.value = response.data;
@@ -425,7 +440,7 @@ const countContracts = async (lectureCode) => {
 
 const fetchContractAdmin = async (adminCode) => {
   try {
-    const response = await axios.get(`http://localhost:5000/admin/${adminCode}`, {
+    const response = await axios.get(`https://learnsmate.shop/admin/${adminCode}`, {
       withCredentials: true,
     });
     const contractAdmin = response.data;
@@ -439,7 +454,7 @@ const fetchContractAdmin = async (adminCode) => {
 
 const fetchContractLecture = async (lectureCode) => {
   try {
-    const response = await axios.get(`http://localhost:5000/lecture/${lectureCode}`,{
+    const response = await axios.get(`https://learnsmate.shop/lecture/${lectureCode}`,{
       withCredentials: true,
     });
     const contractLecture = response.data;
@@ -452,7 +467,7 @@ const fetchContractLecture = async (lectureCode) => {
 
 const fetchUnansweredVOC = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/voc/unanswered', {
+      const response = await axios.get('https://learnsmate.shop/voc/unanswered', {
         method: 'GET',
         withCredentials: true,
       });
@@ -471,7 +486,7 @@ const goToUnansweredVOCPage = () => {
 
 const fetchCampaigns = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/campaign/campaigns', {
+      const response = await axios.get('https://learnsmate.shop/campaign/campaigns', {
         method: 'GET',
         withCredentials: true,
         params: {
@@ -520,7 +535,7 @@ const translateCategory = (category) => {
 
 const fetchCategoryRatio = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/member/category-ratio', {
+    const response = await axios.get('https://learnsmate.shop/member/category-ratio', {
       withCredentials: true,
     });
 
@@ -540,7 +555,7 @@ const fetchCategoryRatio = async () => {
 
 const fetchReservedList = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/blacklist/student/reserved`, {
+    const response = await axios.get(`https://learnsmate.shop/blacklist/student/reserved`, {
       withCredentials: true, 
       params: {
         page: 0,

@@ -85,7 +85,7 @@ export default {
       this.selectedDate = selectedDate;
 
       try {
-        const response = await axios.get("http://localhost:5000/voc/ai/by-date", {
+        const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
           params: { date: selectedDate },
         });
 
@@ -220,6 +220,7 @@ export default {
   border: 1px solid #ddd;
   padding: 10px;
   word-wrap: break-word;
+  max-width: 690px;
 }
 
 .voc-ai-modal-summary-table th {

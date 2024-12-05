@@ -1,67 +1,86 @@
 <template>
   <div class="login-left">
     <h1>Login</h1>
-    <!-- @submit.prevent를 사용하여 재로딩 방지 -->
     <form class="login-form" @submit.prevent="loginUser">
       <input v-model="formData.adminCode" type="text" placeholder="사번 ID" class="login-input" />
       <input v-model="formData.adminPassword" type="password" placeholder="비밀번호" class="login-input" />
       <button type="submit" class="login-button">로그인</button>
-      <!-- 비밀번호 재설정 버튼 -->
       <button type="button" class="login-pw" @click="$emit('show-login-pw')">비밀번호 재설정</button>
     </form>
   </div>
 </template>
+
 <script setup>
 import { useLoginState } from '@/stores/loginState';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
-const loginState = useLoginState(); // Pinia 상태
-const router = useRouter(); // Vue Router 사용
+const loginState = useLoginState();
+const router = useRouter();
 
 const formData = ref({
   adminCode: '',
   adminPassword: '',
 });
 
-const loginUser = async () => {
-  if (!formData.value.adminCode || !formData.value.adminPassword) {
-    alert('사번과 비밀번호를 입력해주세요.');
-    return;
-  }
-
+const checkLoginStatus = async () => {
   try {
-    const response = await axios.post(
-      'http://localhost:5000/users/login',
-      {
-        admin_code: formData.value.adminCode,
-        admin_password: formData.value.adminPassword,
-      },
-      {
-        withCredentials: true, // 쿠키 포함
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
-
-    console.log('login success :', response);
-
-    // 로그인 상태 확인 (쿠키 기반)
     await loginState.fetchLoginState();
-
-    alert(`${loginState.adminName}님, 환영합니다.`);
-    router.push('/'); 
+    if (loginState.isLoggedIn) {
+      await router.push('/main');
+    }
   } catch (error) {
-    console.error('로그인 실패:', error);
-    alert('로그인에 실패했습니다. 사번 또는 비밀번호를 확인해주세요.');
+    if (error.response && error.response.status === 401) {
+      console.warn('인증되지 않은 사용자입니다.');
+      return;
+    }
+    console.error('로그인 상태 확인 중 에러:', error);
   }
 };
 
-// 앱 로드 시 로그인 상태 확인
-onMounted(async () => {
-  await loginState.fetchLoginState(); // 쿠키 기반 인증 정보 확인
-});
+const loginUser = async () => {
+  try {
+    const loginResponse = await axios.post('/users/login', {
+      admin_code: formData.value.adminCode,
+      admin_password: formData.value.adminPassword,
+    });
 
+    const { accessToken, refreshToken, exp, name, adminDepartment } = loginResponse.data;
+
+    if (accessToken) {
+      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
+    }
+
+    if (refreshToken) {
+      document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
+    }
+
+    if (Array.isArray(exp)) {
+      const expDate = new Date(exp[0], exp[1]-1, exp[2], exp[3], exp[4], exp[5]);
+      if (!isNaN(expDate.getTime())) {
+        loginState.setExp(expDate);
+      }
+    }
+
+    loginState.updateLoginState({
+      name,
+      adminDepartment,
+      code: formData.value.adminCode,
+      exp,
+    });
+
+    alert(`${name}님, 환영합니다.`);
+    await router.push('/main');
+  } catch (error) {
+    console.error('로그인 실패:', error);
+    alert('로그인에 실패했습니다.');
+  }
+};
+
+onMounted(async () => {
+  checkLoginStatus();
+});
 </script>
 
   

@@ -83,7 +83,7 @@ const handleSubmit = async () => {
 
 const registerCampaignTemplate = async () => {
   try {
-    await axios.post('http://localhost:5000/campaign-template/register', formData.value,{
+    await axios.post('https://learnsmate.shop/campaign-template/register', formData.value,{
       withCredentials: true,
       method: 'POST',
       headers: {

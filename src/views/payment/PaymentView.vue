@@ -409,7 +409,7 @@ const selectedColumns = ref(Object.keys(columns.value));
 
 const fetchPaymentList = async (filters = {}) => {
   try {
-    const response = await axios.get(`http://localhost:5000/payments`, {
+    const response = await axios.get(`https://learnsmate.shop/payments`, {
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -441,13 +441,25 @@ const camelToSnake = (obj) => {
 const handleSearch = async (filterData) => {
     try {
         isFiltered.value = true;
-        lastFilterData.value = filterData;
+
+        const convertToISODate = (date) => {
+            if (!date) return null;
+            const parsedDate = new Date(date);
+            return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
+        };
+
+        const processedData = {
+            ...filterData,
+            startCreatedAt: convertToISODate(filterData.startCreatedAt),
+            endCreatedAt: convertToISODate(filterData.endCreatedAt),
+        };
+
+        lastFilterData.value = processedData;
+
         const response = await axios.post(
-            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`, 
-            camelToSnake(filterData)
+            `https://learnsmate.shop/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+            camelToSnake(processedData)
         );
-        
-        console.log(response);
 
         paymentList.value = response.data.content;
         totalElements.value = response.data.totalElements;
@@ -469,7 +481,7 @@ const handleSearch = async (filterData) => {
   try {
     const config = {
       method: 'POST',
-      url: 'http://localhost:5000/payments/excel/download',
+      url: 'https://learnsmate.shop/payments/excel/download',
       responseType: 'blob',
       data: {
         selected_columns: selectedColumns.value,
@@ -558,7 +570,7 @@ const showPaymentDetail = async (payment) => {
     try {
       console.log('Requesting payment details for code:', payment.payment_code);
       const response = await axios.get(
-        `http://localhost:5000/payments/${payment.payment_code}`
+        `https://learnsmate.shop/payments/${payment.payment_code}`
       );
       
       if (response.data) {
@@ -588,7 +600,7 @@ const showPaymentDetail = async (payment) => {
 
     if (isFiltered.value && lastFilterData.value) {
         const response = await axios.post(
-            `http://localhost:5000/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+            `https://learnsmate.shop/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
             camelToSnake(lastFilterData.value)
         );
 

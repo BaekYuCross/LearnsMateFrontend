@@ -1,45 +1,52 @@
 <template>
   <div>
-    <AppHeader v-if="showHeader && !isTransitioning" />
+    <div>
+      <AppHeader v-if="isLoggedIn !== null && isLoggedIn && shouldShowHeader" />
+      <main>
+        <RouterView />
+      </main>
+    </div>
   </div>
-  <main>
-    <RouterView />
-  </main>
 </template>
 
 <script setup>
 import AppHeader from './components/AppHeader.vue';
 import { RouterView, useRoute } from 'vue-router';
-import { computed, ref, watch } from 'vue';
+import { computed, ref, onMounted } from 'vue';
+import { useLoginState } from '@/stores/loginState';
+import { storeToRefs } from 'pinia';
 
+const loginState = useLoginState();
+const { isLoggedIn } = storeToRefs(loginState);
 const route = useRoute();
-const isTransitioning = ref(false);
-const isLoginPage = computed(() => route.path === '/login');
-const isClientLoginPage = computed(() => route.path === '/client-login');
-const isClientMainPage = computed(() => route.path === '/client-main');
-const isClientVocPage = computed(() => route.path === '/client-voc');
-const isClientMyVocPage = computed(() => route.path === '/client-myvoc');
-const isClientLecturePage = computed(() => route.path === '/client-lecture');
-const isClientMyLecturePage = computed(() => route.path === '/client-mylecture');
-const isClientLectureDetailPage = computed(() =>
-  route.matched.some((record) => record.path === '/client-lecturedetail/:id')
-);
-const isClientLectureCartPage = computed(() => route.path === '/client-lecturecart');
-const isClientAddCouponPage = computed(() => route.path === '/client-addcoupon');
 
+const excludedPaths = [
+  '/login',
+  '/client-login',
+  '/client-main',
+  '/client-voc',
+  '/client-myvoc',
+  '/client-lecture',
+  '/client-mylecture',
+  '/client-lecturecart',
+  '/client-addcoupon'
+];
 
-const showHeader = computed(() => {
-  return !isLoginPage.value && !isClientLoginPage.value 
-  && !isClientMainPage.value && !isClientVocPage.value 
-  && !isClientMyVocPage.value && !isClientLecturePage.value 
-  && !isClientMyLecturePage.value && !isClientLectureDetailPage.value
-  && !isClientLectureCartPage.value && !isClientAddCouponPage.value;
+const shouldShowHeader = computed(() => {
+  if (!route || isLoggedIn.value === null) return false;
+
+  const isClientLectureDetail = route.path.startsWith('/client-lecturedetail/');
+  const isExcludedPath = excludedPaths.includes(route.path);
+
+  return !isExcludedPath && !isClientLectureDetail;
 });
 
-watch(route, () => {
-  isTransitioning.value = true;
-  isTransitioning.value = false;
- 
+onMounted(async () => {
+  try {
+    await loginState.fetchLoginState();
+  } catch (error) {
+    console.error('Failed to fetch login state:', error);
+  }
 });
 </script>
 

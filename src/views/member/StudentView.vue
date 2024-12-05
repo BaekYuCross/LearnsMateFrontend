@@ -444,7 +444,7 @@ const toggleRecommendedSection = () => {
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/member/students', {
+    const response = await axios.get('https://learnsmate.shop/member/students', {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -465,7 +465,7 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
+    const response = await axios.post('https://learnsmate.shop/member/filter/student',lastFilterData.value, {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -491,7 +491,7 @@ const showDetail = async (student) => {
     studentDetail.value = null;
   } else {
     try {
-      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
+      const response = await axios.get(`https://learnsmate.shop/member/student/${student.memberCode}`, {
         withCredentials: true,   
       });
 
@@ -527,7 +527,7 @@ const handleExcelDownload = async() => {
   try{
     const config = {
       method: 'POST',
-      url: 'http://localhost:5000/member/excel/download/student',
+      url: 'https://learnsmate.shop/member/excel/download/student',
       responseType: 'blob',
       withCredentials: true,
       headers: {

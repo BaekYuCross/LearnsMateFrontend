@@ -1,58 +1,129 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
+const convertArrayToDate = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 6) {
+    console.error('Invalid date array:', dateArray);
+    return null;
+  }
+  const [year, month, day, hour, minute, second] = dateArray;
+  return new Date(year, month - 1, day, hour, minute, second);
+};
+
 export const useLoginState = defineStore('loginState', {
   state: () => ({
-    isLoggedIn: false, // 로그인 상태
-    adminName: '',     // 관리자 이름
-    adminTeam: '',     // 관리자 부서
-    adminCode: '',     // 관리자 코드
-    exp: '',           // 토큰 만료 시간
+    isLoggedIn: false,
+    adminName: '',
+    adminTeam: '',
+    adminCode: '',
+    exp: null,
   }),
+  
   actions: {
-    // 로그인 상태 확인
     async fetchLoginState() {
       try {
-        const response = await axios.get('http://localhost:5000/admin/status', {
+        const response = await axios.get('https://learnsmate.shop/admin/status', {
           withCredentials: true,
         });
-        this.isLoggedIn = true;
-        this.adminName = response.data.name;
-        this.adminTeam = response.data.adminDepartment;
-        this.adminCode = response.data.code;
-        this.exp = response.data.exp;
-        console.log('토큰 만료시간:', this.exp);
+        if (response.data && response.data.code) {
+          this.updateLoginState(response.data);
+        } else {
+          this.resetState();
+        }
       } catch (error) {
-        console.error('로그인 상태를 확인할 수 없습니다:', error);
+        console.error('Error fetching login state:', error);
         this.resetState();
       }
     },
 
-    // 로그아웃 처리
+    updateLoginState(data) {
+      this.isLoggedIn = true;
+      this.adminName = data.name || '';
+      this.adminTeam = data.adminDepartment || '';
+      this.adminCode = data.code || '';
+    
+      if (data.exp) {
+        if (Array.isArray(data.exp)) {
+          const expDate = new Date(Date.UTC(
+            data.exp[0], 
+            data.exp[1] - 1, 
+            data.exp[2], 
+            data.exp[3], 
+            data.exp[4], 
+            data.exp[5]
+          ));
+          this.exp = expDate.toISOString();
+        } else {
+          this.exp = new Date(data.exp).toISOString();
+        }
+      }
+    },
+
     async logout() {
       try {
-        await axios.post('http://localhost:5000/auth/logout', {}, { withCredentials: true });
-        this.resetState();
+        const refreshToken = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('refreshToken='))
+          ?.split('=')[1];
+    
+        if (!refreshToken) {
+          alert('RefreshToken이 없습니다. 로그아웃할 수 없습니다.');
+          return false;
+        }
+    
+        const response = await axios.post(
+          'https://learnsmate.shop/auth/logout',
+          { refreshToken },
+          { withCredentials: false }
+        );
+    
+        if (response.status === 200) {
+          console.log('Logout successful:', response.data);
+    
+          document.cookie = 'token=; Path=/; Max-Age=0;';
+          document.cookie = 'refreshToken=; Path=/; Max-Age=0;';
+    
+          this.resetState();
+          return true;
+        } else {
+          console.error('Unexpected response status:', response.status, response.data);
+          alert('로그아웃에 실패했습니다.');
+          return false;
+        }
       } catch (error) {
-        console.error('로그아웃 중 오류 발생:', error);
-        alert('로그아웃에 실패했습니다. 다시 시도해주세요.');
+        if (error.response) {
+          console.error('Logout failed with response:', error.response.data);
+        } else {
+          console.error('Logout failed with no response:', error.message);
+        }
+        alert('로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.');
+        return false;
       }
     },
 
-
-    // 새 토큰 만료 시간 설정
     setExp(newExp) {
-      this.exp = newExp;
-      console.log('새로운 토큰 만료시간:', this.exp);
+      try {
+        const expDate = Array.isArray(newExp)
+          ? new Date(newExp[0], newExp[1]-1, newExp[2], newExp[3], newExp[4], newExp[5])
+          : new Date(newExp);
+
+        if (!isNaN(expDate.getTime())) {
+          this.exp = expDate.toISOString();
+        } else {
+          throw new Error('Invalid date');
+        }
+      } catch (error) {
+        console.error('Error in setExp:', error);
+        this.exp = null;
+      }
     },
 
-    // 상태 초기화
     resetState() {
       this.isLoggedIn = false;
       this.adminName = '';
       this.adminTeam = '';
       this.adminCode = '';
-      this.exp = '';
+      this.exp = null;
     },
   },
 });

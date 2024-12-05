@@ -152,7 +152,7 @@
   
   const fetchRevenueData = async () => {
   try {
-    const response = await axios.get(`http://localhost:5000/payments`, {
+    const response = await axios.get(`https://learnsmate.shop/payments`, {
       params: {
         page: 0,
         size: 1

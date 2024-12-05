@@ -482,10 +482,9 @@ const getMappedLevel = (level) => {
 };
 
 const getMappedCategory = (category) => {
-  return categoryMapping[category] || '알 수 없음'; // 맵핑되지 않은 값은 '알 수 없음'으로 처리
+  return categoryMapping[category] || '알 수 없음';
 };
 
-// 토글 상태 관리
 const isCourseSectionVisible = ref(false);
 
 const toggleCourseSection = () => {
@@ -511,7 +510,7 @@ const statsFilter = ref({
 
 const fetchLectureList = async (filters = {}) => {
   try {
-    const response = await axios.get('http://localhost:5000/lecture/list', {
+    const response = await axios.get('https://learnsmate.shop/lecture/list', {
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -541,7 +540,7 @@ const handleSearch = async (filterData) => {
     isFiltered.value = true;
     lastFilterData.value = filterData;
     const response = await axios.post(
-      `http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`, camelToSnake(filterData));
+      `https://learnsmate.shop/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`, camelToSnake(filterData));
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -565,7 +564,7 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
 
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(`http://localhost:5000/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,camelToSnake(lastFilterData.value));
+    const response = await axios.post(`https://learnsmate.shop/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,camelToSnake(lastFilterData.value));
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -588,7 +587,7 @@ const handleExcelDownload = async () => {
   try {
     const config = {
       method: 'POST',
-      url: 'http://localhost:5000/lecture/excel/download',
+      url: 'https://learnsmate.shop/lecture/excel/download',
       responseType: 'blob',
       data: {
         selectedColumns: camelToSnake(selectedColumns.value),
@@ -663,7 +662,7 @@ const showLectureDetail = async (lecture) => {
     closeLectureDetail()
   } else {
     try {
-      const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`)
+      const response = await axios.get(`https://learnsmate.shop/lecture/${lecture.lecture_code}`)
       selectedLecture.value = response.data
       console.log(response.data);
       showSingleLecture()
@@ -824,7 +823,7 @@ const createStatsCharts = (data) => {
 const fetchLectureStats = async () => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
+      `https://learnsmate.shop/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
       camelToSnake(statsFilter.value)
     );
 

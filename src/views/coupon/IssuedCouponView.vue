@@ -153,7 +153,7 @@ const columns = ref({
 
 const fetchIssueCouponList = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/issue-coupon/all-issued-coupons2',
+    const response = await axios.get('https://learnsmate.shop/issue-coupon/all-issued-coupons2',
       {
         withCredentials: true,
         params: {
@@ -180,7 +180,7 @@ const applyFilters = async (filterData) => {
     lastFilterData.value = filterData;
 
     const response = await axios.post(
-      `http://localhost:5000/issue-coupon/filters2?page=0&size=${pageSize}`,
+      `https://learnsmate.shop/issue-coupon/filters2?page=0&size=${pageSize}`,
       camelToSnake(filterData)
     );
 
@@ -212,7 +212,7 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `http://localhost:5000/issue-coupon/filters2?page=${currentPage.value - 1}&size=${pageSize}`,
+        `https://learnsmate.shop/issue-coupon/filters2?page=${currentPage.value - 1}&size=${pageSize}`,
         camelToSnake(lastFilterData.value)
       );
 
@@ -230,7 +230,7 @@ const changePage = async (newPage) => {
 const handleExcelDownload = async () => {
   try {
     const response = await axios.post(
-      'http://localhost:5000/issue-coupon/excel/download',
+      'https://learnsmate.shop/issue-coupon/excel/download',
       {
         selectedColumns: selectedColumns.value, 
         ...(isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {})

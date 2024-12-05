@@ -1,5 +1,5 @@
 <template>
-  <header class="header-container">
+  <header class="header-container" v-if="!isLoading && isLoggedIn !== null && isLoggedIn">
     <nav class="nav-container">
       <div class="logo-section" @click="Main">
         <h1>LearnsMate</h1>
@@ -7,8 +7,8 @@
 
       <div class="menu-section">
         <ul class="menu-list">
-          <li 
-            v-for="menu in menus" 
+          <li
+            v-for="menu in menus"
             :key="menu.path"
             class="menu-item"
             :class="{ 'active': currentGroup === menu.group }"
@@ -18,7 +18,7 @@
           </li>
         </ul>
       </div>
-    
+
       <div class="icon-section">
         <div class="user-info2">
           <p class="logouttime">자동 로그아웃 시간 : </p>
@@ -26,16 +26,21 @@
             {{ remainingTime }}
           </span>
 
-          <!-- Vue 방식으로 수정 -->
-          <button class="extend-btn" @click="refreshToken">연장</button>
+          <button class="extend-btn" 
+                  @click.prevent="() => { 
+                    console.log('clicked'); 
+                    refreshToken(); 
+                  }">
+            연장
+          </button>
         </div>
         <div class="user-info">
-          [{{ loginState.adminTeam }}] 
-          <span class="highlight">{{ loginState.adminName }}</span> 님, 반갑습니다.
+          [{{ adminTeam }}]
+          <span class="highlight">{{ adminName }}</span> 님, 반갑습니다.
         </div>
         <img src="@/assets/icons/account.svg" alt="계정" class="icon">
         <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
-        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click="Logout">
+        <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click.stop="Logout">
         <img src="@/assets/icons/search.svg" alt="검색" class="icon">
         <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
@@ -48,160 +53,205 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { useLoginState } from '@/stores/loginState';
+import { startTimer, clearTimer } from '@/utils/timer';
 
-const loginState = useLoginState(); 
+const isLoading = ref(true);
+const loginState = useLoginState();
+const isLoggedIn = computed(() => loginState.isLoggedIn ?? false);
+const adminName = computed(() => loginState.adminName || '');
+const adminTeam = computed(() => loginState.adminTeam || '');
 const router = useRouter();
 const route = useRoute();
-const timer = ref(null);
+const expirationTime = computed(() => loginState.exp ? new Date(loginState.exp) : null);
+const remainingTime = ref('00:00:00');
 
 const menus = ref([
   { name: '메인', path: '/main', group: 'main' },
-  { name: '강의', path: '/lecture', group: 'lecture' , includePaths: ['/lecture','/payment']},
-  { 
-    name: '고객', 
-    path: '/student', 
+  { name: '강의', path: '/lecture', group: 'lecture', includePaths: ['/lecture', '/payment'] },
+  {
+    name: '고객',
+    path: '/student',
     group: 'member',
-    includePaths: ['/student', '/tutor']
+    includePaths: ['/student', '/tutor'],
   },
   { name: '마케팅', path: '/marketing', group: 'marketing' },
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
-// 만료 시간을 배열로 변환하는 함수
-function parseExpirationToArray(exp) {
-  const [date, time] = exp.split(' '); // 날짜와 시간을 분리
-  const [year, month, day] = date.split('-').map(Number); // 연, 월, 일을 숫자로 변환
-  const [hour, minute, second] = time.split(':').map(Number); // 시, 분, 초를 숫자로 변환
-  return [year, month, day, hour, minute, second]; // 배열 형식으로 반환
-}
-
-
-async function refreshToken() {
+const refreshToken = async () => {
   try {
-    // 서버의 토큰 갱신 API
+    const refreshToken = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('refreshToken='))
+      ?.split('=')[1];
+
+    console.log('Refresh token:', refreshToken);
+
+    if (!refreshToken) {
+      console.error('Refresh token is missing or not found in cookies.');
+      alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
+      return;
+    }
+    
+    clearTimer();
+    
     const response = await axios.post(
-      'http://localhost:5000/auth/refresh', // 서버의 토큰 갱신 API URL
-      {},
+      'https://learnsmate.shop/auth/refresh',
+      { refreshToken },
       {
-        withCredentials: true, // 쿠키를 자동으로 포함하여 요청
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
     );
+
+    const { accessToken, exp } = response.data;
+
+    console.log('Refresh response:', response.data);
     
-    console.log('뉴토큰 갱신 성공:', response.data);
-
-    // 서버 응답에서 새로운 만료 시간 가져오기
-    const newExp = response.data.exp; //2024-12-03 09:21:27 이렇게 뽑힘
-
-    if (newExp) {
-      // 새로운 만료 시간을 배열 형식으로 변환
-      const parsedExp = parseExpirationToArray(newExp);
-
-      // 새로운 만료 시간을 loginState에 설정
-      loginState.setExp(parsedExp);
-
-      // 타이머 갱신
-      startTimer();
-
-    } else {
-      console.warn('서버에서 만료 시간이 반환되지 않았습니다.');
+    if (accessToken && exp) {
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
+      document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
+      
+      loginState.setExp(exp);
+      const newExpirationTime = new Date(exp[0], exp[1] - 1, exp[2], exp[3], exp[4], exp[5]);
+      
+      console.log('New expiration time:', newExpirationTime);
+      
+      if (newExpirationTime && !isNaN(newExpirationTime.getTime())) {
+        startTimer(newExpirationTime, (remaining) => {
+          remainingTime.value = remaining;
+        });
+      } else {
+        console.error('Invalid expiration time:', exp);
+        remainingTime.value = '만료됨';
+      }
     }
-
-    // 이후 클라이언트에서 newAccessToken을 활용할 로직 추가
   } catch (error) {
-    console.error('토큰 갱신 실패:', error.response ? error.response.data : error.message);
-    if (error.response && error.response.status === 401) {
+    console.error('토큰 갱신 에러:', error);
+    if (error.response?.status === 401) {
+      clearTimer();
+      document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
+      document.cookie = 'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       alert('토큰 갱신 실패: 다시 로그인하세요.');
-      await Logout(); // 로그아웃 처리
+      loginState.resetState();
+      router.replace('/login');
     }
   }
-}
-
-
-// 남은 시간을 계산하는 함수
-const calculateRemainingTime = () => {
-  if (!loginState.exp || !Array.isArray(loginState.exp)) return '';
-  
-  const [year, month, day, hour, minute, second] = loginState.exp;
-  const expirationDate = new Date(year, month - 1, day, hour, minute, second);
-  const now = new Date();
-  
-  const diffInSeconds = Math.floor((expirationDate - now) / 1000);
-  
-  if (diffInSeconds <= 0) {
-    clearInterval(timer.value);
-    Logout(); 
-    return '만료됨';
-  }
-  
-  const hours = Math.floor(diffInSeconds / 3600);
-  const minutes = Math.floor((diffInSeconds % 3600) / 60);
-  const seconds = diffInSeconds % 60;
-  
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
 
-// 남은 시간을 표시할 ref
-const remainingTime = ref(calculateRemainingTime());
-
 const currentGroup = computed(() => {
-  const currentPath = route.path;
-  const matchedMenu = menus.value.find(menu => {
+  const currentPath = route.path || '';
+  const matchedMenu = menus.value.find((menu) => {
     if (menu.includePaths) {
-      return menu.includePaths.some(path => currentPath.startsWith(path));
+      return menu.includePaths.some((path) => currentPath.startsWith(path));
     }
     return currentPath.startsWith(menu.path);
   });
-  return matchedMenu ? matchedMenu.group : null;
+  return matchedMenu ? matchedMenu.group : 'defaultGroup';
 });
 
+let isLoggingOut = false;
 
-// 로그아웃 처리
 const Logout = async () => {
-  await loginState.logout();
-  alert('로그아웃되었습니다.');
-  router.push('/login');
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+
+  try {
+    const logoutSuccessful = await loginState.logout();
+    if (logoutSuccessful) {
+      alert('로그아웃 성공!');
+      router.replace('/login');
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    alert('로그아웃 중 문제가 발생했습니다.');
+  } finally {
+    isLoggingOut = false;
+  }
 };
 
 const navigateTo = (path) => {
   router.push(path);
 };
 
-const goToLearnsBuddy = (path) => {
+const goToLearnsBuddy = () => {
   router.push('/client-main');
 };
 
-const Main = (path) => {
+const Main = () => {
   router.push('/');
 };
 
-const startTimer = () => {
-  if (timer.value) clearInterval(timer.value);
-  remainingTime.value = calculateRemainingTime();
-  timer.value = setInterval(() => {
-    remainingTime.value = calculateRemainingTime();
-  }, 1000);
+watch(
+  () => loginState.isLoggedIn,
+  (newValue) => {
+    if (!newValue) {
+      router.push('/login');
+    }
+  },
+  { immediate: true }
+);
+
+const convertArrayToDate = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 5) {
+    console.error('Invalid date array:', dateArray);
+    return null;
+  }
+  const [year, month, day, hour, minute, second = 0] = dateArray;
+  return new Date(year, month - 1, day, hour, minute, second);
 };
 
-watch(() => loginState.exp, (newValue) => {
-  if (newValue) {
-    startTimer();
-  }
-}, { immediate: true });
 
 onMounted(async () => {
-  if (!loginState.isLoggedIn) {
-    await loginState.fetchLoginState(); 
+  const button = document.querySelector('.extend-btn');
+  button?.addEventListener('click', (e) => {
+    console.log('Button clicked');
+    e.preventDefault();
+  }); 
+
+  try {
+    await loginState.fetchLoginState();
+
+    console.log('Login state after fetch:', {
+      isLoggedIn: loginState.isLoggedIn,
+      exp: loginState.exp,
+    });
+
+    if (loginState.isLoggedIn && loginState.exp) {
+      let expirationTime;
+
+      if (Array.isArray(loginState.exp)) {
+        expirationTime = convertArrayToDate(loginState.exp);
+      } else {
+        expirationTime = new Date(loginState.exp);
+      }
+
+      if (!expirationTime || isNaN(expirationTime.getTime())) {
+        console.error('Invalid expirationTime:', loginState.exp);
+        remainingTime.value = '만료됨';
+        return;
+      }
+
+      console.log('Starting timer with expirationTime:', expirationTime);
+      startTimer(expirationTime, (remaining) => {
+        remainingTime.value = remaining;
+      });
+    } else {
+      remainingTime.value = '만료됨';
+    }
+  } catch (error) {
+    console.error('Failed to fetch login state:', error);
+    loginState.resetState();
+  } finally {
+    isLoading.value = false;
   }
-  startTimer();
 });
 
-// 컴포넌트가 언마운트될 때 타이머 정리
 onUnmounted(() => {
-  if (timer.value) {
-    clearInterval(timer.value);
-  }
+  remainingTime.value = '00:00:00';
 });
-
 </script>
 
   <style scoped>

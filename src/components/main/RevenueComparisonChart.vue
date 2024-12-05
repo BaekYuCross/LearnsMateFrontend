@@ -1,10 +1,11 @@
 <template>
   <div class="chart-container">
-    <canvas id="revenueComparisonChart"></canvas>
+    <canvas ref="revenueComparisonChart"></canvas>
   </div>
 </template>
 
 <script>
+import { onMounted, onBeforeUnmount } from 'vue';
 import Chart from 'chart.js/auto';
 
 export default {
@@ -15,14 +16,30 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      chartInstance: null,
+    };
+  },
+  watch: {
+    revenueData: {
+      handler() {
+        this.updateChart();
+      },
+      deep: true,
+    },
+  },
   mounted() {
     this.createChart();
   },
+  beforeUnmount() {
+    this.destroyChart();
+  },
   methods: {
     createChart() {
-      const ctx = document.getElementById('revenueComparisonChart').getContext('2d');
+      const ctx = this.$refs.revenueComparisonChart.getContext('2d');
+      if (!ctx || !this.revenueData.length) return;
 
-      // 데이터 가공
       const labels = [...new Set(this.revenueData.map(item => `${item.month}월`))];
       const currentYearData = this.revenueData
         .filter(item => item.year === new Date().getFullYear())
@@ -31,18 +48,18 @@ export default {
         .filter(item => item.year === new Date().getFullYear() - 1)
         .map(item => item.revenue);
 
-      new Chart(ctx, {
+      this.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels, // x축: 월
+          labels,
           datasets: [
             {
-              label: `${new Date().getFullYear() - 1}년`, // 전년도
+              label: `${new Date().getFullYear() - 1}년`,
               data: previousYearData,
-              backgroundColor: '#BCF2E3', 
+              backgroundColor: '#BCF2E3',
             },
             {
-              label: `${new Date().getFullYear()}년`, // 올해
+              label: `${new Date().getFullYear()}년`,
               data: currentYearData,
               backgroundColor: '#029688',
             },
@@ -55,25 +72,34 @@ export default {
             legend: { display: true, position: 'top' },
           },
           scales: {
-            x: { stacked: false,
-                  barPercentage: 0.3, // 막대 너비 설정 (0~1, 1이 최대 너비)
-                  categoryPercentage: 0.6, 
-                  grid: {
-              display: false, // x축 격자 무늬 제거
-              },
-              },
+            x: {
+              stacked: false,
+              barPercentage: 0.3,
+              categoryPercentage: 0.6,
+              grid: { display: false },
+            },
             y: {
               beginAtZero: true,
               ticks: {
-                callback: value => `${value.toLocaleString()} 원`, // 숫자 콤마 표시
+                callback: value => `${value.toLocaleString()} 원`,
               },
-              grid: {
-              display: false, // x축 격자 무늬 제거
-              },
+              grid: { display: false },
             },
           },
         },
       });
+    },
+    updateChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+      this.createChart();
+    },
+    destroyChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+        this.chartInstance = null;
+      }
     },
   },
 };

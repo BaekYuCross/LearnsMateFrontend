@@ -309,7 +309,7 @@ const isLoading = ref(false);
 
 const fetchVOCList = async (filters = {}) => {
   try {
-    const response = await axios.get('http://localhost:5000/voc/list',
+    const response = await axios.get('https://learnsmate.shop/voc/list',
       {
         params: {
           ...filters,
@@ -358,17 +358,25 @@ const handleSearch = async (filterData) => {
     isFiltered.value = true;
     currentPage.value = 1;
 
+    const convertToISODate = (date) => {
+      if (!date) return null;
+      const parsedDate = new Date(date);
+      return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
+    };
+
     const processedData = {
       ...filterData,
+      startCreateDate: convertToISODate(filterData.startCreateDate),
+      endCreateDate: convertToISODate(filterData.endCreateDate),
+      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null,
       vocAnswerStatus: filterData.vocAnswerStatus === "true" ? true :
                       filterData.vocAnswerStatus === "false" ? false : null,
-      vocCategoryCode: filterData.vocCategoryCode ? parseInt(filterData.vocCategoryCode) : null,
     };
 
     lastFilterData.value = processedData;
 
     const response = await axios.post(
-      `http://localhost:5000/voc/filter?page=0&size=${pageSize}`,
+      `https://learnsmate.shop/voc/filter?page=0&size=${pageSize}`,
       camelToSnake(processedData)
     );
 
@@ -401,7 +409,7 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `http://localhost:5000/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
+        `https://learnsmate.shop/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
         camelToSnake(lastFilterData.value)
       );
 
@@ -419,7 +427,7 @@ const changePage = async (newPage) => {
 const handleExcelDownload = async () => {
   try {
     const response = await axios.post(
-      'http://localhost:5000/voc/excel/download',
+      'https://learnsmate.shop/voc/excel/download',
       isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
       {
         responseType: 'blob',
@@ -490,7 +498,7 @@ const showVOCDetail = async (voc) => {
     cancelEditing();
   }
     try {
-      const response = await axios.get(`http://localhost:5000/voc/${voc.voc_code}`);
+      const response = await axios.get(`https://learnsmate.shop/voc/${voc.voc_code}`);
       selectedVOC.value = response.data;
       showSingleVoc();
       console.log('Selected VOC:', selectedVOC.value);
@@ -545,14 +553,14 @@ const confirmAction = () => {
 const submitRegisterAnswer = async () => {
   try {
     const response = await axios.post(
-      `http://localhost:5000/voc-answer/register`,
+      `https://learnsmate.shop/voc-answer/register`,
       {
         voc_answer_content: editAnswerContent.value,
         admin_code: loginState.adminCode,
         voc_code: selectedVOC.value.voc_code,
       }
     );
-    const vocResponse = await axios.get(`http://localhost:5000/voc/${selectedVOC.value.voc_code}`);
+    const vocResponse = await axios.get(`https://learnsmate.shop/voc/${selectedVOC.value.voc_code}`);
     const updatedVOC = vocResponse.data;
     selectedVOC.value = updatedVOC;
     const vocIndex = vocList.value.findIndex(voc => voc.voc_code === updatedVOC.voc_code);
@@ -574,7 +582,7 @@ const submitEditAnswer = async () => {
   try {
     const vocAnswerCode = selectedVOC.value.voc_answer_code;
     const response = await axios.patch(
-      `http://localhost:5000/voc-answer/edit/${vocAnswerCode}`,
+      `https://learnsmate.shop/voc-answer/edit/${vocAnswerCode}`,
       { voc_answer_content: editAnswerContent.value }
     );
     selectedVOC.value.voc_answer_content = editAnswerContent.value;
@@ -593,7 +601,7 @@ const openAiModal = async () => {
   document.body.style.overflow = 'hidden';
 
   try {
-    const response = await axios.get('http://localhost:5000/voc/ai/current-week');
+    const response = await axios.get('https://learnsmate.shop/voc/ai/current-week');
     aiData.value = response.data || [];
   } catch (error) {
     console.error('AI 요약 데이터 로드 실패:', error);

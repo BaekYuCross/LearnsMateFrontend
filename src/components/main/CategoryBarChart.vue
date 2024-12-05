@@ -1,13 +1,14 @@
 <template>
-    <div class="chart-container">
-      <canvas id="categoryBarChart"></canvas>
-    </div>
-  </template>
-  
-  <script>
-  import Chart from 'chart.js/auto';
-  
-  export default {
+  <div class="chart-container">
+    <canvas ref="categoryBarChart"></canvas>
+  </div>
+</template>
+
+<script>
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import Chart from 'chart.js/auto';
+
+export default {
   name: "CategoryBarChart",
   props: {
     categories: {
@@ -15,15 +16,33 @@
       required: true,
     },
   },
+  data() {
+    return {
+      chartInstance: null,
+    };
+  },
+  watch: {
+    categories: {
+      handler() {
+        this.updateChart();
+      },
+      deep: true,
+    },
+  },
   mounted() {
     this.createChart();
   },
+  beforeUnmount() {
+    this.destroyChart();
+  },
   methods: {
     createChart() {
-      const ctx = document.getElementById('categoryBarChart').getContext('2d');
-      const topCategories = this.categories.slice(0, 3); // 상위 3개만 가져오기
+      const ctx = this.$refs.categoryBarChart.getContext('2d');
+      if (!ctx || !this.categories.length) return;
 
-      new Chart(ctx, {
+      const topCategories = this.categories.slice(0, 3);
+
+      this.chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: topCategories.map((category) => category.name),
@@ -37,42 +56,47 @@
           ],
         },
         options: {
-          indexAxis: 'y', // 가로 막대형 차트로 변경
+          indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false, // 범례 숨기기
+              display: false,
             },
           },
           scales: {
             x: {
               beginAtZero: true,
               ticks: { stepSize: 5 },
-              grid: {
-                display: false, // x축 격자 무늬 제거
-                },
+              grid: { display: false },
             },
             y: {
               ticks: { font: { size: 12 } },
-              grid: {
-                display: false, // x축 격자 무늬 제거
-                },
+              grid: { display: false },
             },
           },
         },
       });
     },
+    updateChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+      }
+      this.createChart();
+    },
+    destroyChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy();
+        this.chartInstance = null;
+      }
+    },
   },
 };
+</script>
 
-  
-  </script>
-  
-  <style scoped>
-  .chart-container {
-    max-width: 400px;
-    margin: auto;
-  }
-  </style>
-  
+<style scoped>
+.chart-container {
+  max-width: 400px;
+  margin: auto;
+}
+</style>
