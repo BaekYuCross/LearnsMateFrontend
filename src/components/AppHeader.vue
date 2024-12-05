@@ -72,9 +72,11 @@ const menus = ref([
   { name: 'VOC', path: '/voc', group: 'voc' },
 ]);
 
-// Frontend (AppHeader.vue)
 const refreshToken = async () => {
+  console.log('Refresh token function started');
   try {
+    console.log('All cookies:', document.cookie);
+
     const refreshToken = document.cookie
       .split('; ')
       .find((row) => row.startsWith('refreshToken='))
@@ -103,6 +105,8 @@ const refreshToken = async () => {
       hasAccessToken: !!accessToken,
       expiration: exp
     });
+
+    console.log('Response received:', response);
 
     if (accessToken && exp) {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
