@@ -1,18 +1,25 @@
 export const startTimer = (expirationTime, callback) => {
-    const timer = setInterval(() => {
-      const remaining = calculateRemainingTime(expirationTime);
-      if (remaining === '만료됨') {
-        clearInterval(timer);
-        callback();
-      }
+  if (!expirationTime || isNaN(expirationTime.getTime())) {
+    console.error('Invalid expirationTime passed to startTimer:', expirationTime);
+    callback('만료됨');
+    return;
+  }
+
+  const timer = setInterval(() => {
+    const remaining = calculateRemainingTime(expirationTime);
+    if (remaining === '만료됨') {
+      clearInterval(timer);
       callback(remaining);
-    }, 1000);
-  
-    return timer;
-  };
+    } else {
+      callback(remaining);
+    }
+  }, 1000);
+
+  return timer;
+};
   
   export const calculateRemainingTime = (expirationDate) => {
-    if (!expirationDate || !(expirationDate instanceof Date)) {
+    if (!expirationDate || isNaN(expirationDate.getTime())) {
       console.warn('Invalid expiration date:', expirationDate);
       return '만료됨';
     }

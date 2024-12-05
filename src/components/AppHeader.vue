@@ -161,12 +161,23 @@ onMounted(async () => {
       isLoggedIn: loginState.isLoggedIn,
       exp: loginState.exp,
     });
+
     if (loginState.isLoggedIn && loginState.exp) {
       const expirationTime = new Date(loginState.exp);
+
+      // expirationTime 유효성 검증
+      if (isNaN(expirationTime.getTime())) {
+        console.error('Invalid expirationTime:', loginState.exp);
+        remainingTime.value = '만료됨';
+        return;
+      }
+
+      console.log('Starting timer with expirationTime:', expirationTime);
       startTimer(expirationTime, (remaining) => {
         remainingTime.value = remaining;
       });
     } else {
+      console.warn('Login state is invalid or exp is missing');
       remainingTime.value = '만료됨';
     }
   } catch (error) {
