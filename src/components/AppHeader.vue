@@ -108,11 +108,8 @@ const refreshToken = async () => {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
       loginState.setExp(exp);
       
-      remainingTime.value = '00:00:00';
       const newExpirationTime = Array.isArray(exp) ? convertArrayToDate(exp) : new Date(exp);
-      startTimer(newExpirationTime, (remaining) => {
-        remainingTime.value = remaining;
-      });
+      resetTimer(newExpirationTime);
     }
   } catch (error) {
     console.error('토큰 갱신 상세 에러:', {
