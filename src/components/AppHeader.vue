@@ -84,15 +84,35 @@ const refreshToken = async () => {
       return;
     }
 
-    const response = await axios.post('/auth/refresh', { refreshToken }, { withCredentials: true });
+    console.log('Refreshing token...');
+    const response = await axios.post('/auth/refresh', 
+      { refreshToken }, 
+      { 
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log('Refresh response:', response.data);
 
     const { accessToken, exp } = response.data;
     if (accessToken && exp) {
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
-      loginState.setExp(exp); // 스토어에 만료 시간 업데이트
+      loginState.setExp(exp);
+      console.log('Token refreshed, new expiration:', exp);
+      
+      const newExpirationTime = Array.isArray(exp) 
+        ? convertArrayToDate(exp)
+        : new Date(exp);
+        
+      startTimer(newExpirationTime, (remaining) => {
+        remainingTime.value = remaining;
+      });
     }
   } catch (error) {
-    console.error('토큰 갱신 실패:', error.response?.data || error.message);
+    console.error('토큰 갱신 실패:', error);
     if (error.response?.status === 401) {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
