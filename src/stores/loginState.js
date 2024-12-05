@@ -92,10 +92,22 @@ export const useLoginState = defineStore('loginState', {
     },
 
     setExp(newExp) {
-      const expirationDate = new Date(newExp);
-      const kstDate = new Date(expirationDate.getTime() + 9 * 60 * 60 * 1000);
-      this.exp = kstDate.toISOString();
-      console.log('Updated token expiration time (KST):', this.exp);
+      try {
+        const expirationDate = new Date(newExp);
+    
+        if (isNaN(expirationDate.getTime())) {
+          console.error('Invalid expiration date:', newExp);
+          this.exp = null;
+          return;
+        }
+    
+        const kstDate = new Date(expirationDate.getTime() + 9 * 60 * 60 * 1000);
+        this.exp = kstDate.toISOString();
+        console.log('Updated token expiration time (KST):', this.exp);
+      } catch (error) {
+        console.error('Error in setExp:', error);
+        this.exp = null;
+      }
     },
 
     resetState() {

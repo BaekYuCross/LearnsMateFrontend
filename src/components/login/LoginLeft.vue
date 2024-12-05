@@ -56,8 +56,11 @@ const loginUser = async () => {
       document.cookie = `refreshToken=${refreshToken}; Path=/; Secure; SameSite=None;`;
     }
 
-    if (exp) {
+    if (exp && !isNaN(new Date(exp).getTime())) {
       loginState.setExp(exp);
+    } else {
+      console.error('Invalid expiration time from server:', exp);
+      alert('서버에서 잘못된 만료 시간이 전달되었습니다.');
     }
 
     loginState.updateLoginState({
