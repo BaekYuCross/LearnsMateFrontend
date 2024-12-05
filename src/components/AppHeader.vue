@@ -210,18 +210,6 @@ const Main = () => {
   router.push('/');
 };
 
-const startTimer = () => {
-  if (!exp.value || !Array.isArray(exp.value) || exp.value.length !== 6) {
-    console.warn('Timer not started due to invalid expiration:', exp.value);
-    return;
-  }
-  if (timer.value) clearInterval(timer.value);
-  remainingTime.value = calculateRemainingTime();
-  timer.value = setInterval(() => {
-    remainingTime.value = calculateRemainingTime();
-  }, 1000);
-};
-
 watch(
   () => loginState.isLoggedIn,
   (newValue) => {
