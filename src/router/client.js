@@ -110,8 +110,7 @@ const ClientRouter = [
         meta: { isClientPage: true }
     },
 ];
-
-const setupClientRouter = (router) => {
+export const setupClientGuard = (router) => {
     router.beforeEach(async (to, from, next) => {
         if (to.meta.isClientPage) {
             const isValid = await checkLoginAndTime();
@@ -122,8 +121,6 @@ const setupClientRouter = (router) => {
         }
         next();
     });
-    
-    return ClientRouter;
 };
 
-export { setupClientRouter };
+export default ClientRouter;
