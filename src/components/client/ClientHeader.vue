@@ -42,7 +42,7 @@ const handleLogout = async () => {
     }
 
     // 로그아웃 요청
-    await axios.post('https://learnsmate.shop/client/logout', {
+    await axios.post('https://learnsmate.shop/client/exit', {
       loginHistoryCode: clientInfo.loginHistoryCode,
     });
 

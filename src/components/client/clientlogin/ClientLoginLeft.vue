@@ -75,7 +75,7 @@ const handleLogin = async () => {
       return;
     }
 
-    const response = await axios.post('https://learnsmate.shop/client/login', {
+    const response = await axios.post('https://learnsmate.shop/client/enter', {
       member_email: userId.value,
       member_password: password.value
     }, {
