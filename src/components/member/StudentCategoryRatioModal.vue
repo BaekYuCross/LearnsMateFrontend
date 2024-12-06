@@ -64,7 +64,7 @@
   
   <script setup>
   import { ref, onMounted, defineProps, defineEmits, watch } from 'vue';
-  import axios from '@/plugins/axios';
+  import axios from 'axios';
   import Chart from 'chart.js/auto';
   const props = defineProps({
     isOpen: {
