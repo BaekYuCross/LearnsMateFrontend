@@ -3,7 +3,7 @@ import LectureRouter from './lecture';
 import MemberRouter from './member';
 import LoginRouter from './login';
 import MarketingRouter from './marketing';
-import ClientRouter from './client';
+import { setupClientRouter } from './client';
 import VOCRouter from './voc';
 import { useLoginState } from '@/stores/loginState';
 
@@ -16,7 +16,7 @@ const routes = [
   ...MemberRouter,
   ...LoginRouter,
   ...MarketingRouter,
-  ...ClientRouter,
+  ...setupClientRouter(router),
   ...LectureRouter,
   ...VOCRouter,
   {
