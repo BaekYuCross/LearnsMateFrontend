@@ -77,7 +77,7 @@ const handleSubmit = async() => {
       // vocAnswerStatus: false,  
       // vocAnswerSatisfaction: null,
       // createdAt: new Date(), 
-      member_code: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
+      member_code: JSON.parse(localStorage.getItem('clientInfo')).member_code,
     }, {
       withCredentials: true
     });
