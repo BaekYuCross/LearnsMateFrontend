@@ -72,12 +72,12 @@ const handleSubmit = async() => {
   // console.log(JSON.parse(localStorage.getItem('clientInfo')).memberCode);
 
   const response = await axios.post('https://learnsmate.shop/voc', {
-      vocContent: inquiryContent.value,
-      vocCategoryCode: categoryCodeMap[selectedCategory.value],
+      voc_content: inquiryContent.value,
+      voc_category_code: categoryCodeMap[selectedCategory.value],
       // vocAnswerStatus: false,  
       // vocAnswerSatisfaction: null,
       // createdAt: new Date(), 
-      memberCode: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
+      member_code: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
     }, {
       withCredentials: true
     });

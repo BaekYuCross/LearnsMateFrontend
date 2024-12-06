@@ -29,7 +29,7 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
-import axios from '@/plugins/axios';
+import axios from 'axios';
 
 const router = useRouter();
 
@@ -41,9 +41,11 @@ const handleLogout = async () => {
       return;
     }
 
+    console.log(clientInfo);
+
     // 로그아웃 요청
     await axios.post('https://learnsmate.shop/client/exit', {
-      loginHistoryCode: clientInfo.loginHistoryCode,
+      login_history_code: clientInfo.loginHistoryCode,
     });
 
     // localStorage 클리어
