@@ -45,7 +45,7 @@ const handleLogout = async () => {
 
     // 로그아웃 요청
     await axios.post('https://learnsmate.shop/client/exit', {
-      login_history_code: clientInfo.loginHistoryCode,
+      login_history_code: clientInfo.login_history_code,
     });
 
     // localStorage 클리어
