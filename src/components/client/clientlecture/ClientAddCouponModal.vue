@@ -58,8 +58,8 @@ const fetchLectures = async () => {
     const response = await axios.get(`https://learnsmate.shop/lecture/client/${tutorCode}`);
     
     lectures.value = response.data.map(lecture => ({
-      code: lecture.lecture_code,
-      title: lecture.lecture_title
+      lecture_code: lecture.lecture_code,
+      lecture_title: lecture.lecture_title
     }));
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
