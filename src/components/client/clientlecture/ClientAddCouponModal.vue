@@ -8,7 +8,7 @@
         강의 <span class="clientaddcoupon-modal-label-note">(프로모션에 동의한 강의만 선택 가능합니다.)</span>
         <select v-model="newCoupon.lecture" class="clientaddcoupon-modal-input">
           <option value="" disabled>강의를 선택해주세요</option>
-          <option v-for="lecture in lectures" :key="lecture.code" :value="lecture.code">{{ lecture.title }}</option>
+          <option v-for="lecture in lectures" :key="lecture.lecture_code" :value="lecture.lecture_code">{{ lecture.lecture_title }}</option>
         </select>
       </label>
 
