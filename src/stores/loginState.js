@@ -21,7 +21,7 @@ export const useLoginState = defineStore('loginState', {
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/admin/status', {
+        const response = await axios.get('https://learnsmate.shop/admin/status', {
           withCredentials: true,
         });
         if (response.data && response.data.code) {
@@ -71,7 +71,7 @@ export const useLoginState = defineStore('loginState', {
         }
     
         const response = await axios.post(
-          'http://localhost:5000/auth/logout',
+          'https://learnsmate.shop/auth/logout',
           { refreshToken },
           { withCredentials: false }
         );

@@ -140,7 +140,7 @@ const displayedPages = computed(() => {
 // fetchCoupons 함수 수정
 const fetchCoupons = async () => {
   try {
-    const response = await axios.get('http://localhost:5000/coupon/coupons2',
+    const response = await axios.get('https://learnsmate.shop/coupon/coupons2',
       {
         withCredentials: true,
         params: {
@@ -210,7 +210,7 @@ const applyFilters = async (filters, resetPage = true) => {
       currentPage.value = 1;
     }
 
-    const response = await axios.post('http://localhost:5000/coupon/filters2', filters,
+    const response = await axios.post('https://learnsmate.shop/coupon/filters2', filters,
       {
         withCredentials: true,
         headers: {
@@ -318,7 +318,7 @@ const handleExcelDownload = async () => {
     const config = {
       method: 'POST',
       withCredentials: true,
-      url: 'http://localhost:5000/coupon/excel/download',
+      url: 'https://learnsmate.shop/coupon/excel/download',
       responseType: 'blob',
       data: filterData,
       headers: {

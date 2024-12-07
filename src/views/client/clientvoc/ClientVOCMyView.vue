@@ -146,7 +146,7 @@ const sendFeedback = async (vocCode, status) => {
     };
 
     await axios.post(
-      `http://localhost:5000/voc/client/${vocCode}/feedback`,
+      `https://learnsmate.shop/voc/client/${vocCode}/feedback`,
       null, // body는 null
       {
         params: {  // params로 전송

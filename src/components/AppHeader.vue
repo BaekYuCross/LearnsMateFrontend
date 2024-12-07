@@ -96,7 +96,7 @@ const refreshToken = async () => {
     clearTimer();
     
     const response = await axios.post(
-      'http://localhost:5000/auth/refresh',
+      'https://learnsmate.shop/auth/refresh',
       { refreshToken },
       {
         withCredentials: true,

@@ -133,7 +133,7 @@ const saveCoupon = async () => {
       lecture_code: newCoupon.value.lecture
     };
 
-    const response = await axios.post('http://localhost:5000/coupon/tutor/register', requestData, {
+    const response = await axios.post('https://learnsmate.shop/coupon/tutor/register', requestData, {
       withCredentials: true
     });
 

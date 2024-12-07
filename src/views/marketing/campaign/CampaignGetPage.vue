@@ -341,7 +341,7 @@ const isPastSendDate = computed(() => {
 const fetchTemplate = async () => {
   const campaignCode = route.query.campaignCode;
   try {
-    const response = await axios.get(`http://localhost:5000/campaign/${campaignCode}`, {
+    const response = await axios.get(`https://learnsmate.shop/campaign/${campaignCode}`, {
       params: {
         page: currentPage.value - 1,
         size: pageSize.value,
@@ -438,7 +438,7 @@ const saveChanges = async () => {
     updated_at: new Date().toISOString(),
   };
   try {
-    await axios.patch('http://localhost:5000/campaign/edit', payload, {
+    await axios.patch('https://learnsmate.shop/campaign/edit', payload, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
@@ -561,7 +561,7 @@ const backCampaign = () => {
 const cancelCampaign = async () => {
   const campaignCode = route.query.campaignCode;
   try {
-    await axios.delete(`http://localhost:5000/campaign/delete/${campaignCode}`, {
+    await axios.delete(`https://learnsmate.shop/campaign/delete/${campaignCode}`, {
       withCredentials: true,
     });
     window.location.href = '/marketing';

@@ -87,7 +87,7 @@ const sendAuthCode = async () => {
   }
 
   try {
-    const response = await axios.post('http://localhost:5000/admin/verification-email/password', {
+    const response = await axios.post('https://learnsmate.shop/admin/verification-email/password', {
       email: email.value,
       adminCode: adminCode.value, 
     });
@@ -106,7 +106,7 @@ const handleSubmit = async () => {
   if (!isAuthVerified.value) {
     // 인증번호 검증 단계
     try {
-      await axios.post('http://localhost:5000/admin/verification-email/confirmation', {
+      await axios.post('https://learnsmate.shop/admin/verification-email/confirmation', {
         email: email.value,
         code: authCodeInput.value,
         adminCode: adminCode.value,
@@ -129,7 +129,7 @@ const handleSubmit = async () => {
     try {
       console.log("Email Before Submit:", email.value);
       console.log("New Password Before Submit:", newPassword.value);
-      await axios.post('http://localhost:5000/admin/password', {
+      await axios.post('https://learnsmate.shop/admin/password', {
         adminEmail: email.value,
         adminPassword: newPassword.value,
       });
