@@ -180,7 +180,7 @@ const getSatisfactionEmoji = (satisfaction) => {
 // VOC 목록 조회
 const fetchUserVOCs = async () => {
   try {
-    const memberCode = JSON.parse(localStorage.getItem('clientInfo')).memberCode;
+    const memberCode = JSON.parse(localStorage.getItem('clientInfo')).member_code;
     const response = await axios.get(`https://learnsmate.shop/voc/client/list/${memberCode}`, {
       withCredentials: true
     });
