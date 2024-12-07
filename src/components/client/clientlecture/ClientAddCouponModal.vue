@@ -208,11 +208,14 @@ const saveCoupon = async () => {
   margin-top: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 14px;
   font-weight: 500;
   box-sizing: border-box;
   background-color: #f9f9f9;
   transition: all 0.3s ease;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .clientaddcoupon-modal-input:hover {
@@ -225,6 +228,13 @@ const saveCoupon = async () => {
   border-color: #5651d6;
   box-shadow: 0 0 4px rgba(118, 113, 244, 0.5);
   background-color: #ffffff;
+}
+
+.clientaddcoupon-modal-input option {
+  font-size: 13px;
+  padding: 5px;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .clientaddcoupon-modal-date-inputs {
