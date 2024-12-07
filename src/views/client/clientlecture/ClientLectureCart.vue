@@ -110,7 +110,6 @@
   </template>
   <script setup>
   import ClientHeader from "@/components/client/ClientHeader.vue";
-  import NotCouponModal from "@/components/client/clientlecture/ClientNotCouponModal.vue";
   import CouponModal from "@/components/client/clientlecture/ClientCouponModal.vue";
   import PayModal from "@/components/client/clientpaylecture/ClientPayModal1.vue";
   import PaySuccessModal from "@/components/client/clientpaylecture/ClientPayFinishModal.vue";

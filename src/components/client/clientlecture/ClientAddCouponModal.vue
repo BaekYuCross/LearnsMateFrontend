@@ -54,12 +54,12 @@ const newCoupon = ref({
 
 const fetchLectures = async () => {
   try {
-    const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).memberCode;
+    const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).member_code;
     const response = await axios.get(`https://learnsmate.shop/lecture/client/${tutorCode}`);
     
     lectures.value = response.data.map(lecture => ({
-      code: lecture.lectureCode,
-      title: lecture.lectureTitle
+      code: lecture.lecture_code,
+      title: lecture.lecture_title
     }));
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
@@ -124,7 +124,7 @@ const saveCoupon = async () => {
       coupon_name: selectedLecture.title,
       coupon_discount_rate: discountRate,
       coupon_expire_date: expiryDate,
-      tutor_code: JSON.parse(localStorage.getItem("clientInfo")).memberCode,
+      tutor_code: JSON.parse(localStorage.getItem("clientInfo")).member_code,
       coupon_category_code: 1,
       lecture_code: newCoupon.value.lecture
     };
