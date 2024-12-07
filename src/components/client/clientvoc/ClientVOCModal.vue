@@ -13,9 +13,9 @@
         <select v-model="selectedCategory" class="clientvocmodal-select">
           <option value="" disabled>카테고리 선택</option>
           <option>결제 및 환불</option>
-          <option>강의 자료 요청</option>
-          <option>강사 피드백</option>
-          <option>기술적 문제</option>
+          <option>계정 및 로그인</option>
+          <option>프로모션 및 쿠폰</option>
+          <option>시스템 기술적 문제</option>
           <option>기타 건의사항</option>
         </select>
 
