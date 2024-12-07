@@ -70,37 +70,48 @@ const password = ref(""); // 사용자 비밀번호 입력값
 // 로그인 버튼 처리
 const handleLogin = async () => {
   try {
-    const response = await axios.post('https://learnsmate.shop/client/login', {
-      memberEmail: userId.value,
-      memberPassword: password.value
+    if (!userId.value || !password.value) {
+      alert('이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    const response = await axios.post('https://learnsmate.shop/client/enter', {
+      member_email: userId.value,
+      member_password: password.value
     }, {
+      withCredentials: true,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       }
     });
 
-    console.log('Login response:', response.data);
+    console.log('Login response:', response);
 
-    const loginData = {
-      ...response.data,
-      loginTime: new Date().toISOString()
-    };
+    if (response.data) {
+      const loginData = {
+        ...response.data,
+        loginTime: new Date().toISOString()
+      };
 
-    localStorage.setItem('clientInfo', JSON.stringify(loginData));
-    localStorage.setItem('isAuthenticated', 'true');
-    
-    router.push("/client-main");
+      localStorage.setItem('clientInfo', JSON.stringify(loginData));
+      localStorage.setItem('isAuthenticated', 'true');
+      
+      router.push("/client-main");
+    } else {
+      alert('로그인 응답 데이터가 올바르지 않습니다.');
+    }
   } catch (error) {
-    console.error('로그인 실패:', error);
+    console.error('로그인 실패 상세 정보:', error);
     if (error.response) {
-      // 서버에서 에러 응답이 온 경우
-      alert(error.response.data.message || '로그인에 실패했습니다.');
+      alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+    } else if (error.request) {
+      console.log('요청 에러:', error.request);
+      alert('서버에 연결할 수 없습니다.');
     } else {
       alert('로그인 처리 중 오류가 발생했습니다.');
     }
   }
 };
-
 
 // 카카오 로그인 처리
 const handleKakaoLogin = () => {

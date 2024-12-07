@@ -3,7 +3,7 @@ import LectureRouter from './lecture';
 import MemberRouter from './member';
 import LoginRouter from './login';
 import MarketingRouter from './marketing';
-import ClientRouter from './client';
+import ClientRouter, { setupClientGuard } from './client';
 import VOCRouter from './voc';
 import { useLoginState } from '@/stores/loginState';
 
@@ -34,6 +34,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
+
+setupClientGuard(router);
 
 const authRequiredRoutes = ['/main', '/lecture', '/marketing', '/voc', '/member'];
 
