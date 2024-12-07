@@ -16,7 +16,6 @@ export const useLoginState = defineStore('loginState', {
       const excludePaths = ['/login', '/client-login'];
 
       if (excludePaths.includes(currentPath)) {
-        console.log(`인증 상태 확인을 생략합니다: ${currentPath}`);
         return;
       }
 
