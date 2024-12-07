@@ -122,7 +122,7 @@
 
   const fetchCampaigns = async () => {
     try {
-      const response = await axios.get('https://learnsmate.shop/campaign/campaigns', {
+      const response = await axios.get('http://localhost:5000/campaign/campaigns', {
         method: 'GET',
         withCredentials: true,
         params: {
@@ -193,7 +193,7 @@
     try {
       console.log("filter data:", preparedFilters);
       const response = await axios.post(
-        'https://learnsmate.shop/campaign/filter',
+        'http://localhost:5000/campaign/filter',
         camelToSnake(preparedFilters),
         {
           withCredentials: true,
@@ -259,7 +259,7 @@ const handleExcelDownload = async() => {
     const config = {
       method: 'POST',
       withCredentials: true,
-      url: 'https://learnsmate.shop/campaign/excel/download/campaigns',
+      url: 'http://localhost:5000/campaign/excel/download/campaigns',
       responseType: 'blob',
       data: {
         selectedColumns: camelToSnake(selectedColumns.value),

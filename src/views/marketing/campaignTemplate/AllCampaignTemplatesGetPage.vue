@@ -116,7 +116,7 @@
   
   const fetchCampaignTemplates = async () => {
     try {
-      const response = await axios.get('https://learnsmate.shop/campaign-template/list',{
+      const response = await axios.get('http://localhost:5000/campaign-template/list',{
       method: 'GET',
       withCredentials: true,
     });
@@ -179,7 +179,7 @@
       const config = {
         method: 'POST',
         withCredentials: true,
-        url: 'https://learnsmate.shop/campaign-template/excel/download/campaign-templates',
+        url: 'http://localhost:5000/campaign-template/excel/download/campaign-templates',
         responseType: 'blob',
         data: {
           selectedColumns: camelToSnake(selectedColumns.value),
@@ -242,7 +242,7 @@
     try {
       console.log("filters data: ",preparedFilters);
       const response = await axios.post(
-        'https://learnsmate.shop/campaign-template/filter',
+        'http://localhost:5000/campaign-template/filter',
         camelToSnake(preparedFilters),
         {
           withCredentials: true,

@@ -85,7 +85,7 @@ export default {
       this.selectedDate = selectedDate;
 
       try {
-        const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
+        const response = await axios.get("http://localhost:5000/voc/ai/by-date", {
           params: { date: selectedDate },
         });
 

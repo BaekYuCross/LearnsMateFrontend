@@ -55,7 +55,7 @@ const newCoupon = ref({
 const fetchLectures = async () => {
   try {
     const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).memberCode;
-    const response = await axios.get(`https://learnsmate.shop/lecture/client/${tutorCode}`);
+    const response = await axios.get(`http://localhost:5000/lecture/client/${tutorCode}`);
     
     lectures.value = response.data.map(lecture => ({
       code: lecture.lectureCode,
@@ -129,7 +129,7 @@ const saveCoupon = async () => {
       lecture_code: newCoupon.value.lecture
     };
 
-    const response = await axios.post('https://learnsmate.shop/coupon/tutor/register', requestData, {
+    const response = await axios.post('http://localhost:5000/coupon/tutor/register', requestData, {
       withCredentials: true
     });
 

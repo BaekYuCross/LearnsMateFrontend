@@ -146,7 +146,7 @@ const sendFeedback = async (vocCode, status) => {
     };
 
     await axios.post(
-      `https://learnsmate.shop/voc/client/${vocCode}/feedback`,
+      `http://localhost:5000/voc/client/${vocCode}/feedback`,
       null, // body는 null
       {
         params: {  // params로 전송
@@ -181,7 +181,7 @@ const getSatisfactionEmoji = (satisfaction) => {
 const fetchUserVOCs = async () => {
   try {
     const memberCode = JSON.parse(localStorage.getItem('clientInfo')).memberCode;
-    const response = await axios.get(`https://learnsmate.shop/voc/client/list/${memberCode}`, {
+    const response = await axios.get(`http://localhost:5000/voc/client/list/${memberCode}`, {
       withCredentials: true
     });
     vocList.value = response.data;

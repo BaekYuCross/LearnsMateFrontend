@@ -516,7 +516,7 @@ const toggleRecommendedSection = () => {
 // 학생 목록 가져오기 (일반 조회)
 const fetchStudents = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/member/students', {
+    const response = await axios.get('http://localhost:5000/member/students', {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -545,7 +545,7 @@ const fetchFilteredStudents = async () => {
   if (!lastFilterData.value) return;
 
   try {
-    const response = await axios.post('https://learnsmate.shop/member/filter/student',lastFilterData.value, {
+    const response = await axios.post('http://localhost:5000/member/filter/student',lastFilterData.value, {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -578,7 +578,7 @@ const showDetail = async (student) => {
     studentDetail.value = null;
   } else {
     try {
-      const response = await axios.get(`https://learnsmate.shop/member/student/${student.memberCode}`, {
+      const response = await axios.get(`http://localhost:5000/member/student/${student.memberCode}`, {
         withCredentials: true,   
       });
 
@@ -675,7 +675,7 @@ const handleExcelDownload = async() => {
   try{
     const config = {
       method: 'POST',
-      url: 'https://learnsmate.shop/member/excel/download/student',
+      url: 'http://localhost:5000/member/excel/download/student',
       responseType: 'blob',
       withCredentials: true,
       headers: {
@@ -789,7 +789,7 @@ const fetchSortedStudents = async () => {
    if (isFiltered.value && lastFilterData.value) {
      // 필터링된 상태면 필터링 정렬 API 호출
      console.log(lastFilterData.value);
-     const response = await axios.post('https://learnsmate.shop/member/filter/student/sort', 
+     const response = await axios.post('http://localhost:5000/member/filter/student/sort', 
        lastFilterData.value,
        {
          withCredentials: true,
@@ -806,7 +806,7 @@ const fetchSortedStudents = async () => {
    } else {
      // 필터링되지 않은 상태면 일반 정렬 API 호출
      console.log("노필터링");
-     const response = await axios.get('https://learnsmate.shop/member/students/sort', {
+     const response = await axios.get('http://localhost:5000/member/students/sort', {
        withCredentials: true,
        params: {
          page: currentPage.value - 1,

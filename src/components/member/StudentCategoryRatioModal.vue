@@ -205,11 +205,11 @@ const fetchCategoryRatio = async (useFilter = false) => {
         startDate: `${filter.value.startYear}-${filter.value.startMonth.toString().padStart(2, '0')}-01T00:00:00`,
         endDate: `${filter.value.endYear}-${filter.value.endMonth.toString().padStart(2, '0')}-31T23:59:59`
       };
-      response = await axios.post('https://learnsmate.shop/member/category-ratio/filter', filterData, {
+      response = await axios.post('http://localhost:5000/member/category-ratio/filter', filterData, {
         withCredentials: true, 
       });
     } else {
-      response = await axios.get('https://learnsmate.shop/member/category-ratio', {
+      response = await axios.get('http://localhost:5000/member/category-ratio', {
         withCredentials: true, 
       });
     }

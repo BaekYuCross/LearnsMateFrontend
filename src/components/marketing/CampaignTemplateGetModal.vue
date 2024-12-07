@@ -97,7 +97,7 @@ const campaignTemplate = ref({
 console.log("template Code : ",props.campaignTemplateCode);
 const fetchCampaignTemplate = async () => {
 try {
-  const response = await axios.get(`https://learnsmate.shop/campaign-template/${props.campaignTemplateCode}`, {
+  const response = await axios.get(`http://localhost:5000/campaign-template/${props.campaignTemplateCode}`, {
     withCredentials: true,
   });
   campaignTemplate.value = response.data;
@@ -124,7 +124,7 @@ const saveChanges = async () => {
         adminName: campaignTemplate.value.admin_name, 
     };
   try {
-      await axios.patch(`https://learnsmate.shop/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
+      await axios.patch(`http://localhost:5000/campaign-template/edit/${props.campaignTemplateCode}`,payload,{
         withCredentials: true,
     });
     isConfirmModalOpen.value = true;
@@ -141,7 +141,7 @@ const handleDelete = async () => {
 
 const deleteCampaignTemplate = async () => {
  try {
-  await axios.patch(`https://learnsmate.shop/campaign-template/delete/${props.campaignTemplateCode}`,{
+  await axios.patch(`http://localhost:5000/campaign-template/delete/${props.campaignTemplateCode}`,{
     withCredentials: true,
   });
   await fetchCampaignTemplate();

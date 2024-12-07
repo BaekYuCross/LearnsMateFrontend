@@ -273,7 +273,7 @@ const groupedReports = computed(() => {
 
 const fetchBlacklists = async () => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/sort`, {
+    const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/sort`, {
       withCredentials: true,
       params: {
         page: currentPage.value - 1,
@@ -307,7 +307,7 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `https://learnsmate.shop/blacklist/filter/${memberType.value}/sort`, 
+      `http://localhost:5000/blacklist/filter/${memberType.value}/sort`, 
       lastFilterData.value,
       {
         withCredentials: true,
@@ -345,7 +345,7 @@ const handleExcelDownload = async() => {
   try{
     const config = {
       method: 'POST',
-      url: `https://learnsmate.shop/blacklist/excel/download/${memberType.value}`,
+      url: `http://localhost:5000/blacklist/excel/download/${memberType.value}`,
       responseType: 'blob',
       withCredentials: true,
       headers: {
@@ -477,7 +477,7 @@ const showDetail = async (blacklist) => {
   } else {
     selectedBlacklist.value = blacklist;
     try {
-      const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/${blacklist.blackCode}`, {
+      const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/${blacklist.blackCode}`, {
         withCredentials: true,
       });
       reportDetails.value = response.data;

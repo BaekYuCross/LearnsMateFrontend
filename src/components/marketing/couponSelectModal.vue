@@ -98,7 +98,7 @@ const closeModal = () => {
 const fetchCoupons = async () => {
   try {
     const response = await axios.post(
-      'https://learnsmate.shop/coupon/filters2',
+      'http://localhost:5000/coupon/filters2',
       { 
         registration_type: 'admin',
        },
@@ -166,7 +166,7 @@ const applyFilters = async (filters) => {
       end_updated_at: formatToLocalDateTime(filters.end_updated_at),
      };
     const response = await axios.post(
-      'https://learnsmate.shop/coupon/filters2',
+      'http://localhost:5000/coupon/filters2',
       modifiedFilters,
       {
         withCredentials: true,

@@ -107,7 +107,7 @@ const camelToSnake = (obj) => {
 
 const fetchUsers = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/member/students', {
+    const response = await axios.get('http://localhost:5000/member/students', {
       params: {
         page: currentPage.value - 1,
         size: pageSize
@@ -137,7 +137,7 @@ const selectAll = async (event) => {
       if (isFiltered.value && lastFilterData.value) {
         // 필터링된 전체 데이터 가져오기
         response = await axios.post(
-          'https://learnsmate.shop/member/filter/student',
+          'http://localhost:5000/member/filter/student',
           camelToSnake(lastFilterData.value),
           {
             params: {
@@ -152,7 +152,7 @@ const selectAll = async (event) => {
         );
       } else {
         // 필터링되지 않은 전체 데이터 가져오기
-        response = await axios.get('https://learnsmate.shop/member/students', {
+        response = await axios.get('http://localhost:5000/member/students', {
           params: {
             page: 0,
             size: totalCount.value
@@ -177,7 +177,7 @@ const handleSearch = async (filterData) => {
     selectedUsers.value = []; // 검색 시 선택 초기화 추가
     console.log(lastFilterData.value);
     const response = await axios.post(
-      'https://learnsmate.shop/member/filter/student',
+      'http://localhost:5000/member/filter/student',
       filterData,
       {
         params: {
