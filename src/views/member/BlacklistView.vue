@@ -49,16 +49,16 @@
                   {{ blacklist.memberCode }}
                 </div>
                 <div class="blacklist-board-row-name">
-                  {{ blacklist.memberName }}
+                  {{ maskingUtils.maskName(blacklist.memberName) }}
                 </div>
                 <div class="blacklist-board-row-email">
-                  {{ blacklist.memberEmail }}
+                  {{ maskingUtils.maskEmail(blacklist.memberEmail) }}
                 </div>
                 <div class="blacklist-board-row-address" :title="blacklist.blackReason">
                   {{ blacklist.blackReason }}
                 </div>
                 <div class="blacklist-board-row-address">
-                  {{ blacklist.createdAt }}
+                  {{ formatToDateTime(blacklist.createdAt) }}
                 </div>
                 <div class="blacklist-board-row-address">
                   {{ blacklist.adminName }}
@@ -102,7 +102,7 @@
               </div>
               <div class="info-item">
                 <span class="label">정지일:</span>
-                <span>{{ selectedBlacklist.createdAt }}</span>
+                <span>{{ formatToDateTime(selectedBlacklist.createdAt) }}</span>
               </div>
               <div class="info-item">
                 <span class="label">블랙리스트 사유:</span>
@@ -125,7 +125,7 @@
                   <div class="comment-section">
                     <div class="comment-header">
                       <span>댓글 코드: {{ commentCode }}</span>
-                      <span>작성일: {{ group.commentInfo.createdAt }}</span>
+                      <span>작성일: {{ formatToDateTime(group.commentInfo.createdAt) }}</span>
                     </div>
                     <div class="comment-content">
                       <p>댓글 내용: {{ group.commentInfo.commentContent }}</p>
@@ -136,7 +136,7 @@
                     <div v-for="report in group.reports" :key="report.report_dto.reportCode" class="report-entry">
                       <p>신고 코드: {{ report.report_dto.reportCode }}</p>
                       <p>신고 사유: {{ report.report_dto.reportReason }}</p>
-                      <p>신고일: {{ report.report_dto.reportDate }}</p>
+                      <p>신고일: {{ formatToDateTime(report.report_dto.reportDate) }}</p>
                       <p>신고자: {{ report.report_dto.reportMemberCode }}</p>
                     </div>
                   </div>
@@ -324,6 +324,28 @@ const handleExcelDownload = async() => {
   }
 }
 
+// 마스킹 유틸리티 함수 추가
+const maskingUtils = {
+  // 이름 마스킹 (김창섭 -> 김**섭)
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+
+  // 이메일 마스킹 (dno06117@naver.com -> dn******@naver.com)
+  maskEmail: (email) => {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    
+    const maskedLocal = localPart.substring(0, 2) + 
+      '*'.repeat(Math.max(localPart.length - 2, 4));
+    return `${maskedLocal}@${domain}`;
+  }
+};
+
 // 초기화
 const handleReset = () => {
   isFiltered.value = false;
@@ -413,6 +435,12 @@ const showDetail = async (blacklist) => {
     }
   }
 };
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
 
 onMounted(() => {
   fetchBlacklists();

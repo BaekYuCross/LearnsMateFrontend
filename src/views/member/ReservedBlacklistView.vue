@@ -35,7 +35,7 @@
                   {{ blacklist.member_code }}
                 </div>
                 <div class="reserved-table-row-cell">
-                  {{ blacklist.member_name }}
+                  {{ maskingUtils.maskName(blacklist.member_name) }}
                 </div>
                 <div class="reserved-table-row-cell">
                   {{ blacklist.report_count }}
@@ -107,7 +107,7 @@
                 <div class="reserved-comment-section">
                   <div class="reserved-comment-header">
                     <span>댓글 코드: {{ commentCode }}</span>
-                    <span>작성일: {{ group.commentInfo.createdAt }}</span>
+                    <span>작성일: {{ formatToDateTime(group.commentInfo.createdAt) }}</span>
                   </div>
                   <div class="reserved-comment-content">
                     <p>댓글 내용: {{ group.commentInfo.commentContent }}</p>
@@ -317,6 +317,15 @@ const showDetail = async (blacklist) => {
   }
 };
 
+const maskingUtils = {
+ maskName: (name) => {
+   if (!name) return '';
+   const first = name.charAt(0);
+   const last = name.charAt(name.length - 1);
+   return `${first}**${last}`;
+ }
+};
+
 // 사유 입력 모달 열기
 const openReasonModal = () => {
   isReasonModalOpen.value = true;
@@ -362,6 +371,12 @@ const confirmRegister = async () => {
 const closeResveredBlacklistDetail = () => {
   selectedReserved.value = null;
   reportDetails.value = null;
+}
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
 }
 
 onMounted(() => {

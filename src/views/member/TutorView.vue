@@ -85,7 +85,7 @@
                   {{ tutor.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-row-created">
-                  {{ tutor.createdAt }}
+                  {{ formatToDateTime(tutor.createdAt) }}
                 </div>
                 <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant" :style="{
                     backgroundColor: tutor.memberDormantStatus ? '#fee2e2' : '#dcfce7',
@@ -224,8 +224,14 @@ const fetchTutors = async () => {
       },
     });
     
-    tutors.value = response.data.content;
-    console.log(tutors.value);
+    tutors.value = response.data.content.map(tutor => ({
+      ...tutor,
+      memberName: maskingUtils.maskName(tutor.memberName),
+      memberEmail: maskingUtils.maskEmail(tutor.memberEmail),
+      memberPhone: maskingUtils.maskPhone(tutor.memberPhone),
+      memberAddress: maskingUtils.maskAddress(tutor.memberAddress)
+    }));
+
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -250,7 +256,15 @@ const handleSearch = async (filterData) => {
         'Content-Type': 'application/json',
       },
     });
-    tutors.value = response.data.content;
+
+    tutors.value = response.data.content.map(tutor => ({
+      ...tutor,
+      memberName: maskingUtils.maskName(tutor.memberName),
+      memberEmail: maskingUtils.maskEmail(tutor.memberEmail),
+      memberPhone: maskingUtils.maskPhone(tutor.memberPhone),
+      memberAddress: maskingUtils.maskAddress(tutor.memberAddress)
+    }));
+
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
     selectedTutor.value = null;
@@ -322,7 +336,7 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post('https://learnsmate.shop/member/filter/tutor',lastFilterData.value, {
+    const response = await axios.post('https://learnsmate.shop/member/filter/tutor', lastFilterData.value, {
       withCredentials: true,   
       params: {
         page: currentPage.value - 1,
@@ -333,7 +347,14 @@ const changePage = async (newPage) => {
       },
     });
 
-    tutors.value = response.data.content;
+    tutors.value = response.data.content.map(tutor => ({
+      ...tutor,
+      memberName: maskingUtils.maskName(tutor.memberName),
+      memberEmail: maskingUtils.maskEmail(tutor.memberEmail),
+      memberPhone: maskingUtils.maskPhone(tutor.memberPhone),
+      memberAddress: maskingUtils.maskAddress(tutor.memberAddress)
+    }));
+
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } else {
@@ -370,15 +391,75 @@ const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
 
+const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+
+  maskEmail: (email) => {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    
+    const maskedLocal = localPart.substring(0, 2) + 
+      '*'.repeat(Math.max(localPart.length - 2, 4));
+    return `${maskedLocal}@${domain}`;
+  },
+
+  maskPhone: (phone) => {
+    if (!phone) return '';
+    
+    const parts = phone.split('-');
+    if (parts.length !== 3) return phone;
+    
+    return `${parts[0]}-${'*'.repeat(parts[1].length)}-${parts[2]}`;
+  },
+
+  maskAddress: (address) => {
+    if (!address) return '';
+    
+    const parts = address.split(' ');
+    
+    if (parts.length < 3) return address;
+    
+    const maskedParts = parts.map((part, index) => {
+      if (index < 2) return part; 
+      
+      if (index === 2) {
+        return part.substring(0, 2) + '*'.repeat(part.length - 2);
+      }
+      
+      if (part.includes('번길') || part.includes('번지')) {
+        const suffix = part.includes('번길') ? '번길' : '번지';
+        return '*'.repeat(part.length - suffix.length) + suffix;
+      }
+      
+      return '*'.repeat(part.length);
+    });
+    
+    return maskedParts.join(' ');
+  }
+};
+
 const showDetail = async (tutor) => {
   if (selectedTutor.value?.memberCode === tutor.memberCode) {
     selectedTutor.value = null;
     tutorDetail.value = null;
   } else {
-    selectedTutor.value = tutor;
     try {
       const response = await axios.get(`https://learnsmate.shop/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
+      // 상세 정보는 마스킹하지 않은 원본 데이터 사용
+      selectedTutor.value = {
+        memberCode: response.data.member_dto.member_code,
+        memberName: response.data.member_dto.member_name,
+        memberEmail: response.data.member_dto.member_email,
+        memberPhone: response.data.member_dto.member_phone,
+        memberAddress: response.data.member_dto.member_address
+      };
       console.log(tutorDetail.value);
     } catch (error) {
       console.error('Failed to load tutor detail:', error);
@@ -390,6 +471,25 @@ const closeTutorDetail = () =>{
   selectedTutor.value = null;
   tutorDetail.value = null;
 }
+
+const formatDate = (dateArray) => {
+  if (!dateArray || !Array.isArray(dateArray)) return '-';
+
+  const [year, month, day] = dateArray;
+
+  // 월과 일이 한 자리수일 경우 앞에 0을 붙임
+  const formattedMonth = month.toString().padStart(2, '0');
+  const formattedDay = day.toString().padStart(2, '0');
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
+
 
 onMounted(() => {
   fetchTutors();

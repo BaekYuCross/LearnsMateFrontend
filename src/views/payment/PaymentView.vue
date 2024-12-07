@@ -546,16 +546,12 @@ const formatNumber = (number) => {
   return number.toLocaleString('ko-KR');
 };
 
-  const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
 
-  const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateArray;
+  const [year, month, day] = dateArray;
 
-  if (dateArray.length === 5 && hours === 0 && minutes === 0) {
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  }
-
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 const truncateText = (text, maxLength) => {

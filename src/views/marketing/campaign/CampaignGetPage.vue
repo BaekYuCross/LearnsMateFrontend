@@ -171,7 +171,7 @@
             <div>{{ user.member_age }}</div>
             <div>{{ user.member_birth }}</div>
             <div>{{ user.member_flag ? '활성' : '비활성' }}</div>
-            <div>{{ user.created_at }}</div>
+            <div>{{ formatToDateTime(user.created_at) }}</div>
             <div>{{ user.member_dormant_flag ? '휴면' : '활성' }}</div>
             <div><button class="remove-item-btn" @click="removeUser(user)" v-if="isEditMode">×</button></div>
           </div>
@@ -338,11 +338,6 @@ const isPastSendDate = computed(() => {
   return sendDate < new Date();
 });
 
-function formatToLocalDateTime(dateString) {
-  if (!dateString || dateString.includes('T')) return dateString; // 이미 변환된 경우
-  return `${dateString}T00:00:00`; // 시간 추가
-}
-
 const fetchTemplate = async () => {
   const campaignCode = route.query.campaignCode;
   try {
@@ -380,12 +375,14 @@ const fetchTemplate = async () => {
     targetUsers.value = response.data.members.content.map(user => {
       return {
         ...user,
-        member_birth: formatToLocalDateTime(user.member_birth), // 생일 변환
+        member_birth: formatToDateTime(user.member_birth), // 생일 변환
       };
     });
     totalCount.value = response.data.members.totalElements;
     totalMemberPages.value = response.data.members.totalPages;
     attachedCoupons.value = response.data.coupons.content;
+
+    console.log("awefawe", targetUsers.value);
     
     // Map 초기화 및 설정
     attachedCouponMap.value.clear();
@@ -483,7 +480,7 @@ const handleTargetUserSubmit = (users) => {
   users.forEach((user) => {
     const formattedUser = {
       ...user,
-      member_birth: formatToLocalDateTime(user.member_birth), // 생일 변환
+      member_birth: formatToDateTime(user.member_birth), // 생일 변환
     };
     targetUserMap.value.set(user.member_code, formattedUser);
   });
@@ -573,6 +570,18 @@ const cancelCampaign = async () => {
     alert('삭제에 실패했습니다.');
   }
 };
+
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+  const [year, month, day] = dateArray;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
 
 // 초기 데이터 로드
 fetchTemplate();

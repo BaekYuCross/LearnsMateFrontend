@@ -48,7 +48,7 @@
                 <div class="target-user-board-row-age">{{ user.member_age }}</div>
                 <div class="target-user-board-row-birth">{{ user.member_birth }}</div>
                 <div class="target-user-board-row-memberflag">{{ user.member_flag === true ? '활성' : '비활성' }}</div>
-                <div class="target-user-board-row-createdat">{{ user.created_at }}</div>
+                <div class="target-user-board-row-createdat">{{ formatToDateTime(user.created_at) }}</div>
                 <div class="target-user-board-row-dormantflag">{{ user.member_dormant_flag === true ? '휴면' : '활성' }}</div>
               </div>
 
@@ -257,6 +257,17 @@ const saveSelection = () => {
   emit('submit', selectedUsers.value);
 };
 
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+  const [year, month, day] = dateArray;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
 
 onMounted(() => {
   fetchUsers();

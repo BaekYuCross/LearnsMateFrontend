@@ -377,9 +377,9 @@ const handleSearch = async (filterData) => {
 
     const response = await axios.post(
       `https://learnsmate.shop/voc/filter?page=0&size=${pageSize}`,
-      camelToSnake(processedData)
-    );
-
+      camelToSnake(processedData), {
+        withCredentials: true,
+    });
     vocList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -410,9 +410,9 @@ const changePage = async (newPage) => {
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
         `https://learnsmate.shop/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-        camelToSnake(lastFilterData.value)
-      );
-
+        camelToSnake(lastFilterData.value), {
+        withCredentials: true,
+      });
       vocList.value = response.data.content;
       totalCount.value = response.data.totalElements;
       totalPages.value = response.data.totalPages;
@@ -460,15 +460,9 @@ const cancelEditing = () => {
 };
 
 const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
-
-  const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateArray;
-
-  if (dateArray.length === 5 && hours === 0 && minutes === 0) {
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  }
-
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+  const [year, month, day] = dateArray;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 
@@ -583,8 +577,9 @@ const submitEditAnswer = async () => {
     const vocAnswerCode = selectedVOC.value.voc_answer_code;
     const response = await axios.patch(
       `https://learnsmate.shop/voc-answer/edit/${vocAnswerCode}`,
-      { voc_answer_content: editAnswerContent.value }
-    );
+      { voc_answer_content: editAnswerContent.value }, {
+        withCredentials: true,
+    });
     selectedVOC.value.voc_answer_content = editAnswerContent.value;
     isEditingAnswer.value = false;
     closeEditModal();

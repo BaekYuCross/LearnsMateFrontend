@@ -88,7 +88,7 @@
                       {{ student.memberFlag === true ? '활성' : '비활성' }}
                     </div>
                     <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
-                      {{ student.createdAt }}
+                      {{ formatToDateTime(student.createdAt) }}
                     </div>
                     <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
                       backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
@@ -151,7 +151,7 @@
                 </div>
                 <div class="info-row">
                   <span class="label">생년월일</span>
-                  <span>{{ studentDetail.member_dto.member_birth }}</span>
+                  <span>{{ formatToDateTime(studentDetail.member_dto.member_birth) }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">주소</span>
@@ -452,7 +452,15 @@ const fetchStudents = async () => {
       },
     });
 
-    students.value = response.data.content;
+    // 마스킹 처리를 적용한 데이터로 변환
+    students.value = response.data.content.map(student => ({
+      ...student,
+      memberName: maskingUtils.maskName(student.memberName),
+      memberEmail: maskingUtils.maskEmail(student.memberEmail),
+      memberPhone: maskingUtils.maskPhone(student.memberPhone),
+      memberAddress: maskingUtils.maskAddress(student.memberAddress)
+    }));
+    console.log(students.value);
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -476,7 +484,14 @@ const fetchFilteredStudents = async () => {
       },
     });
 
-    students.value = response.data.content;
+    // 마스킹 처리를 적용한 데이터로 변환
+    students.value = response.data.content.map(student => ({
+      ...student,
+      memberName: maskingUtils.maskName(student.memberName),
+      memberEmail: maskingUtils.maskEmail(student.memberEmail),
+      memberPhone: maskingUtils.maskPhone(student.memberPhone),
+      memberAddress: maskingUtils.maskAddress(student.memberAddress)
+    }));
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -501,6 +516,59 @@ const showDetail = async (student) => {
     } catch (error) {
       console.error('Failed to load student details:', error);
     }
+  }
+};
+
+const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+
+  maskEmail: (email) => {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    
+    const maskedLocal = localPart.substring(0, 2) + 
+      '*'.repeat(Math.max(localPart.length - 2, 4));
+    return `${maskedLocal}@${domain}`;
+  },
+
+    maskPhone: (phone) => {
+    if (!phone) return '';
+    
+    const parts = phone.split('-');
+    if (parts.length !== 3) return phone;
+    
+    return `${parts[0]}-${'*'.repeat(parts[1].length)}-${parts[2]}`;
+  },
+
+  maskAddress: (address) => {
+    if (!address) return '';
+    
+    const parts = address.split(' ');
+    
+    if (parts.length < 3) return address;
+    
+    const maskedParts = parts.map((part, index) => {
+      if (index < 2) return part; 
+      
+      if (index === 2) {
+        return part.substring(0, 2) + '*'.repeat(part.length - 2);
+      }
+      
+      if (part.includes('번길') || part.includes('번지')) {
+        const suffix = part.includes('번길') ? '번길' : '번지';
+        return '*'.repeat(part.length - suffix.length) + suffix;
+      }
+      
+      return '*'.repeat(part.length);
+    });
+    
+    return maskedParts.join(' ');
   }
 };
 
@@ -619,17 +687,21 @@ const getVocCategory = (categoryCode) => {
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
-  
-  const [year, month, day, hour, minute] = dateArray;
-  
-  // 월과 일이 한자리수일 경우 앞에 0을 붙임
+
+  const [year, month, day] = dateArray;
+
+  // 월과 일이 한 자리수일 경우 앞에 0을 붙임
   const formattedMonth = month.toString().padStart(2, '0');
   const formattedDay = day.toString().padStart(2, '0');
-  const formattedHour = hour.toString().padStart(2, '0');
-  const formattedMinute = minute.toString().padStart(2, '0');
-  
-  return `${year}-${formattedMonth}-${formattedDay}T${formattedHour}:${formattedMinute}:00`;
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
 };
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
 
 // 초기 로드
 onMounted(() => {

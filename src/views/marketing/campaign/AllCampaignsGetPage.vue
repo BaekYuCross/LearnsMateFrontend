@@ -225,15 +225,19 @@ const handleReset = async () => {
 
 
 const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) return ''; 
-  const [year, month, day, hours, minutes, seconds] = dateArray;
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+
+  const [year, month, day] = dateArray;
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 const formatSendDateFromArray = (dateArray) => {
- if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
- const [year, month, day, hours, minutes] = dateArray;
- return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+
+  const [year, month, day] = dateArray;
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 const toggleDropdown = () => {
