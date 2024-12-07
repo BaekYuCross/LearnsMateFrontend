@@ -57,10 +57,14 @@ const fetchLectures = async () => {
     const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).member_code;
     const response = await axios.get(`https://learnsmate.shop/lecture/client/${tutorCode}`);
     
+    console.log('API Response:', response.data);
+    
     lectures.value = response.data.map(lecture => ({
       lecture_code: lecture.lecture_code,
       lecture_title: lecture.lecture_title
     }));
+    
+    console.log('Mapped lectures:', lectures.value);
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
   }
@@ -112,7 +116,7 @@ const saveCoupon = async () => {
 
   try {
     const selectedLecture = lectures.value.find(
-      lecture => lecture.code === newCoupon.value.lecture
+      lecture => lecture.lecture_code === newCoupon.value.lecture
     );
 
     // 날짜 포맷팅 (YYYY-MM-DDTHH:mm:ss)
@@ -121,7 +125,7 @@ const saveCoupon = async () => {
     }-${String(newCoupon.value.expiryDay).padStart(2, '0')}T23:59:59`;
 
     const requestData = {
-      coupon_name: selectedLecture.title,
+      coupon_name: selectedLecture.lecture_title,
       coupon_discount_rate: discountRate,
       coupon_expire_date: expiryDate,
       tutor_code: JSON.parse(localStorage.getItem("clientInfo")).member_code,
