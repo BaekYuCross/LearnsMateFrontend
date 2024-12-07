@@ -22,13 +22,55 @@
           <div class="blacklist-board-container">
             <div class="blacklist-board-header">
               <div class="blacklist-board-header-code">No</div>
-              <div class="blacklist-board-header-code">블랙리스트 코드</div>
-              <div class="blacklist-board-header-code">{{ memberTypeText }} 코드</div>
-              <div class="blacklist-board-header-name">{{ memberTypeText }} 이름</div>
-              <div class="blacklist-board-header-email">{{ memberTypeText }} 이메일</div>
-              <div class="blacklist-board-header-address">블랙리스트 사유</div>
-              <div class="blacklist-board-header-address">정지일</div>
-              <div class="blacklist-board-header-address">담당자</div>
+              <div class="blacklist-board-header-code blacklist-clickable"
+                  @click="handleSort('blackCode')">
+                블랙리스트 코드
+                <span v-if="currentSortField === 'blackCode'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-code blacklist-clickable"
+                  @click="handleSort('memberCode')">
+                {{ memberTypeText }} 코드
+                <span v-if="currentSortField === 'memberCode'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-name blacklist-clickable"
+                  @click="handleSort('memberName')">
+                {{ memberTypeText }} 이름
+                <span v-if="currentSortField === 'memberName'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-email blacklist-clickable"
+                  @click="handleSort('memberEmail')">
+                {{ memberTypeText }} 이메일
+                <span v-if="currentSortField === 'memberEmail'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-address blacklist-clickable"
+                  @click="handleSort('blackReason')">
+                블랙리스트 사유
+                <span v-if="currentSortField === 'blackReason'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-address blacklist-clickable"
+                  @click="handleSort('createdAt')">
+                정지일
+                <span v-if="currentSortField === 'createdAt'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="blacklist-board-header-address blacklist-clickable"
+                  @click="handleSort('adminName')">
+                담당자
+                <span v-if="currentSortField === 'adminName'" class="blacklist-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
             </div>
 
             <div class="blacklist-board-body">
@@ -175,6 +217,9 @@ const memberTypeText = computed(() => ({
   'student': '학생'
 }[memberType.value]));
 const filterType = computed(() => memberType.value);
+// 정렬 상태 관리를 위한 ref 추가
+const currentSortField = ref('blackCode');
+const currentSortDirection = ref('DESC');
 
 watch(
   () => route.path,
@@ -228,25 +273,33 @@ const groupedReports = computed(() => {
 
 const fetchBlacklists = async () => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}`, {
+    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/sort`, {
       withCredentials: true,
       params: {
         page: currentPage.value - 1,
-        size: pageSize
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
       },
     });
-    console.log(response.data);
+    
+    if (!response?.data?.content) {
+      console.error('Invalid response data structure:', response);
+      blacklists.value = [];
+      totalCount.value = 0;
+      totalPages.value = 0;
+      return;
+    }
+
     blacklists.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-    console.log(blacklists.value);
   } catch (error) {
     console.error('Failed to fetch blacklists:', error);
   }
 };
 
 
-// 블랙리스트 필터링 검색
 const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
@@ -254,17 +307,30 @@ const handleSearch = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `https://learnsmate.shop/blacklist/filter/${memberType.value}`, filterData, {
+      `https://learnsmate.shop/blacklist/filter/${memberType.value}/sort`, 
+      lastFilterData.value,
+      {
         withCredentials: true,
         params: {
           page: currentPage.value - 1,
-          size: pageSize
+          size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
         },
         headers: {
           'Content-Type': 'application/json',
         },
       }
     );
+
+    if (!response?.data?.content) {
+      console.error('Invalid response data structure:', response);
+      blacklists.value = [];
+      totalCount.value = 0;
+      totalPages.value = 0;
+      return;
+    }
+
     blacklists.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -273,6 +339,7 @@ const handleSearch = async (filterData) => {
     console.error('Failed to filter blacklists:', error);
   }
 };
+
 
 const handleExcelDownload = async() => {
   try{
@@ -352,6 +419,8 @@ const handleReset = () => {
   lastFilterData.value = null;
   currentPage.value = 1;
   selectedBlacklist.value = null;
+  currentSortField.value = 'blackCode'; // 기본 정렬 필드로 리셋
+  currentSortDirection.value = 'DESC'; // 기본 정렬 방향으로 리셋
   fetchBlacklists();
 };
 
@@ -363,26 +432,10 @@ const closeBlacklistDetail = () => {
 // 페이지 변경
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
-  
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(
-      `https://learnsmate.shop/blacklist/filter/${memberType.value}`, lastFilterData.value, {
-        withCredentials: true,
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize
-        },
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    blacklists.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
+    await handleSearch(lastFilterData.value);
   } else {
     await fetchBlacklists();
   }
@@ -441,6 +494,24 @@ function formatToDateTime(dateString) {
   const date = new Date(dateString);
   return date.toISOString().split('T')[0];
 }
+
+// 정렬 처리 함수
+const handleSort = (field) => {
+  if (field === currentSortField.value) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+  
+  currentPage.value = 1;
+  
+  if (isFiltered.value && lastFilterData.value) {
+    handleSearch(lastFilterData.value);
+  } else {
+    fetchBlacklists();
+  }
+};
 
 onMounted(() => {
   fetchBlacklists();

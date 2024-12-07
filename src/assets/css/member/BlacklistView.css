@@ -341,3 +341,19 @@
 .report-entry p {
   margin: 0.25rem 0;
 }
+
+.blacklist-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.blacklist-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.blacklist-sort-arrow {
+  font-size: 12px;
+}
