@@ -37,7 +37,7 @@
   
 <script setup>
 import { ref, defineEmits, onMounted } from "vue";
-import axios from '@/plugins/axios';
+import axios from 'axios';
 
 const emit = defineEmits(["close", "apply"]);
 const closeModal = () => emit("close");

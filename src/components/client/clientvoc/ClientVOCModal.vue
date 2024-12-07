@@ -55,9 +55,9 @@ const selectedCategory = ref("");
 const inquiryContent = ref("");
 const categoryCodeMap = {
       "결제 및 환불": 1,
-      "강의 자료 요청": 2,
-      "강사 피드백": 3,
-      "기술적 문제": 4,
+      "계정 및 로그인": 2,
+      "프로모션 및 쿠폰": 3,
+      "시스템 기술적 문제": 4,
       "기타 건의사항": 5
     };
 
