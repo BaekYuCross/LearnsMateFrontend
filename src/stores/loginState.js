@@ -1,15 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 
-const convertArrayToDate = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 6) {
-    console.error('Invalid date array:', dateArray);
-    return null;
-  }
-  const [year, month, day, hour, minute, second] = dateArray;
-  return new Date(year, month - 1, day, hour, minute, second);
-};
-
 export const useLoginState = defineStore('loginState', {
   state: () => ({
     isLoggedIn: false,
@@ -18,9 +9,17 @@ export const useLoginState = defineStore('loginState', {
     adminCode: '',
     exp: null,
   }),
-  
+
   actions: {
     async fetchLoginState() {
+      const currentPath = window.location.pathname;
+      const excludePaths = ['/login', '/client-login'];
+
+      if (excludePaths.includes(currentPath)) {
+        console.log(`인증 상태 확인을 생략합니다: ${currentPath}`);
+        return;
+      }
+
       try {
         const response = await axios.get('http://localhost:5000/admin/status', {
           withCredentials: true,
@@ -41,7 +40,7 @@ export const useLoginState = defineStore('loginState', {
       this.adminName = data.name || '';
       this.adminTeam = data.adminDepartment || '';
       this.adminCode = data.code || '';
-    
+
       if (data.exp) {
         if (Array.isArray(data.exp)) {
           const expDate = new Date(Date.UTC(

@@ -8,7 +8,7 @@
         강의 <span class="clientaddcoupon-modal-label-note">(프로모션에 동의한 강의만 선택 가능합니다.)</span>
         <select v-model="newCoupon.lecture" class="clientaddcoupon-modal-input">
           <option value="" disabled>강의를 선택해주세요</option>
-          <option v-for="lecture in lectures" :key="lecture.code" :value="lecture.code">{{ lecture.title }}</option>
+          <option v-for="lecture in lectures" :key="lecture.lecture_code" :value="lecture.lecture_code">{{ lecture.lecture_title }}</option>
         </select>
       </label>
 
@@ -37,7 +37,7 @@
   
 <script setup>
 import { ref, defineEmits, onMounted } from "vue";
-import axios from '@/plugins/axios';
+import axios from 'axios';
 
 const emit = defineEmits(["close", "apply"]);
 const closeModal = () => emit("close");
@@ -54,13 +54,17 @@ const newCoupon = ref({
 
 const fetchLectures = async () => {
   try {
-    const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).memberCode;
-    const response = await axios.get(`http://localhost:5000/lecture/client/${tutorCode}`);
+    const tutorCode = JSON.parse(localStorage.getItem("clientInfo")).member_code;
+    const response = await axios.get(`https://learnsmate.shop/lecture/client/${tutorCode}`);
+    
+    console.log('API Response:', response.data);
     
     lectures.value = response.data.map(lecture => ({
-      code: lecture.lectureCode,
-      title: lecture.lectureTitle
+      lecture_code: lecture.lecture_code,
+      lecture_title: lecture.lecture_title
     }));
+    
+    console.log('Mapped lectures:', lectures.value);
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
   }
@@ -112,7 +116,7 @@ const saveCoupon = async () => {
 
   try {
     const selectedLecture = lectures.value.find(
-      lecture => lecture.code === newCoupon.value.lecture
+      lecture => lecture.lecture_code === newCoupon.value.lecture
     );
 
     // 날짜 포맷팅 (YYYY-MM-DDTHH:mm:ss)
@@ -121,10 +125,10 @@ const saveCoupon = async () => {
     }-${String(newCoupon.value.expiryDay).padStart(2, '0')}T23:59:59`;
 
     const requestData = {
-      coupon_name: selectedLecture.title,
+      coupon_name: selectedLecture.lecture_title,
       coupon_discount_rate: discountRate,
       coupon_expire_date: expiryDate,
-      tutor_code: JSON.parse(localStorage.getItem("clientInfo")).memberCode,
+      tutor_code: JSON.parse(localStorage.getItem("clientInfo")).member_code,
       coupon_category_code: 1,
       lecture_code: newCoupon.value.lecture
     };
@@ -204,11 +208,14 @@ const saveCoupon = async () => {
   margin-top: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 14px;
   font-weight: 500;
   box-sizing: border-box;
   background-color: #f9f9f9;
   transition: all 0.3s ease;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .clientaddcoupon-modal-input:hover {
@@ -221,6 +228,13 @@ const saveCoupon = async () => {
   border-color: #5651d6;
   box-shadow: 0 0 4px rgba(118, 113, 244, 0.5);
   background-color: #ffffff;
+}
+
+.clientaddcoupon-modal-input option {
+  font-size: 13px;
+  padding: 5px;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .clientaddcoupon-modal-date-inputs {

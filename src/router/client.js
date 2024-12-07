@@ -1,5 +1,18 @@
 import axios from 'axios'; 
 
+const logout = async (loginHistoryCode) => {
+    try {
+        await axios.post('https://learnsmate.shop/client/exit', {
+            login_history_code: loginHistoryCode,
+        });
+    } catch (error) {
+        console.error('로그아웃 요청 실패:', error);
+    } finally {
+        localStorage.removeItem('clientInfo');
+        localStorage.removeItem('isAuthenticated');
+    }
+};
+
 const checkLoginAndTime = async () => {
     try {
         const clientInfo = JSON.parse(localStorage.getItem('clientInfo'));
@@ -97,18 +110,17 @@ const ClientRouter = [
         meta: { isClientPage: true }
     },
 ];
-
-ClientRouter.forEach(route => {
-    if (route.meta?.isClientPage) {
-        route.beforeEnter = async (to, from, next) => {
+export const setupClientGuard = (router) => {
+    router.beforeEach(async (to, from, next) => {
+        if (to.meta.isClientPage) {
             const isValid = await checkLoginAndTime();
             if (!isValid) {
                 next('/client-login');
-            } else {
-                next();
+                return;
             }
-        };
-    }
-});
+        }
+        next();
+    });
+};
 
 export default ClientRouter;

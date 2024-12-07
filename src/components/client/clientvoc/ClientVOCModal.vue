@@ -13,9 +13,9 @@
         <select v-model="selectedCategory" class="clientvocmodal-select">
           <option value="" disabled>카테고리 선택</option>
           <option>결제 및 환불</option>
-          <option>강의 자료 요청</option>
-          <option>강사 피드백</option>
-          <option>기술적 문제</option>
+          <option>계정 및 로그인</option>
+          <option>프로모션 및 쿠폰</option>
+          <option>시스템 기술적 문제</option>
           <option>기타 건의사항</option>
         </select>
 
@@ -55,9 +55,9 @@ const selectedCategory = ref("");
 const inquiryContent = ref("");
 const categoryCodeMap = {
       "결제 및 환불": 1,
-      "강의 자료 요청": 2,
-      "강사 피드백": 3,
-      "기술적 문제": 4,
+      "계정 및 로그인": 2,
+      "프로모션 및 쿠폰": 3,
+      "시스템 기술적 문제": 4,
       "기타 건의사항": 5
     };
 
@@ -71,13 +71,13 @@ const handleSubmit = async() => {
   // console.log(localStorage.getItem('clientInfo'));
   // console.log(JSON.parse(localStorage.getItem('clientInfo')).memberCode);
 
-  const response = await axios.post('http://localhost:5000/voc', {
-      vocContent: inquiryContent.value,
-      vocCategoryCode: categoryCodeMap[selectedCategory.value],
+  const response = await axios.post('https://learnsmate.shop/voc', {
+      voc_content: inquiryContent.value,
+      voc_category_code: categoryCodeMap[selectedCategory.value],
       // vocAnswerStatus: false,  
       // vocAnswerSatisfaction: null,
       // createdAt: new Date(), 
-      memberCode: JSON.parse(localStorage.getItem('clientInfo')).memberCode,
+      member_code: JSON.parse(localStorage.getItem('clientInfo')).member_code,
     }, {
       withCredentials: true
     });
