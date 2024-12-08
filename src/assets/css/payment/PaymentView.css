@@ -106,27 +106,6 @@
     position: relative;
   }
   
-  .payment-board-header div.sort-asc::after {
-    content: '▲';
-    font-size: 12px;
-    position: absolute;
-    right: 10px;
-    color: #005950;
-  }
-  
-  .payment-board-header div.sort-desc::after {
-    content: '▼';
-    font-size: 12px;
-    position: absolute;
-    right: 10px;
-    color: #005950;
-  }
-  
-  .payment-board-header div:hover {
-    background-color: #f1f1f1;
-  }
-  
-  
   .payment-board-body {
     display: flex;
     flex-direction: column;
@@ -321,4 +300,17 @@
 .payment-board-row-title {
   overflow: hidden;
   white-space: nowrap;
+}
+
+.payment-clickable {
+  cursor: pointer;
+}
+
+.payment-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.payment-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
 }
