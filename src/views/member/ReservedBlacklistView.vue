@@ -15,9 +15,27 @@
           <div class="reserved-board-container">
             <div class="reserved-board-header">
               <div class="reserved-table-cell">No</div>
-              <div class="reserved-table-cell">{{ memberTypeText }} 코드</div>
-              <div class="reserved-table-cell">{{ memberTypeText }} 이름</div>
-              <div class="reserved-table-cell">신고 횟수</div>
+              <div class="reserved-table-cell reserved-clickable" 
+                  @click="handleSort('memberCode')">
+                {{ memberTypeText }} 코드
+                <span v-if="currentSortField === 'memberCode'" class="reserved-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="reserved-table-cell reserved-clickable" 
+                  @click="handleSort('memberName')">
+                {{ memberTypeText }} 이름
+                <span v-if="currentSortField === 'memberName'" class="reserved-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div class="reserved-table-cell reserved-clickable" 
+                  @click="handleSort('reportCount')">
+                신고 횟수
+                <span v-if="currentSortField === 'reportCount'" class="reserved-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
+              </div>
             </div>
             
             <div class="reserved-board-body">
@@ -174,6 +192,8 @@ const modalTitle = ref('블랙리스트를 등록하시겠습니까?');
 const blacklistReason = ref('');
 const isReasonModalOpen = ref(false);
 const isConfirmModalOpen = ref(false);
+const currentSortField = ref('reportCount'); // 기본 정렬 필드
+const currentSortDirection = ref('DESC'); // 기본 정렬 방향
 watch(
   () => route.path,
   (newPath) => {
@@ -229,15 +249,15 @@ const groupedReports = computed(() => {
 
 const fetchReservedList = async () => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved`, {
+    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/sort`, {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
-        size: pageSize
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
       },
     });
-    
-    console.log('Response data:', response.data);
     
     reservedList.value = response.data.content;
     totalCount.value = response.data.totalElements;
@@ -246,6 +266,20 @@ const fetchReservedList = async () => {
   } catch (error) {
     console.error('Failed to fetch reserved list:', error);
   }
+};
+
+const handleSort = async (field) => {
+  if (field === currentSortField.value) {
+    // 같은 필드를 다시 클릭하면 방향만 변경
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    // 다른 필드를 클릭하면 필드 변경 및 DESC로 초기화
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+  
+  currentPage.value = 1; // 페이지 초기화
+  await fetchReservedList();
 };
 
 const changePage = async (newPage) => {

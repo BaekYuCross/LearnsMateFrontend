@@ -410,3 +410,16 @@ textarea {
 .cancel-button:hover {
   background-color: #e5e5e5;
 }
+
+.reserved-clickable {
+  cursor: pointer;
+}
+
+.reserved-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.reserved-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+}
