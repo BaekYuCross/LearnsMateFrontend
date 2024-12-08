@@ -221,12 +221,12 @@ const saveCoupon = async () => {
         },
       }
     );
-    console.log("edit success", response.data);
 
     // 성공 시 화면 데이터 갱신
     Object.assign(props.selectedCoupon, response.data);
     isEditMode.value = false;
   } catch (error) {
+    alert("강사 쿠폰은 수정할 수 없습니다.");
     console.error("edit fail", error.message);
   }
 };
@@ -246,8 +246,8 @@ const deleteCoupon = async () => {
     console.log("delete success", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
+    alert("강사 쿠폰은 삭제할 수 없습니다.");
     console.error("delete fail", error.message);
-    alert("쿠폰 삭제에 실패했습니다.");
   }
 };
 
