@@ -15,7 +15,7 @@
             list="mondays"
           />
           <datalist id="mondays">
-            <option v-for="date in mondayDates" :key="date" :value="date"/>
+            <option v-for="date in mondayDates" :key="date" :value="date"></option>
           </datalist>
         </div>
 
