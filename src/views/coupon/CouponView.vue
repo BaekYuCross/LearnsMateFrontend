@@ -137,7 +137,6 @@ const displayedPages = computed(() => {
   return pages;
 });
 
-// fetchCoupons 함수 수정
 const fetchCoupons = async () => {
   try {
     const response = await axios.get('https://learnsmate.shop/coupon/coupons2',
@@ -153,8 +152,6 @@ const fetchCoupons = async () => {
     totalPages.value = response.data.totalPages;
     totalCount.value = response.data.totalElements;
 
-    console.log(response.data.content);
-    console.log(coupon.value);
   } catch (error) {
     console.error('Error fetching coupons:', error);
     coupon.value = [];
@@ -183,9 +180,9 @@ const paginatedCoupons = computed(() => {
 
 const selectCoupon = (couponData) => {
   if (selectedCoupon.value === couponData) {
-    selectedCoupon.value = null; // 이미 선택된 쿠폰이면 상세 정보를 닫음
+    selectedCoupon.value = null;
   } else {
-    selectedCoupon.value = couponData; // 새로운 쿠폰을 선택하여 상세 정보 표시
+    selectedCoupon.value = couponData;
   }
 };
 
@@ -199,9 +196,6 @@ const registerCoupon = () => {
 
 const applyFilters = async (filters, resetPage = true) => {
   try {
-    console.log('필터 적용 전:', filters);
-    console.log('필터 적용 후:', filters);
-
     isFiltered.value = true;
     currentFilters.value = filters;
 
@@ -232,10 +226,6 @@ const applyFilters = async (filters, resetPage = true) => {
       totalPages.value = Math.ceil((response.data.length || 0) / pageSize);
     }
 
-    console.log('Filtered data:', response.data);
-    console.log('Total count:', totalCount.value);
-    console.log('Total pages:', totalPages.value);
-
   } catch (error) {
     console.error('Error fetching filtered coupons:', error);
     coupon.value = [];
@@ -245,8 +235,8 @@ const applyFilters = async (filters, resetPage = true) => {
 };
 
 const resetFilters = () => {
-  isFiltered.value = false;  // 필터링 상태 해제
-  currentFilters.value = null;  // 현재 필터 값 초기화
+  isFiltered.value = false;
+  currentFilters.value = null;
   currentPage.value = 1;
   fetchCoupons();
 }
@@ -275,7 +265,6 @@ const formatDate = (isoDate) => {
   });
 };
 
-// 기존 imports 아래에 추가
 const columns = {
   couponCode: "쿠폰 번호",
   couponName: "쿠폰 이름",
@@ -294,7 +283,7 @@ const columns = {
 const handleExcelDownload = async () => {
   try {
 
-    console.log('Current filters:', currentFilters.value); // 현재 필터 상태 확인
+    console.log('Current filters:', currentFilters.value);
     const filterData = isFiltered.value && currentFilters.value ? {
       couponName: currentFilters.value.coupon_name || null,
       couponContents: currentFilters.value.coupon_contents || null,
@@ -312,8 +301,6 @@ const handleExcelDownload = async () => {
       tutorName: currentFilters.value.tutor_name || null,
       selectedColumns: Object.keys(columns)
     } : null;
-
-    console.log('Sending filter data for excel:', filterData); // 디버깅용
 
     const config = {
       method: 'POST',
