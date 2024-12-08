@@ -378,10 +378,15 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = processedData;
 
     const response = await axios.post(
-      `https://learnsmate.shop/voc/filter?page=0&size=${pageSize}`,
-      camelToSnake(processedData), {
+      `https://learnsmate.shop/voc/filter/sort?page=0&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+      camelToSnake(processedData),
+      {
         withCredentials: true,
-    });
+      }
+    );
+    
+    console.log(response.data);
+    console.log(currentSortField.value); console.log(currentSortDirection.value);
     vocList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -412,7 +417,7 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `https://learnsmate.shop/voc/filter?page=${currentPage.value - 1}&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+        `https://learnsmate.shop/voc/filter/sort?page=${currentPage.value - 1}&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
         camelToSnake(lastFilterData.value),
         { withCredentials: true }
       );
@@ -683,31 +688,24 @@ const sortVOCList = (columnKey) => {
 };
 
 const handleSort = async (columnKey) => {
-  // 현재 페이지를 1로 리셋
   currentPage.value = 1;
 
+  // 정렬 필드와 방향 업데이트
   if (currentSortField.value === columnKey) {
-    // 같은 컬럼 클릭 시 정렬 방향 전환
     currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
   } else {
-    // 다른 컬럼 클릭 시 새로운 정렬 설정
     currentSortField.value = columnKey;
-    // null 값이 있는 컬럼의 경우 기본 정렬을 DESC로 설정하여 null을 마지막에 표시
-    if (columnKey === 'adminName' || columnKey === 'vocAnswerSatisfaction') {
-      currentSortDirection.value = 'DESC';
-    } else {
-      currentSortDirection.value = 'DESC'; // 다른 컬럼도 기본값은 DESC
-    }
+    currentSortDirection.value = 'DESC';  // 새로운 컬럼 선택시 기본값
   }
 
-  // 필터링 상태에 따라 적절한 API 호출
-  if (isFiltered.value && lastFilterData.value) {
-    await handleSearch({
-      ...lastFilterData.value,
-      page: currentPage.value - 1
-    });
-  } else {
-    await fetchVOCList();
+  try {
+    if (isFiltered.value && lastFilterData.value) {
+      await handleSearch(lastFilterData.value);
+    } else {
+      await fetchVOCList();
+    }
+  } catch (error) {
+    console.error('정렬 중 오류 발생:', error);
   }
 };
 </script>
