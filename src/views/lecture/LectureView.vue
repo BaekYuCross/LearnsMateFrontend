@@ -668,11 +668,11 @@ const createStatsCharts = (data) => {
   };
 
   const transformedData = {
-    totalClicks: Math.log10(safeData.totalClicks + 1),
+    totalClicks: Math.log2(safeData.totalClicks + 1),
     totalPurchases: safeData.totalPurchases,
-    categoryClicks: Math.log10(safeData.categoryClicks + 1),
+    categoryClicks: Math.log2(safeData.categoryClicks + 1),
     categoryPurchases: safeData.categoryPurchases,
-    lectureClicks: Math.log10(safeData.lectureClicks + 1),
+    lectureClicks: Math.log2(safeData.lectureClicks + 1),
     lecturePurchases: safeData.lecturePurchases
   };
 
@@ -700,7 +700,7 @@ const createStatsCharts = (data) => {
             const value = context.parsed.y;
             if (context.dataIndex === 0) {
               const originalValue = (Math.pow(10, value) - 1).toFixed(0);
-              return `${label}: ${originalValue} (log₁₀ 적용됨)`;
+              return `${label}: ${originalValue} ((log₂) 적용됨)`;
             }
             return `${label}: ${value}`;
           }
@@ -745,7 +745,7 @@ const createStatsCharts = (data) => {
   overallChart = new Chart(overallCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수 (log₁₀)", "구매 수"],
+      labels: ["클릭 수 (log₂)", "구매 수"],
       datasets: [
         {
           label: "전체 강의",
@@ -770,7 +770,7 @@ const createStatsCharts = (data) => {
   categoryChart = new Chart(categoryCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수 (log₁₀)", "구매 수"],
+      labels: ["클릭 수 (log₂)", "구매 수"],
       datasets: [
         {
           label: "카테고리",
@@ -795,7 +795,7 @@ const createStatsCharts = (data) => {
   lectureChart = new Chart(lectureCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수 (log₁₀)", "구매 수"],
+      labels: ["클릭 수 (log₂)", "구매 수"],
       datasets: [
         {
           label: "현재 강의",
