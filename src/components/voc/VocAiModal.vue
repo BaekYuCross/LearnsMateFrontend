@@ -1,48 +1,46 @@
 <template>
-    <div class="voc-ai-modal-backdrop">
-      <div class="voc-ai-modal-container">
-        <button class="voc-ai-modal-close" @click="close">×</button>
-        <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
-        
-        <div class="voc-ai-date-picker">
-          <label for="monday-picker">날짜 선택:</label>
-          <input
-            type="date"
-            id="monday-picker"
-            :value="selectedDate"
-            @change="handleDateChange"
-            :min="minDate"
-            list="mondays"
-          />
-          <datalist id="mondays">
-            <option v-for="date in mondayDates" :key="date" :value="date"></option>
-          </datalist>
-        </div>
+  <div class="voc-ai-modal-backdrop">
+    <div class="voc-ai-modal-container">
+      <button class="voc-ai-modal-close" @click="close">×</button>
+      <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
 
-        <div v-if="localSummaryData.length > 0">
-          <table class="voc-ai-modal-summary-table">
-            <thead>
-              <tr>
-                <th>키워드</th>
-                <th>건수</th>
-                <th>추천 답안</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in localSummaryData" :key="index">
-                <td>{{ item.keyword }}</td>
-                <td>{{ item.keywordCount }}건</td>
-                <td>{{ item.recommendation }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else>
-          <p class="voc-ai-modal-message">요약 데이터를 불러오는 중입니다...</p>
-        </div>
+      <div class="voc-ai-date-picker">
+        <label for="monday-picker">날짜 선택:</label>
+        <input
+          type="date"
+          id="monday-picker"
+          :value="selectedDate"
+          @change="handleDateChange"
+          :min="minDate"
+          :max="maxDate"
+          :disabled-dates="disabledDates"
+        />
+      </div>
+
+      <div v-if="localSummaryData.length > 0">
+        <table class="voc-ai-modal-summary-table">
+          <thead>
+            <tr>
+              <th>키워드</th>
+              <th>건수</th>
+              <th>추천 답안</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in localSummaryData" :key="index">
+              <td>{{ item.keyword }}</td>
+              <td>{{ item.keywordCount }}건</td>
+              <td>{{ item.recommendation }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else>
+        <p class="voc-ai-modal-message">요약 데이터를 불러오는 중입니다...</p>
       </div>
     </div>
-  </template>  
+  </div>
+</template>
 
 <script>
 import axios from "axios";
@@ -60,7 +58,8 @@ export default {
       localSummaryData: [],
       selectedDate: null,
       minDate: "2023-06-01",
-      mondayDates: []
+      maxDate: new Date().toISOString().split("T")[0],
+      mondayDates: [],
     };
   },
   created() {
@@ -82,13 +81,13 @@ export default {
       const mondays = [];
       const start = new Date(this.minDate);
       const end = new Date();
-      
+
       while (start.getDay() !== 1) {
         start.setDate(start.getDate() + 1);
       }
 
       while (start <= end) {
-        mondays.push(start.toISOString().split('T')[0]);
+        mondays.push(start.toISOString().split("T")[0]);
         start.setDate(start.getDate() + 7);
       }
 
@@ -127,7 +126,6 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>
