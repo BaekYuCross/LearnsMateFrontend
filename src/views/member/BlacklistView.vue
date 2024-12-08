@@ -496,7 +496,7 @@ function formatToDateTime(dateString) {
 }
 
 // 정렬 처리 함수
-const handleSort = (field) => {
+const handleSort = async (field) => {
   if (field === currentSortField.value) {
     currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
   } else {
@@ -507,9 +507,9 @@ const handleSort = (field) => {
   currentPage.value = 1;
   
   if (isFiltered.value && lastFilterData.value) {
-    handleSearch(lastFilterData.value);
+    await handleSearch(lastFilterData.value);
   } else {
-    fetchBlacklists();
+    await fetchBlacklists();
   }
 };
 
