@@ -10,10 +10,9 @@
           type="date"
           id="monday-picker"
           :value="selectedDate"
-          @change="handleDateChange"
+          @input="restrictToMondays"
           :min="minDate"
           :max="maxDate"
-          :disabled-dates="disabledDates"
         />
       </div>
 
@@ -59,58 +58,31 @@ export default {
       selectedDate: null,
       minDate: "2023-06-01",
       maxDate: new Date().toISOString().split("T")[0],
-      mondayDates: [],
     };
   },
   created() {
-    this.generateMondayDates();
-    if (this.mondayDates.length > 0) {
-      this.selectedDate = this.mondayDates[this.mondayDates.length - 1];
-    }
-  },
-  watch: {
-    summaryData: {
-      immediate: true,
-      handler(newValue) {
-        this.localSummaryData = [...newValue];
-      },
-    },
+    this.setDefaultMonday();
   },
   methods: {
-    generateMondayDates() {
-      const mondays = [];
-      const start = new Date(this.minDate);
-      const end = new Date();
-
-      while (start.getDay() !== 1) {
-        start.setDate(start.getDate() + 1);
-      }
-
-      while (start <= end) {
-        mondays.push(start.toISOString().split("T")[0]);
-        start.setDate(start.getDate() + 7);
-      }
-
-      this.mondayDates = mondays;
+    setDefaultMonday() {
+      const today = new Date();
+      today.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // 최근 월요일 계산
+      this.selectedDate = today.toISOString().split("T")[0];
     },
-    handleDateChange(event) {
-      const selectedDate = event.target.value;
-      if (!this.mondayDates.includes(selectedDate)) {
+    restrictToMondays(event) {
+      const selectedDate = new Date(event.target.value);
+      if (selectedDate.getDay() !== 1) {
+        alert("월요일만 선택할 수 있습니다.");
         event.target.value = this.selectedDate;
         return;
       }
-      this.fetchAnalysisData(event);
+      this.selectedDate = event.target.value;
+      this.fetchAnalysisData();
     },
-    close() {
-      this.$emit("close");
-    },
-    async fetchAnalysisData(event) {
-      const selectedDate = event.target.value;
-      this.selectedDate = selectedDate;
-
+    async fetchAnalysisData() {
       try {
         const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date: selectedDate },
+          params: { date: this.selectedDate },
         });
 
         if (response.status === 204 || !response.data.length) {
@@ -123,6 +95,9 @@ export default {
         console.error("데이터를 가져오는 중 오류 발생:", error);
         alert("데이터를 가져오는 중 문제가 발생했습니다.");
       }
+    },
+    close() {
+      this.$emit("close");
     },
   },
 };
