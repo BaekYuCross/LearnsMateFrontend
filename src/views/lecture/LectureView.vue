@@ -699,7 +699,7 @@ const createStatsCharts = (data) => {
             const label = context.dataset.label || '';
             const value = context.parsed.y;
             if (context.dataIndex === 0) {
-              const originalValue = (Math.pow(10, value) - 1).toFixed(0);
+              const originalValue = (Math.pow(2, value) - 1).toFixed(0);
               return `${label}: ${originalValue} ((log₂) 적용됨)`;
             }
             return `${label}: ${value}`;
