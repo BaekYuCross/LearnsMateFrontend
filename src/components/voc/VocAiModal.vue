@@ -10,9 +10,10 @@
           type="date"
           id="monday-picker"
           :value="selectedDate"
-          @input="restrictToMondays"
+          @change="handleDateChange"
           :min="minDate"
           :max="maxDate"
+          :class="{ 'invalid-date': !isValidMonday(selectedDate) }"
         />
       </div>
 
@@ -58,31 +59,50 @@ export default {
       selectedDate: null,
       minDate: "2023-06-01",
       maxDate: new Date().toISOString().split("T")[0],
+      mondayDates: [],
     };
   },
   created() {
-    this.setDefaultMonday();
+    this.generateMondayDates();
+    if (this.mondayDates.length > 0) {
+      this.selectedDate = this.mondayDates[this.mondayDates.length - 1];
+    }
   },
   methods: {
-    setDefaultMonday() {
-      const today = new Date();
-      today.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // 최근 월요일 계산
-      this.selectedDate = today.toISOString().split("T")[0];
+    generateMondayDates() {
+      const mondays = [];
+      const start = new Date(this.minDate);
+      const end = new Date();
+
+      while (start.getDay() !== 1) {
+        start.setDate(start.getDate() + 1); // 월요일로 맞춤
+      }
+
+      while (start <= end) {
+        mondays.push(start.toISOString().split("T")[0]);
+        start.setDate(start.getDate() + 7); // 다음 주 월요일
+      }
+
+      this.mondayDates = mondays;
     },
-    restrictToMondays(event) {
-      const selectedDate = new Date(event.target.value);
-      if (selectedDate.getDay() !== 1) {
-        alert("월요일만 선택할 수 있습니다.");
-        event.target.value = this.selectedDate;
+    handleDateChange(event) {
+      const selectedDate = event.target.value;
+      if (!this.mondayDates.includes(selectedDate)) {
+        event.target.value = this.selectedDate; // 이전 선택된 날짜로 복원
         return;
       }
-      this.selectedDate = event.target.value;
-      this.fetchAnalysisData();
+      this.fetchAnalysisData(selectedDate);
     },
-    async fetchAnalysisData() {
+    isValidMonday(date) {
+      return this.mondayDates.includes(date); // 월요일인지 확인
+    },
+    close() {
+      this.$emit("close");
+    },
+    async fetchAnalysisData(selectedDate) {
       try {
         const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date: this.selectedDate },
+          params: { date: selectedDate },
         });
 
         if (response.status === 204 || !response.data.length) {
@@ -95,9 +115,6 @@ export default {
         console.error("데이터를 가져오는 중 오류 발생:", error);
         alert("데이터를 가져오는 중 문제가 발생했습니다.");
       }
-    },
-    close() {
-      this.$emit("close");
     },
   },
 };
@@ -141,6 +158,13 @@ export default {
 
 .voc-ai-date-picker input:invalid {
   border-color: #ff0000;
+}
+
+.voc-ai-date-picker input.invalid-date {
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f5f5f5;
+  color: #aaa;
 }
 
 .voc-ai-modal-backdrop {
