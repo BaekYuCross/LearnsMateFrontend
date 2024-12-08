@@ -1,5 +1,5 @@
 <template>
-    <div class="voc-ai-modal-backdrop" v-if="localSummaryData">
+    <div class="voc-ai-modal-backdrop">
       <div class="voc-ai-modal-container">
         <button class="voc-ai-modal-close" @click="close">×</button>
         <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
@@ -65,6 +65,9 @@ export default {
   },
   created() {
     this.generateMondayDates();
+    if (this.mondayDates.length > 0) {
+      this.selectedDate = this.mondayDates[this.mondayDates.length - 1];
+    }
   },
   watch: {
     summaryData: {
@@ -101,10 +104,6 @@ export default {
     },
     close() {
       this.$emit("close");
-    },
-    isMonday(dateString) {
-      const date = new Date(dateString);
-      return date.getDay() === 1;
     },
     async fetchAnalysisData(event) {
       const selectedDate = event.target.value;
