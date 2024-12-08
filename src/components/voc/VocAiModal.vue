@@ -10,9 +10,13 @@
             type="date"
             id="monday-picker"
             :value="selectedDate"
-            @change="fetchAnalysisData"
+            @change="handleDateChange"
             :min="minDate"
+            list="mondays"
           />
+          <datalist id="mondays">
+            <option v-for="date in mondayDates" :key="date" :value="date"/>
+          </datalist>
         </div>
 
         <div v-if="localSummaryData.length > 0">
@@ -56,7 +60,11 @@ export default {
       localSummaryData: [],
       selectedDate: null,
       minDate: "2023-06-01",
+      mondayDates: []
     };
+  },
+  created() {
+    this.generateMondayDates();
   },
   watch: {
     summaryData: {
@@ -67,6 +75,30 @@ export default {
     },
   },
   methods: {
+    generateMondayDates() {
+      const mondays = [];
+      const start = new Date(this.minDate);
+      const end = new Date();
+      
+      while (start.getDay() !== 1) {
+        start.setDate(start.getDate() + 1);
+      }
+
+      while (start <= end) {
+        mondays.push(start.toISOString().split('T')[0]);
+        start.setDate(start.getDate() + 7);
+      }
+
+      this.mondayDates = mondays;
+    },
+    handleDateChange(event) {
+      const selectedDate = event.target.value;
+      if (!this.mondayDates.includes(selectedDate)) {
+        event.target.value = this.selectedDate;
+        return;
+      }
+      this.fetchAnalysisData(event);
+    },
     close() {
       this.$emit("close");
     },
@@ -76,12 +108,6 @@ export default {
     },
     async fetchAnalysisData(event) {
       const selectedDate = event.target.value;
-
-      if (!this.isMonday(selectedDate)) {
-        alert("월요일만 선택할 수 있습니다.");
-        return;
-      }
-
       this.selectedDate = selectedDate;
 
       try {
@@ -132,6 +158,17 @@ export default {
   outline: none;
   border-color: #145f58;
   box-shadow: 0 0 5px rgba(20, 95, 88, 0.5);
+}
+
+.voc-ai-date-picker input::-webkit-calendar-picker-indicator {
+  background-color: #ffffff;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.voc-ai-date-picker input:invalid {
+  border-color: #ff0000;
 }
 
 .voc-ai-modal-backdrop {
