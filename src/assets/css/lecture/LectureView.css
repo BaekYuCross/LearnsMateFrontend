@@ -197,6 +197,7 @@
   word-break: break-all;
   white-space: pre-wrap;
   text-align: left;
+  min-width: 200px;
 }
 
 .lecture-detail-item ul {
