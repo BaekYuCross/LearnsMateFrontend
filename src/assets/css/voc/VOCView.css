@@ -394,3 +394,16 @@
   color: #666;
   margin: 0 5px;
 }
+
+.voc-clickable {
+  cursor: pointer;
+}
+
+.voc-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.voc-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+}
