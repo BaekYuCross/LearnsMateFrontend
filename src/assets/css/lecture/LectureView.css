@@ -179,7 +179,6 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  font-size: 13px;
   padding: 8px 0;
   border-bottom: 1px dashed #eaeaea;
   gap: 15px;
@@ -190,6 +189,7 @@
   color: #666;
   flex: 0 0 100px; /* 고정 너비 설정 */
   min-width: 100px; /* 최소 너비 설정 */
+  font-size: 13px;
 }
 
 .lecture-detail-item .value {
@@ -197,7 +197,7 @@
   word-break: break-all;
   white-space: pre-wrap;
   text-align: left;
-  min-width: 200px;
+  font-size: 11px;
 }
 
 .lecture-detail-item ul {
