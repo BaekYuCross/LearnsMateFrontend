@@ -90,6 +90,9 @@
         chart.destroy();
     }
 
+    const minLectureCount = Math.min(...monthlyData.value.map(item => item.lectureCount));
+    const yAxisMin = Math.floor(minLectureCount / 10) * 10;
+
     const ctx = chartCanvas.value.getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
@@ -141,10 +144,10 @@
             },
             scales: {
                 y: {
-                    beginAtZero: false, // 0부터 시작하지 않도록 설정
-                    min: 10, // Y축의 최소값 설정
+                    beginAtZero: false,
+                    min: yAxisMin,
                     ticks: {
-                        stepSize: 10, // Grid 간격 설정
+                        stepSize: 10,
                         font: {
                             size: 12
                         }
