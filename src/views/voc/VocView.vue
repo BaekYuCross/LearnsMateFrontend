@@ -22,103 +22,93 @@
           <div class="voc-board-header">
             <div 
               class="voc-board-header-number"
-              @click="sortVOCList('voc_code')"
-              :class="{
-                'sort-asc': sortState.column === 'voc_code' && sortState.order === 1,
-                'sort-desc': sortState.column === 'voc_code' && sortState.order === 2
-              }"
+              @click="handleSort('vocCode')"
             >
               VOC 번호
+              <span v-if="currentSortField === 'vocCode'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-content"
-              @click="sortVOCList('voc_content')"
-              :class="{
-                'sort-asc': sortState.column === 'voc_content' && sortState.order === 1,
-                'sort-desc': sortState.column === 'voc_content' && sortState.order === 2
-              }"
+              @click="handleSort('vocContent')"
             >
               VOC 내용
+              <span v-if="currentSortField === 'vocContent'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-category"
-              @click="sortVOCList('voc_category_name')"
-              :class="{
-                'sort-asc': sortState.column === 'voc_category_name' && sortState.order === 1,
-                'sort-desc': sortState.column === 'voc_category_name' && sortState.order === 2
-              }"
+              @click="handleSort('vocCategoryName')"
             >
               카테고리
+              <span v-if="currentSortField === 'vocCategoryName'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-type"
-              @click="sortVOCList('member_type')"
-              :class="{
-                'sort-asc': sortState.column === 'member_type' && sortState.order === 1,
-                'sort-desc': sortState.column === 'member_type' && sortState.order === 2
-              }"
+              @click="handleSort('memberType')"
             >
               고객 유형
+              <span v-if="currentSortField === 'memberType'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-name"
-              @click="sortVOCList('member_name')"
-              :class="{
-                'sort-asc': sortState.column === 'member_name' && sortState.order === 1,
-                'sort-desc': sortState.column === 'member_name' && sortState.order === 2
-              }"
+              @click="handleSort('memberName')"
             >
               고객명
+              <span v-if="currentSortField === 'memberName'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-code"
-              @click="sortVOCList('member_code')"
-              :class="{
-                'sort-asc': sortState.column === 'member_code' && sortState.order === 1,
-                'sort-desc': sortState.column === 'member_code' && sortState.order === 2
-              }"
+              @click="handleSort('memberCode')"
             >
               고객 코드
+              <span v-if="currentSortField === 'memberCode'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-manager"
-              @click="sortVOCList('admin_name')"
-              :class="{
-                'sort-asc': sortState.column === 'admin_name' && sortState.order === 1,
-                'sort-desc': sortState.column === 'admin_name' && sortState.order === 2
-              }"
+              @click="handleSort('adminName')"
             >
               담당자
+              <span v-if="currentSortField === 'adminName'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-date"
-              @click="sortVOCList('created_at')"
-              :class="{
-                'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
-                'sort-desc': sortState.column === 'created_at' && sortState.order === 2
-              }"
+              @click="handleSort('createdAt')"
             >
               등록일
+              <span v-if="currentSortField === 'createdAt'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-status"
-              @click="sortVOCList('voc_answer_status')"
-              :class="{
-                'sort-asc': sortState.column === 'voc_answer_status' && sortState.order === 1,
-                'sort-desc': sortState.column === 'voc_answer_status' && sortState.order === 2
-              }"
+              @click="handleSort('vocAnswerStatus')"
             >
               답변 상태
+              <span v-if="currentSortField === 'vocAnswerStatus'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
             <div 
               class="voc-board-header-satisfaction"
-              @click="sortVOCList('voc_answer_satisfaction')"
-              :class="{
-                'sort-asc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 1,
-                'sort-desc': sortState.column === 'voc_answer_satisfaction' && sortState.order === 2
-              }"
+              @click="handleSort('vocAnswerSatisfaction')"
             >
               만족도
+              <span v-if="currentSortField === 'vocAnswerSatisfaction'" class="voc-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
           </div>
 
@@ -300,30 +290,42 @@ const vocList = ref([])
 const totalCount = ref(0)
 const currentPage = ref(1)
 const totalPages = ref(1)
-const pageSize = 50
+const pageSize = 15
 const isFiltered = ref(false)
 const lastFilterData = ref(null)
 const isAiModalOpen = ref(false);
 const aiData = ref([]);
 const isLoading = ref(false);
+// 상태 관리를 위한 ref 추가
+const currentSortField = ref('createdAt');
+const currentSortDirection = ref('DESC');
 
+
+// fetchVOCList 함수 수정
 const fetchVOCList = async (filters = {}) => {
   try {
-    const response = await axios.get('https://learnsmate.shop/voc/list',
-      {
-        params: {
-          ...filters,
-          page: currentPage.value - 1,
-          size: pageSize,
-        }
+    const response = await axios.get('https://learnsmate.shop/voc/list/sort', {
+      params: {
+        ...filters,
+        page: currentPage.value - 1,
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
       }
-    );
+    });
     
-    vocList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
+    // 응답 데이터 검증
+    if (response.data && Array.isArray(response.data.content)) {
+      vocList.value = response.data.content;
+      totalCount.value = response.data.totalElements;
+      totalPages.value = response.data.totalPages;
+    } else {
+      console.error('Invalid response format:', response.data);
+    }
   } catch (error) {
     console.error('VOC 목록을 불러오는데 실패했습니다:', error);
+    // 사용자에게 에러 알림
+    alert('데이터를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.');
   }
 };
 
@@ -376,10 +378,15 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = processedData;
 
     const response = await axios.post(
-      `https://learnsmate.shop/voc/filter?page=0&size=${pageSize}`,
-      camelToSnake(processedData), {
+      `https://learnsmate.shop/voc/filter/sort?page=0&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+      camelToSnake(processedData),
+      {
         withCredentials: true,
-    });
+      }
+    );
+    
+    console.log(response.data);
+    console.log(currentSortField.value); console.log(currentSortDirection.value);
     vocList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -401,6 +408,7 @@ const handleReset = async () => {
   }
 };
 
+// changePage 함수 수정
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
 
@@ -409,10 +417,10 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `https://learnsmate.shop/voc/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-        camelToSnake(lastFilterData.value), {
-        withCredentials: true,
-      });
+        `https://learnsmate.shop/voc/filter/sort?page=${currentPage.value - 1}&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+        camelToSnake(lastFilterData.value),
+        { withCredentials: true }
+      );
       vocList.value = response.data.content;
       totalCount.value = response.data.totalElements;
       totalPages.value = response.data.totalPages;
@@ -676,6 +684,28 @@ const sortVOCList = (columnKey) => {
         return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
       }
     });
+  }
+};
+
+const handleSort = async (columnKey) => {
+  currentPage.value = 1;
+
+  // 정렬 필드와 방향 업데이트
+  if (currentSortField.value === columnKey) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = columnKey;
+    currentSortDirection.value = 'DESC';  // 새로운 컬럼 선택시 기본값
+  }
+
+  try {
+    if (isFiltered.value && lastFilterData.value) {
+      await handleSearch(lastFilterData.value);
+    } else {
+      await fetchVOCList();
+    }
+  } catch (error) {
+    console.error('정렬 중 오류 발생:', error);
   }
 };
 </script>
