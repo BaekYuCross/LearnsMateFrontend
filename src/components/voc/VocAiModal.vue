@@ -5,29 +5,16 @@
       <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
 
       <div class="voc-ai-date-picker">
-        <label for="custom-monday-picker">날짜 선택:</label>
-        <div id="custom-monday-picker" @click="toggleCalendar">
-          <span>{{ formattedSelectedDate || "날짜를 선택하세요" }}</span>
-        </div>
-        <div v-if="isCalendarOpen" class="voc-ai-calendar-container">
-          <div class="voc-ai-calendar-header">
-            <button @click="changeMonth(-1)">◀</button>
-            <span>{{ currentYear }}년 {{ currentMonth + 1 }}월</span>
-            <button @click="changeMonth(1)">▶</button>
-          </div>
-          <div class="voc-ai-calendar-grid">
-            <span v-for="(day, index) in daysOfWeek" :key="'day-' + index" class="voc-ai-calendar-day">{{ day }}</span>
-            <button
-              v-for="date in mondayDatesInMonth"
-              :key="date"
-              :class="['voc-ai-calendar-date', { 'selected': date === selectedDate }]"
-              @click="selectDate(date)"
-              :aria-label="'Select ' + new Date(date).toLocaleDateString('ko-KR')"
-            >
-              {{ new Date(date).getDate() }}
-            </button>
-          </div>
-        </div>
+        <label for="monday-picker">날짜 선택:</label>
+        <input
+          type="date"
+          id="monday-picker"
+          :value="selectedDate"
+          @change="handleDateChange"
+          :min="minDate"
+          :max="maxDate"
+          :disabled-dates="disabledDates"
+        />
       </div>
 
       <div v-if="localSummaryData.length > 0">
@@ -60,88 +47,72 @@ import axios from "axios";
 
 export default {
   name: "VocAiModal",
-  data() {
-    return {
-      localSummaryData: [],
-      selectedDate: null,
-      isCalendarOpen: false,
-      currentYear: new Date().getFullYear(),
-      currentMonth: new Date().getMonth(),
-      daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
-    };
-  },
-  computed: {
-    mondayDatesInMonth() {
-      const dates = [];
-      const firstDayOfMonth = new Date(this.currentYear, this.currentMonth, 1);
-      const lastDayOfMonth = new Date(this.currentYear, this.currentMonth + 1, 0);
-
-      let currentDate = new Date(firstDayOfMonth);
-      while (currentDate <= lastDayOfMonth) {
-        if (currentDate.getDay() === 1) {
-          dates.push(currentDate.toISOString().split("T")[0]);
-        }
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-      return dates;
+  props: {
+    summaryData: {
+      type: Array,
+      default: () => [],
     },
   },
-  mounted() {
-    document.addEventListener("click", this.handleOutsideClick);
-  },
-  beforeDestroy() {
-    document.removeEventListener("click", this.handleOutsideClick);
-  },
   data() {
     return {
       localSummaryData: [],
       selectedDate: null,
-      formattedSelectedDate: null,
-      isCalendarOpen: false,
-      currentYear: new Date().getFullYear(),
-      currentMonth: new Date().getMonth(),
-      daysOfWeek: ["일", "월", "화", "수", "목", "금", "토"],
+      minDate: "2023-06-01",
+      maxDate: new Date().toISOString().split("T")[0],
+      mondayDates: [],
     };
+  },
+  created() {
+    this.generateMondayDates();
+    if (this.mondayDates.length > 0) {
+      this.selectedDate = this.mondayDates[this.mondayDates.length - 1];
+    }
+  },
+  watch: {
+    summaryData: {
+      immediate: true,
+      handler(newValue) {
+        this.localSummaryData = [...newValue];
+      },
+    },
   },
   methods: {
-    toggleCalendar(event) {
-      event.stopPropagation();
-      this.isCalendarOpen = !this.isCalendarOpen;
-    },
-    handleOutsideClick(event) {
-      const calendar = this.$el.querySelector("#custom-monday-picker");
-      if (calendar && !calendar.contains(event.target)) {
-        this.isCalendarOpen = false;
-      }
-    },
-    changeMonth(direction) {
-      const newMonth = this.currentMonth + direction;
-      const newYear = this.currentYear + (newMonth < 0 ? -1 : newMonth > 11 ? 1 : 0);
-      const adjustedMonth = (newMonth + 12) % 12;
+    generateMondayDates() {
+      const mondays = [];
+      const start = new Date(this.minDate);
+      const end = new Date();
 
-      const newDate = new Date(newYear, adjustedMonth, 1);
-      if (newDate < new Date(this.minDate) || newDate > new Date(this.maxDate)) {
+      while (start.getDay() !== 1) {
+        start.setDate(start.getDate() + 1);
+      }
+
+      while (start <= end) {
+        mondays.push(start.toISOString().split("T")[0]);
+        start.setDate(start.getDate() + 7);
+      }
+
+      this.mondayDates = mondays;
+    },
+    handleDateChange(event) {
+      const selectedDate = event.target.value;
+      if (!this.mondayDates.includes(selectedDate)) {
+        event.target.value = this.selectedDate;
         return;
       }
+      this.fetchAnalysisData(event);
+    },
+    close() {
+      this.$emit("close");
+    },
+    async fetchAnalysisData(event) {
+      const selectedDate = event.target.value;
+      this.selectedDate = selectedDate;
 
-      this.currentYear = newYear;
-      this.currentMonth = adjustedMonth;
-    },
-    formatDate(date) {
-      const options = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(date).toLocaleDateString("ko-KR", options);
-    },
-    selectDate(date) {
-      this.selectedDate = date;
-      this.formattedSelectedDate = this.formatDate(date);
-      this.isCalendarOpen = false;
-      this.fetchAnalysisData(date);
-    },
-    async fetchAnalysisData(date) {
       try {
         const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date },
+          params: { date: selectedDate },
         });
+
         if (response.status === 204 || !response.data.length) {
           this.localSummaryData = [];
           alert("선택한 날짜에 데이터가 없습니다.");
@@ -152,9 +123,6 @@ export default {
         console.error("데이터를 가져오는 중 오류 발생:", error);
         alert("데이터를 가져오는 중 문제가 발생했습니다.");
       }
-    },
-    close() {
-      this.$emit("close");
     },
   },
 };
@@ -174,6 +142,15 @@ export default {
   color: #333;
 }
 
+.voc-ai-date-picker input {
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+  width: 200px;
+}
+
 .voc-ai-date-picker input:focus {
   outline: none;
   border-color: #145f58;
@@ -189,53 +166,6 @@ export default {
 
 .voc-ai-date-picker input:invalid {
   border-color: #ff0000;
-}
-
-.voc-ai-calendar-container {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  z-index: 1000;
-}
-
-.voc-ai-calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.voc-ai-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
-}
-
-.voc-ai-calendar-day {
-  text-align: center;
-  font-weight: bold;
-  color: #555;
-}
-
-.voc-ai-calendar-date {
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-  text-align: center;
-  padding: 8px;
-  cursor: pointer;
-}
-
-.voc-ai-calendar-date:hover {
-  background-color: #eef;
-}
-
-.voc-ai-calendar-date.selected {
-  background-color: #007bff;
-  color: white;
 }
 
 .voc-ai-modal-backdrop {
