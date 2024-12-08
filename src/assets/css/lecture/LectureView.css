@@ -179,6 +179,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  font-size: 13px;
   padding: 8px 0;
   border-bottom: 1px dashed #eaeaea;
   gap: 15px;
@@ -187,9 +188,8 @@
 .lecture-detail-item .label {
   font-weight: bold;
   color: #666;
-  flex: 0 0 100px; /* 고정 너비 설정 */
-  min-width: 100px; /* 최소 너비 설정 */
-  font-size: 13px;
+  flex: 0 0 100px;
+  min-width: 100px;
 }
 
 .lecture-detail-item .value {
@@ -197,7 +197,6 @@
   word-break: break-all;
   white-space: pre-wrap;
   text-align: left;
-  font-size: 11px;
 }
 
 .lecture-detail-item ul {
@@ -243,7 +242,7 @@
 
 .lecture-toggle-header span {
   font-weight: bold;
-  flex: 0 0 100px; /* 고정 너비 설정 */
+  flex: 0 0 100px;
   min-width: 200px;
   font-size: 13px;
   color: #595656;
@@ -253,14 +252,14 @@
 .lecture-toggle-button {
   background: none;
   border: none;
-  font-size: 13px; /* 화살표 크기 */
+  font-size: 13px;
   color: #005950;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   padding: 0;
-  margin-left: 10px; /* 화살표와 텍스트 간 간격 */
-  position: relative; /* 위치 고정 */
+  margin-left: 10px;
+  position: relative;
 }
 
 
@@ -459,7 +458,7 @@
 
 .lecture-stats-search img,
 .lecture-stats-reset img {
-  width: 3px; /* 아이콘 크기 */
+  width: 3px;
   height: 3px;
 }
 
@@ -499,7 +498,7 @@
   border-radius: 8px;
   padding: 6px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 0 auto; /* 가로로 가운데 정렬 */
+  margin: 0 auto;
   margin-bottom: 10px;
 }
 
