@@ -37,115 +37,85 @@
       <div class="lecture-content-body">
         <div class="lecture-board-container">
           <div class="lecture-board-header">
-            <div 
-              v-if="selectedColumns.includes('lectureCode')" 
-              class="lecture-board-header-code"
-              @click="sortLectureList('lecture_code')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_code' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_code' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureCode')" 
+                class="lecture-board-header-code lecture-clickable"
+                @click="sortLectureList('lecture_code')">
               강의 코드
+              <span v-if="sortState.field === 'lecture_code'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('lectureTitle')" 
-              class="lecture-board-header-title"
-              @click="sortLectureList('lecture_title')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_title' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_title' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureTitle')" 
+                class="lecture-board-header-title lecture-clickable"
+                @click="sortLectureList('lecture_title')">
               강의 제목
+              <span v-if="sortState.field === 'lecture_title'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('lectureCategoryName')" 
-              class="lecture-board-header-category"
-              @click="sortLectureList('lecture_category_name')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_category_name' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_category_name' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureCategoryName')" 
+                class="lecture-board-header-category lecture-clickable"
+                @click="sortLectureList('lecture_category_name')">
               카테고리
+              <span v-if="sortState.field === 'lecture_category_name'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('lectureLevel')" 
-              class="lecture-board-header-level"
-              @click="sortLectureList('lecture_level')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_level' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_level' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureLevel')" 
+                class="lecture-board-header-level lecture-clickable"
+                @click="sortLectureList('lecture_level')">
               난이도
+              <span v-if="sortState.field === 'lecture_level'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('tutorName')" 
-              class="lecture-board-header-tutor"
-              @click="sortLectureList('tutor_name')"
-              :class="{
-                'sort-asc': sortState.column === 'tutor_name' && sortState.order === 1,
-                'sort-desc': sortState.column === 'tutor_name' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('tutorName')" 
+                class="lecture-board-header-tutor lecture-clickable"
+                @click="sortLectureList('tutor_name')">
               강사명
+              <span v-if="sortState.field === 'tutor_name'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('tutorCode')" 
-              class="lecture-board-header-tutorcode"
-              @click="sortLectureList('tutor_code')"
-              :class="{
-                'sort-asc': sortState.column === 'tutor_code' && sortState.order === 1,
-                'sort-desc': sortState.column === 'tutor_code' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('tutorCode')" 
+                class="lecture-board-header-tutorcode lecture-clickable"
+                @click="sortLectureList('tutor_code')">
               강사 코드
+              <span v-if="sortState.field === 'tutor_code'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('createdAt')" 
-              class="lecture-board-header-date"
-              @click="sortLectureList('created_at')"
-              :class="{
-                'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
-                'sort-desc': sortState.column === 'created_at' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('createdAt')" 
+                class="lecture-board-header-date lecture-clickable"
+                @click="sortLectureList('created_at')">
               등록일
+              <span v-if="sortState.field === 'created_at'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('price')" 
-              class="lecture-board-header-price"
-              @click="sortLectureList('lecture_price')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_price' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_price' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('price')" 
+                class="lecture-board-header-price lecture-clickable"
+                @click="sortLectureList('lecture_price')">
               가격
+              <span v-if="sortState.field === 'lecture_price'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('lectureConfirmStatus')" 
-              class="lecture-board-header-confirm"
-              @click="sortLectureList('lecture_confirm_status')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_confirm_status' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_confirm_status' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureConfirmStatus')" 
+                class="lecture-board-header-confirm lecture-clickable"
+                @click="sortLectureList('lecture_confirm_status')">
               승인 상태
+              <span v-if="sortState.field === 'lecture_confirm_status'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
-            <div 
-              v-if="selectedColumns.includes('lectureStatus')" 
-              class="lecture-board-header-status"
-              @click="sortLectureList('lecture_status')"
-              :class="{
-                'sort-asc': sortState.column === 'lecture_status' && sortState.order === 1,
-                'sort-desc': sortState.column === 'lecture_status' && sortState.order === 2,
-              }"
-            >
+            <div v-if="selectedColumns.includes('lectureStatus')" 
+                class="lecture-board-header-status lecture-clickable"
+                @click="sortLectureList('lecture_status')">
               강의 상태
+              <span v-if="sortState.field === 'lecture_status'" class="lecture-sort-arrow">
+                {{ sortState.direction === 'ASC' ? '↑' : '↓' }}
+              </span>
             </div>
           </div>
 
@@ -433,10 +403,12 @@ const categoryMapping = {
   FULL_STACK: '풀스택',
 };
 
+// sortState 상태 수정
 const sortState = ref({
-  column: null,
-  order: 0,
+  field: 'created_at',      // 기본 정렬 필드
+  direction: 'DESC'         // 기본 정렬 방향
 });
+
 
 const levelOrder = {
   '입문': 1,
@@ -444,27 +416,25 @@ const levelOrder = {
   '고급': 3,
 };
 
-const sortLectureList = (columnKey) => {
-  if (sortState.value.column === columnKey) {
-    sortState.value.order = (sortState.value.order + 1) % 3;
+// sortLectureList 수정
+const sortLectureList = async (columnKey) => {
+  // 같은 컬럼을 클릭한 경우, 정렬 방향만 변경
+  if (sortState.value.field === columnKey) {
+    sortState.value.direction = sortState.value.direction === 'ASC' ? 'DESC' : 'ASC';
   } else {
-    sortState.value.column = columnKey;
-    sortState.value.order = 1;
+    // 다른 컬럼을 클릭한 경우, 필드 변경 및 DESC로 초기화
+    sortState.value.field = columnKey;
+    sortState.value.direction = 'DESC';
   }
-
-  if (sortState.value.order === 0) {
-    fetchLectureList();
+  
+  // 페이지 초기화
+  currentPage.value = 1;
+  
+  // 필터링 여부에 따라 적절한 API 호출
+  if (isFiltered.value && lastFilterData.value) {
+    await handleSearch(lastFilterData.value);
   } else {
-    lectureList.value.sort((a, b) => {
-      const valueA = columnKey === 'lecture_level' ? levelOrder[getMappedLevel(a[columnKey])] : a[columnKey];
-      const valueB = columnKey === 'lecture_level' ? levelOrder[getMappedLevel(b[columnKey])] : b[columnKey];
-
-      if (sortState.value.order === 1) {
-        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
-      } else {
-        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
-      }
-    });
+    await fetchLectureList();
   }
 };
 
@@ -508,20 +478,22 @@ const statsFilter = ref({
   endMonth: 12
 })
 
+// fetchLectureList 수정
 const fetchLectureList = async (filters = {}) => {
   try {
-    const response = await axios.get('https://learnsmate.shop/lecture/list', {
+    const response = await axios.get('https://learnsmate.shop/lecture/list/sort', {
       params: {
         ...filters,
         page: currentPage.value - 1,
-        size: pageSize
+        size: pageSize,
+        sortField: sortState.value.field,
+        sortDirection: sortState.value.direction
       }
     });
     
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-
   } catch (error) {
     console.error('lecture-list get fail:', error);
   }
@@ -535,17 +507,27 @@ const hideSingleLecture = () => {
   isSingleView.value = false;
 };
 
+// handleSearch 수정
 const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
     lastFilterData.value = filterData;
     const response = await axios.post(
-      `https://learnsmate.shop/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`, camelToSnake(filterData));
+      `https://learnsmate.shop/lecture/filter/sort`, 
+      camelToSnake(filterData),
+      {
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+          sortField: sortState.value.field,      // 현재 정렬 필드
+          sortDirection: sortState.value.direction // 현재 정렬 방향
+        }
+      }
+    );
 
     lectureList.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-
   } catch (error) {
     console.error("Failed to filter lectures:", error);
   }
@@ -559,17 +541,13 @@ const handleReset = () => {
   fetchLectureList();
 };
 
+// changePage 수정
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
-
+  
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(`https://learnsmate.shop/lecture/filter?page=${currentPage.value - 1}&size=${pageSize}`,camelToSnake(lastFilterData.value));
-
-    lectureList.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-
+    await handleSearch(lastFilterData.value);
   } else {
     await fetchLectureList();
   }
@@ -621,15 +599,11 @@ const formatDateFromString = (dateString) => {
 };
 
 const formatDateFromArray = (dateArray) => {
-  if (!Array.isArray(dateArray) || dateArray.length < 5) return '';
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
 
-  const [year, month, day, hours = 0, minutes = 0, seconds = 0] = dateArray;
+  const [year, month, day] = dateArray;
 
-  if (dateArray.length === 5 && hours === 0 && minutes === 0) {
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-  }
-
-  return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')} ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
 const formatNumber = (number) => {

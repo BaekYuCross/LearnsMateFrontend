@@ -574,3 +574,16 @@
   color: #333;
   cursor: pointer;
 }
+
+.lecture-clickable {
+  cursor: pointer;
+}
+
+.lecture-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.lecture-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+}

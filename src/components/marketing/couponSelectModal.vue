@@ -43,10 +43,10 @@
                 <div class="board-row-contents">{{ coupon.coupon_contents }}</div>
                 <div class="board-row-discount-rate">{{ coupon.coupon_discount_rate }}%</div>
                 <div class="board-row-type">{{ coupon.coupon_category_name }}</div>
-                <div class="board-row-start-date">{{ coupon.coupon_start_date }}</div>
-                <div class="board-row-expire-date">{{ coupon.coupon_expire_date }}</div>
-                <div class="board-row-created-at">{{ coupon.created_at }}</div>
-                <div class="board-row-updated-at">{{ coupon.updated_at }}</div>
+                <div class="board-row-start-date">{{ formatToDateTime(coupon.coupon_start_date) }}</div>
+                <div class="board-row-expire-date">{{ formatToDateTime(coupon.coupon_expire_date) }}</div>
+                <div class="board-row-created-at">{{ formatToDateTime(coupon.created_at) }}</div>
+                <div class="board-row-updated-at">{{ formatToDateTime(coupon.updated_at) }}</div>
               </div>
             </div>
             <!-- 페이지네이션 버튼 -->
@@ -118,7 +118,6 @@ const fetchCoupons = async () => {
   }
 };
 
-
 const saveSelection = () => {
   emit('submit', selectedCoupons.value);
 };
@@ -186,6 +185,21 @@ const applyFilters = async (filters) => {
     console.error('Error fetching filtered coupons:', error);
   }
 };
+
+const formatDateFromArray = (dateArray) => {
+  if (!Array.isArray(dateArray) || dateArray.length < 3) return '';
+
+  const [year, month, day] = dateArray;
+
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
+
 
 onMounted(async () => {
   await fetchCoupons();

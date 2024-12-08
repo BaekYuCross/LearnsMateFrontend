@@ -37,17 +37,87 @@
         <div class="tutor-table-container" :class="{ 'shrink': selectedTutor }">
           <div class="tutor-board-container">
             <div class="tutor-board-header">
-              <div v-if="selectedColumns.includes('memberCode')" class="tutor-board-header-code">강사 코드</div>
-              <div v-if="selectedColumns.includes('memberName')" class="tutor-board-header-name">이름</div>
-              <div v-if="selectedColumns.includes('memberEmail')" class="tutor-board-header-email">이메일</div>
-              <div v-if="selectedColumns.includes('memberPhone')" class="tutor-board-header-phone">연락처</div>
-              <div v-if="selectedColumns.includes('memberAddress')" class="tutor-board-header-address">주소</div>
-              <div v-if="selectedColumns.includes('memberAge')" class="tutor-board-header-age">나이</div>
-              <div v-if="selectedColumns.includes('memberBirth')" class="tutor-board-header-birth">생년월일</div>
-              <div v-if="selectedColumns.includes('memberFlag')" class="tutor-board-header-flag">계정상태</div>
-              <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-header-created">생성일</div>
-              <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-header-dormant">휴면상태</div>
-            </div>
+              <div v-if="selectedColumns.includes('memberCode')" 
+                    class="tutor-board-header-code tutor-clickable"
+                    @click="handleSort('memberCode')">
+                강사 코드
+                <span v-if="currentSortField === 'memberCode'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberName')" 
+                    class="tutor-board-header-name tutor-clickable"
+                    @click="handleSort('memberName')">
+                이름
+                <span v-if="currentSortField === 'memberName'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberEmail')" 
+                    class="tutor-board-header-email tutor-clickable"
+                    @click="handleSort('memberEmail')">
+                이메일
+                <span v-if="currentSortField === 'memberEmail'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberPhone')" 
+                    class="tutor-board-header-phone tutor-clickable"
+                    @click="handleSort('memberPhone')">
+                연락처
+                <span v-if="currentSortField === 'memberPhone'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberAddress')" 
+                    class="tutor-board-header-address tutor-clickable"
+                    @click="handleSort('memberAddress')">
+                주소
+                <span v-if="currentSortField === 'memberAddress'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberAge')" 
+                    class="tutor-board-header-age tutor-clickable"
+                    @click="handleSort('memberAge')">
+                나이
+                <span v-if="currentSortField === 'memberAge'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberBirth')" 
+                    class="tutor-board-header-birth tutor-clickable"
+                    @click="handleSort('memberBirth')">
+                생년월일
+                <span v-if="currentSortField === 'memberBirth'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberFlag')" 
+                    class="tutor-board-header-flag tutor-clickable"
+                    @click="handleSort('memberFlag')">
+                계정상태
+                <span v-if="currentSortField === 'memberFlag'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('createdAt')" 
+                    class="tutor-board-header-created tutor-clickable"
+                    @click="handleSort('createdAt')">
+                생성일
+                <span v-if="currentSortField === 'createdAt'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              <div v-if="selectedColumns.includes('memberDormantStatus')" 
+                    class="tutor-board-header-dormant tutor-clickable"
+                    @click="handleSort('memberDormantStatus')">
+                휴면상태
+                <span v-if="currentSortField === 'memberDormantStatus'" class="tutor-sort-arrow">
+                  {{ currentSortDirection === 'DESC' ? '↑' : '↓' }}
+                </span>
+              </div>
+              </div>
 
             <div class="tutor-board-body">
               <div 
@@ -85,7 +155,7 @@
                   {{ tutor.memberFlag === true ? '활성' : '비활성' }}
                 </div>
                 <div v-if="selectedColumns.includes('createdAt')" class="tutor-board-row-created">
-                  {{ tutor.createdAt }}
+                  {{ formatToDateTime(tutor.createdAt) }}
                 </div>
                 <div v-if="selectedColumns.includes('memberDormantStatus')" class="tutor-board-row-dormant" :style="{
                     backgroundColor: tutor.memberDormantStatus ? '#fee2e2' : '#dcfce7',
@@ -199,6 +269,8 @@ const columns = ref({
   createdAt: "생성일",
   memberDormantStatus: "휴면상태"
 });
+const currentSortField = ref('memberCode');
+const currentSortDirection = ref('DESC');
 const selectedColumns = ref(Object.keys(columns.value));
 
 const toggleDropdown = () => {
@@ -224,35 +296,29 @@ const fetchTutors = async () => {
       },
     });
     
-    tutors.value = response.data.content;
-    console.log(tutors.value);
+    tutors.value = response.data.content.map(tutor => ({
+      ...tutor,
+      memberName: maskingUtils.maskName(tutor.memberName),
+      memberEmail: maskingUtils.maskEmail(tutor.memberEmail),
+      memberPhone: maskingUtils.maskPhone(tutor.memberPhone),
+      memberAddress: maskingUtils.maskAddress(tutor.memberAddress)
+    }));
+
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
     console.error('Failed to fetch tutors:', error);
   }
 };
-
-// 필터링 검색
+// 필터 검색 처리 함수 수정
 const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
     lastFilterData.value = filterData;
     currentPage.value = 1;
-
-    const response = await axios.post('https://learnsmate.shop/member/filter/tutor', lastFilterData.value, {
-      withCredentials: true, 
-      params: {
-        page: currentPage.value - 1,
-        size: pageSize
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    tutors.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
+    
+    // 항상 정렬된 상태로 데이터를 가져옴
+    await fetchSortedTutors();
     selectedTutor.value = null;
   } catch (error) {
     console.error('Failed to filter tutors:', error);
@@ -316,31 +382,13 @@ const handleReset = () => {
   fetchTutors();
 };
 
+// changePage 함수 수정
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
-  
   currentPage.value = newPage;
   
-  if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post('https://learnsmate.shop/member/filter/tutor',lastFilterData.value, {
-      withCredentials: true,   
-      params: {
-        page: currentPage.value - 1,
-        size: pageSize
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    tutors.value = response.data.content;
-    totalCount.value = response.data.totalElements;
-    totalPages.value = response.data.totalPages;
-  } else {
-    await fetchTutors();
-  }
-  
-  selectedTutor.value = null;
+  // 항상 정렬된 데이터를 가져옴
+  await fetchSortedTutors();
 };
 
 const displayedPages = computed(() => {
@@ -370,15 +418,75 @@ const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
 
+const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+
+  maskEmail: (email) => {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    
+    const maskedLocal = localPart.substring(0, 2) + 
+      '*'.repeat(Math.max(localPart.length - 2, 4));
+    return `${maskedLocal}@${domain}`;
+  },
+
+  maskPhone: (phone) => {
+    if (!phone) return '';
+    
+    const parts = phone.split('-');
+    if (parts.length !== 3) return phone;
+    
+    return `${parts[0]}-${'*'.repeat(parts[1].length)}-${parts[2]}`;
+  },
+
+  maskAddress: (address) => {
+    if (!address) return '';
+    
+    const parts = address.split(' ');
+    
+    if (parts.length < 3) return address;
+    
+    const maskedParts = parts.map((part, index) => {
+      if (index < 2) return part; 
+      
+      if (index === 2) {
+        return part.substring(0, 2) + '*'.repeat(part.length - 2);
+      }
+      
+      if (part.includes('번길') || part.includes('번지')) {
+        const suffix = part.includes('번길') ? '번길' : '번지';
+        return '*'.repeat(part.length - suffix.length) + suffix;
+      }
+      
+      return '*'.repeat(part.length);
+    });
+    
+    return maskedParts.join(' ');
+  }
+};
+
 const showDetail = async (tutor) => {
   if (selectedTutor.value?.memberCode === tutor.memberCode) {
     selectedTutor.value = null;
     tutorDetail.value = null;
   } else {
-    selectedTutor.value = tutor;
     try {
       const response = await axios.get(`https://learnsmate.shop/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
+      // 상세 정보는 마스킹하지 않은 원본 데이터 사용
+      selectedTutor.value = {
+        memberCode: response.data.member_dto.member_code,
+        memberName: response.data.member_dto.member_name,
+        memberEmail: response.data.member_dto.member_email,
+        memberPhone: response.data.member_dto.member_phone,
+        memberAddress: response.data.member_dto.member_address
+      };
       console.log(tutorDetail.value);
     } catch (error) {
       console.error('Failed to load tutor detail:', error);
@@ -390,6 +498,111 @@ const closeTutorDetail = () =>{
   selectedTutor.value = null;
   tutorDetail.value = null;
 }
+
+const formatDate = (dateArray) => {
+  if (!dateArray || !Array.isArray(dateArray)) return '-';
+
+  const [year, month, day] = dateArray;
+
+  // 월과 일이 한 자리수일 경우 앞에 0을 붙임
+  const formattedMonth = month.toString().padStart(2, '0');
+  const formattedDay = day.toString().padStart(2, '0');
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
+// 정렬된 강사 목록 가져오기
+const fetchSortedTutors = async () => {
+  try {
+    console.log('Fetch sorted tutors with:', {
+      isFiltered: isFiltered.value,
+      sortField: currentSortField.value,
+      sortDirection: currentSortDirection.value,
+      filterData: lastFilterData.value
+    });
+
+    if (isFiltered.value && lastFilterData.value) {
+      // 필터링된 상태면 필터링 정렬 API 호출
+      const response = await axios.post(
+        'https://learnsmate.shop/member/filter/tutor/sort', 
+        lastFilterData.value,  // 필터 데이터는 body로
+        {
+          withCredentials: true,
+          params: {  // 정렬 관련 파라미터
+            page: currentPage.value - 1,
+            size: pageSize,
+            sortField: currentSortField.value,
+            sortDirection: currentSortDirection.value
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log(response.data);
+      handleResponse(response);
+    } else {
+      // 필터링되지 않은 상태면 일반 정렬 API 호출
+      const response = await axios.get(
+        'https://learnsmate.shop/member/tutors/sort', 
+        {
+          withCredentials: true,
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize,
+            sortField: currentSortField.value,
+            sortDirection: currentSortDirection.value
+          }
+        }
+      );
+      handleResponse(response);
+    }
+  } catch (error) {
+    console.error('Failed to fetch sorted tutors:', error);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+    }
+  }
+};
+
+// 응답 처리 헬퍼 함수
+const handleResponse = (response) => {
+  if (!response?.data?.content) {
+    console.error('Invalid response data structure:', response);
+    tutors.value = [];
+    totalCount.value = 0;
+    totalPages.value = 0;
+    return;
+  }
+
+  tutors.value = response.data.content.map(tutor => ({
+    ...tutor,
+    memberName: maskingUtils.maskName(tutor.memberName),
+    memberEmail: maskingUtils.maskEmail(tutor.memberEmail),
+    memberPhone: maskingUtils.maskPhone(tutor.memberPhone),
+    memberAddress: maskingUtils.maskAddress(tutor.memberAddress)
+  }));
+  totalCount.value = response.data.totalElements;
+  totalPages.value = response.data.totalPages;
+};
+
+// 정렬 처리 함수
+const handleSort = (field) => {
+  if (field === currentSortField.value) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+  
+  currentPage.value = 1;
+  fetchSortedTutors();
+};
 
 onMounted(() => {
   fetchTutors();

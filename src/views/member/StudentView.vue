@@ -41,16 +41,86 @@
             <div class="table-container" :class="{ 'shrink': selectedStudent }">
               <div class="student-board-container">
                 <div class="student-board-header">
-                  <div v-if="selectedColumns.includes('memberCode')" class="student-board-header-code">학생 코드</div>
-                  <div v-if="selectedColumns.includes('memberName')" class="student-board-header-name">이름</div>
-                  <div v-if="selectedColumns.includes('memberEmail')" class="student-board-header-email">이메일</div>
-                  <div v-if="selectedColumns.includes('memberPhone')" class="student-board-header-phone">연락처</div>
-                  <div v-if="selectedColumns.includes('memberAddress')" class="student-board-header-address">주소</div>
-                  <div v-if="selectedColumns.includes('memberAge')" class="student-board-header-age">나이</div>
-                  <div v-if="selectedColumns.includes('memberBirth')" class="student-board-header-birth">생년월일</div>
-                  <div v-if="selectedColumns.includes('memberFlag')" class="student-board-header-flag">계정상태</div>
-                  <div v-if="selectedColumns.includes('createdAt')" class="student-board-header-created">생성일</div>
-                  <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-header-dormant">휴면상태</div>
+                  <div v-if="selectedColumns.includes('memberCode')" 
+                        class="student-board-header-code student-clickable"
+                        @click="handleSort('memberCode')">
+                    학생 코드
+                    <span v-if="currentSortField === 'memberCode'" class="student-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberName')" 
+                        class="student-board-header-name student-clickable"
+                        @click="handleSort('memberName')">
+                    이름
+                    <span v-if="currentSortField === 'memberName'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberEmail')" 
+                        class="student-board-header-email student-clickable"
+                        @click="handleSort('memberEmail')">
+                    이메일
+                    <span v-if="currentSortField === 'memberEmail'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberPhone')" 
+                        class="student-board-header-phone student-clickable"
+                        @click="handleSort('memberPhone')">
+                    연락처
+                    <span v-if="currentSortField === 'memberPhone'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberAddress')" 
+                        class="student-board-header-address student-clickable"
+                        @click="handleSort('memberAddress')">
+                    주소
+                    <span v-if="currentSortField === 'memberAddress'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberAge')" 
+                        class="student-board-header-age student-clickable"
+                        @click="handleSort('memberAge')">
+                    나이
+                    <span v-if="currentSortField === 'memberAge'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberBirth')" 
+                        class="student-board-header-birth student-clickable"
+                        @click="handleSort('memberBirth')">
+                    생년월일
+                    <span v-if="currentSortField === 'memberBirth'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberFlag')" 
+                        class="student-board-header-flag student-clickable"
+                        @click="handleSort('memberFlag')">
+                    계정상태
+                    <span v-if="currentSortField === 'memberFlag'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('createdAt')" 
+                        class="student-board-header-created student-clickable"
+                        @click="handleSort('createdAt')">
+                    생성일
+                    <span v-if="currentSortField === 'createdAt'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
+                  <div v-if="selectedColumns.includes('memberDormantStatus')" 
+                        class="student-board-header-dormant student-clickable"
+                        @click="handleSort('memberDormantStatus')">
+                    휴면상태
+                    <span v-if="currentSortField === 'memberDormantStatus'" class="studnet-sort-arrow">
+                      {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                    </span>
+                  </div>
                 </div>
 
                 <div class="student-board-body">
@@ -88,7 +158,7 @@
                       {{ student.memberFlag === true ? '활성' : '비활성' }}
                     </div>
                     <div v-if="selectedColumns.includes('createdAt')" class="student-board-row-created">
-                      {{ student.createdAt }}
+                      {{ formatToDateTime(student.createdAt) }}
                     </div>
                     <div v-if="selectedColumns.includes('memberDormantStatus')" class="student-board-row-dormant" :style="{
                       backgroundColor: student.memberDormantStatus ? '#fee2e2' : '#dcfce7',
@@ -151,7 +221,7 @@
                 </div>
                 <div class="info-row">
                   <span class="label">생년월일</span>
-                  <span>{{ studentDetail.member_dto.member_birth }}</span>
+                  <span>{{ formatToDateTime(studentDetail.member_dto.member_birth) }}</span>
                 </div>
                 <div class="info-row">
                   <span class="label">주소</span>
@@ -392,6 +462,8 @@ const columns = ref({
   createdAt: "생성일",
   memberDormantStatus: "휴면상태"
 });
+const currentSortField = ref('memberCode');
+const currentSortDirection = ref('DESC');
 const selectedColumns = ref(Object.keys(columns.value));
 
 const isUnusedCouponsVisible = ref(false);
@@ -452,7 +524,15 @@ const fetchStudents = async () => {
       },
     });
 
-    students.value = response.data.content;
+    // 마스킹 처리를 적용한 데이터로 변환
+    students.value = response.data.content.map(student => ({
+      ...student,
+      memberName: maskingUtils.maskName(student.memberName),
+      memberEmail: maskingUtils.maskEmail(student.memberEmail),
+      memberPhone: maskingUtils.maskPhone(student.memberPhone),
+      memberAddress: maskingUtils.maskAddress(student.memberAddress)
+    }));
+    console.log(students.value);
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -476,7 +556,14 @@ const fetchFilteredStudents = async () => {
       },
     });
 
-    students.value = response.data.content;
+    // 마스킹 처리를 적용한 데이터로 변환
+    students.value = response.data.content.map(student => ({
+      ...student,
+      memberName: maskingUtils.maskName(student.memberName),
+      memberEmail: maskingUtils.maskEmail(student.memberEmail),
+      memberPhone: maskingUtils.maskPhone(student.memberPhone),
+      memberAddress: maskingUtils.maskAddress(student.memberAddress)
+    }));
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {
@@ -504,23 +591,84 @@ const showDetail = async (student) => {
   }
 };
 
-// 페이지 변경 처리
-const changePage = async (newPage) => {
-  if (newPage < 1 || newPage > totalPages.value) return;
-  currentPage.value = newPage;
-  if (isFiltered.value) {
-    await fetchFilteredStudents();
-  } else {
-    await fetchStudents();
+const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+
+  maskEmail: (email) => {
+    if (!email) return '';
+    const [localPart, domain] = email.split('@');
+    if (!localPart || !domain) return email;
+    
+    const maskedLocal = localPart.substring(0, 2) + 
+      '*'.repeat(Math.max(localPart.length - 2, 4));
+    return `${maskedLocal}@${domain}`;
+  },
+
+    maskPhone: (phone) => {
+    if (!phone) return '';
+    
+    const parts = phone.split('-');
+    if (parts.length !== 3) return phone;
+    
+    return `${parts[0]}-${'*'.repeat(parts[1].length)}-${parts[2]}`;
+  },
+
+  maskAddress: (address) => {
+    if (!address) return '';
+    
+    const parts = address.split(' ');
+    
+    if (parts.length < 3) return address;
+    
+    const maskedParts = parts.map((part, index) => {
+      if (index < 2) return part; 
+      
+      if (index === 2) {
+        return part.substring(0, 2) + '*'.repeat(part.length - 2);
+      }
+      
+      if (part.includes('번길') || part.includes('번지')) {
+        const suffix = part.includes('번길') ? '번길' : '번지';
+        return '*'.repeat(part.length - suffix.length) + suffix;
+      }
+      
+      return '*'.repeat(part.length);
+    });
+    
+    return maskedParts.join(' ');
   }
 };
 
-// 필터링 검색
+// 페이지 변경 처리 수정
+const changePage = async (newPage) => {
+ if (newPage < 1 || newPage > totalPages.value) return;
+ currentPage.value = newPage;
+ 
+ if (currentSortField.value) {
+   await fetchSortedStudents();
+ } else if (isFiltered.value) {
+   await fetchFilteredStudents();
+ } else {
+   await fetchStudents();
+ }
+};
+
+// 필터 검색 처리 함수 수정
 const handleSearch = async (filterData) => {
-  isFiltered.value = true;
-  lastFilterData.value = filterData;
-  currentPage.value = 1;
-  await fetchFilteredStudents();
+ isFiltered.value = true;
+ lastFilterData.value = filterData;
+ currentPage.value = 1;
+ 
+ if (currentSortField.value) {
+   await fetchSortedStudents();
+ } else {
+   await fetchFilteredStudents();
+ }
 };
 
 const handleExcelDownload = async() => {
@@ -619,16 +767,89 @@ const getVocCategory = (categoryCode) => {
 
 const formatDate = (dateArray) => {
   if (!dateArray || !Array.isArray(dateArray)) return '-';
-  
-  const [year, month, day, hour, minute] = dateArray;
-  
-  // 월과 일이 한자리수일 경우 앞에 0을 붙임
+
+  const [year, month, day] = dateArray;
+
+  // 월과 일이 한 자리수일 경우 앞에 0을 붙임
   const formattedMonth = month.toString().padStart(2, '0');
   const formattedDay = day.toString().padStart(2, '0');
-  const formattedHour = hour.toString().padStart(2, '0');
-  const formattedMinute = minute.toString().padStart(2, '0');
-  
-  return `${year}-${formattedMonth}-${formattedDay}T${formattedHour}:${formattedMinute}:00`;
+
+  return `${year}-${formattedMonth}-${formattedDay}`;
+};
+
+function formatToDateTime(dateString) {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return date.toISOString().split('T')[0];
+}
+
+// 정렬된 학생 목록 가져오기 (필터링 여부에 따라 다른 endpoint 사용)
+const fetchSortedStudents = async () => {
+ try {
+   if (isFiltered.value && lastFilterData.value) {
+     // 필터링된 상태면 필터링 정렬 API 호출
+     console.log(lastFilterData.value);
+     const response = await axios.post('https://learnsmate.shop/member/filter/student/sort', 
+       lastFilterData.value,
+       {
+         withCredentials: true,
+         params: {
+           page: currentPage.value - 1,
+           size: pageSize,
+           sortField: currentSortField.value,
+           sortDirection: currentSortDirection.value
+         }
+       }
+     );
+     console.log(response.data);
+     handleResponse(response);
+   } else {
+     // 필터링되지 않은 상태면 일반 정렬 API 호출
+     console.log("노필터링");
+     const response = await axios.get('https://learnsmate.shop/member/students/sort', {
+       withCredentials: true,
+       params: {
+         page: currentPage.value - 1,
+         size: pageSize,
+         sortField: currentSortField.value,
+         sortDirection: currentSortDirection.value
+       }
+     });
+     handleResponse(response);
+   }
+ } catch (error) {
+   console.error('Failed to fetch sorted students:', error);
+ }
+};
+
+// 응답 처리 헬퍼 함수
+const handleResponse = (response) => {
+ students.value = response.data.content.map(student => ({
+   ...student,
+   memberName: maskingUtils.maskName(student.memberName),
+   memberEmail: maskingUtils.maskEmail(student.memberEmail),
+   memberPhone: maskingUtils.maskPhone(student.memberPhone),
+   memberAddress: maskingUtils.maskAddress(student.memberAddress)
+ }));
+ totalCount.value = response.data.totalElements;
+ totalPages.value = response.data.totalPages;
+};
+
+
+// 정렬 처리 함수
+const handleSort = (field) => {
+ if (field === currentSortField.value) {
+   // 같은 필드면 방향만 전환
+   currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+ } else {
+   // 다른 필드면 필드 변경 및 방향 초기화
+   currentSortField.value = field;
+   currentSortDirection.value = 'DESC';
+ }
+ 
+ // 현재 페이지 초기화 및 데이터 가져오기
+ currentPage.value = 1;
+ fetchSortedStudents();
 };
 
 // 초기 로드

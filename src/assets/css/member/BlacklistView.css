@@ -145,6 +145,13 @@
   position: relative;
 }
 
+.blacklist-board-row-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;  
+  padding: 0 5px;
+}
+
 .selected {
   background-color: #e2e8f0;
 }
@@ -333,4 +340,20 @@
 
 .report-entry p {
   margin: 0.25rem 0;
+}
+
+.blacklist-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.blacklist-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.blacklist-sort-arrow {
+  font-size: 12px;
 }

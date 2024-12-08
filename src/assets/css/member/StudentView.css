@@ -601,3 +601,19 @@ th {
   color: #333;
   cursor: pointer;
 }
+
+.student-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.student-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.student-sort-arrow {
+  font-size: 12px;
+}

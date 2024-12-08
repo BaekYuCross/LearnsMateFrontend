@@ -389,3 +389,19 @@ color: #333;
   color: #333;
   cursor: pointer;
 }
+
+.tutor-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tutor-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tutor-sort-arrow {
+  font-size: 12px;
+}
