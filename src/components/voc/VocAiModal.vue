@@ -207,7 +207,7 @@ export default {
 
   &.expanded {
     height: auto !important;
-    min-height: 600px;
+    min-height: 400px;
   }
 
   &::before,
