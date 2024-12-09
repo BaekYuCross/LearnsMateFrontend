@@ -109,7 +109,7 @@ const totalCount = ref(0);
 const coupon = ref([]);
 const selectedCoupon = ref(null);
 const currentPage = ref(1);
-const pageSize = 15;
+const pageSize = 50;
 
 const totalPages = ref(1);
 
@@ -413,7 +413,7 @@ const handleExcelDownload = async () => {
   color: #333333;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-x: auto;
   /* height: calc(100% - 35px); */
   height: 400px;
 }
