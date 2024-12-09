@@ -73,12 +73,12 @@
             <input 
             type="number" 
             placeholder="강의 금액을 입력하세요."
-            v-model="filters.min_price">
+            v-model="filters.min_lecture_price">
             ~
             <input 
             type="number" 
             placeholder="강의 금액을 입력하세요."
-            v-model="filters.max_price">
+            v-model="filters.max_lecture_price">
           <button 
           class="lecture-search-button"
           @click="() => applyFilters(filters.value)">
@@ -298,8 +298,8 @@ const formatDateWithTime = {
 const filters = ref({
   lecture_title: '',
   tutor_name: '',
-  min_price: '',
-  max_price: ''
+  min_lecture_price: '',
+  max_lecture_price: ''
 })
 
 const applyFilters = async (filterData, resetPage = true) => {
@@ -310,8 +310,8 @@ const applyFilters = async (filterData, resetPage = true) => {
     const formattedFilters = {
       lecture_title: filters.value.lecture_title || null,
       tutor_name: filters.value.tutor_name || null,
-      min_price: filters.value.min_price || null,
-      max_price: filters.value.max_price || null
+      min_lecture_price: filters.value.min_lecture_price || null,
+      max_lecture_price: filters.value.max_lecture_price || null
     };
 
     console.log('필터 내용:', formattedFilters);
@@ -325,7 +325,6 @@ const applyFilters = async (filterData, resetPage = true) => {
     }
 
     const page = currentPage.value - 1;
-    console.log('Sending page:', page); // 디버깅용
 
     const response = await axios.post('https://learnsmate.shop/lecture/coupon-register/filter', formattedFilters,
     {
@@ -339,7 +338,6 @@ const applyFilters = async (filterData, resetPage = true) => {
       }
     });
 
-    console.log("eawfweaf", response.data);
     if (response.data) {
       lecture.value = response.data.content;
       totalCount.value = response.data.totalElements;
@@ -649,31 +647,31 @@ const showCancelModal = () => {
 /* 강의 제목 */
 .coupon-target-lecture-table th:nth-child(3),
 .coupon-target-lecture-table td:nth-child(3) {
-  width: 30%;
+  width: 20%;
 }
 
 /* 강의 카테고리 */
 .coupon-target-lecture-table th:nth-child(4),
 .coupon-target-lecture-table td:nth-child(4) {
-  width: 10%;
+  width: 15%;
 }
 
 /* 난이도 */
 .coupon-target-lecture-table th:nth-child(5),
 .coupon-target-lecture-table td:nth-child(5) {
-  width: 15%;
+  width: 8%;
 }
 
 /* 강사명 */
 .coupon-target-lecture-table th:nth-child(6),
 .coupon-target-lecture-table td:nth-child(6) {
-  width: 10%;
+  width: 8%;
 }
 
 /* 강사 코드 */
 .coupon-target-lecture-table th:nth-child(7),
 .coupon-target-lecture-table td:nth-child(7) {
-  width: 10%;
+  width: 9%;
 }
 
 /* 등록일 */

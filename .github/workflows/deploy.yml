@@ -22,7 +22,18 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '18'
+
+    - name: Configure NPM registry
+      run: npm config set registry https://registry.npmjs.org/
+
+    - name: Clean previous install
+      run: |
+        rm -rf node_modules
+        rm package-lock.json
+
+    - name: Clean npm cache
+      run: npm cache clean --force
 
     - name: Install dependencies
       run: npm install

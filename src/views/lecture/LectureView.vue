@@ -667,6 +667,15 @@ const createStatsCharts = (data) => {
     lectureConversionRate: data.conversion_rate || 0,
   };
 
+  const transformedData = {
+    totalClicks: safeData.totalClicks / 10,
+    totalPurchases: safeData.totalPurchases,
+    categoryClicks: safeData.categoryClicks / 10,
+    categoryPurchases: safeData.categoryPurchases,
+    lectureClicks: safeData.lectureClicks / 10,
+    lecturePurchases: safeData.lecturePurchases
+  };
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true,
@@ -683,6 +692,19 @@ const createStatsCharts = (data) => {
         padding: {
           bottom: 10
         },
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            if (context.dataIndex === 0) {
+              const originalValue = (value * 10).toFixed(0);
+              return `${label}: ${originalValue} (÷10 적용됨)`;
+            }
+            return `${label}: ${value}`;
+          }
+        }
       }
     },
     layout: {
@@ -723,11 +745,11 @@ const createStatsCharts = (data) => {
   overallChart = new Chart(overallCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수", "구매 수"],
+      labels: ["클릭 수 (÷10)", "구매 수"],
       datasets: [
         {
           label: "전체 강의",
-          data: [safeData.totalClicks, safeData.totalPurchases],
+          data: [transformedData.totalClicks, transformedData.totalPurchases],
           backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)"],
           borderColor: ["rgba(75, 192, 192, 1)", "rgba(54, 162, 235, 1)"],
           borderWidth: 1,
@@ -748,11 +770,11 @@ const createStatsCharts = (data) => {
   categoryChart = new Chart(categoryCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수", "구매 수"],
+      labels: ["클릭 수 (÷10)", "구매 수"],
       datasets: [
         {
           label: "카테고리",
-          data: [safeData.categoryClicks, safeData.categoryPurchases],
+          data: [transformedData.categoryClicks, transformedData.categoryPurchases],
           backgroundColor: ["rgba(255, 159, 64, 0.2)", "rgba(153, 102, 255, 0.2)"],
           borderColor: ["rgba(255, 159, 64, 1)", "rgba(153, 102, 255, 1)"],
           borderWidth: 1,
@@ -773,11 +795,11 @@ const createStatsCharts = (data) => {
   lectureChart = new Chart(lectureCtx, {
     type: "bar",
     data: {
-      labels: ["클릭 수", "구매 수"],
+      labels: ["클릭 수 (÷10)", "구매 수"],
       datasets: [
         {
           label: "현재 강의",
-          data: [safeData.lectureClicks, safeData.lecturePurchases],
+          data: [transformedData.lectureClicks, transformedData.lecturePurchases],
           backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(255, 99, 132, 0.2)"],
           borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
           borderWidth: 1,

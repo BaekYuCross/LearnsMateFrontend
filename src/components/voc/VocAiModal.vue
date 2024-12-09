@@ -1,50 +1,66 @@
 <template>
-    <div class="voc-ai-modal-backdrop" v-if="localSummaryData">
-      <div class="voc-ai-modal-container">
-        <button class="voc-ai-modal-close" @click="close">×</button>
-        <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
-        
-        <div class="voc-ai-date-picker">
-          <label for="monday-picker">날짜 선택:</label>
+  <div class="voc-ai-modal-backdrop">
+    <div 
+      class="voc-ai-modal-container"
+      :class="{ 'expanded': showCalendar }"
+    >
+      <button class="voc-ai-modal-close" @click="close">×</button>
+      <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
+
+      <div class="voc-ai-date-picker">
+        <label for="monday-picker">날짜 선택:</label>
+        <div class="date-input-wrapper">
           <input
-            type="date"
+            type="text"
             id="monday-picker"
-            :value="selectedDate"
-            @change="fetchAnalysisData"
-            :min="minDate"
+            :value="formatDate(selectedDate)"
+            readonly
+            @click="toggleCalendar"
+          />
+          <CustomCalendar
+            v-model="selectedDate"
+            :min-date="minDate"
+            :max-date="maxDate"
+            :is-visible="showCalendar"
+            @select="handleDateSelect"
           />
         </div>
+      </div>
 
-        <div v-if="localSummaryData.length > 0">
-          <table class="voc-ai-modal-summary-table">
-            <thead>
-              <tr>
-                <th>키워드</th>
-                <th>건수</th>
-                <th>추천 답안</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in localSummaryData" :key="index">
-                <td>{{ item.keyword }}</td>
-                <td>{{ item.keywordCount }}건</td>
-                <td>{{ item.recommendation }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div v-else>
-          <p class="voc-ai-modal-message">요약 데이터를 불러오는 중입니다...</p>
-        </div>
+      <div v-if="localSummaryData.length > 0" :class="{ 'content-wrapper': true, 'hidden': showCalendar }">
+        <table class="voc-ai-modal-summary-table">
+          <thead>
+            <tr>
+              <th>키워드</th>
+              <th>건수</th>
+              <th>추천 답안</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in localSummaryData" :key="index">
+              <td>{{ item.keyword }}</td>
+              <td>{{ item.keywordCount }}건</td>
+              <td>{{ item.recommendation }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else class="voc-ai-modal-message">
+        <p>요약 데이터를 불러오는 중입니다...</p>
       </div>
     </div>
-  </template>  
+  </div>
+</template>
 
 <script>
 import axios from "axios";
+import CustomCalendar from './VOCCustomCalendar.vue';
 
 export default {
   name: "VocAiModal",
+  components: {
+    CustomCalendar
+  },
   props: {
     summaryData: {
       type: Array,
@@ -56,7 +72,17 @@ export default {
       localSummaryData: [],
       selectedDate: null,
       minDate: "2023-06-01",
+      maxDate: new Date().toISOString().split("T")[0],
+      showCalendar: false
     };
+  },
+  created() {
+    const today = new Date();
+    while (today.getDay() !== 1) {
+      today.setDate(today.getDate() - 1);
+    }
+    this.selectedDate = today.toISOString().split('T')[0];
+    this.fetchAnalysisData(this.selectedDate);
   },
   watch: {
     summaryData: {
@@ -67,26 +93,29 @@ export default {
     },
   },
   methods: {
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    },
+    toggleCalendar() {
+      this.showCalendar = !this.showCalendar;
+    },
+    handleDateSelect(date) {
+      this.showCalendar = false;
+      this.fetchAnalysisData(date);
+    },
     close() {
       this.$emit("close");
     },
-    isMonday(dateString) {
-      const date = new Date(dateString);
-      return date.getDay() === 1;
-    },
-    async fetchAnalysisData(event) {
-      const selectedDate = event.target.value;
-
-      if (!this.isMonday(selectedDate)) {
-        alert("월요일만 선택할 수 있습니다.");
-        return;
-      }
-
-      this.selectedDate = selectedDate;
-
+    async fetchAnalysisData(date) {
       try {
         const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date: selectedDate },
+          params: { date }
         });
 
         if (response.status === 204 || !response.data.length) {
@@ -102,10 +131,18 @@ export default {
     },
   },
 };
-
 </script>
 
 <style scoped>
+.voc-ai-date-picker input {
+  cursor: pointer;
+  background: #fff;
+}
+
+.voc-ai-date-picker input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 .voc-ai-date-picker {
   display: flex;
   align-items: center;
@@ -134,6 +171,17 @@ export default {
   box-shadow: 0 0 5px rgba(20, 95, 88, 0.5);
 }
 
+.voc-ai-date-picker input::-webkit-calendar-picker-indicator {
+  background-color: #ffffff;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+.voc-ai-date-picker input:invalid {
+  border-color: #ff0000;
+}
+
 .voc-ai-modal-backdrop {
   position: fixed;
   top: 0;
@@ -155,8 +203,13 @@ export default {
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   padding: 20px;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
+
+  &.expanded {
+    height: auto !important;
+    min-height: 450px;
+  }
 
   &::before,
   &::after {
@@ -208,19 +261,36 @@ export default {
 }
 
 .voc-ai-modal-summary-table {
-  width: 100%; /* 표를 모달 컨테이너의 너비에 맞춤 */
-  max-height: 300px; /* 표의 최대 높이를 제한 */
-  overflow-y: auto; /* 표 내용이 넘칠 경우 스크롤 추가 */
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
   border-collapse: collapse;
   margin-top: 20px;
+  table-layout: fixed; /* 테이블 레이아웃을 고정으로 설정 */
 }
 
 .voc-ai-modal-summary-table th,
 .voc-ai-modal-summary-table td {
   border: 1px solid #ddd;
   padding: 10px;
-  word-wrap: break-word;
-  max-width: 690px;
+  vertical-align: top;
+}
+
+.voc-ai-modal-summary-table th:nth-child(1),
+.voc-ai-modal-summary-table td:nth-child(1) {
+  width: 20%; /* 키워드 컬럼 */
+}
+
+.voc-ai-modal-summary-table th:nth-child(2),
+.voc-ai-modal-summary-table td:nth-child(2) {
+  width: 15%; /* 건수 컬럼 */
+}
+
+.voc-ai-modal-summary-table th:nth-child(3),
+.voc-ai-modal-summary-table td:nth-child(3) {
+  width: 65%;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .voc-ai-modal-summary-table th {
@@ -240,10 +310,30 @@ export default {
 
 .voc-ai-modal-summary-table td {
   font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   text-align: left;
+  word-break: break-all; /* 긴 텍스트를 여러 줄로 나누기 */
+  white-space: normal; /* 줄바꿈 허용 */
+  line-height: 1.4; /* 줄 간격 조정 */
 }
 
+.voc-ai-modal-summary-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.content-wrapper {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+.content-wrapper.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.date-input-wrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 1001;
+}
 </style>

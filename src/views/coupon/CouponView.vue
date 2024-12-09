@@ -109,7 +109,7 @@ const totalCount = ref(0);
 const coupon = ref([]);
 const selectedCoupon = ref(null);
 const currentPage = ref(1);
-const pageSize = 15;
+const pageSize = 50;
 
 const totalPages = ref(1);
 
@@ -361,11 +361,9 @@ const handleExcelDownload = async () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 575px;
-  height: 100%;
+  height: 570px;
   width: 100%;
   transition: width 0.3s ease;
-  /* Smooth width transition */
   overflow: hidden;
 }
 
@@ -384,7 +382,7 @@ const handleExcelDownload = async () => {
 .coupon-table {
   width: 100%;
   min-width: 1200px;
-  table-layout: fixed;
+  height: 100%; /* 570px에서 100%로 변경 */
   border-collapse: collapse;
   background-color: #ffffff;
 }
@@ -414,8 +412,7 @@ const handleExcelDownload = async () => {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  /* height: calc(100% - 35px); */
-  height: 400px;
+  height: calc(100% - 35px);
 }
 
 .coupon-table-row {
@@ -450,7 +447,7 @@ const handleExcelDownload = async () => {
 .coupon-table-container {
   flex: 1;
   transition: flex 0.3s ease;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .coupon-inner-container.shrink {

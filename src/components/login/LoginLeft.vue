@@ -41,7 +41,7 @@ const checkLoginStatus = async () => {
 
 const loginUser = async () => {
   try {
-    const loginResponse = await axios.post('/users/login', {
+    const loginResponse = await axios.post('https://learnsmate.shop/users/login', {
       admin_code: formData.value.adminCode,
       admin_password: formData.value.adminPassword,
     });

@@ -92,33 +92,34 @@ const refreshToken = async () => {
       alert('RefreshToken이 없습니다. 갱신할 수 없습니다.');
       return;
     }
-    
+
     clearTimer();
-    
+
     const response = await axios.post(
       'https://learnsmate.shop/auth/refresh',
       { refreshToken },
       {
         withCredentials: true,
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
 
     const { accessToken, exp } = response.data;
 
     console.log('Refresh response:', response.data);
-    
+
     if (accessToken && exp) {
       document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
       document.cookie = `token=${accessToken}; Path=/; Secure; SameSite=None;`;
-      
+
       loginState.setExp(exp);
+
       const newExpirationTime = new Date(exp[0], exp[1] - 1, exp[2], exp[3], exp[4], exp[5]);
-      
+
       console.log('New expiration time:', newExpirationTime);
-      
+
       if (newExpirationTime && !isNaN(newExpirationTime.getTime())) {
         startTimer(newExpirationTime, (remaining) => {
           remainingTime.value = remaining;
@@ -126,10 +127,15 @@ const refreshToken = async () => {
       } else {
         console.error('Invalid expiration time:', exp);
         remainingTime.value = '만료됨';
+        alert('토큰이 만료돼 로그아웃합니다..')
+        setTimeout(() => {
+          router.replace('/login');
+        }, 500);
       }
     }
   } catch (error) {
     console.error('토큰 갱신 에러:', error);
+
     if (error.response?.status === 401) {
       clearTimer();
       document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; SameSite=None;';
@@ -137,6 +143,10 @@ const refreshToken = async () => {
       alert('토큰 갱신 실패: 다시 로그인하세요.');
       loginState.resetState();
       router.replace('/login');
+    } else if (error.response?.status === 500) {
+      alert('서버 오류로 인해 토큰 갱신에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    } else {
+      alert('알 수 없는 오류가 발생했습니다. 관리자에게 문의하세요.');
     }
   }
 };
