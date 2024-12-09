@@ -6,15 +6,22 @@
 
       <div class="voc-ai-date-picker">
         <label for="monday-picker">날짜 선택:</label>
-        <input
-          type="date"
-          id="monday-picker"
-          :value="selectedDate"
-          @change="handleDateChange"
-          :min="minDate"
-          :max="maxDate"
-          :disabled-dates="disabledDates"
-        />
+        <div class="date-input-wrapper">
+          <input
+            type="text"
+            id="monday-picker"
+            :value="formatDate(selectedDate)"
+            readonly
+            @click="toggleCalendar"
+          />
+          <CustomCalendar
+            v-model="selectedDate"
+            :min-date="minDate"
+            :max-date="maxDate"
+            :is-visible="showCalendar"
+            @select="handleDateSelect"
+          />
+        </div>
       </div>
 
       <div v-if="localSummaryData.length > 0">
@@ -44,9 +51,13 @@
 
 <script>
 import axios from "axios";
+import CustomCalendar from './VOCCustomCalendar.vue';
 
 export default {
   name: "VocAiModal",
+  components: {
+    CustomCalendar
+  },
   props: {
     summaryData: {
       type: Array,
@@ -59,14 +70,15 @@ export default {
       selectedDate: null,
       minDate: "2023-06-01",
       maxDate: new Date().toISOString().split("T")[0],
-      mondayDates: [],
+      showCalendar: false
     };
   },
   created() {
-    this.generateMondayDates();
-    if (this.mondayDates.length > 0) {
-      this.selectedDate = this.mondayDates[this.mondayDates.length - 1];
+    const today = new Date();
+    while (today.getDay() !== 1) {
+      today.setDate(today.getDate() - 1);
     }
+    this.selectedDate = today.toISOString().split('T')[0];
   },
   watch: {
     summaryData: {
@@ -77,40 +89,29 @@ export default {
     },
   },
   methods: {
-    generateMondayDates() {
-      const mondays = [];
-      const start = new Date(this.minDate);
-      const end = new Date();
-
-      while (start.getDay() !== 1) {
-        start.setDate(start.getDate() + 1);
-      }
-
-      while (start <= end) {
-        mondays.push(start.toISOString().split("T")[0]);
-        start.setDate(start.getDate() + 7);
-      }
-
-      this.mondayDates = mondays;
+    formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     },
-    handleDateChange(event) {
-      const selectedDate = event.target.value;
-      if (!this.mondayDates.includes(selectedDate)) {
-        event.target.value = this.selectedDate;
-        return;
-      }
-      this.fetchAnalysisData(event);
+    toggleCalendar() {
+      this.showCalendar = !this.showCalendar;
+    },
+    handleDateSelect(date) {
+      this.showCalendar = false;
+      this.fetchAnalysisData(date);
     },
     close() {
       this.$emit("close");
     },
-    async fetchAnalysisData(event) {
-      const selectedDate = event.target.value;
-      this.selectedDate = selectedDate;
-
+    async fetchAnalysisData(date) {
       try {
         const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date: selectedDate },
+          params: { date }
         });
 
         if (response.status === 204 || !response.data.length) {
@@ -129,6 +130,20 @@ export default {
 </script>
 
 <style scoped>
+.date-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.voc-ai-date-picker input {
+  cursor: pointer;
+  background: #fff;
+}
+
+.voc-ai-date-picker input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 .voc-ai-date-picker {
   display: flex;
   align-items: center;
