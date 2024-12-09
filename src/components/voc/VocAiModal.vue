@@ -1,6 +1,9 @@
 <template>
   <div class="voc-ai-modal-backdrop">
-    <div class="voc-ai-modal-container">
+    <div 
+      class="voc-ai-modal-container"
+      :class="{ 'expanded': showCalendar }"
+    >
       <button class="voc-ai-modal-close" @click="close">×</button>
       <h2 class="voc-ai-modal-title">주차 별 AI 요약 보고서</h2>
 
@@ -24,7 +27,7 @@
         </div>
       </div>
 
-      <div v-if="localSummaryData.length > 0">
+      <div v-if="localSummaryData.length > 0" :class="{ 'content-wrapper': true, 'hidden': showCalendar }">
         <table class="voc-ai-modal-summary-table">
           <thead>
             <tr>
@@ -42,8 +45,8 @@
           </tbody>
         </table>
       </div>
-      <div v-else>
-        <p class="voc-ai-modal-message">요약 데이터를 불러오는 중입니다...</p>
+      <div v-else class="voc-ai-modal-message">
+        <p>요약 데이터를 불러오는 중입니다...</p>
       </div>
     </div>
   </div>
@@ -130,11 +133,6 @@ export default {
 </script>
 
 <style scoped>
-.date-input-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
 .voc-ai-date-picker input {
   cursor: pointer;
   background: #fff;
@@ -206,6 +204,11 @@ export default {
   padding: 20px;
   overflow-y: auto;
   position: relative;
+
+  &.expanded {
+    height: auto !important;
+    min-height: 600px;
+  }
 
   &::before,
   &::after {
@@ -295,4 +298,20 @@ export default {
   text-align: left;
 }
 
+.content-wrapper {
+  transition: opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+.content-wrapper.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.date-input-wrapper {
+  position: relative;
+  display: inline-block;
+  z-index: 1001;
+}
 </style>
