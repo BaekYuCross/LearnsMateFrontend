@@ -223,12 +223,11 @@ const fetchCoupons = async () => {
   }
 };
 
-// changePage 함수도 수정
+// changePage 함수 수정 (정렬 상태 유지)
 const changePage = async (newPage) => {
   if (newPage < 1 || newPage > totalPages.value) return;
   currentPage.value = newPage;
   if (isFiltered.value && currentFilters.value) {
-    // 페이지 리셋하지 않고 필터 적용
     await applyFilters(currentFilters.value, false);
   } else {
     await fetchCoupons();
@@ -258,6 +257,7 @@ const registerCoupon = () => {
   router.push({ name: 'Register-Coupon' });
 };
 
+// applyFilters 함수 수정
 const applyFilters = async (filters, resetPage = true) => {
   try {
     isFiltered.value = true;
@@ -268,7 +268,8 @@ const applyFilters = async (filters, resetPage = true) => {
       currentPage.value = 1;
     }
 
-    const response = await axios.post('https://learnsmate.shop/coupon/filters2', filters,
+    const response = await axios.post('https://learnsmate.shop/coupon/filters2/sort',
+      filters,
       {
         withCredentials: true,
         headers: {
@@ -277,8 +278,12 @@ const applyFilters = async (filters, resetPage = true) => {
         params: {
           page: currentPage.value - 1,
           size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
         }
       });
+
+      console.log("데이터는: ", response.data);
 
     if (response.data && response.data.content) {
       coupon.value = response.data.content;
@@ -346,7 +351,7 @@ const columns = {
 
 const handleExcelDownload = async () => {
   try {
-
+    
     console.log('Current filters:', currentFilters.value);
     const filterData = isFiltered.value && currentFilters.value ? {
       couponName: currentFilters.value.coupon_name || null,
@@ -363,8 +368,11 @@ const handleExcelDownload = async () => {
       couponCategoryName: currentFilters.value.coupon_category_name || null,
       adminName: currentFilters.value.admin_name || null,
       tutorName: currentFilters.value.tutor_name || null,
+      registrationType: currentFilters.value.registration_type || null,
       selectedColumns: Object.keys(columns)
     } : null;
+
+    console.log('Excel download request data:', filterData);
 
     const config = {
       method: 'POST',
@@ -409,6 +417,7 @@ const handleExcelDownload = async () => {
   }
 }
 
+// 정렬 처리를 위한 함수
 const handleSort = async (field) => {
   if (currentSortField.value === field) {
     // 같은 필드를 다시 클릭하면 정렬 방향을 토글
@@ -419,7 +428,7 @@ const handleSort = async (field) => {
     currentSortDirection.value = 'DESC';
   }
   
-  // 정렬된 데이터 fetch
+  // 현재 필터 상태에 따라 적절한 API 호출
   if (isFiltered.value && currentFilters.value) {
     await applyFilters(currentFilters.value, false);
   } else {
