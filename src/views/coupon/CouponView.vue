@@ -415,8 +415,6 @@ const handleExcelDownload = async () => {
   display: flex;
   flex-direction: column;
   overflow-x: auto;
-  /* height: calc(100% - 35px); */
-  height: 400px;
 }
 
 .coupon-table-row {
