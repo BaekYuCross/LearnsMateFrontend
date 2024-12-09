@@ -82,6 +82,7 @@ export default {
       today.setDate(today.getDate() - 1);
     }
     this.selectedDate = today.toISOString().split('T')[0];
+    this.fetchAnalysisData(this.selectedDate);
   },
   watch: {
     summaryData: {
@@ -207,7 +208,7 @@ export default {
 
   &.expanded {
     height: auto !important;
-    min-height: 400px;
+    min-height: 450px;
   }
 
   &::before,
