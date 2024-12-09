@@ -21,20 +21,80 @@
           <div class="coupon-table-container">
             <div class="coupon-table-wrapper">
               <div class="coupon-table">
-                <div class="coupon-table-header"> 
-                    <div>쿠폰 번호</div>
-                    <div>쿠폰 이름</div>
-                    <div>쿠폰 내용</div>
-                    <div>쿠폰 할인율</div>
-                    <div>쿠폰 종류</div>
-                    <div>상태</div>
-                    <div>시작일</div>
-                    <div>만료일</div>
-                    <div>생성일</div>
-                    <div>수정일</div>
-                    <div>직원</div>
-                    <div>강사</div>
-                </div>
+                <div class="coupon-table-header">
+                  <div class="coupon-clickable" @click="handleSort('couponCode')">
+                      쿠폰 번호
+                      <span v-if="currentSortField === 'couponCode'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponName')">
+                      쿠폰 이름
+                      <span v-if="currentSortField === 'couponName'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponContents')">
+                      쿠폰 내용
+                      <span v-if="currentSortField === 'couponContents'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponDiscountRate')">
+                      쿠폰 할인율
+                      <span v-if="currentSortField === 'couponDiscountRate'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponCategoryName')">
+                      쿠폰 종류
+                      <span v-if="currentSortField === 'couponCategoryName'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('activeState')">
+                      상태
+                      <span v-if="currentSortField === 'activeState'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponStartDate')">
+                      시작일
+                      <span v-if="currentSortField === 'couponStartDate'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('couponExpireDate')">
+                      만료일
+                      <span v-if="currentSortField === 'couponExpireDate'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('createdAt')">
+                      생성일
+                      <span v-if="currentSortField === 'createdAt'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('updatedAt')">
+                      수정일
+                      <span v-if="currentSortField === 'updatedAt'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('adminName')">
+                      직원
+                      <span v-if="currentSortField === 'adminName'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+                  <div class="coupon-clickable" @click="handleSort('tutorName')">
+                      강사
+                      <span v-if="currentSortField === 'tutorName'" class="coupon-sort-arrow">
+                          {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                      </span>
+                  </div>
+              </div>
                 <div class="coupon-table-body">
                   <div class="coupon-table-row" v-for="(coupon, index) in coupon || []" :key="coupon.coupon_code"
                     @click="selectCoupon(coupon)">
@@ -115,6 +175,8 @@ const totalPages = ref(1);
 
 const isFiltered = ref(false);
 const currentFilters = ref(null);
+const currentSortField = ref('createdAt');
+const currentSortDirection = ref('DESC');
 
 // displayedPages computed 속성 추가
 const displayedPages = computed(() => {
@@ -139,12 +201,14 @@ const displayedPages = computed(() => {
 
 const fetchCoupons = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/coupon/coupons2',
+    const response = await axios.get('https://learnsmate.shop/coupon/coupons2/sort',
       {
         withCredentials: true,
         params: {
           page: currentPage.value - 1,
           size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
         },
       });
 
@@ -344,6 +408,24 @@ const handleExcelDownload = async () => {
     }
   }
 }
+
+const handleSort = async (field) => {
+  if (currentSortField.value === field) {
+    // 같은 필드를 다시 클릭하면 정렬 방향을 토글
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    // 다른 필드를 클릭하면 해당 필드로 변경하고 DESC로 시작
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+  
+  // 정렬된 데이터 fetch
+  if (isFiltered.value && currentFilters.value) {
+    await applyFilters(currentFilters.value, false);
+  } else {
+    await fetchCoupons();
+  }
+};
 
 </script>
 
@@ -784,5 +866,21 @@ const handleExcelDownload = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.coupon-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coupon-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.coupon-sort-arrow {
+  font-size: 12px;
 }
 </style>
