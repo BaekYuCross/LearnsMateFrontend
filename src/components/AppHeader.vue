@@ -127,6 +127,10 @@ const refreshToken = async () => {
       } else {
         console.error('Invalid expiration time:', exp);
         remainingTime.value = '만료됨';
+        alert('토큰이 만료돼 로그아웃합니다..')
+        setTimeout(() => {
+          router.replace('/login');
+        }, 500);
       }
     }
   } catch (error) {

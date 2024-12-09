@@ -361,11 +361,9 @@ const handleExcelDownload = async () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 575px;
-  height: 100%;
+  height: 570px;
   width: 100%;
   transition: width 0.3s ease;
-  /* Smooth width transition */
   overflow: hidden;
 }
 
@@ -384,12 +382,9 @@ const handleExcelDownload = async () => {
 .coupon-table {
   width: 100%;
   min-width: 1200px;
-  table-layout: fixed;
-  height: 570px;
+  height: 100%; /* 570px에서 100%로 변경 */
   border-collapse: collapse;
   background-color: #ffffff;
-  overflow-x: auto;
-  transition: flex 0.5s ease;
 }
 
 .coupon-table-header {
@@ -452,7 +447,7 @@ const handleExcelDownload = async () => {
 .coupon-table-container {
   flex: 1;
   transition: flex 0.3s ease;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 .coupon-inner-container.shrink {
