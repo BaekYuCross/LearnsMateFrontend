@@ -41,135 +41,134 @@
             <div class="payment-board-header">
               <div 
                 v-if="selectedColumns.includes('paymentCode')" 
-                class="payment-board-header-code"
-                @click="sortPaymentList('payment_code')"
-                :class="{
-                  'sort-asc': sortState.column === 'payment_code' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'payment_code' && sortState.order === 2
-                }"
+                class="payment-board-header-code payment-clickable"
+                @click="handleSort('paymentCode')"
               >
                 결제코드
+                <span v-if="currentSortField === 'paymentCode'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('createdAt')" 
-                class="payment-board-header-date"
-                @click="sortPaymentList('created_at')"
-                :class="{
-                  'sort-asc': sortState.column === 'created_at' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'created_at' && sortState.order === 2
-                }"
+                class="payment-board-header-date payment-clickable"
+                @click="handleSort('createdAt')"
               >
                 결제일
+                <span v-if="currentSortField === 'createdAt'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('lectureCode')" 
-                class="payment-board-header-lecturecode"
-                @click="sortPaymentList('lecture_code')"
-                :class="{
-                  'sort-asc': sortState.column === 'lecture_code' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'lecture_code' && sortState.order === 2
-                }"
+                class="payment-board-header-lecturecode payment-clickable"
+                @click="handleSort('lectureCode')"
               >
                 강의코드
+                <span v-if="currentSortField === 'lectureCode'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('lectureTitle')" 
-                class="payment-board-header-title"
-                @click="sortPaymentList('lecture_title')"
-                :class="{
-                  'sort-asc': sortState.column === 'lecture_title' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'lecture_title' && sortState.order === 2
-                }"
+                class="payment-board-header-title payment-clickable"
+                @click="handleSort('lectureTitle')"
               >
                 강의명
+                <span v-if="currentSortField === 'lectureTitle'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('lectureCategoryName')" 
-                class="payment-board-header-category"
-                @click="sortPaymentList('lecture_category_name')"
-                :class="{
-                  'sort-asc': sortState.column === 'lecture_category_name' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'lecture_category_name' && sortState.order === 2
-                }"
+                class="payment-board-header-category payment-clickable"
+                @click="handleSort('lectureCategoryName')"
               >
                 강의 카테고리
+                <span v-if="currentSortField === 'lectureCategoryName'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('tutorCode')" 
-                class="payment-board-header-tutorcode"
-                @click="sortPaymentList('tutor_code')"
-                :class="{
-                  'sort-asc': sortState.column === 'tutor_code' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'tutor_code' && sortState.order === 2
-                }"
+                class="payment-board-header-tutorcode payment-clickable"
+                @click="handleSort('tutorCode')"
               >
                 강사코드
+                <span v-if="currentSortField === 'tutorCode'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('tutorName')" 
-                class="payment-board-header-tutor"
-                @click="sortPaymentList('tutor_name')"
-                :class="{
-                  'sort-asc': sortState.column === 'tutor_name' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'tutor_name' && sortState.order === 2
-                }"
+                class="payment-board-header-tutor payment-clickable"
+                @click="handleSort('tutorName')"
               >
                 강사명
+                <span v-if="currentSortField === 'tutorName'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('studentCode')" 
-                class="payment-board-header-studentcode"
-                @click="sortPaymentList('student_code')"
-                :class="{
-                  'sort-asc': sortState.column === 'student_code' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'student_code' && sortState.order === 2
-                }"
+                class="payment-board-header-studentcode payment-clickable"
+                @click="handleSort('studentCode')"
               >
                 학생코드
+                <span v-if="currentSortField === 'studentCode'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('studentName')" 
-                class="payment-board-header-student"
-                @click="sortPaymentList('student_name')"
-                :class="{
-                  'sort-asc': sortState.column === 'student_name' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'student_name' && sortState.order === 2
-                }"
+                class="payment-board-header-student payment-clickable"
+                @click="handleSort('studentName')"
               >
                 학생명
+                <span v-if="currentSortField === 'studentName'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('lecturePrice')" 
-                class="payment-board-header-lectureprice"
-                @click="sortPaymentList('lecture_price')"
-                :class="{
-                  'sort-asc': sortState.column === 'lecture_price' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'lecture_price' && sortState.order === 2
-                }"
+                class="payment-board-header-lectureprice payment-clickable"
+                @click="handleSort('lecturePrice')"
               >
                 원가(원)
+                <span v-if="currentSortField === 'lecturePrice'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('couponIssuanceName')" 
-                class="payment-board-header-coupon"
-                @click="sortPaymentList('coupon_issuance_name')"
-                :class="{
-                  'sort-asc': sortState.column === 'coupon_issuance_name' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'coupon_issuance_name' && sortState.order === 2
-                }"
+                class="payment-board-header-coupon payment-clickable"
+                @click="handleSort('couponIssuanceName')"
               >
                 적용쿠폰
+                <span v-if="currentSortField === 'couponIssuanceName'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
+
               <div 
                 v-if="selectedColumns.includes('paymentPrice')" 
-                class="payment-board-header-price"
-                @click="sortPaymentList('payment_price')"
-                :class="{
-                  'sort-asc': sortState.column === 'payment_price' && sortState.order === 1,
-                  'sort-desc': sortState.column === 'payment_price' && sortState.order === 2
-                }"
+                class="payment-board-header-price payment-clickable"
+                @click="handleSort('paymentPrice')"
               >
                 결제액(원)
+                <span v-if="currentSortField === 'paymentPrice'" class="payment-sort-arrow">
+                  {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+                </span>
               </div>
             </div>
   
@@ -376,44 +375,39 @@ const columns = ref({
     paymentPrice: "결제액(원)"
 });
 
-const sortState = ref({
-  column: null,
-  order: 0,
-});
+// 기존 sortState 대신 새로운 정렬 상태 관리
+const currentSortField = ref('createdAt');
+const currentSortDirection = ref('DESC');
 
+// 정렬 함수 수정
 const sortPaymentList = (columnKey) => {
-  if (sortState.value.column === columnKey) {
-    sortState.value.order = (sortState.value.order + 1) % 3;
+  if (currentSortField.value === columnKey) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
   } else {
-    sortState.value.column = columnKey;
-    sortState.value.order = 1;
+    currentSortField.value = columnKey;
+    currentSortDirection.value = 'DESC';
   }
 
-  if (sortState.value.order === 0) {
-    fetchPaymentList();
+  // 필터가 적용된 상태라면 필터와 함께 정렬 적용
+  if (isFiltered.value && lastFilterData.value) {
+    handleSearch(lastFilterData.value);
   } else {
-    paymentList.value.sort((a, b) => {
-      const valueA = a[columnKey];
-      const valueB = b[columnKey];
-
-      if (sortState.value.order === 1) {
-        return valueA > valueB ? 1 : valueA < valueB ? -1 : 0;
-      } else {
-        return valueA < valueB ? 1 : valueA > valueB ? -1 : 0;
-      }
-    });
+    fetchPaymentList();
   }
 };
 
 const selectedColumns = ref(Object.keys(columns.value));
 
+// fetchPaymentList 수정
 const fetchPaymentList = async (filters = {}) => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/payments`, {
+    const response = await axios.get(`https://learnsmate.shop/payments/sort`, {
       params: {
         ...filters,
         page: currentPage.value - 1,
-        size: pageSize
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
       },
     });
 
@@ -439,43 +433,73 @@ const camelToSnake = (obj) => {
 };
 
 const handleSearch = async (filterData) => {
-    try {
-        isFiltered.value = true;
+  try {
+    isFiltered.value = true;
 
-        const convertToISODate = (date) => {
-            if (!date) return null;
-            const parsedDate = new Date(date);
-            return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
-        };
+    const convertToISODate = (date) => {
+      if (!date) return null;
+      const parsedDate = new Date(date);
+      return new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 0, 0, 0).toISOString();
+    };
 
-        const processedData = {
-            ...filterData,
-            startCreatedAt: convertToISODate(filterData.startCreatedAt),
-            endCreatedAt: convertToISODate(filterData.endCreatedAt),
-        };
+    const processedData = {
+      ...filterData,
+      startCreatedAt: convertToISODate(filterData.startCreatedAt),
+      endCreatedAt: convertToISODate(filterData.endCreatedAt),
+    };
 
-        lastFilterData.value = processedData;
+    lastFilterData.value = processedData;
 
-        const response = await axios.post(
-            `https://learnsmate.shop/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-            camelToSnake(processedData)
-        );
+    console.log('Request Data:', {
+      url: `https://learnsmate.shop/payments/filter/sort`,
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
+      },
+      body: camelToSnake(processedData)
+    });
 
-        paymentList.value = response.data.content;
-        totalElements.value = response.data.totalElements;
-        totalPages.value = response.data.totalPages;
-    } catch (error) {
-        console.error('Failed to filter payments:', error);
-    }
+    const response = await axios.post(
+      `https://learnsmate.shop/payments/filter/sort`,
+      camelToSnake(processedData),
+      {
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
+        }
+      }
+    );
+
+    console.log('Filter Response:', response.data);
+
+    // 응답 구조에 따라 적절히 매핑
+    paymentList.value = response.data.paymentData || response.data.content || [];
+    totalElements.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages || Math.ceil(totalElements.value / pageSize);
+
+    console.log('Processed Data:', {
+      paymentList: paymentList.value,
+      totalElements: totalElements.value,
+      totalPages: totalPages.value
+    });
+  } catch (error) {
+    console.error('Failed to filter payments:', error);
+  }
 };
-  
-  const handleReset = () => {
-    isFiltered.value = false;
-    lastFilterData.value = null;
-    currentPage.value = 1;
-    selectedPayment.value = null;
-    fetchPaymentList();
-  };
+
+const handleReset = () => {
+  isFiltered.value = false;
+  lastFilterData.value = null;
+  currentPage.value = 1;
+  selectedPayment.value = null;
+  currentSortField.value = 'createdAt';
+  currentSortDirection.value = 'DESC';
+  fetchPaymentList();
+};
 
   const handleExcelDownload = async () => {
   try {
@@ -590,22 +614,31 @@ const showPaymentDetail = async (payment) => {
     selectedPayment.value = null;
   };
   
-  const changePage = async (newPage) => {
-    if (newPage < 1 || newPage > totalPages.value) return;
-    currentPage.value = newPage;
+// changePage 수정
+const changePage = async (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  currentPage.value = newPage;
 
-    if (isFiltered.value && lastFilterData.value) {
-        const response = await axios.post(
-            `https://learnsmate.shop/payments/filter?page=${currentPage.value - 1}&size=${pageSize}`,
-            camelToSnake(lastFilterData.value)
-        );
+  if (isFiltered.value && lastFilterData.value) {
+    const response = await axios.post(
+      `https://learnsmate.shop/payments/filter/sort`, // 엔드포인트 수정
+      camelToSnake(lastFilterData.value),
+      {
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
+        }
+      }
+    );
 
-        paymentList.value = response.data.content;
-        totalElements.value = response.data.totalElements;
-        totalPages.value = response.data.totalPages;
-    } else {
-        await fetchPaymentList();
-    }
+    paymentList.value = response.data.content;
+    totalElements.value = response.data.totalElements;
+    totalPages.value = response.data.totalPages;
+  } else {
+    await fetchPaymentList();
+  }
 };
 
 const openRevenueModal = () => {
@@ -644,6 +677,21 @@ const maskName = (name) => {
   const firstChar = name[0];
   const lastChar = name[name.length - 1];
   return `${firstChar}**${lastChar}`;
+};
+
+const handleSort = (field) => {
+  if (currentSortField.value === field) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+
+  if (isFiltered.value && lastFilterData.value) {
+    handleSearch(lastFilterData.value);
+  } else {
+    fetchPaymentList();
+  }
 };
   
   onMounted(async () => {
