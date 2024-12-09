@@ -32,13 +32,55 @@
         </div>
         <div class="board-container">
           <div class="board-header">
-            <div  v-if="selectedColumns.includes('campaignTemplateCode')" class="board-header-number">템플릿 코드</div>
-            <div  v-if="selectedColumns.includes('campaignTemplateTitle')" class="board-header-title">템플릿 제목</div>
-            <div  v-if="selectedColumns.includes('campaignTemplateContents')" class="board-header-contents">템플릿 내용</div>
-            <div  v-if="selectedColumns.includes('createdAt')" class="board-header-created">생성일</div>
-            <div  v-if="selectedColumns.includes('updatedAt')" class="board-header-updated">수정일</div>
-            <div  v-if="selectedColumns.includes('adminName')" class="board-header-admin">담당자</div>
-          </div>
+            <div v-if="selectedColumns.includes('campaignTemplateCode')" 
+                  class="board-header-number campaigntemplate-clickable"
+                  @click="handleSort('campaignTemplateCode')">
+              템플릿 코드
+              <span v-if="currentSortField === 'campaignTemplateCode'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('campaignTemplateTitle')" 
+                  class="board-header-title campaigntemplate-clickable"
+                  @click="handleSort('campaignTemplateTitle')">
+              템플릿 제목
+              <span v-if="currentSortField === 'campaignTemplateTitle'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('campaignTemplateContents')" 
+                  class="board-header-contents campaigntemplate-clickable"
+                  @click="handleSort('campaignTemplateContents')">
+              템플릿 내용
+              <span v-if="currentSortField === 'campaignTemplateContents'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('createdAt')" 
+                  class="board-header-created campaigntemplate-clickable"
+                  @click="handleSort('createdAt')">
+              생성일
+              <span v-if="currentSortField === 'createdAt'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('updatedAt')" 
+                  class="board-header-updated campaigntemplate-clickable"
+                  @click="handleSort('updatedAt')">
+              수정일
+              <span v-if="currentSortField === 'updatedAt'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('adminName')" 
+                  class="board-header-admin campaigntemplate-clickable"
+                  @click="handleSort('adminName')">
+              담당자
+              <span v-if="currentSortField === 'adminName'" class="campaigntemplate-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            </div>
           <div class="board-body">
             <div
               class="board-row"
@@ -113,20 +155,23 @@
   });
 
   const selectedColumns = ref(Object.keys(columns.value));
-  
-  const fetchCampaignTemplates = async () => {
-    try {
-      const response = await axios.get('https://learnsmate.shop/campaign-template/list',{
-      method: 'GET',
-      withCredentials: true,
-    });
-      campaignTemplates.value = response.data;
-      console.log(campaignTemplates.value);
-    } catch (error) {
-      console.error('Failed to fetch campaign-templates:', error);
-    }
-  };
+const currentSortField = ref('createdAt');
+const currentSortDirection = ref('DESC');
 
+const fetchCampaignTemplates = async () => {
+ try {
+   const response = await axios.get('https://learnsmate.shop/campaign-template/list/sort', {
+     withCredentials: true,
+     params: {
+       sortField: currentSortField.value,
+       sortDirection: currentSortDirection.value
+     }
+   });
+   campaignTemplates.value = response.data;
+ } catch (error) {
+   console.error('Failed to fetch campaign-templates:', error);
+ }
+};
   const showRegisterModal = ref(false);
   const showGetModal = ref(false);
   const selectedCampaignTemplate = ref(null);
@@ -237,31 +282,31 @@
 
 
   const handleSearch = async (preparedFilters) => {
-    isFiltered.value = true;
-    lastFilterData.value = preparedFilters;
-    try {
-      console.log("filters data: ",preparedFilters);
-      const response = await axios.post(
-        'https://learnsmate.shop/campaign-template/filter',
-        camelToSnake(preparedFilters),
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          params: {
-            page: currentPage.value - 1, // 0-based pagination
-            size: pageSize,
-          },
-        }
-      );
-      campaignTemplates.value = response.data.content; // API의 응답 구조에 따라 조정
-      console.log('Filtered campaigns:', campaignTemplates.value);
-      totalPages.value = response.data.totalPages; 
-    } catch (error) {
-      console.error('Error while fetching filtered campaigns:', error);
-    }
-  };
+  isFiltered.value = true;
+  lastFilterData.value = preparedFilters;
+  try {
+    const response = await axios.post(
+      'https://learnsmate.shop/campaign-template/filter/sort',
+      camelToSnake(preparedFilters),
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        params: {
+          page: currentPage.value - 1,
+          size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
+        },
+      }
+    );
+    campaignTemplates.value = response.data.content;
+    totalPages.value = response.data.totalPages;
+  } catch (error) {
+    console.error('Error while fetching filtered campaigns:', error);
+  }
+};
 
   const handleReset = async () => {
     isFiltered.value = false;
@@ -275,6 +320,22 @@
     fetchCampaignTemplates();
   };
 
+  const handleSort = (field) => {
+ if (currentSortField.value === field) {
+   currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC'
+ } else {
+   currentSortField.value = field
+   currentSortDirection.value = 'ASC'
+ }
+
+ if (isFiltered.value) {
+   handleSearch(lastFilterData.value)
+ } else {
+   fetchCampaignTemplates()
+ }
+}
+
+  
   onMounted(() => {
     fetchCampaignTemplates();
   });
@@ -453,5 +514,20 @@
     color: #ccc;
     cursor: not-allowed;
   }
+
+  .campaigntemplate-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.campaigntemplate-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.campaigntemplate-sort-arrow {
+  font-size: 12px;
+}
   </style>
-  
