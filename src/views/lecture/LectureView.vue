@@ -371,7 +371,10 @@ let overallChart = null;
 let categoryChart = null;
 let lectureChart = null;
 const currentYear = new Date().getFullYear()
-const years = ref(Array.from({length: 5}, (_, i) => currentYear - 4 + i))
+const years = ref(Array.from(
+  {length: (new Date().getFullYear() - 2022 + 1)}, 
+  (_, i) => 2022 + i
+));
 const months = ref(Array.from({length: 12}, (_, i) => i + 1))
 const isDropdownOpen = ref(false);
 const columns = ref({
@@ -472,7 +475,7 @@ const camelToSnake = (obj) => {
 };
 
 const statsFilter = ref({
-  startYear: new Date().getFullYear() - 1,
+  startYear: 2022,
   startMonth: 1,
   endYear: new Date().getFullYear(),
   endMonth: 12
