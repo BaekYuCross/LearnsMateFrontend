@@ -98,14 +98,14 @@
           <span class="lecture-filter-label">가격 범위</span>
           <div class="lecture-price-range-container">
             <input 
-              v-model="filterData.minPrice" 
+              v-model="filterData.minLecturePrice" 
               type="number" 
               placeholder="최소"
               class="lecture-filter-input lecture-price-input"
             />
             <span class="lecture-price-separator">~</span>
             <input 
-              v-model="filterData.maxPrice" 
+              v-model="filterData.maxLecturePrice" 
               type="number" 
               placeholder="최대"
               class="lecture-filter-input lecture-price-input"
