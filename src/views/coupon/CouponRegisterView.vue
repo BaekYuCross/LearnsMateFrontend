@@ -298,8 +298,8 @@ const formatDateWithTime = {
 const filters = ref({
   lecture_title: '',
   tutor_name: '',
-  min_price: '',
-  max_price: ''
+  min_lecture_price: '',
+  max_lecture_price: ''
 })
 
 const applyFilters = async (filterData, resetPage = true) => {
@@ -310,8 +310,8 @@ const applyFilters = async (filterData, resetPage = true) => {
     const formattedFilters = {
       lecture_title: filters.value.lecture_title || null,
       tutor_name: filters.value.tutor_name || null,
-      min_price: filters.value.min_price || null,
-      max_price: filters.value.max_price || null
+      min_lecture_price: filters.value.min_lecture_price || null,
+      max_lecture_price: filters.value.max_lecture_price || null
     };
 
     console.log('필터 내용:', formattedFilters);

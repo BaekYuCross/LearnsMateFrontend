@@ -147,8 +147,8 @@ const filterData = ref({
   lectureLevel: '',
   lectureConfirmStatus: '',
   lectureStatus: '',
-  minPrice: '',
-  maxPrice: '',
+  minLecturePrice: '',
+  maxLecturePrice: '',
   startCreatedAt: '',
   endCreatedAt: ''
 });
