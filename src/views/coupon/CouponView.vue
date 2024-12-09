@@ -384,6 +384,7 @@ const handleExcelDownload = async () => {
 .coupon-table {
   width: 100%;
   min-width: 1200px;
+  height: 570px;
   table-layout: fixed;
   border-collapse: collapse;
   background-color: #ffffff;
