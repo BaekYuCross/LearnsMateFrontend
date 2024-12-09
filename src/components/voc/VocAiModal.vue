@@ -276,15 +276,19 @@ export default {
   vertical-align: top;
 }
 
+.voc-ai-modal-summary-table th:nth-child(1),
 .voc-ai-modal-summary-table td:nth-child(1) {
   width: 20%; /* 키워드 컬럼 */
 }
 
+.voc-ai-modal-summary-table th:nth-child(2),
 .voc-ai-modal-summary-table td:nth-child(2) {
   width: 15%; /* 건수 컬럼 */
 }
 
+.voc-ai-modal-summary-table th:nth-child(3),
 .voc-ai-modal-summary-table td:nth-child(3) {
+  width: 65%;
   white-space: normal;
   word-break: break-word;
 }
