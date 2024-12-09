@@ -203,7 +203,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   padding: 20px;
-  overflow-y: auto;
+  overflow: hidden;
   position: relative;
 
   &.expanded {
@@ -276,19 +276,17 @@ export default {
   vertical-align: top;
 }
 
-.voc-ai-modal-summary-table th:nth-child(1),
 .voc-ai-modal-summary-table td:nth-child(1) {
   width: 20%; /* 키워드 컬럼 */
 }
 
-.voc-ai-modal-summary-table th:nth-child(2),
 .voc-ai-modal-summary-table td:nth-child(2) {
   width: 15%; /* 건수 컬럼 */
 }
 
-.voc-ai-modal-summary-table th:nth-child(3),
 .voc-ai-modal-summary-table td:nth-child(3) {
-  width: 65%; /* 추천 답안 컬럼 */
+  white-space: normal;
+  word-break: break-word;
 }
 
 .voc-ai-modal-summary-table th {
