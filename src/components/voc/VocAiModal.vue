@@ -261,19 +261,34 @@ export default {
 }
 
 .voc-ai-modal-summary-table {
-  width: 100%; /* 표를 모달 컨테이너의 너비에 맞춤 */
-  max-height: 300px; /* 표의 최대 높이를 제한 */
-  overflow-y: auto; /* 표 내용이 넘칠 경우 스크롤 추가 */
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
   border-collapse: collapse;
   margin-top: 20px;
+  table-layout: fixed; /* 테이블 레이아웃을 고정으로 설정 */
 }
 
 .voc-ai-modal-summary-table th,
 .voc-ai-modal-summary-table td {
   border: 1px solid #ddd;
   padding: 10px;
-  word-wrap: break-word;
-  max-width: 690px;
+  vertical-align: top;
+}
+
+.voc-ai-modal-summary-table th:nth-child(1),
+.voc-ai-modal-summary-table td:nth-child(1) {
+  width: 20%; /* 키워드 컬럼 */
+}
+
+.voc-ai-modal-summary-table th:nth-child(2),
+.voc-ai-modal-summary-table td:nth-child(2) {
+  width: 15%; /* 건수 컬럼 */
+}
+
+.voc-ai-modal-summary-table th:nth-child(3),
+.voc-ai-modal-summary-table td:nth-child(3) {
+  width: 65%; /* 추천 답안 컬럼 */
 }
 
 .voc-ai-modal-summary-table th {
@@ -293,10 +308,14 @@ export default {
 
 .voc-ai-modal-summary-table td {
   font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   text-align: left;
+  word-break: break-all; /* 긴 텍스트를 여러 줄로 나누기 */
+  white-space: normal; /* 줄바꿈 허용 */
+  line-height: 1.4; /* 줄 간격 조정 */
+}
+
+.voc-ai-modal-summary-table tr:hover {
+  background-color: #f1f1f1;
 }
 
 .content-wrapper {
