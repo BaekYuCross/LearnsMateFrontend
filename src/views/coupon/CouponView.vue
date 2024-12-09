@@ -415,11 +415,11 @@ const handleExcelDownload = async () => {
   height: calc(100% - 35px);
 }
 
-.coupon-table-body::-webkit-scrollbar {
+.coupon-table-wrapper::-webkit-scrollbar {
   width: 6px;
 }
 
-.coupon-table-body::-webkit-scrollbar-thumb:hover {
+.coupon-table-wrapper::-webkit-scrollbar-thumb:hover {
   background-color: #00302b;
 }
 
