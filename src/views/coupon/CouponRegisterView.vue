@@ -647,7 +647,7 @@ const showCancelModal = () => {
 /* 강의 제목 */
 .coupon-target-lecture-table th:nth-child(3),
 .coupon-target-lecture-table td:nth-child(3) {
-  width: 25%;
+  width: 20%;
 }
 
 /* 강의 카테고리 */
@@ -659,19 +659,19 @@ const showCancelModal = () => {
 /* 난이도 */
 .coupon-target-lecture-table th:nth-child(5),
 .coupon-target-lecture-table td:nth-child(5) {
-  width: 5%;
+  width: 8%;
 }
 
 /* 강사명 */
 .coupon-target-lecture-table th:nth-child(6),
 .coupon-target-lecture-table td:nth-child(6) {
-  width: 5%;
+  width: 8%;
 }
 
 /* 강사 코드 */
 .coupon-target-lecture-table th:nth-child(7),
 .coupon-target-lecture-table td:nth-child(7) {
-  width: 10%;
+  width: 9%;
 }
 
 /* 등록일 */
