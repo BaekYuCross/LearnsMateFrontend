@@ -415,14 +415,6 @@ const handleExcelDownload = async () => {
   height: calc(100% - 35px);
 }
 
-.coupon-table-wrapper::-webkit-scrollbar {
-  width: 6px;
-}
-
-.coupon-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #00302b;
-}
-
 .coupon-table-row {
   display: grid;
   grid-template-columns:  1fr 2fr 3fr 1fr 1fr 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1fr 1fr;
