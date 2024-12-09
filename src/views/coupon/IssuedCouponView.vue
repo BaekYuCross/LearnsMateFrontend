@@ -31,18 +31,102 @@
       <div class="issue-coupon-content-body">
         <div class="issue-coupon-board-container" :class="{ 'single-view': isSingleView }">
           <div class="issue-coupon-board-header">
-            <div v-if="selectedColumns.includes('couponIssuanceCode')" class="issue-coupon-board-header-issuance_code">발급 쿠폰 번호</div>
-            <div v-if="selectedColumns.includes('couponName')" class="issue-coupon-board-header-coupon-name">쿠폰 이름</div>
-            <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-header-coupon-contents">쿠폰 내용</div>
-            <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-header-coupon-category-name">쿠폰 종류</div>
-            <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-header-student-code">고객 코드</div>
-            <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-header-student-name">고객명</div>
-            <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-header-use-status">사용 여부</div>
-            <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-header-discount-rate">할인율</div>
-            <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-header-start-date">시작일</div> 
-            <div v-if="selectedColumns.includes('couponExpireDate')" class="issue-coupon-board-header-expire-date">만료일</div>
-            <div v-if="selectedColumns.includes('couponIssueDate')" class="issue-coupon-board-header-issue-date">발급일</div>
-            <div v-if="selectedColumns.includes('couponUseDate')" class="issue-coupon-board-header-use-date">사용일</div>
+            <div v-if="selectedColumns.includes('couponIssuanceCode')" 
+                class="issue-coupon-board-header-issuance_code issue-coupon-clickable"
+                @click="handleSort('couponIssuanceCode')">
+              발급 쿠폰 번호
+              <span v-if="currentSortField === 'couponIssuanceCode'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponName')"
+                class="issue-coupon-board-header-coupon-name issue-coupon-clickable"
+                @click="handleSort('couponName')">
+              쿠폰 이름
+              <span v-if="currentSortField === 'couponName'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponContents')"
+                class="issue-coupon-board-header-coupon-contents issue-coupon-clickable"
+                @click="handleSort('couponContents')">
+              쿠폰 내용
+              <span v-if="currentSortField === 'couponContents'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponCategoryName')"
+                class="issue-coupon-board-header-coupon-category-name issue-coupon-clickable"
+                @click="handleSort('couponCategoryName')">
+              쿠폰 종류
+              <span v-if="currentSortField === 'couponCategoryName'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('studentCode')"
+                class="issue-coupon-board-header-student-code issue-coupon-clickable"
+                @click="handleSort('studentCode')">
+              고객 코드
+              <span v-if="currentSortField === 'studentCode'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('studentName')"
+                class="issue-coupon-board-header-student-name issue-coupon-clickable"
+                @click="handleSort('studentName')">
+              고객명
+              <span v-if="currentSortField === 'studentName'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponUseStatus')"
+                class="issue-coupon-board-header-use-status issue-coupon-clickable"
+                @click="handleSort('couponUseStatus')">
+              사용 여부
+              <span v-if="currentSortField === 'couponUseStatus'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponDiscountRate')"
+                class="issue-coupon-board-header-discount-rate issue-coupon-clickable"
+                @click="handleSort('couponDiscountRate')">
+              할인율
+              <span v-if="currentSortField === 'couponDiscountRate'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponStartDate')"
+                class="issue-coupon-board-header-start-date issue-coupon-clickable"
+                @click="handleSort('couponStartDate')">
+              시작일
+              <span v-if="currentSortField === 'couponStartDate'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponExpireDate')"
+                class="issue-coupon-board-header-expire-date issue-coupon-clickable"
+                @click="handleSort('couponExpireDate')">
+              만료일
+              <span v-if="currentSortField === 'couponExpireDate'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponIssueDate')"
+                class="issue-coupon-board-header-issue-date issue-coupon-clickable"
+                @click="handleSort('couponIssueDate')">
+              발급일
+              <span v-if="currentSortField === 'couponIssueDate'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
+            <div v-if="selectedColumns.includes('couponUseDate')"
+                class="issue-coupon-board-header-use-date issue-coupon-clickable"
+                @click="handleSort('couponUseDate')">
+              사용일
+              <span v-if="currentSortField === 'couponUseDate'" class="issue-coupon-sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+            </div>
           </div>
 
           <div class="issue-coupon-board-body">
@@ -132,6 +216,8 @@ const selectedCoupon = ref(null);
 const isSingleView = ref(false);
 const isDropdownOpen = ref(false);
 const coupons = ref([]);
+const currentSortField = ref('couponIssueDate');
+const currentSortDirection = ref('DESC');
 
 const columns = ref({
   couponIssuanceCode: "발급 쿠폰 번호",
@@ -151,23 +237,24 @@ const columns = ref({
 
   const selectedColumns = ref(Object.keys(columns.value));
 
-const fetchIssueCouponList = async () => {
+  const fetchIssueCouponList = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/issue-coupon/all-issued-coupons2',
-      {
-        withCredentials: true,
-        params: {
-          page: currentPage.value - 1,
-          size: pageSize,
-        }
+    const response = await axios.get('https://learnsmate.shop/issue-coupon/all-issued-coupons2/sort', {
+      withCredentials: true,
+      params: {
+        page: currentPage.value - 1,
+        size: pageSize,
+        sortField: currentSortField.value,
+        sortDirection: currentSortDirection.value
       }
-    );
+    });
 
+    console.log(pageSize);
+    // 응답 구조 확인 및 통일
     coupons.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-
-    console.log("발급쿠폰 데이터:",coupons.value);
+    console.log('Response data:', response.data); // 디버깅용
   } catch(error) {
     console.error('IssueCoupon 목록을 불러오는데 실패했습니다:', error);
   }
@@ -175,15 +262,25 @@ const fetchIssueCouponList = async () => {
 
 const applyFilters = async (filterData) => {
   try {
+    // 필터 데이터 복사하여 저장
+    lastFilterData.value = { ...filterData };
     isFiltered.value = true;
     currentPage.value = 1;
-    lastFilterData.value = filterData;
 
     const response = await axios.post(
-      `https://learnsmate.shop/issue-coupon/filters2?page=0&size=${pageSize}`,
-      camelToSnake(filterData)
+      `https://learnsmate.shop/issue-coupon/filters2/sort`,
+      camelToSnake(filterData),
+      {
+        params: {
+          page: 0,
+          size: pageSize,
+          sortField: currentSortField.value,
+          sortDirection: currentSortDirection.value
+        }
+      }
     );
 
+    // response 처리
     coupons.value = response.data.content;
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
@@ -212,8 +309,16 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `https://learnsmate.shop/issue-coupon/filters2?page=${currentPage.value - 1}&size=${pageSize}`,
-        camelToSnake(lastFilterData.value)
+        `https://learnsmate.shop/issue-coupon/filters2/sort`,
+        camelToSnake(lastFilterData.value),
+        {
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize,
+            sortField: currentSortField.value,
+            sortDirection: currentSortDirection.value
+          }
+        }
       );
 
       coupons.value = response.data.content;
@@ -228,17 +333,17 @@ const changePage = async (newPage) => {
 };
 
 const handleExcelDownload = async () => {
-  try {
-    const response = await axios.post(
-      'https://learnsmate.shop/issue-coupon/excel/download',
-      {
-        selectedColumns: selectedColumns.value, 
-        ...(isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {})
-      },
-      {
-        responseType: 'blob',
-      }
-    );
+ try {
+   const filterDto = lastFilterData.value ? {
+     ...snakeToCamel(lastFilterData.value),
+     selectedColumns: selectedColumns.value
+   } : { selectedColumns: selectedColumns.value };
+
+   const response = await axios.post(
+     'https://learnsmate.shop/issue-coupon/excel/download',
+     filterDto,
+     { responseType: 'blob' }
+   );
 
     if (response.data instanceof Blob) {
       const isJson = response.data.type === 'application/json';
@@ -311,6 +416,17 @@ const camelToSnake = (obj) => {
   }, {});
 };
 
+const snakeToCamel = (obj) => {
+ if (!obj || typeof obj !== 'object') return obj;
+ if (Array.isArray(obj)) return obj.map(snakeToCamel);
+ 
+ return Object.keys(obj).reduce((acc, key) => {
+   const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+   acc[camelKey] = snakeToCamel(obj[key]);
+   return acc;
+ }, {});
+};
+
 const formatDate = (isoDate) => {
   if (!isoDate) return '-';
   const date = new Date(isoDate);
@@ -343,6 +459,21 @@ const startPage = computed(() => {
 const endPage = computed(() => {
   return displayedPages.value[displayedPages.value.length - 1];
 });
+
+const handleSort = async (field) => {
+  if (currentSortField.value === field) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = field;
+    currentSortDirection.value = 'ASC';
+  }
+  
+  if (isFiltered.value && lastFilterData.value) {
+    await applyFilters(lastFilterData.value);
+  } else {
+    await fetchIssueCouponList();
+  }
+};
 
 onMounted(() => {
   fetchIssueCouponList();
@@ -584,5 +715,21 @@ onMounted(() => {
 
 .issue-coupon-excel-button:hover {
   background-color: #004c42;
+}
+
+.issue-coupon-clickable {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.issue-coupon-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.issue-coupon-sort-arrow {
+  font-size: 12px;
 }
 </style>
