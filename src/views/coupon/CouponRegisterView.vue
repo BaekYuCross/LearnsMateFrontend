@@ -73,12 +73,12 @@
             <input 
             type="number" 
             placeholder="강의 금액을 입력하세요."
-            v-model="filters.min_price">
+            v-model="filters.min_lecture_price">
             ~
             <input 
             type="number" 
             placeholder="강의 금액을 입력하세요."
-            v-model="filters.max_price">
+            v-model="filters.max_lecture_price">
           <button 
           class="lecture-search-button"
           @click="() => applyFilters(filters.value)">
@@ -325,7 +325,6 @@ const applyFilters = async (filterData, resetPage = true) => {
     }
 
     const page = currentPage.value - 1;
-    console.log('Sending page:', page); // 디버깅용
 
     const response = await axios.post('https://learnsmate.shop/lecture/coupon-register/filter', formattedFilters,
     {
@@ -339,7 +338,6 @@ const applyFilters = async (filterData, resetPage = true) => {
       }
     });
 
-    console.log("eawfweaf", response.data);
     if (response.data) {
       lecture.value = response.data.content;
       totalCount.value = response.data.totalElements;
