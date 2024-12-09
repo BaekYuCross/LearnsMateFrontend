@@ -385,8 +385,11 @@ const handleExcelDownload = async () => {
   width: 100%;
   min-width: 1200px;
   table-layout: fixed;
+  height: 570px;
   border-collapse: collapse;
   background-color: #ffffff;
+  overflow-x: auto;
+  transition: flex 0.5s ease;
 }
 
 .coupon-table-header {
@@ -413,8 +416,8 @@ const handleExcelDownload = async () => {
   color: #333333;
   display: flex;
   flex-direction: column;
-  height: 570px;
-  overflow-x: auto;
+  overflow-y: auto;
+  height: calc(100% - 35px);
 }
 
 .coupon-table-row {
