@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="campaign-filter-item">
-            <span class="campaign-filter-label">유형</span>
+            <span class="campaign-filter-label">발송 타입</span>
             <select 
                 v-model="filters.campaignType"
                 class="campaign-filter-input"
@@ -159,6 +159,7 @@
     padding-left: 8px;
     display: flex;
     align-items: center;
+
   }
 
   .partial-width {
@@ -182,6 +183,7 @@
     border: 1px solid #e2e8f0;
     min-width: 0;
     width: 100%;
+    outline: none;
   }
 
   .campaign-date-range-container {
