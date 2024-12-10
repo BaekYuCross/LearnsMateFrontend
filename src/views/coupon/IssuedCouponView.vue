@@ -605,7 +605,7 @@ onMounted(() => {
 
 .issue-coupon-board-header {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: 1fr 0.6fr 0.9fr 0.6fr 0.7fr 0.6fr 0.7fr 0.6fr 0.6fr 0.5fr 0.6fr 0.5fr;
   padding: 7px 14px;
   background-color: #f9f9f9;
   font-size: 12px;
@@ -627,7 +627,7 @@ onMounted(() => {
 
 .issue-coupon-board-row {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: 1fr 0.6fr 0.9fr 0.6fr 0.7fr 0.6fr 0.7fr 0.6fr 0.6fr 0.5fr 0.6fr 0.5fr;
   padding: 10px 15px;
   border-bottom: 1px solid #eaeaea;
   font-size: 11px;
@@ -720,7 +720,6 @@ onMounted(() => {
 .issue-coupon-clickable {
   cursor: pointer;
   user-select: none;
-  display: flex;
   align-items: center;
   gap: 4px;
 }
