@@ -261,7 +261,7 @@ const fetchRevenueData = async () => {
       {
         year: currentYear - 1,
         month: previousMonth,
-        revenue: data[previousYear]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
+        revenue: data[currentYear - 1]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
       },
       {
         year: currentYear,
