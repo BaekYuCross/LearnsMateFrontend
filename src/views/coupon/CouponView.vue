@@ -106,9 +106,9 @@
                     <div class="coupon-table-active-state-row">
                     <div :class="{
                       'active-state': true,
-                      'active': coupon.coupon_flag,
-                      'inactive': !coupon.coupon_flag
-                    }">{{ coupon.coupon_flag ? '활성' : '비활성' }}</div>
+                      'active': Boolean(coupon.coupon_flag),
+                      'inactive': !Boolean(coupon.coupon_flag)
+                    }">{{ Boolean(coupon.coupon_flag) ? '활성' : '비활성' }}</div>
                     </div>
                     <div>{{ formatDate(coupon.coupon_start_date) }}</div>
                     <div>{{ formatDate(coupon.coupon_expire_date) }}</div>
@@ -351,8 +351,6 @@ const columns = {
 
 const handleExcelDownload = async () => {
   try {
-    
-    console.log('Current filters:', currentFilters.value);
     const filterData = isFiltered.value && currentFilters.value ? {
       couponName: currentFilters.value.coupon_name || null,
       couponContents: currentFilters.value.coupon_contents || null,
