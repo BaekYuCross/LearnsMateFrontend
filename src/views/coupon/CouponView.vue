@@ -867,16 +867,6 @@ const handleSort = async (field) => {
   width: 50px;
 }
 
-.coupon-table-row div.active-state.active {
-  background-color: #dcfce7;
-  color: #166534; /* 활성일 때 글자색 */
-}
-
-.coupon-table-row div.active-state.inactive {
-  background-color: #fee2e2;
-  color: #991b1b; /* 비활성일 때 글자색 */
-}
-
 .coupon-table-active-state-row {
   display: flex;
   align-items: center;

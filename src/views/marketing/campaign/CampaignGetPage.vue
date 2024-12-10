@@ -96,15 +96,13 @@
                       v-model="selectedDate"
                       class="date-input"
                   />
-                  <input
+                  <TimeSelect
                       v-if="isEditMode && campaignType === 'RESERVATION'"
-                      type="time"
                       v-model="selectedTime"
-                      class="time-input"
+                      :selected-date="selectedDate"
                   />
               </div>
-          </div>
-
+            </div>
           </div>
         </div>
 
@@ -261,8 +259,8 @@
 
   
   
-  <script setup>
-  import { ref, computed, watch } from 'vue';
+<script setup>
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
@@ -270,6 +268,8 @@ import CouponSelectModal from '@/components/marketing/couponSelectModal.vue';
 import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.vue';
 import CancelModule from '@/components/modules/CancelModule.vue';
 import { useLoginState } from '@/stores/loginState';
+import TimeSelect from '@/components/marketing/TimeSelect.vue';
+
 
 const loginState = useLoginState();
 const userCode = loginState.adminCode;
@@ -746,10 +746,6 @@ fetchTemplate();
   border-radius: 4px;
   font-size: 14px;
   font-family: inherit;
-}
-
-.time-input {
-  width: 100px;
 }
 
 .campaign-get-attach {

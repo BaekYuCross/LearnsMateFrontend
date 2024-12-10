@@ -93,12 +93,10 @@
                     :disabled="campaignType === 'INSTANT'"
                     @change="handleDateChange"
                   />
-                  <input
-                    type="time"
+                  <TimeSelect
                     v-model="selectedTime"
-                    class="time-input"
-                    :min="minTime"
                     :disabled="campaignType === 'INSTANT'"
+                    :selected-date="selectedDate"
                   />
                 </div>
               </div>
@@ -253,6 +251,7 @@ import TargetUserSelctModal from '@/components/marketing/TargetUserSelectModal.v
 import RegisterModule from '@/components/modules/RegisterModule.vue';
 import CancelModule from '@/components/modules/CancelModule.vue'; 
 import { useLoginState } from '@/stores/loginState';
+import TimeSelect from '@/components/marketing/TimeSelect.vue';
 
 const loginState = useLoginState();
 
@@ -298,6 +297,16 @@ const camelToSnake = (obj) => {
     acc[snakeKey] = camelToSnake(obj[key]);
     return acc;
   }, {});
+};
+const formatHour = (hour) => `${String(hour).padStart(2, '0')}:00`;
+
+const isPastTime = (hour) => {
+  const now = new Date();
+  const selectedDateTime = new Date(selectedDate.value);
+  selectedDateTime.setHours(hour, 0, 0, 0);
+
+  // 현재 날짜와 시간 비교
+  return selectedDateTime <= now && selectedDate.value === now.toISOString().split('T')[0];
 };
 
 
@@ -437,11 +446,7 @@ const minTime = computed(() => {
 
 const handleDateChange = () => {
   if (selectedDate.value === minDate.value) {
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    if (selectedTime.value && selectedTime.value < currentTime) {
-      selectedTime.value = '';
-    }
+    selectedTime.value = "";
   }
 };
 
@@ -747,8 +752,25 @@ fetchTemplates();
    font-family: inherit;
 }
 
-.time-input {
-   width: 100px;
+.time-select {
+  max-height: 40px;  
+  overflow-y: auto;   
+  height: 30.4px;    
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 13px; 
+  background-color: #ffffff;
+  color: #333333;
+  cursor: pointer;
+  outline: none;
+}
+
+
+
+.time-select option:disabled {
+  color: #bbb;
+  background-color: #f9f9f9;
 }
 
 .campaign-attach {

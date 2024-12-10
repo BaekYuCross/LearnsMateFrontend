@@ -58,13 +58,14 @@
     <div class="coupon-detail-table-row">
       <div class="coupon-detail-table-head">상태</div>
       <div class="coupon-detail-table-body">
-        <div div class="active-state" :class="{
-      'active-state': true,
-      'active': props.selectedCoupon.active_state,
-      'inactive': !props.selectedCoupon.active_state
-    }">
-        {{ props.selectedCoupon.active_state ? '활성' : '비활성' }}
-      </div>
+        <div div class="coupon-detail-active-state" :class="{
+          'active-state': true,
+          'active': props.selectedCoupon.active_state && props.selectedCoupon.coupon_flag,
+          'inactive': !props.selectedCoupon.active_state || props.selectedCoupon.coupon_flag
+        }">
+            {{ (props.selectedCoupon.active_state && props.selectedCoupon.coupon_flag) ? '활성' :
+            (!props.selectedCoupon.coupon_flag ? '삭제' : '비활성') }}
+        </div>
       </div>
     </div>
     <div class="coupon-detail-table-row">
@@ -102,15 +103,35 @@
       <div class="coupon-detail-table-body">{{ props.selectedCoupon.tutor_name || '-' }}</div>
     </div>
     <div class="coupon-buttons">
-  <template v-if="!isEditMode">
-    <button class="coupon-edit-button" @click="enableEditMode">수정</button>
-    <button class="coupon-delete-button" @click="deleteCoupon">삭제</button>
-  </template>
-  <template v-else>
-    <button class="coupon-save-button" @click="saveCoupon">저장</button>
-    <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
-  </template>
-</div>
+      <template v-if="!isEditMode">
+        <button 
+          class="coupon-edit-button" 
+          @click="handleEditClick"
+          :class="{ 'disabled': isDeleted }"
+          :disabled="isDeleted"
+        >수정</button>
+        <button 
+          class="coupon-delete-button" 
+          @click="handleDeleteClick"
+          :class="{ 'disabled': isDeleted }"
+          :disabled="isDeleted"
+        >삭제</button>
+      </template>
+      <template v-else>
+        <button 
+          class="coupon-save-button" 
+          @click="saveCoupon"
+          :disabled="isDeleted"
+        >저장</button>
+        <button 
+          class="coupon-cancel-button" 
+          @click="cancelEdit"
+        >취소</button>
+      </template>
+    </div>
+    <div v-if="isDeleted" class="deleted-coupon-banner">
+      이 쿠폰은 삭제되었습니다
+    </div>
   </div>
 </template>
 
@@ -123,6 +144,26 @@ const props = defineProps(['selectedCoupon']);
 
 const isEditMode = ref(false);
 const editCouponData = ref({});
+
+const isDeleted = computed(() => {
+  return props.selectedCoupon && !props.selectedCoupon.coupon_flag;
+});
+
+const handleEditClick = () => {
+  if (isDeleted.value) {
+    alert('이미 삭제된 쿠폰은 수정할 수 없습니다.');
+    return;
+  }
+  enableEditMode();
+};
+
+const handleDeleteClick = () => {
+  if (isDeleted.value) {
+    alert('이미 삭제된 쿠폰입니다.');
+    return;
+  }
+  deleteCoupon();
+};
 
 watch(
   () => props.selectedCoupon,
@@ -400,7 +441,7 @@ const deleteCoupon = async () => {
   display: flex;
 }
 
-.coupon-detail-table-body .active-state {
+.coupon-detail-table-body .coupon-detail-active-state {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -411,12 +452,12 @@ const deleteCoupon = async () => {
   font-size: 13px;
 }
 
-.coupon-detail-table-body .active-state.active {
+.coupon-detail-table-body .coupon-detail-active-state.active {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.coupon-detail-table-body .active-state.inactive {
+.coupon-detail-table-body .coupon-detail-active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b;
 }
@@ -437,4 +478,54 @@ const deleteCoupon = async () => {
     border: 1px solid #eaeaea;
     border-radius: 4px;
 }
+
+.deleted-coupon-banner {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.coupon-edit-button.disabled,
+.coupon-delete-button.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.coupon-edit-button.disabled:hover,
+.coupon-delete-button.disabled:hover {
+  background-color: #cccccc;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: #cccccc;
+}
+
+.coupon-detail-table-body .active-state {
+  font-weight: bold;
+}
+
+.coupon-detail-table-body .coupon-detail-active-state.active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.coupon-detail-table-body .coupon-detail-active-state.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.coupon-detail-table-body .coupon-detail-active-state.deleted {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
 </style>
