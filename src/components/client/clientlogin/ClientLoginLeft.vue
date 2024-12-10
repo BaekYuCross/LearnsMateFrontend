@@ -99,33 +99,34 @@ const handleLogin = async () => {
       router.push("/client-main");
     } else {
       alert('로그인 응답 데이터가 올바르지 않습니다.');
+      return;
     }
   } catch (error) {
     console.error('로그인 실패 상세 정보:', error);
     if (error.response) {
-      alert(`${error.response.data.message}`);
+      alert(`블랙리스트로 등록된 계정입니다.`);
+      return;
     } else if (error.request) {
       console.log('요청 에러:', error.request);
       alert('서버에 연결할 수 없습니다.');
+      return;
     } else {
       alert('로그인 처리 중 오류가 발생했습니다.');
+      return;
     }
   }
 };
 
-// 카카오 로그인 처리
 const handleKakaoLogin = () => {
   console.log("kakao login");
 };
 
-// 구글 로그인 처리
 const handleGoogleLogin = () => {
   console.log("google login");
 };
 </script>
 
 <style scoped>
-/* 스타일 그대로 유지 */
 .clientlogin-login-left {
   border-top: 8px solid #7671f4;
   width: 50%;
