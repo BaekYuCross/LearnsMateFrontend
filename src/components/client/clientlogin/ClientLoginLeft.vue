@@ -99,16 +99,20 @@ const handleLogin = async () => {
       router.push("/client-main");
     } else {
       alert('로그인 응답 데이터가 올바르지 않습니다.');
+      return;
     }
   } catch (error) {
     console.error('로그인 실패 상세 정보:', error);
     if (error.response) {
       alert(`블랙리스트로 등록된 계정입니다.`);
+      return;
     } else if (error.request) {
       console.log('요청 에러:', error.request);
       alert('서버에 연결할 수 없습니다.');
+      return;
     } else {
       alert('로그인 처리 중 오류가 발생했습니다.');
+      return;
     }
   }
 };
