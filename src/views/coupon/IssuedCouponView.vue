@@ -142,7 +142,7 @@
               <div v-if="selectedColumns.includes('couponContents')" class="issue-coupon-board-row-coupon-contents">{{ coupon.coupon_contents }}</div>
               <div v-if="selectedColumns.includes('couponCategoryName')" class="issue-coupon-board-row-coupon-category-name">{{ coupon.coupon_category_name }}</div>
               <div v-if="selectedColumns.includes('studentCode')" class="issue-coupon-board-row-student-code">{{ coupon.student_code }}</div>
-              <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-row-student-name">{{ coupon.student_name }}</div>
+              <div v-if="selectedColumns.includes('studentName')" class="issue-coupon-board-row-student-name">{{ coupon.mask_name }}</div>
               <div v-if="selectedColumns.includes('couponUseStatus')" class="issue-coupon-board-row-use-status">{{ coupon.coupon_use_status ? 'O' : 'X' }}</div>
               <div v-if="selectedColumns.includes('couponDiscountRate')" class="issue-coupon-board-row-discount-rate">{{ coupon.coupon_discount_rate }}</div>
               <div v-if="selectedColumns.includes('couponStartDate')" class="issue-coupon-board-row-start-date">{{ formatDate(coupon.coupon_start_date) }}</div>
@@ -237,6 +237,15 @@ const columns = ref({
 
   const selectedColumns = ref(Object.keys(columns.value));
 
+  const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+};
+
   const fetchIssueCouponList = async () => {
   try {
     const response = await axios.get('https://learnsmate.shop/issue-coupon/all-issued-coupons2/sort', {
@@ -250,11 +259,13 @@ const columns = ref({
     });
 
     console.log(pageSize);
-    // 응답 구조 확인 및 통일
-    coupons.value = response.data.content;
+    coupons.value = response.data.content.map(item => ({
+      ...item,
+      mask_name: maskingUtils.maskName(item.student_name)
+    }));
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
-    console.log('Response data:', response.data); // 디버깅용
+    console.log('Response data:', response.data);
   } catch(error) {
     console.error('IssueCoupon 목록을 불러오는데 실패했습니다:', error);
   }
@@ -658,7 +669,8 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   gap: 5px;
-  margin-top: 10px;
+  margin-top: 40px;
+  margin-bottom: 10px;
 }
 
 .issue-coupon-page-button {
