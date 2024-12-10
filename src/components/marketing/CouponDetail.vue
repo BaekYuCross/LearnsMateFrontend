@@ -211,7 +211,6 @@ const saveCoupon = async () => {
 
     const requestData = formatDateWithTime.applyCouponDates({ ...editCouponData.value });
 
-    // 저장 로직 (예: API 호출)
     const response = await axios.patch(`https://learnsmate.shop/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
       requestData,
       {
@@ -222,12 +221,25 @@ const saveCoupon = async () => {
       }
     );
 
-    // 성공 시 화면 데이터 갱신
     Object.assign(props.selectedCoupon, response.data);
     isEditMode.value = false;
   } catch (error) {
-    alert("강사 쿠폰은 수정할 수 없습니다.");
-    console.error("edit fail", error.message);
+    if (error.response) {
+      if (error.response.status === 400) {
+        alert(error.response.data);
+        return;
+      } 
+      else if (error.response.status === 404) {
+        alert(error.response.data);
+        return;
+      }
+      else {
+        alert('직원 쿠폰은 수정할 수 없습니다.');
+        return;
+      }
+    } else {
+      alert('서버와의 통신 중 오류가 발생했습니다.');
+    }
   }
 };
 
@@ -243,11 +255,24 @@ const deleteCoupon = async () => {
     }
     );
     window.location.href = '/marketing/coupons'
-    console.log("delete success", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
-    alert("강사 쿠폰은 삭제할 수 없습니다.");
-    console.error("delete fail", error.message);
+    if (error.response) {
+      if (error.response.status === 400) {
+        alert(error.response.data);
+        return;
+      } 
+      else if (error.response.status === 404) {
+        alert(error.response.data);
+        return;
+      }
+      else {
+        alert('쿠폰 삭제 중 오류가 발생했습니다.');
+        return;
+      }
+    } else {
+      alert('서버와의 통신 중 오류가 발생했습니다.');
+    }
   }
 };
 
