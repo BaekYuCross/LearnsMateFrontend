@@ -516,12 +516,11 @@ const fetchCampaignTemplates = async () => {
   }
 
   .campaigntemplate-clickable {
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    gap: 4px;
+  }
 
 .campaigntemplate-clickable:hover {
   background-color: rgba(0, 0, 0, 0.05);

@@ -190,23 +190,23 @@
             <div class="tutor-info-grid">
               <div class="tutor-info-item">
                 <span class="tutor-label">강사 코드</span>
-                <span>{{ selectedTutor.memberCode }}</span>
+                <span class="tutor-detail-info">{{ selectedTutor.memberCode }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">이름</span>
-                <span>{{ selectedTutor.memberName }}</span>
+                <span class="tutor-detail-info">{{ selectedTutor.memberName }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">이메일</span>
-                <span>{{ selectedTutor.memberEmail }}</span>
+                <span class="tutor-detail-info">{{ selectedTutor.memberEmail }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">연락처</span>
-                <span>{{ selectedTutor.memberPhone }}</span>
+                <span class="tutor-detail-info">{{ selectedTutor.memberPhone }}</span>
               </div>
               <div class="tutor-info-item">
                 <span class="tutor-label">주소</span>
-                <span>{{ selectedTutor.memberAddress }}</span>
+                <span class="tutor-detail-info">{{ selectedTutor.memberAddress }}</span>
               </div>
         
               <!-- 강의 정보 -->

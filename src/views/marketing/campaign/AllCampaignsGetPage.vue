@@ -601,4 +601,19 @@ onMounted(async() => {
       color: #ccc;
       cursor: not-allowed;
     }
+
+    .campaign-clickable {
+    cursor: pointer;
+    user-select: none;
+    align-items: center;
+    gap: 4px;
+  }
+
+.campaign-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.campaign-sort-arrow {
+  font-size: 12px;
+}
   </style>

@@ -103,7 +103,7 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('로그인 실패 상세 정보:', error);
     if (error.response) {
-      alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+      alert(`${error.response.data.message}`);
     } else if (error.request) {
       console.log('요청 에러:', error.request);
       alert('서버에 연결할 수 없습니다.');
