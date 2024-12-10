@@ -1,27 +1,22 @@
 <template>
   <div class="dashboard-container">
-    <div v-if="loading" class="loading-overlay">
-      <div class="spinner"></div>
-      <div class="loading-text">데이터를 불러오는 중입니다...</div>
-    </div>
-    <div v-else>
     <!-- 상단 카드 섹션 -->
-      <div class="top-section">
-        <!-- 고객 섹션 -->
-        <div class="card">
-          <h3>고객</h3>
-          <ul>
-            <li v-for="member in formattedMembers" :key="member.memberCode">
-              [{{ member.memberType }}]&nbsp; {{ member.memberName }} &nbsp;| &nbsp;{{ member.createdAt }} &nbsp;|&nbsp; {{ member.memberEmail }}
-            </li>
-          </ul>
-          <a href="/student" class="more-link">+ 더보기</a>
-        </div>
+    <div class="top-section">
+      <!-- 고객 섹션 -->
+      <div class="card">
+        <h3>고객</h3>
+        <ul>
+          <li v-for="member in formattedMembers" :key="member.memberCode">
+            [{{ member.memberType }}]&nbsp; {{ member.memberName }} &nbsp;| &nbsp;{{ member.createdAt }} &nbsp;|&nbsp; {{ member.memberEmail }}
+          </li>
+        </ul>
+        <a href="/student" class="more-link">+ 더보기</a>
+      </div>
 
-        <!-- 전날 가입한 회원수 섹션 -->
-        <div class="card">
-          <h3>전날 가입한 회원수</h3>
-          <div class="yesterday-stats">
+      <!-- 전날 가입한 회원수 섹션 -->
+      <div class="card">
+        <h3>전날 가입한 회원수</h3>
+        <div class="yesterday-stats">
           <div class="stat-item">
             <p class="yesterday-p">학생</p>
             <p class="stat-value">
@@ -37,103 +32,102 @@
             </p>
           </div>
         </div>       
-        </div>
-
-        <!-- 전년도 동월 매출액 비교 섹션 -->
-        <div class="card">
-          <h3>전년 동월 대비 매출액</h3>
-          <div class="stat">
-            <Suspense>
-              <RevenueComparisonChart :revenueData="revenueData" />
-              <template #fallback>
-                <div>Loading chart...</div>
-              </template>
-            </Suspense>
-          </div>
-        </div>
       </div>
 
-      <!-- 중앙 섹션 -->
-      <div class="center-section">
-        <!-- 강의 섹션 -->
-        <div class="card full-width">
-          <h3>강의</h3>
-          <ul>
-            <li v-for="lecture in formattedTutors" :key="lecture.lecture_code">
-              [강사] {{ lecture.tutor_name }} / {{ lecture.lecture_title }}
-              <span class="rating">({{ lecture.lecture_category_name }}) {{ lecture.rating }} ★★★★★</span>
-            </li>
-          </ul>
-          <a href="/lecture" class="more-link">+ 더보기</a>
+      <!-- 전년도 동월 매출액 비교 섹션 -->
+      <div class="card">
+        <h3>전년 동월 대비 매출액</h3>
+        <div class="stat">
+          <Suspense>
+            <RevenueComparisonChart :revenueData="revenueData" />
+            <template #fallback>
+              <div>Loading chart...</div>
+            </template>
+          </Suspense>
         </div>
+      </div>
+    </div>
 
-        <!-- 계약 섹션 -->
-        <div class="card full-width">
-          <h3>계약</h3>
-          <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ formattedContract.client }}</p>
-          <div class="contract-status">
-            <div
-              class="step"
-              v-for="(step, index) in contracts.steps"
-              :key="index"
-              :class="{ active: step.active, current: step.current }"
-            >
-              {{ step.name }}
+    <!-- 중앙 섹션 -->
+    <div class="center-section">
+      <!-- 강의 섹션 -->
+      <div class="card full-width">
+        <h3>강의</h3>
+        <ul>
+          <li v-for="lecture in formattedTutors" :key="lecture.lecture_code">
+            [강사] {{ lecture.tutor_name }} / {{ lecture.lecture_title }}
+            <span class="rating">({{ lecture.lecture_category_name }}) {{ lecture.rating }} ★★★★★</span>
+          </li>
+        </ul>
+        <a href="/lecture" class="more-link">+ 더보기</a>
+      </div>
+
+      <!-- 계약 섹션 -->
+      <div class="card full-width">
+        <h3>계약</h3>
+        <p><strong>[담당자]</strong> {{ contracts.manager }} - {{ formattedContract.client }}</p>
+        <div class="contract-status">
+          <div
+            class="step"
+            v-for="(step, index) in contracts.steps"
+            :key="index"
+            :class="{ active: step.active, current: step.current }"
+          >
+            {{ step.name }}
+          </div>
+        </div>
+        <a href="/contract-process" class="more-link">{{ contracts.progress }}</a>
+      </div>
+    </div>
+
+    <!-- 하단 섹션 -->
+    <div class="bottom-section">
+      <!-- 미답변 VOC 섹션 -->
+      <div class="card small">
+        <h3>미답변 VOC</h3>
+        <ul>
+          <li v-for="(unansweredVOC, index) in unansweredVOCs" :key="index">
+            <div class="main-voc-section">
+              <p class="voc-contents">[{{ unansweredVOC.voc_category_name }}] - {{ unansweredVOC.voc_content }}</p>
+              <button class="detail-button" @click="goToUnansweredVOCPage(unansweredVOC.voc_code)">자세히</button>
             </div>
-          </div>
-          <a href="/contract-process" class="more-link">{{ contracts.progress }}</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 마케팅 섹션 -->
+      <div class="card small">
+        <h3>마케팅</h3>
+        <ul>
+          <li v-for="(campaign, index) in marketing" :key="index">
+            {{ campaign.admin_name }} - {{ campaign.campaign_title }} [{{ campaign.campaign_type }}]
+            <button class="detail-button" @click="goToCampaignDetail(campaign.campaign_code)">자세히</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- TOP3 강의 카테고리 -->
+      <div class="card small">
+        <h3>TOP3 강의 카테고리</h3>
+        <div class="chart-stats">
+          <Suspense>
+            <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
+            <template #fallback>
+              <div>Loading chart...</div>
+            </template>
+          </Suspense>
         </div>
       </div>
 
-      <!-- 하단 섹션 -->
-      <div class="bottom-section">
-        <!-- 미답변 VOC 섹션 -->
-        <div class="card small">
-          <h3>미답변 VOC</h3>
-          <ul>
-            <li v-for="(unansweredVOC, index) in unansweredVOCs" :key="index">
-              <div class="main-voc-section">
-                <p class="voc-contents">[{{ unansweredVOC.voc_category_name }}] - {{ unansweredVOC.voc_content }}</p>
-                <button class="detail-button" @click="goToUnansweredVOCPage(unansweredVOC.voc_code)">자세히</button>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- 마케팅 섹션 -->
-        <div class="card small">
-          <h3>마케팅</h3>
-          <ul>
-            <li v-for="(campaign, index) in marketing" :key="index">
-              {{ campaign.admin_name }} - {{ campaign.campaign_title }} [{{ campaign.campaign_type }}]
-              <button class="detail-button" @click="goToCampaignDetail(campaign.campaign_code)">자세히</button>
-            </li>
-          </ul>
-        </div>
-
-        <!-- TOP3 강의 카테고리 -->
-        <div class="card small">
-          <h3>TOP3 강의 카테고리</h3>
-          <div class="chart-stats">
-            <Suspense>
-              <CategoryBarChart v-if="categories.length > 0" :categories="categories" />
-              <template #fallback>
-                <div>Loading chart...</div>
-              </template>
-            </Suspense>
-          </div>
-        </div>
-
-        <!-- 예비 블랙리스트 -->
-        <div class="card small">
-          <h3>예비 블랙리스트</h3>
-          <ul>
-            <li v-for="(reserved, index) in formattedReservedStudents" :key="index">
-              {{ reserved.member_name }} - 신고횟수: {{ reserved.report_count }}
-            </li>
-            <a href="/student/blacklist/reserved" class="more-link">+ 더보기</a>
-          </ul>
-        </div>
+      <!-- 예비 블랙리스트 -->
+      <div class="card small">
+        <h3>예비 블랙리스트</h3>
+        <ul>
+          <li v-for="(reserved, index) in formattedReservedStudents" :key="index">
+            {{ reserved.member_name }} - 신고횟수: {{ reserved.report_count }}
+          </li>
+          <a href="/student/blacklist/reserved" class="more-link">+ 더보기</a>
+        </ul>
       </div>
     </div>
   </div>
@@ -153,25 +147,28 @@ const RevenueComparisonChart = defineAsyncComponent(() =>
 
 const router = useRouter();
 
-// 고객 데이터 타입 이름 등록일
-const members = ref([]);
+// Loading states for each section
+const loadingStates = ref({
+  members: true,
+  memberCounts: true,
+  revenue: true,
+  lectures: true,
+  contracts: true,
+  voc: true,
+  marketing: true,
+  categories: true,
+  reservedList: true
+});
 
-// 전날 가입한 회원 수 데이터
+// Data refs
+const members = ref([]);
 const yesterdayStudentCount = ref(0);
 const totalStudentCount = ref(0);
 const yesterdayTutorCount = ref(0);
 const totalTutorCount = ref(0);
-
-// 전년 동월 매출 데이터
 const revenueData = ref([]);
-
-// 강의 데이터
 const lectures = ref([]);
-
-// 예비 블랙리스트 데이터
 const reservedList = ref([]);
-
-// 계약 데이터
 const latestLectureCode = ref('');
 const contracts = ref({
   manager: '',
@@ -187,84 +184,69 @@ const contracts = ref({
   ],
   progress: '0/7 완료',
 });
-
-// 미답변 VOC 데이터
 const unansweredVOCs = ref({});
-
-// 마케팅 데이터
 const marketing = ref({});
+const categories = ref([]);
 
-// TOP3강의카테고리 데이터
-const categories = ref([]); 
-
-// 매출 데이터
-const sales = ref({
-  quotes: 4,
-  revenue: 0,
-});
-
-const loading = ref(true);
-
+// Fetch functions with loading state management
 const fetchMembers = async () => {
+  loadingStates.value.members = true;
   try {
     const response = await axios.get('https://learnsmate.shop/member/students', {
       params: {
         page: 0,
-        size: 5, 
-        sort: 'created_at,DESC', 
+        size: 5,
+        sort: 'created_at,DESC',
       },
       withCredentials: true,
     });
-
-    members.value = response.data.content; 
-    console.log('최근 등록된 멤버 데이터:', members.value);
+    members.value = response.data.content;
   } catch (error) {
     console.error('Failed to fetch members:', error);
+  } finally {
+    loadingStates.value.members = false;
   }
 };
 
-const fetchYesterdayStudentCount = async () => {
+const fetchMemberCounts = async () => {
+  loadingStates.value.memberCounts = true;
   try {
-    const response = await axios.get("https://learnsmate.shop/member/count", {
-      params: { type: "student" },
-      withCredentials: true,
-    });
-    yesterdayStudentCount.value = response.data.yesterdayCount;
-    totalStudentCount.value = response.data.totalCount;
+    const [studentResponse, tutorResponse] = await Promise.all([
+      axios.get("https://learnsmate.shop/member/count", {
+        params: { type: "student" },
+        withCredentials: true,
+      }),
+      axios.get("https://learnsmate.shop/member/count", {
+        params: { type: "tutor" },
+        withCredentials: true,
+      })
+    ]);
+    
+    yesterdayStudentCount.value = studentResponse.data.yesterdayCount;
+    totalStudentCount.value = studentResponse.data.totalCount;
+    yesterdayTutorCount.value = tutorResponse.data.yesterdayCount;
+    totalTutorCount.value = tutorResponse.data.totalCount;
   } catch (error) {
-    console.error("Failed to fetch student counts: ", error);
+    console.error("Failed to fetch member counts:", error);
+  } finally {
+    loadingStates.value.memberCounts = false;
   }
 };
-
-const fetchYesterdayTutorCount = async () => {
-  try {
-    const response = await axios.get("https://learnsmate.shop/member/count", {
-      params: { type: "tutor" },
-      withCredentials: true,
-    });
-    yesterdayTutorCount.value = response.data.yesterdayCount;
-    totalTutorCount.value = response.data.totalCount;
-  } catch (error) {
-    console.error("Failed to fetch tutor counts: ", error);
-  }
-};
-
 
 const fetchRevenueData = async () => {
+  loadingStates.value.revenue = true;
   try {
     const response = await axios.get('https://learnsmate.shop/payments', {
       params: { page: 0, size: 50 },
       withCredentials: true,
     });
 
-    const data = response.data.graphData; 
+    const data = response.data.graphData;
     const currentYear = new Date().getFullYear();
-    const currentMonth = new Date().getMonth() + 1; // 현재 월 (1~12)
-    const previousMonth = currentMonth - 1 || 12; // 저번달 (12월 예외 처리)
+    const currentMonth = new Date().getMonth() + 1;
+    const previousMonth = currentMonth - 1 || 12;
     const previousYear = previousMonth === 12 ? currentYear - 1 : currentYear;
-    console.log("전년 동월 대비 매출액:",data);
 
-    // 데이터 추출
     revenueData.value = [
       {
         year: currentYear - 1,
@@ -279,7 +261,7 @@ const fetchRevenueData = async () => {
       {
         year: currentYear - 1,
         month: previousMonth,
-        revenue: data[currentYear - 1]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
+        revenue: data[previousYear]?.find((item) => item.month === previousMonth)?.totalRevenue || 0,
       },
       {
         year: currentYear,
@@ -288,30 +270,195 @@ const fetchRevenueData = async () => {
       },
     ];
   } catch (error) {
-    console.error('매출 데이터를 불러오는데 실패했습니다:', error);
+    console.error('Failed to fetch revenue data:', error);
+  } finally {
+    loadingStates.value.revenue = false;
   }
 };
 
 const fetchLectures = async () => {
-  try { 
-    const response = await axios.get('https://learnsmate.shop/lecture/list',{
+  loadingStates.value.lectures = true;
+  try {
+    const response = await axios.get('https://learnsmate.shop/lecture/list', {
       params: {
         page: 0,
         size: 3,
         sort: 'created_at,DESC'
       },
       withCredentials: true,
-    })
+    });
     lectures.value = response.data.content.map(lecture => ({
       ...lecture,
       lecture_category_name: translateCategory(lecture.lecture_category_name)
     }));
-    console.log('최근 등록된 강의 데이터:',lectures.value);
   } catch (error) {
     console.error('Failed to fetch lectures:', error);
+  } finally {
+    loadingStates.value.lectures = false;
   }
 };
 
+const fetchContractData = async () => {
+  loadingStates.value.contracts = true;
+  try {
+    const response = await axios.get('https://learnsmate.shop/contract-status/list', {
+      withCredentials: true,
+    });
+    const contractList = response.data;
+    if (contractList.length > 0) {
+      const latestContract = contractList.reduce((latest, current) => {
+        return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current;
+      });
+      latestLectureCode.value = latestContract.lecture_code;
+      await Promise.all([
+        fetchContractLecture(latestLectureCode.value),
+        countContracts(latestLectureCode.value)
+      ]);
+    }
+  } catch (error) {
+    console.error('Failed to fetch contract list:', error);
+  } finally {
+    loadingStates.value.contracts = false;
+  }
+};
+
+const countContracts = async (lectureCode) => {
+  try {
+    const response = await axios.get(`https://learnsmate.shop/contract-status/lecture/${lectureCode}`, {
+      withCredentials: true,
+    });
+    contracts.value = response.data;
+    const contractsData = response.data;
+    const count = contractsData.length;
+
+    if (!contracts.value.steps || !Array.isArray(contracts.value.steps)) {
+      contracts.value.steps = [
+        { name: '강의 정보\n입력 확인', active: false, current: false },
+        { name: '커리큘럼 검토', active: false, current: false },
+        { name: '강의 커버\n이미지 확인', active: false, current: false },
+        { name: '강의 검토', active: false, current: false },
+        { name: '약관 동의 요청', active: false, current: false },
+        { name: '정산 정보 확인', active: false, current: false },
+        { name: '최종 승인', active: false, current: false },
+      ];
+    }
+
+    contracts.value.steps = contracts.value.steps.map((step, index) => ({
+      ...step,
+      active: index < count,
+      current: index === count,
+    }));
+
+    contracts.value.progress = `${count}/${contracts.value.steps.length} 완료`;
+
+    if (contractsData.length > 0) {
+      const lastContract = contractsData[contractsData.length - 1];
+      const adminCode = lastContract.admin_code;
+      await fetchContractAdmin(adminCode);
+    }
+  } catch (error) {
+    console.error('Failed to count contracts:', error);
+  }
+};
+
+const fetchContractAdmin = async (adminCode) => {
+  try {
+    const response = await axios.get(`https://learnsmate.shop/admin/${adminCode}`, {
+      withCredentials: true,
+    });
+    const contractAdmin = response.data;
+    contracts.value.manager = contractAdmin.admin_name;
+  } catch (error) {
+    console.error('Failed to fetch contract admin:', error);
+  }
+};
+
+const fetchContractLecture = async (lectureCode) => {
+  try {
+    const response = await axios.get(`https://learnsmate.shop/lecture/${lectureCode}`, {
+      withCredentials: true,
+    });
+    const contractLecture = response.data;
+    contracts.value.client = contractLecture.tutor_name;
+  } catch (error) {
+    console.error('Failed to fetch contract lecture:', error);
+  }
+};
+
+const fetchUnansweredVOC = async () => {
+  loadingStates.value.voc = true;
+  try {
+    const response = await axios.get('https://learnsmate.shop/voc/unanswered', {
+      withCredentials: true,
+    });
+    unansweredVOCs.value = response.data.slice(0, 5);
+  } catch (error) {
+    console.error('Failed to fetch unanswered VOCs:', error);
+  } finally {
+    loadingStates.value.voc = false;
+  }
+};
+
+const fetchCampaigns = async () => {
+  loadingStates.value.marketing = true;
+  try {
+    const response = await axios.get('https://learnsmate.shop/campaign/campaigns', {
+      params: {
+        page: 0,
+        size: 5,
+        sort: 'created_at,DESC'
+      },
+      withCredentials: true,
+    });
+    marketing.value = response.data.content.map(campaign => ({
+      ...campaign,
+      campaign_type: translateCampaignType(campaign.campaign_type)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch campaigns:', error);
+  } finally {
+    loadingStates.value.marketing = false;
+  }
+};
+
+const fetchCategoryRatio = async () => {
+  loadingStates.value.categories = true;
+  try {
+    const response = await axios.get('https://learnsmate.shop/member/category-ratio', {
+      withCredentials: true,
+    });
+    const sortedCategories = response.data.sort((a, b) => b.percentage - a.percentage);
+    categories.value = sortedCategories.slice(0, 3).map((item) => ({
+      name: translateCategory(item.category),
+      ratio: item.percentage,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch category ratios:', error);
+  } finally {
+    loadingStates.value.categories = false;
+  }
+};
+
+const fetchReservedList = async () => {
+  loadingStates.value.reservedList = true;
+  try {
+    const response = await axios.get(`https://learnsmate.shop/blacklist/student/reserved`, {
+      withCredentials: true,
+      params: {
+        page: 0,
+        size: 5,
+        sort: 'created_at,DESC',
+      },
+    });
+    reservedList.value = response.data.content;
+  } catch (error) {
+    console.error('Failed to fetch reserved list:', error);
+  } finally {
+    loadingStates.value.reservedList = false;
+  }
+};
+
+// Utility functions
 const maskEmail = (email) => {
   if (!email) return '';
   const [localPart, domain] = email.split('@');
@@ -336,188 +483,12 @@ const maskName = (name) => {
   return name.charAt(0) + '*'.repeat(name.length - 2) + name.charAt(name.length - 1);
 };
 
-const formattedMembers = computed(() => {
-  return members.value.map((member) => {
-    return {
-      ...member,
-      memberType: member.memberType === 'STUDENT' ? '학생' : member.memberType,
-      createdAt: new Date(member.createdAt).toISOString().split('T')[0],
-      memberEmail: maskEmail(member.memberEmail),
-      memberName: maskName(member.memberName) 
-    };
-  });
-});
-
-const formattedTutors = computed(() => {
-  return lectures.value.map((tutor) => {
-    return {
-      ...tutor,
-      tutor_name: maskName(tutor.tutor_name) 
-    };
-  });
-});
-
-const formattedContract = computed(() => {
-  return {
-    ...contracts.value,
-    client: maskName(contracts.value.client), 
-  };
-});
-
-
-const formattedReservedStudents = computed(() => {
-  return reservedList.value.map((student) => {
-    return {
-      ...student,
-      member_name: maskName(student.member_name) 
-    };
-  });
-}); 
-
-const fetchContract = async () => {
-  try {
-    const response = await axios.get('https://learnsmate.shop/contract-status/list', {
-      withCredentials: true,
-    });
-    const contractList = response.data;
-    if (contractList.length > 0) {
-      const latestContract = contractList.reduce((latest, current) => {
-        return new Date(latest.createdAt) > new Date(current.createdAt) ? latest : current;
-      });
-      console.log('가장 최근에 등록된 계약의 강의코드:', latestContract.lecture_code);
-      latestLectureCode.value = latestContract.lecture_code;
-      fetchContractLecture(latestLectureCode.value);
-      countContracts(latestLectureCode.value);
-    } else {
-      console.log('계약 목록이 비어 있습니다.');
-    }
-  } catch (error) {
-    console.error('계약 목록 조회 실패:', error);
-  }
-};
-
-const countContracts = async (lectureCode) => {
-  try { 
-    const response = await axios.get(`https://learnsmate.shop/contract-status/lecture/${lectureCode}`,{
-      withCredentials: true,
-    })
-    contracts.value = response.data;
-    const contractsData = response.data; 
-    const count = contractsData.length;
-    console.log('최근 등록된 강의의 계약 데이터:',contracts.value);
-    console.log('계약 과정의 개수:', count);
-
-    if (!contracts.value.steps || !Array.isArray(contracts.value.steps)) {
-      contracts.value.steps = [
-        { name: '강의 정보\n입력 확인', active: false, current: false },
-        { name: '커리큘럼 검토', active: false, current: false },
-        { name: '강의 커버\n이미지 확인', active: false, current: false },
-        { name: '강의 검토', active: false, current: false },
-        { name: '약관 동의 요청', active: false, current: false },
-        { name: '정산 정보 확인', active: false, current: false },
-        { name: '최종 승인', active: false, current: false },
-      ];
-    }
-
-    contracts.value.steps = contracts.value.steps.map((step, index) => ({
-      ...step,
-      active: index < count,
-      current: index === count, 
-    }));
-
-    contracts.value.progress = `${count}/${contracts.value.steps.length} 완료`;
-    console.log('업데이트된 계약 데이터:', contracts.value);
-    if (contractsData.length > 0) {
-      const lastContract = contractsData[contractsData.length - 1];
-      const adminCode = lastContract.admin_code;
-      console.log('마지막 계약의 admin_code:', adminCode);
-      fetchContractAdmin(adminCode);
-    }
-  } catch (error) {
-    console.error('Failed to fetch lectures:', error);
-  }
-};
-
-const fetchContractAdmin = async (adminCode) => {
-  try {
-    const response = await axios.get(`https://learnsmate.shop/admin/${adminCode}`, {
-      withCredentials: true,
-    });
-    const contractAdmin = response.data;
-    console.log('계약담당직원 정보:', contractAdmin);
-    contracts.value.manager = contractAdmin.admin_name;
-    } 
-   catch (error) {
-    console.error('계약담당직원 조회 실패:', error);
-  }
-};
-
-const fetchContractLecture = async (lectureCode) => {
-  try {
-    const response = await axios.get(`https://learnsmate.shop/lecture/${lectureCode}`,{
-      withCredentials: true,
-    });
-    const contractLecture = response.data;
-    contracts.value.client = contractLecture.tutor_name;
-    console.log('계약강의 정보:', contractLecture);
-  } catch (error) {
-    console.error('계약강의 조회 실패:', error);
-  }
-};
-
-const fetchUnansweredVOC = async () => {
-    try {
-      const response = await axios.get('https://learnsmate.shop/voc/unanswered', {
-        method: 'GET',
-        withCredentials: true,
-      });
-      unansweredVOCs.value = response.data.slice(0, 5);
-      console.log('미답변voc 데이터:', unansweredVOCs.value);
-    } catch (error) {
-      console.error('Failed to fetch vocs:', error);
-    }
-};
-
-const goToUnansweredVOCPage = () => {
-  router.push({
-    path: '/voc',
-  });
-};
-
-const fetchCampaigns = async () => {
-    try {
-      const response = await axios.get('https://learnsmate.shop/campaign/campaigns', {
-        method: 'GET',
-        withCredentials: true,
-        params: {
-          page: 0,
-          size: 5,
-          sort: 'created_at,DESC'
-        },
-      });
-      marketing.value = response.data.content.map(campaign => ({
-        ...campaign,
-        campaign_type: translateCampaignType(campaign.campaign_type)
-      }));
-      console.log('캠페인 데이터:', marketing.value);
-    } catch (error) {
-      console.error('Failed to fetch campaigns:', error);
-    }
-  };
-
 const translateCampaignType = (type) => {
   const campaignTypeMap = {
     INSTANT: '즉시발송',
     RESERVATION: '예약발송',
   };
   return campaignTypeMap[type] || type;
-};
-
-const goToCampaignDetail = (campaignCode) => {
-  router.push({
-    path: '/marketing/campaign',
-    query: { campaignCode: campaignCode }
-  });
 };
 
 const translateCategory = (category) => {
@@ -533,67 +504,65 @@ const translateCategory = (category) => {
   return categoryMap[category] || category;
 };
 
-const fetchCategoryRatio = async () => {
-  try {
-    const response = await axios.get('https://learnsmate.shop/member/category-ratio', {
-      withCredentials: true,
-    });
-
-    const sortedCategories = response.data.sort((a, b) => b.percentage - a.percentage);
-
-    // 데이터 가공
-    categories.value = sortedCategories.slice(0, 3).map((item) => ({
-      name: translateCategory(item.category), // 사용자 친화적인 이름으로 변환
-      ratio: item.percentage, // percentage를 ratio로 매핑
-    }));
-
-    console.log("TOP3 카테고리:", categories.value);
-  } catch (error) {
-    console.error('카테고리 비율 데이터를 불러오는데 실패했습니다:', error);
-  }
-};
-
-const fetchReservedList = async () => {
-  try {
-    const response = await axios.get(`https://learnsmate.shop/blacklist/student/reserved`, {
-      withCredentials: true, 
-      params: {
-        page: 0,
-        size: 5,
-        sort: 'created_at,DESC',
-      },
-    });
-    
-    console.log('예비블랙리스트 데이터:', response.data);
-    
-    reservedList.value = response.data.content;
-  } catch (error) {
-    console.error('Failed to fetch reserved list:', error);
-  }
-};
-
-// OnMounted - 전체 로딩 관리
-onMounted(async () => {
-  try {
-    await Promise.all([
-      fetchMembers(),
-      fetchLectures(),
-      fetchContract(),
-      fetchUnansweredVOC(),
-      fetchCampaigns(),
-      fetchCategoryRatio(),
-      fetchRevenueData(),
-      fetchReservedList(),
-      fetchYesterdayStudentCount(),
-      fetchYesterdayTutorCount(),
-    ]);
-  } catch (error) {
-    console.error('데이터 로딩 중 오류 발생:', error);
-  } finally {
-    loading.value = false; 
-  }
+// Computed properties
+const formattedMembers = computed(() => {
+  return members.value.map((member) => ({
+    ...member,
+    memberType: member.memberType === 'STUDENT' ? '학생' : member.memberType,
+    createdAt: new Date(member.createdAt).toISOString().split('T')[0],
+    memberEmail: maskEmail(member.memberEmail),
+    memberName: maskName(member.memberName)
+  }));
 });
 
+const formattedTutors = computed(() => {
+  return lectures.value.map((tutor) => ({
+    ...tutor,
+    tutor_name: maskName(tutor.tutor_name)
+  }));
+});
+
+const formattedContract = computed(() => {
+  return {
+    ...contracts.value,
+    client: maskName(contracts.value.client),
+  };
+});
+
+const formattedReservedStudents = computed(() => {
+  return reservedList.value.map((student) => ({
+    ...student,
+    member_name: maskName(student.member_name)
+  }));
+});
+
+// Navigation functions
+const goToUnansweredVOCPage = () => {
+  router.push({
+    path: '/voc',
+  });
+};
+
+const goToCampaignDetail = (campaignCode) => {
+  router.push({
+    path: '/marketing/campaign',
+    query: { campaignCode: campaignCode }
+  });
+};
+
+// Lifecycle hooks
+onMounted(() => {
+  // 각 섹션별로 독립적으로 데이터 로딩
+  fetchMembers();
+  fetchMemberCounts();
+  fetchRevenueData();
+  fetchLectures();
+  fetchContractData();
+  fetchUnansweredVOC();
+  fetchCampaigns();
+  fetchCategoryRatio();
+  fetchReservedList();
+});
 </script>
 
 <style scoped>
