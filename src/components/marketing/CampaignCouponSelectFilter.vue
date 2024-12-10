@@ -117,32 +117,18 @@
           </div>
       </div>
       <div class="coupon-select-filter-item">
-          <span class="coupon-select-filter-label">쿠폰 수정일</span>
-          <div class="coupon-select-date-range-container">
-            <input 
-              v-model="filters.updated_at"
-              type="date" 
-              class="coupon-select-filter-input date-input"
-            />
-            <span class="coupon-select-date-separator">~</span>
-            <input 
-              v-model="filters.updated_at"
-              type="date" 
-              class="coupon-select-filter-input date-input"
-            />
-          </div>
+          <div class="coupon-select-button-group">
+          <button @click="search" class="coupon-select-search-button">
+            <i class="fas fa-search"></i>
+            <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
+          </button>
+          <button @click="reset" class="coupon-select-reset-button">
+            <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
+          </button>
+        </div>
       </div>
   </div>
   <div class="coupon-select-filter-row white">
-      <div class="coupon-select-button-group">
-        <button @click="search" class="coupon-select-search-button">
-          <i class="fas fa-search"></i>
-          <img class="search-img" src="/src/assets/icons/search_white.svg" alt="">조회
-        </button>
-        <button @click="reset" class="coupon-select-reset-button">
-          <img class="reset-img" src="/src/assets/icons/reset.svg" alt="">
-        </button>
-      </div>
       </div>
       </div>
   </div>
@@ -165,8 +151,6 @@ const filters = ref({
   end_expire_date: '',
   start_created_at: '',
   end_created_at: '',
-  start_updated_at: '',
-  end_updated_at: '',
   admin_code: '',
   tutor_code: '',
   registration_type: 'admin',
@@ -279,7 +263,7 @@ const reset = () => {
 .coupon-select-button-group {
   display: flex;
   gap: 0.5rem;
-  margin-left: 1100px;
+  margin-left: 310px;
 }
 
 .coupon-select-search-button {
