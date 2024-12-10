@@ -32,14 +32,63 @@
     </div>
       <div class="board-container">
         <div class="board-header">
-          <div v-if="selectedColumns.includes('campaignCode')" class="board-header-number">캠페인 코드</div>
-          <div v-if="selectedColumns.includes('campaignTitle')" class="board-header-title">캠페인 제목</div>
-          <div v-if="selectedColumns.includes('campaignContents')" class="board-header-contents">캠페인 내용</div>
-          <div v-if="selectedColumns.includes('campaignType')" class="board-header-type">발송 타입</div>
-          <div v-if="selectedColumns.includes('campaignSendDate')" class="board-header-send">발송 날짜</div>
-          <div v-if="selectedColumns.includes('createdAt')" class="board-header-created">생성일</div>
-          <div v-if="selectedColumns.includes('updatedAt')" class="board-header-updated">수정일</div>
-          <div v-if="selectedColumns.includes('adminName')" class="board-header-admin">담당자</div>
+          <div v-if="selectedColumns.includes('campaignCode')" 
+              class="board-header-number campaign-clickable"
+              @click="handleSort('campaignCode')">
+            캠페인 코드
+            <span v-if="currentSortField === 'campaignCode'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>
+          </div>
+          <div v-if="selectedColumns.includes('campaignTitle')" 
+              class="board-header-title campaign-clickable"
+              @click="handleSort('campaignTitle')">캠페인 제목
+              <span v-if="currentSortField === 'campaignTitle'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>
+          </div>
+          <div v-if="selectedColumns.includes('campaignContents')"
+              class="board-header-contents campaign-clickable"
+              @click="handleSort('campaignContents')">캠페인 내용
+              <span v-if="currentSortField === 'campaignContents'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>
+          </div>
+          <div v-if="selectedColumns.includes('campaignType')" 
+              class="board-header-type campaign-clickable"
+              @click="handleSort('campaignType')">발송 타입
+              <span v-if="currentSortField === 'campaignType'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>
+          </div>
+          <div v-if="selectedColumns.includes('campaignSendDate')" 
+              class="board-header-send campaign-clickable"
+              @click="handleSort('campaignSendDate')">발송 날짜
+              <span v-if="currentSortField === 'campaignSendDate'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>  
+          </div>
+          <div v-if="selectedColumns.includes('createdAt')" 
+              class="board-header-created campaign-clickable"
+              @click="handleSort('createdAt')">생성일
+              <span v-if="currentSortField === 'createdAt'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>   
+          </div>
+          <div v-if="selectedColumns.includes('updatedAt')" 
+              class="board-header-updated campaign-clickable"
+              @click="handleSort('updatedAt')">수정일
+              <span v-if="currentSortField === 'updatedAt'" class="sort-arrow">
+              {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+            </span>   
+          </div>
+          <div v-if="selectedColumns.includes('adminName')" 
+              class="board-header-admin campaign-clickable"
+              @click="handleSort('adminName')">담당자
+              <span v-if="currentSortField === 'adminName'" class="sort-arrow">
+                {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
+              </span>
+          </div>
         </div>
         <div class="board-body">
           <div
@@ -106,6 +155,9 @@
   const lastFilterData = ref(null);
   const isDropdownOpen = ref(false);
 
+  const currentSortField = ref('campaignCode');
+  const currentSortDirection = ref('DESC');
+
   const columns = ref({
     campaignCode: "캠페인 코드",
     campaignTitle: "캠페인 제목",
@@ -140,6 +192,66 @@
       console.error('Failed to fetch campaigns:', error);
     }
   };
+
+  const fetchSortedCampaigns = async () => {
+  try {
+    if (isFiltered.value && lastFilterData.value) {
+      const response = await axios.post(
+        'https://learnsmate.shop/campaign/filter/sort',
+        camelToSnake(lastFilterData.value),
+        {
+          withCredentials: true,
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize,
+            sortField: camelToSnake(currentSortField.value),
+            sortDirection: currentSortDirection.value
+          }
+        }
+      );
+      handleResponse(response);
+      
+    } else {
+      const response = await axios.get(
+        'https://learnsmate.shop/campaign/campaigns/sort',
+        {
+          withCredentials: true,
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize,
+            sortField: camelToSnake(currentSortField.value),
+            sortDirection: currentSortDirection.value
+          }
+        }
+      );
+      handleResponse(response);
+    }
+  } catch (error) {
+    console.error('Failed to fetch sorted campaigns:', error);
+  }
+};
+
+const handleResponse = (response) => {
+  campaigns.value = response.data.content.map(campaign => ({
+    ...campaign,
+    campaign_type: translateCampaignType(campaign.campaign_type)
+  }));
+  totalPages.value = response.data.totalPages;
+};
+
+
+
+const handleSort = (field) => {
+  if (field === currentSortField.value) {
+    currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
+  } else {
+    currentSortField.value = field;
+    currentSortDirection.value = 'DESC';
+  }
+  
+  currentPage.value = 1;
+  fetchSortedCampaigns();
+};
 
   const translateCampaignType = (type) => {
     const campaignTypeMap = {
