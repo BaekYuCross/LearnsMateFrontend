@@ -103,7 +103,7 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('로그인 실패 상세 정보:', error);
     if (error.response) {
-      alert(`${error.response.data.message}`);
+      alert(`블랙리스트로 등록된 계정입니다.`);
     } else if (error.request) {
       console.log('요청 에러:', error.request);
       alert('서버에 연결할 수 없습니다.');
