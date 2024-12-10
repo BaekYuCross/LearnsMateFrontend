@@ -115,22 +115,29 @@ export default {
       this.$emit("close");
     },
     async fetchAnalysisData(date) {
-      try {
-        const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
-          params: { date }
-        });
+  try {
+    // 선택된 날짜에서 7일을 뺀 날짜 계산
+    const selectedDate = new Date(date);
+    selectedDate.setDate(selectedDate.getDate() - 7);
+    
+    // YYYY-MM-DD 형식으로 변환
+    const prevWeekDate = selectedDate.toISOString().split('T')[0];
 
-        if (response.status === 204 || !response.data.length) {
-          this.localSummaryData = [];
-          alert("선택한 날짜에 데이터가 없습니다.");
-        } else {
-          this.localSummaryData = response.data;
-        }
-      } catch (error) {
-        console.error("데이터를 가져오는 중 오류 발생:", error);
-        alert("데이터를 가져오는 중 문제가 발생했습니다.");
-      }
-    },
+    const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
+      params: { date: prevWeekDate }
+    });
+
+    if (response.status === 204 || !response.data.length) {
+      this.localSummaryData = [];
+      alert("선택한 날짜에 데이터가 없습니다.");
+    } else {
+      this.localSummaryData = response.data;
+    }
+  } catch (error) {
+    console.error("데이터를 가져오는 중 오류 발생:", error);
+    alert("데이터를 가져오는 중 문제가 발생했습니다.");
+  }
+}
   },
 };
 </script>
