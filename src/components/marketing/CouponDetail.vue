@@ -58,7 +58,7 @@
     <div class="coupon-detail-table-row">
       <div class="coupon-detail-table-head">상태</div>
       <div class="coupon-detail-table-body">
-        <div div class="active-state" :class="{
+        <div div class="coupon-detail-active-state" :class="{
           'active-state': true,
           'active': props.selectedCoupon.active_state && props.selectedCoupon.coupon_flag,
           'inactive': !props.selectedCoupon.active_state || props.selectedCoupon.coupon_flag
@@ -441,7 +441,7 @@ const deleteCoupon = async () => {
   display: flex;
 }
 
-.coupon-detail-table-body .active-state {
+.coupon-detail-table-body .coupon-detail-active-state {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -452,12 +452,12 @@ const deleteCoupon = async () => {
   font-size: 13px;
 }
 
-.coupon-detail-table-body .active-state.active {
+.coupon-detail-table-body .coupon-detail-active-state.active {
   background-color: #dcfce7;
   color: #166534;
 }
 
-.coupon-detail-table-body .active-state.inactive {
+.coupon-detail-table-body .coupon-detail-active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b;
 }
@@ -513,8 +513,19 @@ button:disabled:hover {
   font-weight: bold;
 }
 
-.coupon-detail-table-body .active-state.inactive {
+.coupon-detail-table-body .coupon-detail-active-state.active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.coupon-detail-table-body .coupon-detail-active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b;
 }
+
+.coupon-detail-table-body .coupon-detail-active-state.deleted {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
 </style>
