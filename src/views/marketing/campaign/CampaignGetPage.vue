@@ -32,7 +32,7 @@
             </div>
             <div class="campaign-get-detail-row">
               <span class="detail-title">담당자</span>
-              <span class="detail-content">{{ userName }}</span>
+              <span class="detail-content">{{ campaign.admin_name }}</span>
               <span class="detail-title">발송 수단</span>
                 <div class="detail-content send-method">
                   <button
@@ -260,7 +260,7 @@
   
   
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 import MarketingSideMenu from '@/components/sideMenu/MarketingSideMenu.vue';
@@ -273,7 +273,6 @@ import TimeSelect from '@/components/marketing/TimeSelect.vue';
 
 const loginState = useLoginState();
 const userCode = loginState.adminCode;
-const userName = loginState.adminName;
 
 const route = useRoute();
 const router = useRouter();
@@ -359,8 +358,9 @@ const fetchTemplate = async () => {
       campaign_send_date: response.data.campaign_send_date,
       created_at: response.data.created_at,
       updated_at: response.data.updated_at,
+      admin_code: response.data.admin_code,
+      admin_name: response.data.admin_name,
     };
-
     campaignType.value = response.data.campaign_type;
     campaignMethod.value = response.data.campaign_method;
 
@@ -381,8 +381,6 @@ const fetchTemplate = async () => {
     totalCount.value = response.data.members.totalElements;
     totalMemberPages.value = response.data.members.totalPages;
     attachedCoupons.value = response.data.coupons.content;
-
-    console.log("awefawe", targetUsers.value);
     
     // Map 초기화 및 설정
     attachedCouponMap.value.clear();
