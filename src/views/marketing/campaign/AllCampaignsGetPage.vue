@@ -318,7 +318,8 @@ const handleSort = (field) => {
           },
         }
       );
-      campaigns.value = response.data.content; // content 배열로 설정
+      response = handleResponse(response);
+      campaigns.value = response.data.content;
       console.log('filtered campaign data:', campaigns.value);
       totalPages.value = response.data.totalPages;
     } catch (error) {
