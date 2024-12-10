@@ -514,7 +514,7 @@ button:disabled:hover {
 .coupon-detail-active-state-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .coupon-detail-table-body .active-state {
