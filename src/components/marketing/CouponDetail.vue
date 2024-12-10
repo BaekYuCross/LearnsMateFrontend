@@ -227,12 +227,15 @@ const saveCoupon = async () => {
     if (error.response) {
       if (error.response.status === 400) {
         alert(error.response.data);
+        return;
       } 
       else if (error.response.status === 404) {
         alert(error.response.data);
+        return;
       }
       else {
         alert('직원 쿠폰은 수정할 수 없습니다.');
+        return;
       }
     } else {
       alert('서버와의 통신 중 오류가 발생했습니다.');
@@ -257,12 +260,15 @@ const deleteCoupon = async () => {
     if (error.response) {
       if (error.response.status === 400) {
         alert(error.response.data);
+        return;
       } 
       else if (error.response.status === 404) {
         alert(error.response.data);
+        return;
       }
       else {
         alert('쿠폰 삭제 중 오류가 발생했습니다.');
+        return;
       }
     } else {
       alert('서버와의 통신 중 오류가 발생했습니다.');
