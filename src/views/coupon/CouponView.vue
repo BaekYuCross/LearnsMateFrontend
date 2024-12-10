@@ -4,15 +4,12 @@
     <CouponFilter @search="applyFilters" @reset="resetFilters" />
     <!-- 전체 쿠폰 개수 -->
     <div class="coupon-table-top">
-          <div class="coupon-count">
-            등록된 쿠폰 <span class="coupon-length">{{ (totalCount || 0).toLocaleString("ko-KR") }}</span>개
-          </div>
-          <div class="coupon-count-right">
-            <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
-            <button class="coupon-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg"
-                alt="" class="excel-img">엑셀 다운로드</button>
-          </div>
-        </div>
+      <div class="coupon-count"> 등록된 쿠폰 <span class="coupon-length">{{ (totalCount || 0).toLocaleString("ko-KR") }}</span>개 </div>
+      <div class="coupon-count-right">
+        <button class="coupon-register-button" @click="registerCoupon">쿠폰 등록</button>
+        <button class="coupon-excel-button" @click="handleExcelDownload"><img src="/src/assets/icons/download.svg" alt="" class="excel-img">엑셀 다운로드</button>
+      </div>
+    </div>
     <div class="coupon-inner-container" :class="{ 'shrink': selectedCoupon }">
       <div class="coupon-full-view">
         
@@ -118,7 +115,7 @@
                     <div>{{ formatDate(coupon.created_at) }}</div>
                     <div>{{ formatDate(coupon.updated_at) }}</div>
                     <div>{{ coupon.admin_name || '-' }}</div>
-                    <div>{{ coupon.tutor_name || '-' }}</div>
+                    <div>{{ coupon.mask_name || '-' }}</div>
                   </div>
                 </div>
               </div>
@@ -202,6 +199,15 @@ const displayedPages = computed(() => {
   return pages;
 });
 
+const maskingUtils = {
+  maskName: (name) => {
+    if (!name) return '';
+    const first = name.charAt(0);
+    const last = name.charAt(name.length - 1);
+    return `${first}**${last}`;
+  },
+};
+
 const fetchCoupons = async () => {
   try {
     const response = await axios.get('https://learnsmate.shop/coupon/coupons2/sort',
@@ -215,7 +221,12 @@ const fetchCoupons = async () => {
         },
       });
 
-    coupon.value = response.data.content;
+    // 각 쿠폰 데이터에 mask_name 추가
+    coupon.value = response.data.content.map(item => ({
+      ...item,
+      mask_name: maskingUtils.maskName(item.tutor_name)
+    }));
+    console.log(response.data.content);
     totalPages.value = response.data.totalPages;
     totalCount.value = response.data.totalElements;
 
@@ -614,26 +625,39 @@ const handleSort = async (field) => {
   background-color: #cc0000;
 }
 
-.coupon-register-button,
-.coupon-excel-button {
-  background-color: #005950;
-  color: #ffffff;
-  border: none;
-  border-radius: 3px;
-  margin-left: 20px;
-  padding: 3px 5px;
+.coupon-count-right {
+  display: flex;
+  gap: 10px;
 }
 
-.coupon-register-button:hover,
-.coupon-excel-button:hover {
+.coupon-register-button,
+.coupon-excel-button {
+    background: #005950;
+    padding: 3px 5px;
+    margin-bottom: 3px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 3px;
+}
+
+.coupon-register-button:hover {
   cursor: pointer;
+  background-color: #004c42;
+}
+
+.coupon-excel-button:hover {
   background-color: #004c42;
 }
 
 .coupon-table-top {
   display: flex;
   justify-content: space-between;
-  padding: 0px 10px;
+  align-items: center;
 }
 
 .coupon-table-row td {
@@ -789,14 +813,6 @@ const handleSort = async (field) => {
   width: 40%;
   opacity: 1;
   /* height: 100%; */
-}
-
-/* coupon-table-top 수정 */
-.coupon-table-top {
-  display: flex;
-  justify-content: space-between;
-  padding: 0px 10px;
-  width: 100%;
 }
 
 /* coupon-content-container 수정 */
