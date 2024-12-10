@@ -375,7 +375,8 @@ const fetchTemplate = async () => {
     targetUsers.value = response.data.members.content.map(user => {
       return {
         ...user,
-        member_birth: formatToDateTime(user.member_birth), // 생일 변환
+        member_birth: user.member_birth ? 
+        new Date(user.member_birth).toISOString().slice(0, 19) : null
       };
     });
     totalCount.value = response.data.members.totalElements;
