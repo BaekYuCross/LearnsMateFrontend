@@ -52,9 +52,9 @@
                           {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
                       </span>
                   </div>
-                  <div class="coupon-clickable" @click="handleSort('activeState')">
+                  <div class="coupon-clickable" @click="handleSort('couponFlag')">
                       상태
-                      <span v-if="currentSortField === 'activeState'" class="coupon-sort-arrow">
+                      <span v-if="currentSortField === 'couponFlag'" class="coupon-sort-arrow">
                           {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
                       </span>
                   </div>
@@ -106,9 +106,9 @@
                     <div class="coupon-table-active-state-row">
                     <div :class="{
                       'active-state': true,
-                      'active': coupon.active_state,
-                      'inactive': !coupon.active_state
-                    }">{{ coupon.active_state ? '활성' : '비활성' }}</div>
+                      'active': coupon.coupon_flag,
+                      'inactive': !coupon.coupon_flag
+                    }">{{ coupon.coupon_flag ? '활성' : '비활성' }}</div>
                     </div>
                     <div>{{ formatDate(coupon.coupon_start_date) }}</div>
                     <div>{{ formatDate(coupon.coupon_expire_date) }}</div>
@@ -340,7 +340,7 @@ const columns = {
   couponContents: "쿠폰 내용",
   couponDiscountRate: "쿠폰 할인율",
   couponCategoryName: "쿠폰 종류",
-  activeState: "상태",
+  couponFlag: "상태",
   couponStartDate: "시작일",
   couponExpireDate: "만료일",
   createdAt: "생성일",
@@ -356,7 +356,7 @@ const handleExcelDownload = async () => {
     const filterData = isFiltered.value && currentFilters.value ? {
       couponName: currentFilters.value.coupon_name || null,
       couponContents: currentFilters.value.coupon_contents || null,
-      activeState: currentFilters.value.active_state || null,
+      couponFlag: currentFilters.value.coupon_flag || null,
       startExpireDate: currentFilters.value.start_expire_date || null,
       endExpireDate: currentFilters.value.end_expire_date || null,
       startCreatedAt: currentFilters.value.start_created_at || null,
@@ -819,13 +819,11 @@ const handleSort = async (field) => {
   margin-top: auto;
 }
 
-/* active_state가 true일 때 */
 .coupon-table .coupon-table-row td.active-state.active {
   background-color: #dcfce7;
   color: #166534; /* 활성일 때 글자색 */
 }
 
-/* active_state가 false일 때 */
 .coupon-table .coupon-table-row td.active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b; /* 비활성일 때 글자색 */
@@ -848,13 +846,11 @@ const handleSort = async (field) => {
   width: 50px;
 }
 
-/* active_state가 true일 때 */
 .coupon-table-row div.active-state.active {
   background-color: #dcfce7;
   color: #166534; /* 활성일 때 글자색 */
 }
 
-/* active_state가 false일 때 */
 .coupon-table-row div.active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b; /* 비활성일 때 글자색 */
