@@ -17,7 +17,7 @@
         <!-- 첫째 줄 - 회색 배경 -->
         <div class="campaign-filter-row gray">
         <div class="campaign-filter-item">
-            <span class="campaign-filter-label">제목</span>
+            <span class="campaign-filter-label">캠페인 제목</span>
             <input 
                 v-model="filters.campaignTitle"
                 type="text" 
