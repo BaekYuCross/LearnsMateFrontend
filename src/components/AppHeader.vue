@@ -38,10 +38,10 @@
           [{{ adminTeam }}]
           <span class="highlight">{{ adminName }}</span> 님, 반갑습니다.
         </div>
-        <img src="@/assets/icons/account.svg" alt="계정" class="icon">
-        <img src="@/assets/icons/bell.svg" alt="알림" class="icon">
+        <img src="@/assets/icons/account.svg" alt="계정" class="disabled-icon">
+        <img src="@/assets/icons/bell.svg" alt="알림" class="disabled-icon">
         <img src="@/assets/icons/logout.svg" alt="로그아웃" class="icon" @click.stop="Logout">
-        <img src="@/assets/icons/search.svg" alt="검색" class="icon">
+        <img src="@/assets/icons/search.svg" alt="검색" class="disabled-icon">
         <img src="@/assets/icons/settings.svg" alt="설정" class="icon" @click="goToLearnsBuddy">
       </div>
     </nav>
@@ -396,5 +396,10 @@ onUnmounted(() => {
     height: 24px;
     cursor: pointer;
     flex-shrink: 0;
+  }
+
+  .disabled-icon {
+    width:18px;
+    height: 19px;
   }
   </style>
