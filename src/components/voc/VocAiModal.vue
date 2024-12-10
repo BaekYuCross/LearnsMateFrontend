@@ -23,6 +23,7 @@
             :max-date="maxDate"
             :is-visible="showCalendar"
             @select="handleDateSelect"
+            :selected-date="selectedDate"
           />
         </div>
       </div>
@@ -106,6 +107,7 @@ export default {
       this.showCalendar = !this.showCalendar;
     },
     handleDateSelect(date) {
+      this.selectedDate = date;
       this.showCalendar = false;
       this.fetchAnalysisData(date);
     },
