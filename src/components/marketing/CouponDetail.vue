@@ -58,13 +58,12 @@
     <div class="coupon-detail-table-row">
       <div class="coupon-detail-table-head">상태</div>
       <div class="coupon-detail-table-body">
-        <div div class="active-state" :class="{
-      'active-state': true,
-      'active': props.selectedCoupon.active_state,
-      'inactive': !props.selectedCoupon.active_state
-    }">
-        {{ props.selectedCoupon.active_state ? '활성' : '비활성' }}
-      </div>
+        <div :class="{
+          'active-state': true,
+          'active': coupon.active_state && coupon.coupon_flag,
+          'inactive': !coupon.active_state || !coupon.coupon_flag
+          }">{{ (coupon.active_state && coupon.coupon_flag) ? '활성' : (!coupon.coupon_flag ? '삭제' : '비활성') }}
+        </div>
       </div>
     </div>
     <div class="coupon-detail-table-row">
