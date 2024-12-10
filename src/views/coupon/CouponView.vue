@@ -454,7 +454,6 @@ const handleSort = async (field) => {
   flex-direction: column;
   height: 570px;
   width: 100%;
-  transition: width 0.3s ease;
   overflow: hidden;
 }
 
@@ -537,7 +536,6 @@ const handleSort = async (field) => {
 
 .coupon-table-container {
   flex: 1;
-  transition: flex 0.3s ease;
   overflow-x: auto;
 }
 
@@ -582,7 +580,6 @@ const handleSort = async (field) => {
   width: 0;
   opacity: 0;
   overflow: hidden;
-  transition: all 0.3s ease;
   /* margin-top: 40px; */
   border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -752,12 +749,10 @@ const handleSort = async (field) => {
   flex-grow: 1;
   gap: 20px;
   position: relative;
-  transition: all 0.3s ease;
 }
 
 .coupon-full-view {
   width: 100%;
-  transition: width 0.3s ease;
 }
 
 .coupon-inner-container.shrink .coupon-full-view {
@@ -771,7 +766,6 @@ const handleSort = async (field) => {
   width: 0;
   opacity: 0;
   overflow: hidden;
-  transition: all 0.3s ease;
 }
 
 /* shrink 상태일 때 coupon-detail-container 수정 */
@@ -787,7 +781,6 @@ const handleSort = async (field) => {
   justify-content: space-between;
   padding: 0px 10px;
   width: 100%;
-  transition: width 0.3s ease;
 }
 
 /* coupon-content-container 수정 */
@@ -800,7 +793,6 @@ const handleSort = async (field) => {
   height: 575px;
   /* height: 100%; */
   width: 100%;
-  transition: all 0.3s ease;
   overflow-x: auto;
 }
 
@@ -877,7 +869,6 @@ const handleSort = async (field) => {
 .coupon-clickable {
   cursor: pointer;
   user-select: none;
-  display: flex;
   align-items: center;
   gap: 4px;
 }
