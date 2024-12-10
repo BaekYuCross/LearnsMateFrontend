@@ -23,7 +23,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
 }
 
 .student-content-section {
@@ -262,7 +261,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .student-excel-button img {
