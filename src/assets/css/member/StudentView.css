@@ -75,12 +75,6 @@
   margin-bottom: 15px;
 }
 
-table {
-  width: 100%;
-  min-width: 1200px;
-  border-collapse: collapse;
-}
-
 .student-selected {
   background-color: #e2e8f0;
 }
