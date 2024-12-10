@@ -135,14 +135,13 @@ const selectAll = async (event) => {
     try {
       let response;
       if (isFiltered.value && lastFilterData.value) {
-        // 필터링된 전체 데이터 가져오기
         response = await axios.post(
           'https://learnsmate.shop/member/filter/student',
-          camelToSnake(lastFilterData.value),
+          lastFilterData.value,
           {
             params: {
               page: 0,
-              size: totalCount.value // 전체 데이터를 한 번에 가져오기 위해 size를 totalCount로 설정
+              size: totalCount.value
             },
             withCredentials: true,
             headers: {
@@ -150,6 +149,8 @@ const selectAll = async (event) => {
             },
           }
         );
+        console.log("Filtered response:", response.data); // 응답 데이터 확인
+        console.log("Total selected users:", response.data.content.length); // 선택된 유저 수 확인
       } else {
         // 필터링되지 않은 전체 데이터 가져오기
         response = await axios.get('https://learnsmate.shop/member/students', {
@@ -161,6 +162,8 @@ const selectAll = async (event) => {
         });
       }
       selectedUsers.value = camelToSnake(response.data.content);
+      console.log(selectedUsers.value);
+      console.log("Selected users after assignment:", selectedUsers.value.length); // 할당 후 선택된 유저 수 확인
     } catch (error) {
       console.error('Failed to fetch all users:', error);
     }
@@ -173,8 +176,8 @@ const handleSearch = async (filterData) => {
   try {
     isFiltered.value = true;
     lastFilterData.value = filterData;
-    currentPage.value = 1;
-    selectedUsers.value = []; // 검색 시 선택 초기화 추가
+    currentPage.value = 1;  // 검색 시 첫 페이지로
+    // selectedUsers.value = []; // 이 줄 제거 - 선택 유지
     console.log(lastFilterData.value);
     const response = await axios.post(
       'https://learnsmate.shop/member/filter/student',
@@ -242,7 +245,27 @@ const changePage = async (newPage) => {
   currentPage.value = newPage; 
   
   if (isFiltered.value && lastFilterData.value) {
-    await handleSearch(lastFilterData.value);
+    try {
+      const response = await axios.post(
+        'https://learnsmate.shop/member/filter/student',
+        lastFilterData.value,  
+        {
+          params: {
+            page: currentPage.value - 1,
+            size: pageSize
+          },
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      users.value = camelToSnake(response.data.content);
+      totalCount.value = response.data.totalElements;
+      totalPages.value = response.data.totalPages;
+    } catch (error) {
+      console.error('Failed to fetch filtered users:', error);
+    }
   } else {
     await fetchUsers();
   }
