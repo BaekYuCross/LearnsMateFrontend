@@ -318,8 +318,7 @@ const handleSort = (field) => {
           },
         }
       );
-      response = handleResponse(response);
-      campaigns.value = response.data.content;
+      campaigns.value = handleResponse(response).data.content;
       console.log('filtered campaign data:', campaigns.value);
       totalPages.value = response.data.totalPages;
     } catch (error) {
