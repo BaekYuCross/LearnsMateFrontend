@@ -93,10 +93,17 @@
                     :disabled="campaignType === 'INSTANT'"
                     @change="handleDateChange"
                   />
-                  <TimeSelect
+                  <!-- <TimeSelect
                     v-model="selectedTime"
                     :disabled="campaignType === 'INSTANT'"
                     :selected-date="selectedDate"
+                  /> -->
+                  <input
+                    type="time"
+                    v-model="selectedTime"
+                    class="time-input"
+                    :min="minTime"
+                    :disabled="campaignType === 'INSTANT'"
                   />
                 </div>
               </div>
