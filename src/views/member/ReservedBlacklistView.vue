@@ -106,16 +106,16 @@
           <div class="reserved-detail-content">
             <div class="reserved-info-grid">
               <div class="reserved-info-item">
-                <span class="reserved-label">{{ memberTypeText }} 코드:</span>
-                <span>{{ selectedReserved.member_code }}</span>
+                <span class="reserved-label">{{ memberTypeText }} 코드</span>
+                <span class="reserved-detail-info">{{ selectedReserved.member_code }}</span>
               </div>
               <div class="reserved-info-item">
-                <span class="reserved-label">이름:</span>
-                <span>{{ selectedReserved.member_name }}</span>
+                <span class="reserved-label">이름</span>
+                <span class="reserved-detail-info">{{ selectedReserved.member_name }}</span>
               </div>
               <div class="reserved-info-item">
-                <span class="reserved-label">신고 횟수:</span>
-                <span>{{ selectedReserved.report_count }}회</span>
+                <span class="reserved-label">신고 횟수</span>
+                <span class="reserved-detail-info">{{ selectedReserved.report_count }}회</span>
               </div>
             </div>
 
