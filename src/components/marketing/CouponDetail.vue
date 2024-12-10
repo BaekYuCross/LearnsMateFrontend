@@ -59,12 +59,13 @@
       <div class="coupon-detail-table-head">상태</div>
       <div class="coupon-detail-table-body">
         <div div class="active-state" :class="{
-      'active-state': true,
-      'active': props.selectedCoupon.active_state,
-      'inactive': !props.selectedCoupon.active_state
-    }">
-        {{ props.selectedCoupon.active_state ? '활성' : '비활성' }}
-      </div>
+          'active-state': true,
+          'active': props.selectedCoupon.active_state && props.selectedCoupon.coupon_flag,
+          'inactive': !props.selectedCoupon.active_state || props.selectedCoupon.coupon_flag
+        }">
+            {{ (props.selectedCoupon.active_state && props.selectedCoupon.coupon_flag) ? '활성' :
+            (!props.selectedCoupon.coupon_flag ? '삭제' : '비활성') }}
+        </div>
       </div>
     </div>
     <div class="coupon-detail-table-row">
@@ -102,15 +103,35 @@
       <div class="coupon-detail-table-body">{{ props.selectedCoupon.tutor_name || '-' }}</div>
     </div>
     <div class="coupon-buttons">
-  <template v-if="!isEditMode">
-    <button class="coupon-edit-button" @click="enableEditMode">수정</button>
-    <button class="coupon-delete-button" @click="deleteCoupon">삭제</button>
-  </template>
-  <template v-else>
-    <button class="coupon-save-button" @click="saveCoupon">저장</button>
-    <button class="coupon-cancel-button" @click="cancelEdit">취소</button>
-  </template>
-</div>
+      <template v-if="!isEditMode">
+        <button 
+          class="coupon-edit-button" 
+          @click="handleEditClick"
+          :class="{ 'disabled': isDeleted }"
+          :disabled="isDeleted"
+        >수정</button>
+        <button 
+          class="coupon-delete-button" 
+          @click="handleDeleteClick"
+          :class="{ 'disabled': isDeleted }"
+          :disabled="isDeleted"
+        >삭제</button>
+      </template>
+      <template v-else>
+        <button 
+          class="coupon-save-button" 
+          @click="saveCoupon"
+          :disabled="isDeleted"
+        >저장</button>
+        <button 
+          class="coupon-cancel-button" 
+          @click="cancelEdit"
+        >취소</button>
+      </template>
+    </div>
+    <div v-if="isDeleted" class="deleted-coupon-banner">
+      이 쿠폰은 삭제되었습니다
+    </div>
   </div>
 </template>
 
@@ -123,6 +144,26 @@ const props = defineProps(['selectedCoupon']);
 
 const isEditMode = ref(false);
 const editCouponData = ref({});
+
+const isDeleted = computed(() => {
+  return props.selectedCoupon && !props.selectedCoupon.coupon_flag;
+});
+
+const handleEditClick = () => {
+  if (isDeleted.value) {
+    alert('이미 삭제된 쿠폰은 수정할 수 없습니다.');
+    return;
+  }
+  enableEditMode();
+};
+
+const handleDeleteClick = () => {
+  if (isDeleted.value) {
+    alert('이미 삭제된 쿠폰입니다.');
+    return;
+  }
+  deleteCoupon();
+};
 
 watch(
   () => props.selectedCoupon,
@@ -211,7 +252,6 @@ const saveCoupon = async () => {
 
     const requestData = formatDateWithTime.applyCouponDates({ ...editCouponData.value });
 
-    // 저장 로직 (예: API 호출)
     const response = await axios.patch(`https://learnsmate.shop/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
       requestData,
       {
@@ -222,12 +262,25 @@ const saveCoupon = async () => {
       }
     );
 
-    // 성공 시 화면 데이터 갱신
     Object.assign(props.selectedCoupon, response.data);
     isEditMode.value = false;
   } catch (error) {
-    alert("강사 쿠폰은 수정할 수 없습니다.");
-    console.error("edit fail", error.message);
+    if (error.response) {
+      if (error.response.status === 400) {
+        alert(error.response.data);
+        return;
+      } 
+      else if (error.response.status === 404) {
+        alert(error.response.data);
+        return;
+      }
+      else {
+        alert('직원 쿠폰은 수정할 수 없습니다.');
+        return;
+      }
+    } else {
+      alert('서버와의 통신 중 오류가 발생했습니다.');
+    }
   }
 };
 
@@ -243,11 +296,24 @@ const deleteCoupon = async () => {
     }
     );
     window.location.href = '/marketing/coupons'
-    console.log("delete success", response.data);
     alert("쿠폰이 삭제되었습니다.");
   } catch (error) {
-    alert("강사 쿠폰은 삭제할 수 없습니다.");
-    console.error("delete fail", error.message);
+    if (error.response) {
+      if (error.response.status === 400) {
+        alert(error.response.data);
+        return;
+      } 
+      else if (error.response.status === 404) {
+        alert(error.response.data);
+        return;
+      }
+      else {
+        alert('쿠폰 삭제 중 오류가 발생했습니다.');
+        return;
+      }
+    } else {
+      alert('서버와의 통신 중 오류가 발생했습니다.');
+    }
   }
 };
 
@@ -411,5 +477,44 @@ const deleteCoupon = async () => {
   padding-left: 5px;
     border: 1px solid #eaeaea;
     border-radius: 4px;
+}
+
+.deleted-coupon-banner {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 8px 16px;
+  border-radius: 4px;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.coupon-edit-button.disabled,
+.coupon-delete-button.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.coupon-edit-button.disabled:hover,
+.coupon-delete-button.disabled:hover {
+  background-color: #cccccc;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: #cccccc;
+}
+
+.coupon-detail-table-body .active-state {
+  font-weight: bold;
+}
+
+.coupon-detail-table-body .active-state.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 </style>

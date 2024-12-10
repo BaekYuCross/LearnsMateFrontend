@@ -52,9 +52,9 @@
                           {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
                       </span>
                   </div>
-                  <div class="coupon-clickable" @click="handleSort('activeState')">
+                  <div class="coupon-clickable" @click="handleSort('couponFlag')">
                       상태
-                      <span v-if="currentSortField === 'activeState'" class="coupon-sort-arrow">
+                      <span v-if="currentSortField === 'couponFlag'" class="coupon-sort-arrow">
                           {{ currentSortDirection === 'ASC' ? '↑' : '↓' }}
                       </span>
                   </div>
@@ -104,11 +104,14 @@
                     <div>{{ coupon.coupon_discount_rate }}</div>
                     <div>{{ coupon.coupon_category_name }}</div>
                     <div class="coupon-table-active-state-row">
-                    <div :class="{
-                      'active-state': true,
-                      'active': coupon.active_state,
-                      'inactive': !coupon.active_state
-                    }">{{ coupon.active_state ? '활성' : '비활성' }}</div>
+                      <div :class="{
+                        'active-state': true,
+                        'active': coupon.active_state && coupon.coupon_flag,
+                        'inactive': !coupon.active_state || !coupon.coupon_flag
+                      }">
+                        {{ (coupon.active_state && coupon.coupon_flag) ? '활성' : 
+                          (!coupon.coupon_flag ? '삭제' : '비활성') }}
+                      </div>
                     </div>
                     <div>{{ formatDate(coupon.coupon_start_date) }}</div>
                     <div>{{ formatDate(coupon.coupon_expire_date) }}</div>
@@ -340,7 +343,7 @@ const columns = {
   couponContents: "쿠폰 내용",
   couponDiscountRate: "쿠폰 할인율",
   couponCategoryName: "쿠폰 종류",
-  activeState: "상태",
+  couponFlag: "상태",
   couponStartDate: "시작일",
   couponExpireDate: "만료일",
   createdAt: "생성일",
@@ -351,11 +354,10 @@ const columns = {
 
 const handleExcelDownload = async () => {
   try {
-    
-    console.log('Current filters:', currentFilters.value);
     const filterData = isFiltered.value && currentFilters.value ? {
       couponName: currentFilters.value.coupon_name || null,
       couponContents: currentFilters.value.coupon_contents || null,
+      couponFlag: currentFilters.value.coupon_flag || null,
       activeState: currentFilters.value.active_state || null,
       startExpireDate: currentFilters.value.start_expire_date || null,
       endExpireDate: currentFilters.value.end_expire_date || null,
@@ -397,7 +399,6 @@ const handleExcelDownload = async () => {
       }
     }
 
-    // 파일 다운로드
     const blob = new Blob([response.data], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
@@ -419,16 +420,32 @@ const handleExcelDownload = async () => {
 
 // 정렬 처리를 위한 함수
 const handleSort = async (field) => {
+  const getBackendFieldName = (field) => {
+    switch(field) {
+      case 'couponCode': return 'coupon_code';
+      case 'couponName': return 'coupon_name';
+      case 'couponContents': return 'coupon_contents';
+      case 'couponDiscountRate': return 'coupon_discount_rate';
+      case 'couponCategoryName': return 'coupon_category_name';
+      case 'couponFlag': return 'coupon_flag';
+      case 'activeState': return 'active_state';
+      case 'couponStartDate': return 'coupon_start_date';
+      case 'couponExpireDate': return 'coupon_expire_date';
+      case 'createdAt': return 'created_at';
+      case 'updatedAt': return 'updated_at';
+      case 'adminName': return 'admin_name';
+      case 'tutorName': return 'tutor_name';
+      default: return field;
+    }
+  };
+  
   if (currentSortField.value === field) {
-    // 같은 필드를 다시 클릭하면 정렬 방향을 토글
     currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
   } else {
-    // 다른 필드를 클릭하면 해당 필드로 변경하고 DESC로 시작
     currentSortField.value = field;
     currentSortDirection.value = 'DESC';
   }
   
-  // 현재 필터 상태에 따라 적절한 API 호출
   if (isFiltered.value && currentFilters.value) {
     await applyFilters(currentFilters.value, false);
   } else {
@@ -472,7 +489,7 @@ const handleSort = async (field) => {
 .coupon-table {
   width: 100%;
   min-width: 1200px;
-  height: 100%; /* 570px에서 100%로 변경 */
+  height: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
 }
@@ -580,7 +597,6 @@ const handleSort = async (field) => {
   width: 0;
   opacity: 0;
   overflow: hidden;
-  /* margin-top: 40px; */
   border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -819,16 +835,19 @@ const handleSort = async (field) => {
   margin-top: auto;
 }
 
-/* active_state가 true일 때 */
-.coupon-table .coupon-table-row td.active-state.active {
+.coupon-table-row div.active-state.active {
   background-color: #dcfce7;
-  color: #166534; /* 활성일 때 글자색 */
+  color: #166534;
 }
 
-/* active_state가 false일 때 */
-.coupon-table .coupon-table-row td.active-state.inactive {
+.coupon-table-row div.active-state.inactive {
   background-color: #fee2e2;
-  color: #991b1b; /* 비활성일 때 글자색 */
+  color: #991b1b;
+}
+
+.coupon-table-row div.active-state.deleted {
+  background-color: #f3f4f6;
+  color: #6b7280;
 }
 
 .coupon-active-state {
@@ -848,13 +867,11 @@ const handleSort = async (field) => {
   width: 50px;
 }
 
-/* active_state가 true일 때 */
 .coupon-table-row div.active-state.active {
   background-color: #dcfce7;
   color: #166534; /* 활성일 때 글자색 */
 }
 
-/* active_state가 false일 때 */
 .coupon-table-row div.active-state.inactive {
   background-color: #fee2e2;
   color: #991b1b; /* 비활성일 때 글자색 */
