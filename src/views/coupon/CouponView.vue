@@ -399,7 +399,6 @@ const handleExcelDownload = async () => {
       }
     }
 
-    // 파일 다운로드
     const blob = new Blob([response.data], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
@@ -441,15 +440,12 @@ const handleSort = async (field) => {
   };
   
   if (currentSortField.value === field) {
-    // 같은 필드를 다시 클릭하면 정렬 방향을 토글
     currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
   } else {
-    // 다른 필드를 클릭하면 해당 필드로 변경하고 DESC로 시작
     currentSortField.value = field;
     currentSortDirection.value = 'DESC';
   }
   
-  // 현재 필터 상태에 따라 적절한 API 호출
   if (isFiltered.value && currentFilters.value) {
     await applyFilters(currentFilters.value, false);
   } else {
@@ -493,7 +489,7 @@ const handleSort = async (field) => {
 .coupon-table {
   width: 100%;
   min-width: 1200px;
-  height: 100%; /* 570px에서 100%로 변경 */
+  height: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
 }
@@ -601,7 +597,6 @@ const handleSort = async (field) => {
   width: 0;
   opacity: 0;
   overflow: hidden;
-  /* margin-top: 40px; */
   border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
