@@ -60,9 +60,11 @@ import axios from 'axios';
 import DeleteModule from '../modules/DeleteModule.vue';
 import ConfirmModule from '../modules/ConfirmModule.vue';
 
+
 const closeModal = () => {
   isOpen.value = false;
   emit('close');
+  window.location.href = '/marketing/campaign-template'; 
 };
 
 const props = defineProps({
@@ -129,7 +131,7 @@ const saveChanges = async () => {
     });
     isConfirmModalOpen.value = true;
     isEditMode.value = false;
-    fetchCampaignTemplate();
+    await fetchCampaignTemplate();
   } catch (error) {
     console.error('edit fail :', error);
   }
