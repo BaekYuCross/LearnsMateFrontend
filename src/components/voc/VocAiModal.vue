@@ -287,12 +287,12 @@ export default {
 
 .voc-ai-modal-summary-table th:nth-child(1),
 .voc-ai-modal-summary-table td:nth-child(1) {
-  width: 20%; /* 키워드 컬럼 */
+  width: 15%; /* 키워드 컬럼 */
 }
 
 .voc-ai-modal-summary-table th:nth-child(2),
 .voc-ai-modal-summary-table td:nth-child(2) {
-  width: 15%; /* 건수 컬럼 */
+  width: 10%; /* 건수 컬럼 */
 }
 
 .voc-ai-modal-summary-table th:nth-child(3),
@@ -318,7 +318,7 @@ export default {
 }
 
 .voc-ai-modal-summary-table td {
-  font-size: 12px;
+  font-size: 11px;
   text-align: left;
   word-break: break-all; /* 긴 텍스트를 여러 줄로 나누기 */
   white-space: normal; /* 줄바꿈 허용 */
