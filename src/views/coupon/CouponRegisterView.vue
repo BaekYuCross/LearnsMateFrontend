@@ -89,7 +89,7 @@
         <table class="coupon-target-lecture-table">
           <thead class="coupon-target-lecture-table-header">
             <tr>
-              <th><input type="checkbox" @change="toggleAllLectures"></th>
+              <th><input type="checkbox" ref="selectAllCheckbox" @change="toggleAllLectures"></th>
               <th>강의 코드</th>
               <th>강의 제목</th>
               <th>강의 카테고리</th>
@@ -194,7 +194,7 @@ const pageSize = 15; // 페이지당 항목 수
 const totalCount = ref(0);
 const isFiltered = ref(false);
 const currentFilters = ref(null);
-
+const selectAllCheckbox = ref(null);
 // displayedPages computed 속성 추가
 const displayedPages = computed(() => {
   const pages = [];
@@ -306,6 +306,14 @@ const applyFilters = async (filterData, resetPage = true) => {
   try {
     console.log('필터 적용 전:', filters.value);
     
+    // 선택된 강의 초기화 추가
+    selectedLectureIds.value = [];
+    couponData.value.selectedLectures = [];
+
+    // 전체 선택 체크박스 초기화
+    if (selectAllCheckbox.value) {
+      selectAllCheckbox.value.checked = false;
+    }
     // 빈 문자열을 null로 변환
     const formattedFilters = {
       lecture_title: filters.value.lecture_title || null,
@@ -342,7 +350,6 @@ const applyFilters = async (filterData, resetPage = true) => {
       lecture.value = response.data.content;
       totalCount.value = response.data.totalElements;
       totalPages.value = response.data.totalPages;
-
 
       console.log('페이지 정보:', {
         현재페이지: currentPage.value,
@@ -442,9 +449,51 @@ const toggleLecture = (lecture) => {
   couponData.value.selectedLectures = [...selectedLectureIds.value];
 };
 
-const toggleAllLectures = (event) => {
+const toggleAllLectures = async (event) => {
   if (event.target.checked) {
-    selectedLectureIds.value = [...lecture.value]; 
+    try {
+      // 현재 적용된 필터가 있는지 확인
+      if (isFiltered.value) {
+        const formattedFilters = {
+          lecture_title: filters.value.lecture_title || null,
+          tutor_name: filters.value.tutor_name || null,
+          min_lecture_price: filters.value.min_lecture_price || null,
+          max_lecture_price: filters.value.max_lecture_price || null
+        };
+
+        // 필터링된 모든 강의 가져오기
+        const response = await axios.post('https://learnsmate.shop/lecture/coupon-register/filter', 
+          formattedFilters,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            params: {
+              page: 0,  // 첫 페이지부터
+              size: totalCount.value  // 전체 개수만큼 가져오기
+            }
+          }
+        );
+        selectedLectureIds.value = response.data.content;
+      } else {
+        // 필터 없을 때는 전체 강의 목록 가져오기
+        const response = await axios.get('https://learnsmate.shop/lecture/list', {
+          withCredentials: true,
+          params: {
+            page: 0,
+            size: totalCount.value
+          },
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        selectedLectureIds.value = response.data.content;
+      }
+    } catch (error) {
+      console.error('전체 강의를 가져오는 중 오류 발생:', error);
+      selectedLectureIds.value = [];
+    }
   } else {
     selectedLectureIds.value = [];
   }
