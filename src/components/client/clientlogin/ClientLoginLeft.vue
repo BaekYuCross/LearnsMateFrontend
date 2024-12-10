@@ -117,19 +117,16 @@ const handleLogin = async () => {
   }
 };
 
-// 카카오 로그인 처리
 const handleKakaoLogin = () => {
   console.log("kakao login");
 };
 
-// 구글 로그인 처리
 const handleGoogleLogin = () => {
   console.log("google login");
 };
 </script>
 
 <style scoped>
-/* 스타일 그대로 유지 */
 .clientlogin-login-left {
   border-top: 8px solid #7671f4;
   width: 50%;
