@@ -104,11 +104,14 @@
                     <div>{{ coupon.coupon_discount_rate }}</div>
                     <div>{{ coupon.coupon_category_name }}</div>
                     <div class="coupon-table-active-state-row">
-                    <div :class="{
-                      'active-state': true,
-                      'active': coupon.coupon_flag,
-                      'inactive': !coupon.coupon_flag
-                    }">{{ coupon.coupon_flag ? '활성' : '비활성' }}</div>
+                      <div :class="{
+                        'active-state': true,
+                        'active': coupon.active_state && coupon.coupon_flag,
+                        'inactive': !coupon.active_state || !coupon.coupon_flag
+                      }">
+                        {{ (coupon.active_state && coupon.coupon_flag) ? '활성' : 
+                          (!coupon.coupon_flag ? '삭제' : '비활성') }}
+                      </div>
                     </div>
                     <div>{{ formatDate(coupon.coupon_start_date) }}</div>
                     <div>{{ formatDate(coupon.coupon_expire_date) }}</div>
@@ -355,6 +358,7 @@ const handleExcelDownload = async () => {
       couponName: currentFilters.value.coupon_name || null,
       couponContents: currentFilters.value.coupon_contents || null,
       couponFlag: currentFilters.value.coupon_flag || null,
+      activeState: currentFilters.value.active_state || null,
       startExpireDate: currentFilters.value.start_expire_date || null,
       endExpireDate: currentFilters.value.end_expire_date || null,
       startCreatedAt: currentFilters.value.start_created_at || null,
@@ -417,6 +421,25 @@ const handleExcelDownload = async () => {
 
 // 정렬 처리를 위한 함수
 const handleSort = async (field) => {
+  const getBackendFieldName = (field) => {
+    switch(field) {
+      case 'couponCode': return 'coupon_code';
+      case 'couponName': return 'coupon_name';
+      case 'couponContents': return 'coupon_contents';
+      case 'couponDiscountRate': return 'coupon_discount_rate';
+      case 'couponCategoryName': return 'coupon_category_name';
+      case 'couponFlag': return 'coupon_flag';
+      case 'activeState': return 'active_state';
+      case 'couponStartDate': return 'coupon_start_date';
+      case 'couponExpireDate': return 'coupon_expire_date';
+      case 'createdAt': return 'created_at';
+      case 'updatedAt': return 'updated_at';
+      case 'adminName': return 'admin_name';
+      case 'tutorName': return 'tutor_name';
+      default: return field;
+    }
+  };
+  
   if (currentSortField.value === field) {
     // 같은 필드를 다시 클릭하면 정렬 방향을 토글
     currentSortDirection.value = currentSortDirection.value === 'ASC' ? 'DESC' : 'ASC';
@@ -817,14 +840,19 @@ const handleSort = async (field) => {
   margin-top: auto;
 }
 
-.coupon-table .coupon-table-row td.active-state.active {
+.coupon-table-row div.active-state.active {
   background-color: #dcfce7;
-  color: #166534; /* 활성일 때 글자색 */
+  color: #166534;
 }
 
-.coupon-table .coupon-table-row td.active-state.inactive {
+.coupon-table-row div.active-state.inactive {
   background-color: #fee2e2;
-  color: #991b1b; /* 비활성일 때 글자색 */
+  color: #991b1b;
+}
+
+.coupon-table-row div.active-state.deleted {
+  background-color: #f3f4f6;
+  color: #6b7280;
 }
 
 .coupon-active-state {
