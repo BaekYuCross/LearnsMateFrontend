@@ -53,7 +53,7 @@
           </div>
           <div class="lecture-chart-container">
             <div class="total-count">
-                전체 인원: <span style="color:#005950 ;">{{ totalCount.toLocaleString() }}</span>명
+              총 선호 카테고리 수: <span style="color:#005950 ;">{{ totalCount.toLocaleString() }}</span>건
             </div>
             <canvas ref="chartCanvas"></canvas>
           </div>

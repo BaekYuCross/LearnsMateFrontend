@@ -45,13 +45,13 @@
 }
 
 .tutor-detail-container {
-  flex: 0.6;
+  flex: 0.4;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 20px;
   overflow-y: auto;
-  height: auto; 
+  height: 570px; 
 }
 
 .tutor-detail-header {
@@ -89,15 +89,24 @@ margin-top: 16px;
 }
 
 .tutor-info-item {
-display: flex;
-gap: 20px;
+  display: flex;
+  align-items: center; /* 가운데 정렬 */
+  justify-content: space-between; /* 좌우로 나뉘게 정렬 */
+  gap: 3px;
+  border-bottom: 1px dashed #eaeaea;
+  padding: 8px 0;
 }
 
+.tutor-detail-info {
+  font-size: 13px;
+}
 
 .tutor-label {
 color: #64748b;
 min-width: 100px;
 text-align: left;
+font-size: 13px;
+font-weight: bold;
 }
 
 .tutor-board-container {

@@ -1,21 +1,21 @@
 <template>
-  <div class="layout-container">
-    <div class="side-menu"><MemberSideMenu/></div>
-      <div class="main-content">
+  <div class="student-layout-container">
+    <div class="student-side-menu"><MemberSideMenu/></div>
+      <div class="student-main-content">
         <MemberFilter 
           type="student" 
           @search="handleSearch" 
           @reset="handleReset"
         />
           <div class="student-header-container" >
-            <div class="count">전체 학생 수 <span class="count-number">{{ formatCurrency(totalCount) }}</span>명</div>
-            <div class="button-group">
-              <div class="column-selector">
-                <button @click="toggleDropdown" class="dropdown-button">
+            <div class="student-count">전체 학생 수 <span class="student-count-number">{{ formatCurrency(totalCount) }}</span>명</div>
+            <div class="student-button-group">
+              <div class="student-column-selector">
+                <button @click="toggleDropdown" class="student-dropdown-button">
                   필요 컬럼 선택 ▼
                 </button>
-                <div v-show="isDropdownOpen" class="dropdown-menu">
-                  <div v-for="(label, key) in columns" :key="key" class="dropdown-item">
+                <div v-show="isDropdownOpen" class="student-dropdown-menu">
+                  <div v-for="(label, key) in columns" :key="key" class="student-dropdown-item">
                     <input 
                       type="checkbox"   
                       :value="key" 
@@ -37,8 +37,8 @@
           </div>
 
 
-          <div class="content-section">
-            <div class="table-container" :class="{ 'shrink': selectedStudent }">
+          <div class="student-content-section">
+            <div class="student-table-container" :class="{ 'shrink': selectedStudent }">
               <div class="student-board-container">
                 <div class="student-board-header">
                   <div v-if="selectedColumns.includes('memberCode')" 
@@ -200,59 +200,59 @@
               </div>
             </div>
 
-          <div v-if="selectedStudent && studentDetail" class="detail-container">
-            <div class="detail-header">
-              <h3>상세 정보</h3>
-              <button class="close-button" @click="closeStudentDetail">×</button>
+          <div v-if="selectedStudent && studentDetail" class="student-detail-container">
+            <div class="student-detail-header">
+              <h3>학생 상세 정보</h3>
+              <button class="student-close-button" @click="closeStudentDetail">×</button>
             </div>
-            <div class="detail-content">
-              <div class="info-grid">
-                <div class="info-row">
-                  <span class="label">이름</span>
-                  <span>{{ studentDetail.member_dto.member_name }}</span>
+            <div class="student-detail-content">
+              <div class="student-info-grid">
+                <div class="student-info-row">
+                  <span class="student-label">이름</span>
+                  <span class="student-detail-info">{{ studentDetail.member_dto.member_name }}</span>
                 </div>
-                <div class="info-row">
-                  <span class="label">이메일</span>
-                  <span>{{ studentDetail.member_dto.member_email }}</span>
+                <div class="student-info-row">
+                  <span class="student-label">이메일</span>
+                  <span class="student-detail-info">{{ studentDetail.member_dto.member_email }}</span>
                 </div>
-                <div class="info-row">
-                  <span class="label">연락처</span>
-                  <span>{{ studentDetail.member_dto.member_phone }}</span>
+                <div class="student-info-row">
+                  <span class="student-label">연락처</span>
+                  <span class="student-detail-info">{{ studentDetail.member_dto.member_phone }}</span>
                 </div>
-                <div class="info-row">
-                  <span class="label">생년월일</span>
-                  <span>{{ formatToDateTime(studentDetail.member_dto.member_birth) }}</span>
+                <div class="student-info-row">
+                  <span class="student-label">생년월일</span>
+                  <span class="student-detail-info">{{ formatToDateTime(studentDetail.member_dto.member_birth) }}</span>
                 </div>
-                <div class="info-row">
-                  <span class="label">주소</span>
-                  <span>{{ studentDetail.member_dto.member_address }}</span>
+                <div class="student-info-row">
+                  <span class="student-label">주소</span>
+                  <span class="student-detail-info">{{ studentDetail.member_dto.member_address }}</span>
                 </div>
               </div>
 
 
               <!-- 수강 진행 현황 -->
-              <div class="course-section">
-                <div class="course-header">
+              <div class="student-course-section">
+                <div class="student-course-header">
                   <h4>수강 진행 현황 ({{ studentDetail?.lecture_video_progress_dtolist?.length || 0 }})
-                  <button class="course-toggle-button" @click="toggleCourseSection">
+                  <button class="student-course-toggle-button" @click="toggleCourseSection">
                     {{ isCourseSectionVisible ? '&#9650;' : '&#9660;'  }}
                   </button>
                 </h4>
                 </div>
-                <div v-if="isCourseSectionVisible" class="course-list">
+                <div v-if="isCourseSectionVisible" class="student-course-list">
                   <div
                     v-for="lecture in studentDetail.lecture_video_progress_dtolist"
                     :key="lecture.lectureCode"
-                    class="course-item"
+                    class="student-course-item"
                   >
-                    <div class="course-title">{{ lecture.lectureTitle }}</div>
-                    <div class="progress-bar">
+                    <div class="student-course-title">{{ lecture.lectureTitle }}</div>
+                    <div class="student-progress-bar">
                       <div
-                        class="progress"
+                        class="student-progress"
                         :style="{ width: `${(lecture.completedVideos / lecture.totalVideos) * 100}%` }"
                       ></div>
                     </div>
-                    <div class="progress-text">
+                    <div class="student-progress-text">
                       {{ lecture.completedVideos }}/{{ lecture.totalVideos }}
                       ({{ Math.round((lecture.completedVideos / lecture.totalVideos) * 100) }}%)
                     </div>
@@ -261,38 +261,38 @@
               </div>
               
               <!-- 추천 강의 섹션 -->
-              <div class="recommended-section">
-                <div class="recommended-header">
+              <div class="student-recommended-section">
+                <div class="student-recommended-header">
                   <h4>추천 강의 ({{ studentDetail.recommended_lecture_list?.length || 0 }})
-                  <button class="recommended-toggle-button" @click="toggleRecommendedSection">
+                  <button class="student-recommended-toggle-button" @click="toggleRecommendedSection">
                     {{ isRecommendedSectionVisible ? '&#9650;' : '&#9660;' }}
                   </button></h4>
                 </div>
-                <div v-if="isRecommendedSectionVisible" class="recommended-list">
+                <div v-if="isRecommendedSectionVisible" class="student-recommended-list">
                   <div
                     v-for="lecture in studentDetail.recommended_lecture_list"
                     :key="lecture.lectureCode"
-                    class="recommended-item"
+                    class="student-recommended-item"
                   >
-                    <div class="recommended-content">
-                      <div class="lecture-header">
-                        <span class="lecture-title">{{ lecture.lectureTitle }}</span>
-                        <span :class="['lecture-level', lecture.lectureLevel.toLowerCase()]">
+                    <div class="student-recommended-content">
+                      <div class="student-lecture-header">
+                        <span class="student-lecture-title">{{ lecture.lectureTitle }}</span>
+                      </div>
+                      <div class="student-lecture-info">
+                        <div class="student-info-item">
+                          <span class="student-label">강의 가격</span>
+                          <span class="student-detail-info">{{ lecture.lecturePrice.toLocaleString() }}원</span>
+                        </div>
+                        <div class="student-info-item">
+                          <span class="student-label">조회수</span>
+                          <span class="student-detail-info">{{ lecture.lectureClickCount }}회</span>
+                        </div>
+                        <div class="student-info-item">
+                          <span class="student-label">등록일</span>
+                          <span class="student-detail-info">{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
+                          <span :class="['student-lecture-level', lecture.lectureLevel.toLowerCase()]">
                           {{ lecture.lectureLevel }}
                         </span>
-                      </div>
-                      <div class="lecture-info">
-                        <div class="info-item">
-                          <span class="label">강의 가격</span>
-                          <span>{{ lecture.lecturePrice.toLocaleString() }}원</span>
-                        </div>
-                        <div class="info-item">
-                          <span class="label">조회수</span>
-                          <span>{{ lecture.lectureClickCount }}회</span>
-                        </div>
-                        <div class="info-item">
-                          <span class="label">등록일</span>
-                          <span>{{ formatDate(lecture.createdAt).split('T')[0] }}</span>
                         </div>
                       </div>
                     </div>
@@ -301,23 +301,23 @@
               </div>
 
               <!-- 쿠폰 정보 -->
-              <div class="coupon-section">
+              <div class="student-coupon-section">
                 <h4>쿠폰 정보</h4>
-                <div class="coupon-list">
+                <div class="student-coupon-list">
                   <!-- 미사용 쿠폰 -->
-                  <div class="unused-coupons">
-                    <div class="subsection-header">
+                  <div class="student-unused-coupons">
+                    <div class="student-subsection-header">
                       <h5>미사용 쿠폰 ({{ studentDetail.unused_coupons_list?.length || 0 }})
-                        <button class="coupon-toggle-button" @click="toggleUnusedCoupons">
+                        <button class="student-coupon-toggle-button" @click="toggleUnusedCoupons">
                           {{ isUnusedCouponsVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
-                    <div v-if="isUnusedCouponsVisible" class="coupon-grid">
+                    <div v-if="isUnusedCouponsVisible" class="student-coupon-grid">
                       <div v-for="coupon in studentDetail.unused_coupons_list" 
                           :key="coupon.couponIssuanceCode" 
-                          class="coupon-item">
-                        <div class="coupon-detail">
+                          class="student-coupon-item">
+                        <div class="student-coupon-detail">
                           <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
                           <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
                           <div>사용 상태: {{ coupon.couponUseStatus ? '사용' : '미사용' }}</div>
@@ -328,19 +328,19 @@
                   </div>
 
                   <!-- 사용완료 쿠폰 -->
-                  <div class="used-coupons">
-                    <div class="subsection-header">
+                  <div class="student-used-coupons">
+                    <div class="student-subsection-header">
                       <h5>사용완료 쿠폰 ({{ studentDetail.used_coupons_list?.length || 0 }})
-                        <button class="coupon-toggle-button" @click="toggleUsedCoupons">
+                        <button class="student-coupon-toggle-button" @click="toggleUsedCoupons">
                           {{ isUsedCouponsVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
-                    <div v-if="isUsedCouponsVisible" class="coupon-grid">
+                    <div v-if="isUsedCouponsVisible" class="student-coupon-grid">
                       <div v-for="coupon in studentDetail.used_coupons_list" 
                           :key="coupon.couponIssuanceCode" 
-                          class="coupon-item">
-                        <div class="coupon-detail">
+                          class="student-coupon-item">
+                        <div class="student-coupon-detail">
                           <div>발급 코드: {{ coupon.couponIssuanceCode }}</div>
                           <div>발급일: {{ formatDate(coupon.couponIssueDate) }}</div>
                           <div>사용일: {{ formatDate(coupon.couponUseDate) }}</div>
@@ -353,32 +353,32 @@
                 </div>
 
                 <!-- VOC 내역 -->
-                <div class="voc-section">
+                <div class="student-voc-section">
                   <h4>문의 내역</h4>
-                  <div class="voc-list">
+                  <div class="student-voc-list">
                   <!-- 미답변 문의 -->
-                  <div class="unanswered">
-                    <div class="subsection-header">
+                  <div class="student-unanswered">
+                    <div class="student-subsection-header">
                       <h5>미답변 문의 ({{ studentDetail.unanswered_vocby_member_list?.length || 0 }})
-                        <button class="voc-toggle-button" @click="toggleUnansweredVoc">
+                        <button class="student-voc-toggle-button" @click="toggleUnansweredVoc">
                           {{ isUnansweredVocVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
-                    <div v-if="isUnansweredVocVisible" class="voc-grid">
+                    <div v-if="isUnansweredVocVisible" class="student-voc-grid">
                       <div v-for="voc in studentDetail.unanswered_vocby_member_list" 
                           :key="voc.vocCode" 
-                          class="voc-item">
-                        <div class="voc-detail">
-                          <div class="voc-header">
+                          class="student-voc-item">
+                        <div class="student-voc-detail">
+                          <div class="student-voc-header">
                             <span>문의 코드: {{ voc.vocCode }}</span>
                             <span>작성일: {{ formatDate(voc.createdAt) }}</span>
                           </div>
-                          <div class="voc-body">
-                            <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
-                            <div class="voc-content">{{ voc.vocContent }}</div>
+                          <div class="student-voc-body">
+                            <div class="student-voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                            <div class="student-voc-content">{{ voc.vocContent }}</div>
                           </div>
-                          <div class="voc-footer">
+                          <div class="student-voc-footer">
                             <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
                             <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
                           </div>
@@ -388,28 +388,28 @@
                   </div>
 
                   <!-- 답변완료 문의 -->
-                  <div class="answered">
-                    <div class="subsection-header">
+                  <div class="student-answered">
+                    <div class="student-subsection-header">
                       <h5>답변완료 문의 ({{ studentDetail.answered_vocby_member_list?.length || 0 }})
-                        <button class="voc-toggle-button" @click="toggleAnsweredVoc">
+                        <button class="student-voc-toggle-button" @click="toggleAnsweredVoc">
                           {{ isAnsweredVocVisible ? '▲' : '▼' }}
                         </button>
                       </h5>
                     </div>
-                    <div v-if="isAnsweredVocVisible" class="voc-grid">
+                    <div v-if="isAnsweredVocVisible" class="student-voc-grid">
                       <div v-for="voc in studentDetail.answered_vocby_member_list" 
                           :key="voc.vocCode" 
-                          class="voc-item">
-                        <div class="voc-detail">
-                          <div class="voc-header">
+                          class="student-voc-item">
+                        <div class="student-voc-detail">
+                          <div class="student-voc-header">
                             <span>문의 코드: {{ voc.vocCode }}</span>
                             <span>작성일: {{ formatDate(voc.createdAt) }}</span>
                           </div>
-                          <div class="voc-body">
-                            <div class="voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
-                            <div class="voc-content">{{ voc.vocContent }}</div>
+                          <div class="student-voc-body">
+                            <div class="student-voc-category">카테고리: {{ getVocCategory(voc.vocCategoryCode) }}</div>
+                            <div class="student-voc-content">{{ voc.vocContent }}</div>
                           </div>
-                          <div class="voc-footer">
+                          <div class="student-voc-footer">
                             <div>답변 상태: {{ voc.vocAnswerStatus ? '답변완료' : '미답변' }}</div>
                             <div>만족도: {{ voc.vocAnswerSatisfaction || '-' }}</div>
                           </div>

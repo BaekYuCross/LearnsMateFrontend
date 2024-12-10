@@ -1,9 +1,9 @@
-.layout-container {
+.student-layout-container {
   display: flex;
   min-height: 100vh;
 }
 
-.side-menu {
+.student-side-menu {
   left: 0;
   top: 0;
   bottom: 0;
@@ -12,7 +12,7 @@
 }
 
 
-.main-content {
+.student-main-content {
   flex: 1;
   margin-left: 160px;
   padding: 20px;
@@ -26,14 +26,14 @@
   padding-bottom: 10px;
 }
 
-.content-section {
+.student-content-section {
   display: flex;
   gap: 20px;
   margin-top: 10px;
   width: 100%;
 }
 
-.table-container {
+.student-table-container {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -44,7 +44,7 @@
   overflow-x: auto;
 }
 
-.close-button {
+.student-close-button {
   background: none;
   border: none;
   font-size: 20px;
@@ -52,12 +52,12 @@
   cursor: pointer;
 }
 
-.close-button:hover {
+.student-close-button:hover {
   color: #333;
 }
 
-.detail-container {
-  flex: 0.6;     
+.student-detail-container {
+  flex: 0.4;     
   background: white;
   border-radius: 8px; 
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -66,7 +66,7 @@
   overflow-y: auto;
 }
 
-.detail-header {
+.student-detail-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -81,44 +81,37 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
-  padding: 12px;
-  text-align: center;
-  border-bottom: 1px solid #e2e8f0;
-  white-space: nowrap;
-  font-size: 11px;
-}
-
-th {
-  font-size: 13px;
-}
-
-.selected {
+.student-selected {
   background-color: #e2e8f0;
 }
 
-.info-grid {
+.student-info-grid {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.info-item {
+.student-info-item {
   display: flex;
-  gap: 20px;
+  gap: 10px;
 }
 
-.info-row {
+.student-info-row {
   display: flex;
-  align-items: left; 
-  gap: 3px; 
-  margin-bottom: 3px; 
+  align-items: center; /* 가운데 정렬 */
+  justify-content: space-between; /* 좌우로 나뉘게 정렬 */
+  gap: 3px;
+  /* margin-bottom: 3px; */
+  border-bottom: 1px dashed #eaeaea;
+  padding: 8px 0;
 }
 
-.label {
+.student-label {
   color: #64748b;
   min-width: 100px;
+  font-size: 13px;
   text-align: left;
+  font-weight: bold;
 }
 .student-board-container {
   background-color: #ffffff;
@@ -131,6 +124,12 @@ th {
   overflow-x: auto;
   min-width: 0;
   width: 100%;
+}
+
+.student-board-container table {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: collapse;
 }
 
 .student-board-header {
@@ -240,18 +239,18 @@ th {
   cursor: not-allowed;
 }
 
-.count {
+.student-count {
   font-size: 17px;
   font-weight: bold;
   color: #333;
 }
 
-.count-number {
+.student-count-number {
   color: #006D5C;
   font-weight: bold;
 }
 
-.button-group {
+.student-button-group {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -272,24 +271,24 @@ th {
   border-radius: 5px;
 }
 
-.excel-button img {
+.student-excel-button img {
   width: 16px;
   height: 16px;
 }
 
-.detail-content h3 {
+.student-detail-content h3 {
   margin-bottom: 20px;
   color: #333;
 }
 
-.info-section, .course-section, .voc-section, .coupon-section {
+.student-info-section, .student-course-section, .student-voc-section, .student-coupon-section {
   border-top: 1px solid #e2e8f0;
   padding: 20px 0;
   margin-top: 20px;
   padding-top: 20px;
  }
  
- .info-section h4, .course-section h4, .voc-section h4, .coupon-section h4 {
+ .student-info-section h4, .student-course-section h4, .student-voc-section h4, .student-coupon-section h4 {
   font-size: 15px;
   color: #333;
   margin-bottom: 15px;
@@ -297,26 +296,26 @@ th {
   
  }
  
- .course-list {
+ .student-course-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
  }
  
- .course-item {
+ .student-course-item {
   padding: 15px;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #eee;
  }
  
- .course-title {
+ .student-course-title {
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 10px;
  }
  
- .progress-bar {
+ .student-progress-bar {
   width: 100%;
   height: 8px;
   background: #e9ecef;
@@ -325,37 +324,37 @@ th {
   overflow: hidden;
  }
  
- .progress {
+ .student-progress {
   height: 100%;
   background: #00bfa5;  
   transition: width 0.3s ease;
  }
  
- .progress-text {
+ .student-progress-text {
   margin-top: 5px;
   font-size: 12px;
   color: #666;
   text-align: right;
  }
  
-.recommended-section {
+.student-recommended-section {
   padding: 20px 0;
 }
 
-.recommended-section h4 {
+.student-recommended-section h4 {
   font-size: 15px;
   color: #333;
   margin-bottom: 15px;
   font-weight: bold;
 }
 
-.recommended-list {
+.student-recommended-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.recommended-item {
+.student-recommended-item {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 15px;
   background: #f8f9fa;
@@ -364,92 +363,98 @@ th {
 
 }
 
-.recommended-item:hover {
+.student-recommended-item:hover {
   cursor: pointer;
 }
 
-.recommended-content {
+.student-recommended-content {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.lecture-header {
+.student-lecture-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
 
-.lecture-title {
+.student-lecture-title {
   font-size: 14px;
   font-weight: 500;
   color: #333;
   flex: 1;
 }
 
-.lecture-level {
-  padding: 4px 8px;
+.student-lecture-level {
+  padding: 0px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 500;
   text-transform: lowercase;
+  margin-left: auto;
 }
 
-.lecture-level.beginner {
+.student-lecture-level.beginner {
   background-color: #e3f2fd;
   color: #1976d2;
 }
 
-.lecture-level.intermediate {
+.student-lecture-level.intermediate {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
 
-.lecture-level.advanced {
+.student-lecture-level.advanced {
   background-color: #fce4ec;
   color: #c2185b;
 }
 
-.lecture-info {
+.student-lecture-info {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* grid-template-columns: repeat(3, 1fr); */
   gap: 10px;
+  overflow: hidden;
   margin-top: 5px;
 }
 
-.lecture-info .info-item {
+.student-lecture-info .info-item {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.lecture-info .label {
+.student-lecture-info .label {
   font-size: 11px;
   color: #666;
 }
 
-.lecture-info .info-item span:last-child {
+.student-lecture-info .info-item span{
   font-size: 13px;
   color: #333;
 }
-.course-header {
+
+.student-detail-info {
+  font-size: 13px;
+}
+.student-course-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
  
 }
 
-.recommended-header {
+.student-recommended-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.recommended-toggle-button,
-.course-toggle-button,
-.coupon-toggle-button,
-.voc-toggle-button {
+.student-recommended-toggle-button,
+.student-course-toggle-button,
+.student-coupon-toggle-button,
+.student-voc-toggle-button {
   background: none;
   border: none;
   font-size: 16px; 
@@ -462,32 +467,32 @@ th {
   position: relative; 
 }
 
-.recommended-toggle-button span,
-.course-toggle-button span {
+.student-recommended-toggle-button span,
+.student-course-toggle-button span {
   line-height: 1; 
   vertical-align: middle;
   display: inline-block;
 }
 
- .voc-list {
+ .student-voc-list {
   display: flex;
   flex-direction: column;
   gap: 20px;
  }
  
- .voc-grid {
+ .student-voc-grid {
   display: grid;
   gap: 10px;
  }
  
- .voc-item {
+ .student-voc-item {
   padding: 15px;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #eee;
  }
  
- .voc-header {
+ .student-voc-header {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
@@ -495,18 +500,18 @@ th {
   margin-bottom: 10px;
  }
  
- .voc-content {
+ .student-voc-content {
   padding: 10px 0;
   font-size: 13px;
  }
  
- .voc-category {
+ .student-voc-category {
   font-size: 12px;
   color: #666;
   margin-bottom: 5px;
  }
  
- .voc-footer {
+ .student-voc-footer {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
@@ -516,26 +521,26 @@ th {
   border-top: 1px solid #eee;
  }
  
- .coupon-list,
- .voc-list {
+ .student-coupon-list,
+ .student-voc-list {
   display: grid;
   gap: 20px;
  }
  
- .coupon-grid {
+ .student-coupon-grid {
   display: grid;
   gap: 10px;
   margin-top: 10px;
  }
  
- .coupon-item {
+ .student-coupon-item {
   padding: 15px;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #eee;
  }
  
- .coupon-detail {
+ .student-coupon-detail {
   font-size: 12px;
   display: flex;
   flex-direction: column;
@@ -549,11 +554,8 @@ th {
   font-weight: 500;
  }
  
- .detail-content {
-  padding-right: 20px;
- }
  
- .column-selector {
+ .student-column-selector {
   cursor: pointer;
   font-size: 14px;
   display: flex;
@@ -562,7 +564,7 @@ th {
   border-radius: 5px;
 }
 
-.dropdown-button {
+.student-dropdown-button {
   background-color: #ffffff;
   color: #000000;
   border: 0.5px solid #d5d5d5;
@@ -572,7 +574,7 @@ th {
   cursor: pointer;
 }
 
-.dropdown-menu {
+.student-dropdown-menu {
   position: absolute;
   background-color: white;
   border: 1px solid #ddd;
@@ -584,12 +586,12 @@ th {
   border-radius: 4px;
 }
 
-.dropdown-menu input[type="checkbox"] {
+.student-dropdown-menu input[type="checkbox"] {
   outline: none;
   accent-color: #005950; 
 }
 
-.dropdown-item {
+.student-dropdown-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -597,7 +599,7 @@ th {
   
 }
 
-.dropdown-item label {
+.student-dropdown-item label {
   font-size: 12px;
   color: #333;
   cursor: pointer;
