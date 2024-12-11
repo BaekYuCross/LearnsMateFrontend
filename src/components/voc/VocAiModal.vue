@@ -79,10 +79,19 @@ export default {
   },
   created() {
     const today = new Date();
-    while (today.getDay() !== 1) {
-      today.setDate(today.getDate() - 1);
-    }
-    this.selectedDate = today.toISOString().split('T')[0];
+    // 한국 시간대로 강제 설정
+    const kstDate = new Date(today.getTime() + (9 * 60 * 60 * 1000));
+    const mondayDate = new Date(kstDate);
+    const currentDay = kstDate.getDay();
+    
+    const daysUntilMonday = currentDay === 0 ? 6 : currentDay - 1;
+    mondayDate.setDate(kstDate.getDate() - daysUntilMonday);
+    
+    console.log("현재 요일(0=일요일):", currentDay);
+    console.log("월요일까지 뺄 일수:", daysUntilMonday);
+    
+    this.selectedDate = mondayDate.toISOString().split('T')[0];
+    console.log("선택된 날짜:", this.selectedDate);
     this.fetchAnalysisData(this.selectedDate);
   },
   watch: {
