@@ -18,7 +18,6 @@
             placeholder="E-mail 입력"
             class="login-input email-input"
           />
-          <!-- 인증 버튼 -->
           <button type="button" class="auth-button" @click="sendAuthCode">인증</button>
         </div>
       </div>
@@ -34,7 +33,6 @@
         />
       </div>
 
-      <!-- 새 비밀번호 입력창 (인증 성공 시 표시) -->
       <div class="input-group" v-if="isAuthVerified">
         <label for="new-password" class="input-label">새 비밀번호</label>
         <input
