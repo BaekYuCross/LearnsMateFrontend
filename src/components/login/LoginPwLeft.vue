@@ -44,13 +44,10 @@
         />
       </div>
 
-      <!-- 다음 버튼 (인증 성공 시 완료 버튼으로 변경) -->
       <button type="submit" class="login-button">
         {{ isAuthVerified ? '완료' : '다음' }}
       </button>
-      <!-- 메시지 출력 -->
       <p v-if="message" :class="messageClass">{{ message }}</p>
-      <!-- 로그인하기 버튼 -->
       <button type="button" class="login-pw" @click="$emit('show-login')">로그인하기</button>
     </form>
   </div>
