@@ -292,7 +292,10 @@ const applyFilters = async (filterData) => {
     );
 
     // response 처리
-    coupons.value = response.data.content;
+    coupons.value = response.data.content.map(item => ({
+      ...item,
+      mask_name: maskingUtils.maskName(item.student_name)
+    }));
     totalCount.value = response.data.totalElements;
     totalPages.value = response.data.totalPages;
   } catch (error) {

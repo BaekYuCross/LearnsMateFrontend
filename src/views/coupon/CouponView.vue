@@ -300,11 +300,19 @@ const applyFilters = async (filters, resetPage = true) => {
       console.log("데이터는: ", response.data);
 
     if (response.data && response.data.content) {
-      coupon.value = response.data.content;
+
+      coupon.value = response.data.content.map(item => ({
+        ...item,
+        mask_name: maskingUtils.maskName(item.tutor_name)
+      }));
       totalCount.value = response.data.totalElements || 0;
       totalPages.value = response.data.totalPages || 1;
     } else {
-      coupon.value = response.data;
+      
+      coupon.value = response.data.map(item => ({
+        ...item,
+        mask_name: maskingUtils.maskName(item.tutor_name)
+      }));
       totalCount.value = response.data.length || 0;
       totalPages.value = Math.ceil((response.data.length || 0) / pageSize);
     }
