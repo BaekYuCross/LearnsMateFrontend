@@ -1,0 +1,316 @@
+.payment-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+  }
+  
+  .payment-content-container {
+    flex: 1;
+    padding: 20px;
+    margin-left: 160px;
+    margin-top: 50px;
+  }
+  
+  .payment-content-body {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .payment-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .payment-count {
+    flex: 1;
+    font-size: 17px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .payment-length {
+    color: #005950;
+  }
+  
+  .payment-button-group {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .payment-excel-button {
+    background: #005950;
+  padding: 3px 5px;
+  margin-bottom: 3px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 3px;
+  }
+
+  .payment-revenue-button {
+    background: #005950;
+    padding: 3px 5px;
+    margin-bottom: 3px;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 3px;
+  }
+  
+  .payment-revenue-button img {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .payment-board-container {
+    background-color: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 570px;
+  flex: 1;
+  overflow-x: auto;
+  transition: flex 0.5s ease;
+  }
+  
+  .payment-board-header {
+    display: grid;
+    grid-template-columns: 0.3fr 0.6fr 0.8fr 0.8fr 0.7fr 0.5fr 0.4fr 0.4fr 0.4fr 0.4fr 0.8fr 0.5fr 0.05fr;
+    padding: 7px 14px;
+    background-color: #f9f9f9;
+    font-size: 12px;
+    font-weight: bold;
+    color: #595656;
+    text-align: center;
+    border-bottom: 1px solid #eaeaea;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .payment-board-header div {
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .payment-board-body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: calc(100% - 35px);
+  }
+  
+  .payment-board-row {
+    display: grid;
+    grid-template-columns: 0.3fr 0.6fr 0.8fr 0.8fr 0.7fr 0.5fr 0.4fr 0.4fr 0.4fr 0.4fr 0.8fr 0.5fr;
+    padding: 10px 14px;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 11px;
+    color: #333333;
+    text-align: center;
+    align-items: center;
+    background-color: #ffffff;
+    cursor: pointer;
+  }
+  
+  .payment-board-row:hover {
+
+    background-color: #f4f4f4;
+  }
+  
+  .payment-board-row.selected {
+    background-color: #E2E8F0;
+  }
+  
+  .payment-detail-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 570px;
+    flex: 0.4;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  .payment-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .payment-detail-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .payment-detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .payment-detail-item {
+    display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eaeaea;
+  gap: 15px;
+  }
+  
+  .payment-detail-item .label {
+    font-weight: bold;
+    color: #666;
+    flex: 0 0 100px; /* 고정 너비 설정 */
+  min-width: 100px; /* 최소 너비 설정 */
+  }
+  
+  .payment-detail-item .value {
+    color: #333;
+    word-break: break-all; /* 긴 텍스트 줄바꿈 */
+    white-space: pre-wrap; /* 줄바꿈 보존 */
+    text-align: left; /* 왼쪽 정렬 */
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+  }
+  
+  .close-button:hover {
+    color: #333;
+  }
+  
+  .payment-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 15px;
+    padding: 10px 0;
+  }
+  
+  .payment-page-button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .payment-page-button.active {
+    font-weight: bold;
+    color: #005950;
+  }
+  
+  .payment-page-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .payment-prev-button,
+  .payment-next-button {
+    color: #005950;
+  }
+  
+  .payment-column-selector {
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
+  }
+  
+  .payment-dropdown-button {
+    background-color: #ffffff;
+    color: #000000;
+    border: 0.5px solid #d5d5d5;
+    padding: 3px 5px;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  .payment-dropdown-menu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    margin-top: 279px;
+    z-index: 10;
+    width: 110px;
+    border-radius: 4px;
+  }
+
+  .payment-dropdown-menu input[type="checkbox"] {
+    outline: none;
+    accent-color: #005950; 
+  }
+  
+  .payment-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .payment-dropdown-item label {
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+  }
+  
+ 
+  .payment-excel-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .payment-board-row-lecturecode,
+.payment-board-row-title {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.payment-clickable {
+  cursor: pointer;
+}
+
+.payment-clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.payment-sort-arrow {
+  display: inline-block;
+  margin-left: 4px;
+}

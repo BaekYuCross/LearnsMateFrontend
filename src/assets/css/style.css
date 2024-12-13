@@ -1,0 +1,61 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    background-color: #F4F4F4;
+    font-family:'Pretendard-Light';
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+button {
+  font-family:'Pretendard-Light';
+}
+
+input:focus {
+  outline: none;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2); 
+    border-radius: 10px; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #005950;
+    border-radius: 10px; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00423b;
+}
+
+.clientvoc-app-container {
+    background-color: #f9f9f9;
+    height: 100vh;
+    overflow-y: auto; 
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar-thumb {
+    background-color: #7671f4; 
+    border-radius: 10px;
+    height: 10px; 
+  }
+  
+  .clientvoc-app-container::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    border-radius: 10px;
+  }
+  
