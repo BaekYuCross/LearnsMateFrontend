@@ -1,6 +1,6 @@
 # 👨‍🏫 LearnsMate 
 
-<img src="learnsmate_readmeimages/01.프로젝트개요/LearnsBuddy-logo.png">
+<img src="https://github.com/LearnsMate/LearnsMateBackend/blob/develop/learnsmate_readmeimages/01.%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EA%B0%9C%EC%9A%94/LearnsBuddy-logo.png">
 
 ##  [➡️  Dev5Oops - LearnsMate PPT 자료 바로가기 ](https://drive.google.com/file/d/1uhkju48AMsp_QFIqk1KVPPqWoqpMuqw1/view?usp=sharing)
 
