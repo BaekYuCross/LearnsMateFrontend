@@ -71,7 +71,7 @@ const handleSubmit = async() => {
   // console.log(localStorage.getItem('clientInfo'));
   // console.log(JSON.parse(localStorage.getItem('clientInfo')).memberCode);
 
-  const response = await axios.post('https://learnsmate.shop/voc', {
+  const response = await axios.post('http://localhost:5000/voc', {
       voc_content: inquiryContent.value,
       voc_category_code: categoryCodeMap[selectedCategory.value],
       // vocAnswerStatus: false,  

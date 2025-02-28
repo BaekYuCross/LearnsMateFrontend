@@ -304,7 +304,7 @@ const currentSortDirection = ref('DESC');
 // fetchVOCList 함수 수정
 const fetchVOCList = async (filters = {}) => {
   try {
-    const response = await axios.get('https://learnsmate.shop/voc/list/sort', {
+    const response = await axios.get('http://localhost:5000/voc/list/sort', {
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -378,7 +378,7 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = processedData;
 
     const response = await axios.post(
-      `https://learnsmate.shop/voc/filter/sort?page=0&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+      `http://localhost:5000/voc/filter/sort?page=0&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
       camelToSnake(processedData),
       {
         withCredentials: true,
@@ -417,7 +417,7 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `https://learnsmate.shop/voc/filter/sort?page=${currentPage.value - 1}&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
+        `http://localhost:5000/voc/filter/sort?page=${currentPage.value - 1}&size=${pageSize}&sortField=${currentSortField.value}&sortDirection=${currentSortDirection.value}`,
         camelToSnake(lastFilterData.value),
         { withCredentials: true }
       );
@@ -435,7 +435,7 @@ const changePage = async (newPage) => {
 const handleExcelDownload = async () => {
   try {
     const response = await axios.post(
-      'https://learnsmate.shop/voc/excel/download',
+      'http://localhost:5000/voc/excel/download',
       isFiltered.value && lastFilterData.value ? camelToSnake(lastFilterData.value) : {},
       {
         responseType: 'blob',
@@ -500,7 +500,7 @@ const showVOCDetail = async (voc) => {
     cancelEditing();
   }
     try {
-      const response = await axios.get(`https://learnsmate.shop/voc/${voc.voc_code}`);
+      const response = await axios.get(`http://localhost:5000/voc/${voc.voc_code}`);
       selectedVOC.value = response.data;
       showSingleVoc();
       console.log('Selected VOC:', selectedVOC.value);
@@ -555,14 +555,14 @@ const confirmAction = () => {
 const submitRegisterAnswer = async () => {
   try {
     const response = await axios.post(
-      `https://learnsmate.shop/voc-answer/register`,
+      `http://localhost:5000/voc-answer/register`,
       {
         voc_answer_content: editAnswerContent.value,
         admin_code: loginState.adminCode,
         voc_code: selectedVOC.value.voc_code,
       }
     );
-    const vocResponse = await axios.get(`https://learnsmate.shop/voc/${selectedVOC.value.voc_code}`);
+    const vocResponse = await axios.get(`http://localhost:5000/voc/${selectedVOC.value.voc_code}`);
     const updatedVOC = vocResponse.data;
     selectedVOC.value = updatedVOC;
     const vocIndex = vocList.value.findIndex(voc => voc.voc_code === updatedVOC.voc_code);
@@ -584,7 +584,7 @@ const submitEditAnswer = async () => {
   try {
     const vocAnswerCode = selectedVOC.value.voc_answer_code;
     const response = await axios.patch(
-      `https://learnsmate.shop/voc-answer/edit/${vocAnswerCode}`,
+      `http://localhost:5000/voc-answer/edit/${vocAnswerCode}`,
       { voc_answer_content: editAnswerContent.value }, {
         withCredentials: true,
     });
@@ -604,7 +604,7 @@ const openAiModal = async () => {
   document.body.style.overflow = 'hidden';
 
   try {
-    const response = await axios.get('https://learnsmate.shop/voc/ai/current-week');
+    const response = await axios.get('http://localhost:5000/voc/ai/current-week');
     aiData.value = response.data || [];
   } catch (error) {
     console.error('AI 요약 데이터 로드 실패:', error);

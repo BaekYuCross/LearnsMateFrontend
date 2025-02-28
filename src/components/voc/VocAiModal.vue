@@ -132,7 +132,7 @@ export default {
     // YYYY-MM-DD 형식으로 변환
     const prevWeekDate = selectedDate.toISOString().split('T')[0];
 
-    const response = await axios.get("https://learnsmate.shop/voc/ai/by-date", {
+    const response = await axios.get("http://localhost:5000/voc/ai/by-date", {
       params: { date: prevWeekDate }
     });
 

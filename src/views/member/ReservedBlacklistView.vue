@@ -249,7 +249,7 @@ const groupedReports = computed(() => {
 
 const fetchReservedList = async () => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/sort`, {
+    const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved/sort`, {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -288,7 +288,7 @@ const changePage = async (newPage) => {
   currentPage.value = newPage;
   
   if (isFiltered.value && lastFilterData.value) {
-    const response = await axios.post(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/filter`,lastFilterData.value, {
+    const response = await axios.post(`http://localhost:5000/blacklist/${memberType.value}/reserved/filter`,lastFilterData.value, {
       withCredentials: true,  
       params: {
         page: currentPage.value - 1,
@@ -338,7 +338,7 @@ const showDetail = async (blacklist) => {
   } else {
     selectedReserved.value = blacklist;
     try {
-      const response = await axios.get(`https://learnsmate.shop/blacklist/${memberType.value}/reserved/${blacklist.member_code}`, {
+      const response = await axios.get(`http://localhost:5000/blacklist/${memberType.value}/reserved/${blacklist.member_code}`, {
           withCredentials: true
         }
       );
@@ -385,7 +385,7 @@ const closeConfirmModal = () => {
 const confirmRegister = async () => {
   try {
     await axios.post(
-      `https://learnsmate.shop/blacklist/${selectedReserved.value.member_code}`,{ blackReason: blacklistReason.value }, {
+      `http://localhost:5000/blacklist/${selectedReserved.value.member_code}`,{ blackReason: blacklistReason.value }, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

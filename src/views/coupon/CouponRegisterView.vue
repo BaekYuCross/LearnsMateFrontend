@@ -219,7 +219,7 @@ const displayedPages = computed(() => {
 // fetchLectures 함수 수정
 const fetchLectures = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/lecture/list', {
+    const response = await axios.get('http://localhost:5000/lecture/list', {
       withCredentials: true,
       params: {
         page: currentPage.value - 1,
@@ -334,7 +334,7 @@ const applyFilters = async (filterData, resetPage = true) => {
 
     const page = currentPage.value - 1;
 
-    const response = await axios.post('https://learnsmate.shop/lecture/coupon-register/filter', formattedFilters,
+    const response = await axios.post('http://localhost:5000/lecture/coupon-register/filter', formattedFilters,
     {
       withCredentials: true,
       headers: {
@@ -384,7 +384,7 @@ const registerCoupon = async () => {
       lectureCode: couponData.value.selectedLectures.map(lecture => lecture.lecture_code), // lecture_code 배열로 전송
     };
 
-    const response = await axios.post('https://learnsmate.shop/coupon/admin/register', requestData, {
+    const response = await axios.post('http://localhost:5000/coupon/admin/register', requestData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json'
@@ -462,7 +462,7 @@ const toggleAllLectures = async (event) => {
         };
 
         // 필터링된 모든 강의 가져오기
-        const response = await axios.post('https://learnsmate.shop/lecture/coupon-register/filter', 
+        const response = await axios.post('http://localhost:5000/lecture/coupon-register/filter', 
           formattedFilters,
           {
             withCredentials: true,
@@ -478,7 +478,7 @@ const toggleAllLectures = async (event) => {
         selectedLectureIds.value = response.data.content;
       } else {
         // 필터 없을 때는 전체 강의 목록 가져오기
-        const response = await axios.get('https://learnsmate.shop/lecture/list', {
+        const response = await axios.get('http://localhost:5000/lecture/list', {
           withCredentials: true,
           params: {
             page: 0,

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const logout = async (loginHistoryCode) => {
     try {
-        await axios.post('https://learnsmate.shop/client/exit', {
+        await axios.post('http://localhost:5000/client/exit', {
             login_history_code: loginHistoryCode,
         });
     } catch (error) {
@@ -26,7 +26,7 @@ const checkLoginAndTime = async () => {
         
         if (diffHours >= 3) {
             try {
-                await axios.post('https://learnsmate.shop/client/logout', {
+                await axios.post('http://localhost:5000/client/logout', {
                     loginHistoryCode: clientInfo.loginHistoryCode,
                 });
             } catch (error) {

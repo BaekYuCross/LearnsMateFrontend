@@ -182,9 +182,9 @@
     try {
       let response;
       if (useFilter) {
-        response = await axios.post('https://learnsmate.shop/lecture/monthly-counts/filter', filter.value);
+        response = await axios.post('http://localhost:5000/lecture/monthly-counts/filter', filter.value);
       } else {
-        response = await axios.get('https://learnsmate.shop/lecture/monthly-counts');
+        response = await axios.get('http://localhost:5000/lecture/monthly-counts');
       }
       monthlyData.value = response.data;
       await createChart();

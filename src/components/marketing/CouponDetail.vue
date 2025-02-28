@@ -254,7 +254,7 @@ const saveCoupon = async () => {
 
     const requestData = formatDateWithTime.applyCouponDates({ ...editCouponData.value });
 
-    const response = await axios.patch(`https://learnsmate.shop/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
+    const response = await axios.patch(`http://localhost:5000/coupon/admin/edit/${props.selectedCoupon.coupon_code}`,
       requestData,
       {
         withCredentials: true,
@@ -289,7 +289,7 @@ const saveCoupon = async () => {
 // 쿠폰 삭제 (예: 삭제 로직 추가)
 const deleteCoupon = async () => {
   try {
-    const response = await axios.patch(`https://learnsmate.shop/coupon/admin/delete/${props.selectedCoupon.coupon_code}`,
+    const response = await axios.patch(`http://localhost:5000/coupon/admin/delete/${props.selectedCoupon.coupon_code}`,
       {}, {
       withCredentials: true,
       headers: {

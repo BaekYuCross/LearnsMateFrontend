@@ -484,7 +484,7 @@ const statsFilter = ref({
 // fetchLectureList 수정
 const fetchLectureList = async (filters = {}) => {
   try {
-    const response = await axios.get('https://learnsmate.shop/lecture/list/sort', {
+    const response = await axios.get('http://localhost:5000/lecture/list/sort', {
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -516,7 +516,7 @@ const handleSearch = async (filterData) => {
     isFiltered.value = true;
     lastFilterData.value = filterData;
     const response = await axios.post(
-      `https://learnsmate.shop/lecture/filter/sort`, 
+      `http://localhost:5000/lecture/filter/sort`, 
       camelToSnake(filterData),
       {
         params: {
@@ -568,7 +568,7 @@ const handleExcelDownload = async () => {
   try {
     const config = {
       method: 'POST',
-      url: 'https://learnsmate.shop/lecture/excel/download',
+      url: 'http://localhost:5000/lecture/excel/download',
       responseType: 'blob',
       data: {
         selectedColumns: camelToSnake(selectedColumns.value),
@@ -639,7 +639,7 @@ const showLectureDetail = async (lecture) => {
     closeLectureDetail()
   } else {
     try {
-      const response = await axios.get(`https://learnsmate.shop/lecture/${lecture.lecture_code}`)
+      const response = await axios.get(`http://localhost:5000/lecture/${lecture.lecture_code}`)
       selectedLecture.value = response.data
       console.log(response.data);
       showSingleLecture()
@@ -822,7 +822,7 @@ const createStatsCharts = (data) => {
 const fetchLectureStats = async () => {
   try {
     const response = await axios.post(
-      `https://learnsmate.shop/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
+      `http://localhost:5000/lecture/${selectedLecture.value.lecture_code}/stats/filter`,
       camelToSnake(statsFilter.value)
     );
 

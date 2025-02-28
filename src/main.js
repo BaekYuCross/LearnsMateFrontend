@@ -8,7 +8,7 @@ import axios from 'axios';
 // Axios 기본 설정
 axios.defaults.withCredentials = true;
 axios.defaults.headers['Content-Type'] = 'application/json; charset=UTF-8';
-axios.defaults.baseURL = 'https://learnsmate.shop';
+axios.defaults.baseURL = 'http://localhost:5000';
 
 // Axios 요청 인터셉터 설정
 axios.interceptors.request.use(

@@ -417,7 +417,7 @@ const updateTemplate = async () => {
 
 const fetchTemplates = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/campaign-template/list', {
+    const response = await axios.get('http://localhost:5000/campaign-template/list', {
       withCredentials: true,
     });
     templates.value = response.data;
@@ -471,7 +471,7 @@ const handleTargetUserFileChange = async (event) => {
   formData.append("file", file);
   if (file) {
     try {
-      const response = await axios.post("https://learnsmate.shop/member/excel/upload/target-student", formData, {
+      const response = await axios.post("http://localhost:5000/member/excel/upload/target-student", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -494,7 +494,7 @@ const handleCouponFileChange = async (event) => {
   formData.append("file", file);
   if (file) {
     try {
-      const response = await axios.post("https://learnsmate.shop/coupon/excel/upload/target-coupon", formData, {
+      const response = await axios.post("http://localhost:5000/coupon/excel/upload/target-coupon", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
@@ -545,7 +545,7 @@ const registerCampaign = async () => {
     admin_code: userCode,
   };
   try {
-    await axios.post('https://learnsmate.shop/campaign/register', payload, {
+    await axios.post('http://localhost:5000/campaign/register', payload, {
       withCredentials:true,
       headers: { 'Content-Type': 'application/json' },
     });

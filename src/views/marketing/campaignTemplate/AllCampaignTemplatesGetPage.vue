@@ -160,7 +160,7 @@ const currentSortDirection = ref('DESC');
 
 const fetchCampaignTemplates = async () => {
  try {
-   const response = await axios.get('https://learnsmate.shop/campaign-template/list/sort', {
+   const response = await axios.get('http://localhost:5000/campaign-template/list/sort', {
      withCredentials: true,
      params: {
        sortField: currentSortField.value,
@@ -224,7 +224,7 @@ const fetchCampaignTemplates = async () => {
       const config = {
         method: 'POST',
         withCredentials: true,
-        url: 'https://learnsmate.shop/campaign-template/excel/download/campaign-templates',
+        url: 'http://localhost:5000/campaign-template/excel/download/campaign-templates',
         responseType: 'blob',
         data: {
           selectedColumns: camelToSnake(selectedColumns.value),
@@ -286,7 +286,7 @@ const fetchCampaignTemplates = async () => {
   lastFilterData.value = preparedFilters;
   try {
     const response = await axios.post(
-      'https://learnsmate.shop/campaign-template/filter/sort',
+      'http://localhost:5000/campaign-template/filter/sort',
       camelToSnake(preparedFilters),
       {
         withCredentials: true,

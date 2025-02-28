@@ -248,7 +248,7 @@ const columns = ref({
 
   const fetchIssueCouponList = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/issue-coupon/all-issued-coupons2/sort', {
+    const response = await axios.get('http://localhost:5000/issue-coupon/all-issued-coupons2/sort', {
       withCredentials: true,
       params: {
         page: currentPage.value - 1,
@@ -279,7 +279,7 @@ const applyFilters = async (filterData) => {
     currentPage.value = 1;
 
     const response = await axios.post(
-      `https://learnsmate.shop/issue-coupon/filters2/sort`,
+      `http://localhost:5000/issue-coupon/filters2/sort`,
       camelToSnake(filterData),
       {
         params: {
@@ -323,7 +323,7 @@ const changePage = async (newPage) => {
 
     if (isFiltered.value && lastFilterData.value) {
       const response = await axios.post(
-        `https://learnsmate.shop/issue-coupon/filters2/sort`,
+        `http://localhost:5000/issue-coupon/filters2/sort`,
         camelToSnake(lastFilterData.value),
         {
           params: {
@@ -354,7 +354,7 @@ const handleExcelDownload = async () => {
    } : { selectedColumns: selectedColumns.value };
 
    const response = await axios.post(
-     'https://learnsmate.shop/issue-coupon/excel/download',
+     'http://localhost:5000/issue-coupon/excel/download',
      filterDto,
      { responseType: 'blob' }
    );

@@ -401,7 +401,7 @@ const selectedColumns = ref(Object.keys(columns.value));
 // fetchPaymentList 수정
 const fetchPaymentList = async (filters = {}) => {
   try {
-    const response = await axios.get(`https://learnsmate.shop/payments/sort`, {
+    const response = await axios.get(`http://localhost:5000/payments/sort`, {
       params: {
         ...filters,
         page: currentPage.value - 1,
@@ -451,7 +451,7 @@ const handleSearch = async (filterData) => {
     lastFilterData.value = processedData;
 
     console.log('Request Data:', {
-      url: `https://learnsmate.shop/payments/filter/sort`,
+      url: `http://localhost:5000/payments/filter/sort`,
       params: {
         page: currentPage.value - 1,
         size: pageSize,
@@ -462,7 +462,7 @@ const handleSearch = async (filterData) => {
     });
 
     const response = await axios.post(
-      `https://learnsmate.shop/payments/filter/sort`,
+      `http://localhost:5000/payments/filter/sort`,
       camelToSnake(processedData),
       {
         params: {
@@ -505,7 +505,7 @@ const handleReset = () => {
   try {
     const config = {
       method: 'POST',
-      url: 'https://learnsmate.shop/payments/excel/download',
+      url: 'http://localhost:5000/payments/excel/download',
       responseType: 'blob',
       data: {
         selected_columns: selectedColumns.value,
@@ -590,7 +590,7 @@ const showPaymentDetail = async (payment) => {
     try {
       console.log('Requesting payment details for code:', payment.payment_code);
       const response = await axios.get(
-        `https://learnsmate.shop/payments/${payment.payment_code}`
+        `http://localhost:5000/payments/${payment.payment_code}`
       );
       
       if (response.data) {
@@ -621,7 +621,7 @@ const changePage = async (newPage) => {
 
   if (isFiltered.value && lastFilterData.value) {
     const response = await axios.post(
-      `https://learnsmate.shop/payments/filter/sort`, // 엔드포인트 수정
+      `http://localhost:5000/payments/filter/sort`, // 엔드포인트 수정
       camelToSnake(lastFilterData.value),
       {
         params: {

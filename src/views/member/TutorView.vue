@@ -288,7 +288,7 @@ const formatCurrency = (value) => {
 // 전체 강사 목록
 const fetchTutors = async () => {
   try {
-    const response = await axios.get('https://learnsmate.shop/member/tutors', {
+    const response = await axios.get('http://localhost:5000/member/tutors', {
       withCredentials: true, 
       params: {
         page: currentPage.value - 1,
@@ -329,7 +329,7 @@ const handleExcelDownload = async() => {
   try{
     const config = {
       method: 'POST',
-      url: 'https://learnsmate.shop/member/excel/download/tutor',
+      url: 'http://localhost:5000/member/excel/download/tutor',
       responseType: 'blob',
       withCredentials: true, 
       headers: {
@@ -477,7 +477,7 @@ const showDetail = async (tutor) => {
     tutorDetail.value = null;
   } else {
     try {
-      const response = await axios.get(`https://learnsmate.shop/member/tutor/${tutor.memberCode}`);
+      const response = await axios.get(`http://localhost:5000/member/tutor/${tutor.memberCode}`);
       tutorDetail.value = response.data;
       // 상세 정보는 마스킹하지 않은 원본 데이터 사용
       selectedTutor.value = {
@@ -529,7 +529,7 @@ const fetchSortedTutors = async () => {
     if (isFiltered.value && lastFilterData.value) {
       // 필터링된 상태면 필터링 정렬 API 호출
       const response = await axios.post(
-        'https://learnsmate.shop/member/filter/tutor/sort', 
+        'http://localhost:5000/member/filter/tutor/sort', 
         lastFilterData.value,  // 필터 데이터는 body로
         {
           withCredentials: true,
@@ -549,7 +549,7 @@ const fetchSortedTutors = async () => {
     } else {
       // 필터링되지 않은 상태면 일반 정렬 API 호출
       const response = await axios.get(
-        'https://learnsmate.shop/member/tutors/sort', 
+        'http://localhost:5000/member/tutors/sort', 
         {
           withCredentials: true,
           params: {
